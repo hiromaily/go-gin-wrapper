@@ -1,0 +1,18 @@
+#local , docker, staging, production
+environment = "local"
+
+[server]
+host = "localhost"
+port = 9999
+
+[mysql]
+host = "localhost"
+port = 3306
+dbname = "hiromaily"
+user = "hiromaily"
+pass = "12345678"
+
+[aws]
+access_key = "AKIAIBHB72VATR7DIYOQ"
+secret_key = "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"
+region = "ap-northeast-1"
