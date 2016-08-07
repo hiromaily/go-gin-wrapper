@@ -1,0 +1,42 @@
+#local, heroku, docker, staging, production
+environment = "docker"
+
+[server]
+host = "docker.hiromaily.com"
+port = 9999
+referer = "http://docker.hiromaily.com:9999"
+
+[server.log]
+level = 1
+path = "/var/log/goweb/ginserver.log"
+
+[proxy]
+enable = true
+host = "172.18.0.1"
+#host = "proxy-server"
+
+[api]
+header = "X-Custom-Header-Gin"
+key = "key12345"
+only_ajax = true
+
+[mysql]
+host = "mysql-server"
+port = 3306
+dbname = "hiromaily"
+user = "hiromaily"
+pass = "12345678"
+
+[redis]
+host = "redis-server"
+port = 6379
+pass = "password"
+session = true
+
+[aws]
+access_key = "XXXXXXXXXXXX"
+secret_key = "XXXXXXXXXXXX"
+region = "ap-northeast-1"
+
+[profile]
+enable = false

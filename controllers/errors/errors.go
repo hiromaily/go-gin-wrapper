@@ -6,12 +6,12 @@ import (
 	"net/http"
 )
 
-//404 Error
+//404 Error [GET]
 func Error404Action(c *gin.Context) {
 	//Param
 
 	//View
-	c.HTML(http.StatusOK, "errors/error.tmpl", gin.H{
+	c.HTML(http.StatusNotFound, "errors/error.tmpl", gin.H{
 		"message": "404 errors",
 	})
 }
@@ -21,7 +21,7 @@ func Error405Action(c *gin.Context) {
 	//Param
 
 	//View
-	c.HTML(http.StatusOK, "errors/error.tmpl", gin.H{
+	c.HTML(http.StatusMethodNotAllowed, "errors/error.tmpl", gin.H{
 		"message": "405 errors",
 	})
 }

@@ -14,13 +14,35 @@ var tomlFileName string = "./configs/settings.toml"
 type Config struct {
 	Environment string
 	Server      ServerConfig
+	Proxy       ProxyConfig
+	Api         ApiConfig
 	MySQL       MySQLConfig
+	Redis       RedisConfig
 	Aws         AwsConfig
+	Profile     ProfileConfig
 }
 
 type ServerConfig struct {
-	Host string `toml:"host"`
-	Port int    `toml:"port"`
+	Host    string    `toml:"host"`
+	Port    int       `toml:"port"`
+	Referer string    `toml:"referer"`
+	Log     LogConfig `toml:"log"`
+}
+
+type LogConfig struct {
+	Level uint8  `toml:"level"`
+	Path  string `toml:"path"`
+}
+
+type ProxyConfig struct {
+	Enable bool   `toml:"enable"`
+	Host   string `toml:"host"`
+}
+
+type ApiConfig struct {
+	Header string `toml:"header"`
+	Key    string `toml:"key"`
+	Ajax   bool   `toml:"only_ajax"`
 }
 
 type MySQLConfig struct {
@@ -31,10 +53,21 @@ type MySQLConfig struct {
 	Pass   string `toml:"pass"`
 }
 
+type RedisConfig struct {
+	Host    string `toml:"host"`
+	Port    uint16 `toml:"port"`
+	Pass    string `toml:"pass"`
+	Session bool   `toml:"session"`
+}
+
 type AwsConfig struct {
 	AccessKey string `toml:"access_key"`
 	SecretKey string `toml:"secret_key"`
 	Region    string `toml:"region"`
+}
+
+type ProfileConfig struct {
+	Enable bool `toml:"enable"`
 }
 
 //check validation of config
@@ -42,7 +75,7 @@ func validateConfig(conf *Config, md *toml.MetaData) error {
 	//for protection when debugging on non production environment
 	var errStrings []string
 
-	//新規追加したtomlのkeyをチェック(通常は通らないが、初期項目追加時用)
+	//Check added new items on toml
 	if !md.IsDefined("environment") {
 		errStrings = append(errStrings, "environment")
 	}

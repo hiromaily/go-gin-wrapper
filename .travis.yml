@@ -1,0 +1,20 @@
+language: go
+sudo: false
+go:
+  - tip
+
+services:
+  - mysql
+  - redis-server
+
+script:
+  - go fmt ./...
+  - go vet $(go list ./... | grep -v /vendor/)
+  - go test -v cmd/ginserver/*.go -f ../../configs/travis.toml
+
+before_install:
+  - go get github.com/tools/godep
+
+branches:
+  only:
+    - master

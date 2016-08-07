@@ -4,8 +4,6 @@ import (
 	"time"
 )
 
-//const msyqlDatetimeFormat = "2006-01-02 15:04:05"
-
 type Invoices struct {
 	InvoiceId uint32     `column:"invoice_id"`
 	UserId    uint16     `column:"user_id"`

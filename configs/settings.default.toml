@@ -1,0 +1,41 @@
+#local, heroku, docker, staging, production
+environment = "local"
+
+[server]
+host = "localhost"
+port = 9999
+referer = "http://localhost"
+
+[server.log]
+level = 1
+path = "/var/log/goweb/ginserver.log"
+
+[proxy]
+enable = false
+host = "127.0.0.1"
+
+[api]
+header = "X-Custom-Header-Gin"
+key = "key12345"
+only_ajax = true
+
+[mysql]
+host = "localhost"
+port = 3306
+dbname = "testdb"
+user = "testuser"
+pass = "12345678"
+
+[redis]
+host = "localhost"
+port = 6379
+pass = ""
+session = false
+
+[aws]
+access_key = "XXXXXXXXXXXX"
+secret_key = "XXXXXXXXXXXX"
+region = "ap-northeast-1"
+
+[profile]
+enable = false

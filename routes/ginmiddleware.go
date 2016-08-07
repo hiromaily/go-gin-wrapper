@@ -1,0 +1,285 @@
+package routes
+
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+	conf "github.com/hiromaily/go-gin-wrapper/configs"
+	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
+	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
+	lg "github.com/hiromaily/golibs/log"
+	"net/http"
+	"strings"
+)
+
+//TODO: it's not finished yet.
+func CheckHttpRefererAndCSRF() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		//Referer
+		url := hh.GetUrl(c)
+		lg.Debugf("url: %s", url)
+		//get referer data mapping table using url (map[string])
+		if refUrl, ok := RefererUrls[url]; ok {
+			//Check Referer
+			if !hh.IsRefererHostValid(c, refUrl) {
+				c.Next()
+				return
+			}
+		}
+
+		//CSRF
+		sess.IsTokenSessionValid(c, c.PostForm("gintoken"))
+		c.Next()
+	}
+}
+
+//Check Http Referer.
+//TODO: it's not checked yet if it work well or not.
+func CheckHttpReferer() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		url := hh.GetUrl(c)
+		lg.Debugf("url: %s", url)
+		//get referer data mapping table using url (map[string])
+		if refUrl, ok := RefererUrls[url]; ok {
+			//Check Referer
+			hh.IsRefererHostValid(c, refUrl)
+		}
+		c.Next()
+	}
+}
+
+//TODO: it's not finished yet.
+func CheckCSRF() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		sess.IsTokenSessionValid(c, c.PostForm("gintoken"))
+		c.Next()
+	}
+}
+
+//Check Http Header for Ajax request. (For REST)
+func CheckHttpHeader() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		apiConf := conf.GetConfInstance().Api
+
+		lg.Debugf("[Request Header]\n%#v\n", c.Request.Header)
+		lg.Debugf("[Request Form]\n%#v\n", c.Request.Form)
+		lg.Debugf("[Request Body]\n%#v\n", c.Request.Body)
+
+		lg.Debugf("c.ClientIP() %s", c.ClientIP())
+
+		//IsAjax := c.Request.Header.Get("X-Requested-With")
+		//lg.Debugf("[X-Requested-With] %s", IsAjax)
+
+		//IsKey := c.Request.Header.Get("X-Custom-Header-Gin")
+		//lg.Debugf("[X-Custom-Header-Gin] %s", IsKey)
+
+		IsKey := c.Request.Header.Get(apiConf.Header)
+		lg.Debugf("[%s] %s", apiConf.Header, IsKey)
+
+		IsContentType := c.Request.Header.Get("Content-Type")
+		lg.Debugf("[Content-Type] %s", IsContentType)
+
+		//check
+		//if IsXHR(c) || IsKey != "key" || IsContentType != "application/json" {
+		//if IsXHR(c) && IsKey != "key" {
+		if (apiConf.Ajax && !IsXHR(c)) || IsKey != apiConf.Key {
+			//error
+			c.AbortWithStatus(400)
+			return
+		}
+
+		//Context Meta Data
+		//SetMetaData(c)
+
+		c.Next()
+	}
+}
+
+//Update user session expire.
+//TODO:When session has already started, update session expired
+func UpdateUserSession() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if bRet, uid := sess.IsLogin(c); bRet {
+			sess.SetUserSession(c, uid)
+		}
+		c.Next()
+	}
+}
+
+//Set Meta Data
+func SetMetaData() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		//Context Meta Data
+		//http.Header{
+		// "Referer":[]string{"http://localhost:9999/"},
+		// "Accept-Language":[]string{"ja,en-US;q=0.8,en;q=0.6,de;q=0.4,nl;q=0.2"},
+		// "X-Frame-Options":[]string{"deny"},
+		// "Content-Security-Policy":[]string{"default-src 'none'"},
+		// "X-Xss-Protection":[]string{"1, mode=block"},
+		// "Connection":[]string{"keep-alive"},
+		// "Accept":[]string{"application/json, text/javascript, */*; q=0.01"},
+		// "User-Agent":[]string{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36"},
+		// "X-Content-Type-Options":[]string{"nosniff"},
+		// "X-Requested-With":[]string{"XMLHttpRequest"},
+		// "X-Custom-Header-Gin":[]string{"key"},
+		// "Content-Type":[]string{"application/x-www-form-urlencoded"},
+		// "Accept-Encoding":[]string{"gzip, deflate, sdch"}}
+
+		//IP check
+		lg.Debugf("c.ClientIP() %s", c.ClientIP())
+
+		//Ajax
+		if IsXHR(c) {
+			c.Set("ajax", "1")
+		} else {
+			c.Set("ajax", "0")
+		}
+
+		//Response Data
+		if IsAcceptHeaderJson(c) {
+			c.Set("responseData", "json")
+		} else {
+			c.Set("responseData", "html")
+		}
+
+		//Requested Data
+		if IsContentTypeJson(c) {
+			c.Set("requestData", "json")
+		} else {
+			c.Set("requestData", "data")
+		}
+
+		//User Agent
+		c.Set("userAgent", GetUserAgent(c))
+
+		//Language
+		c.Set("language", GetLanguage(c))
+
+		c.Next()
+	}
+}
+
+//After request, handle aborted code or 500 error.
+func GlobalRecover() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		//TODO:log can't work well in this func.
+		defer func(c *gin.Context) {
+			fmt.Println("[GlobalRecover] defer func()")
+			var errMsg string
+			if c.IsAborted() {
+				fmt.Println("[GlobalRecover] c.IsAborted() is true")
+				if c.Errors != nil {
+					errMsg = c.Errors.Last().Err.Error()
+				}
+
+				if IsXHR(c) {
+					c.JSON(c.Writer.Status(), gin.H{
+						"code": fmt.Sprintf("%d", c.Writer.Status()),
+						//"error": c.Errors.Last().Err.Error(), //it caused error because of nil of objct
+						"error": errMsg,
+					})
+				} else {
+					c.HTML(c.Writer.Status(), "errors/error.tmpl", gin.H{
+						"code":  fmt.Sprintf("%d", c.Writer.Status()),
+						"error": errMsg,
+					})
+				}
+			}
+			//*
+			if rec := recover(); rec != nil {
+				fmt.Printf("[GlobalRecover] recover() is not nil:\n %v", rec)
+				//TODO:How should response data be decided whether html or json?
+				//TODO:Ajax or not doesn't matter to response. HTTP header of Accept may be better.
+				//TODO:How precise should I follow specifications of HTTP header.
+
+				if IsXHR(c) {
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"code":  "500",
+						"error": rec,
+					})
+				} else {
+					c.HTML(http.StatusInternalServerError, "errors/error.tmpl", gin.H{
+						"code":  "500",
+						"error": rec,
+					})
+				}
+			}
+		}(c)
+
+		c.Next()
+		//Next is [Main gin Recovery]
+	}
+}
+
+//Reject specific IP.
+//TODO: it's not fixed yet.
+//TODO: it reject all without reverse　proxy ip address.
+func RejectSpecificIp() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ip := c.ClientIP()
+		//TODO:check registered IP address to reject
+		//proxy
+		if conf.GetConfInstance().Proxy.Enable {
+			if conf.GetConfInstance().Proxy.Host != ip {
+				c.AbortWithStatus(403)
+				return
+			}
+		}
+		//if ip != "127.0.0.1" {
+		//	c.AbortWithStatus(403)
+		//}
+		c.Next()
+	}
+}
+
+//Reject non HTTPS access.
+//TODO: it's not fixed yet.
+func RejectNonHTTPS() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		//TODO:check protocol of url
+		//if strings.Index(c.url, "https://") == -1 {
+		//	c.AbortWithStatus(403)
+		//}
+		c.Next()
+	}
+}
+
+//Is this request Ajax or not
+func IsXHR(c *gin.Context) bool {
+	return strings.ToLower(c.Request.Header.Get("X-Requested-With")) == "xmlhttprequest"
+}
+
+//Is this request to require JSON or not
+func IsAcceptHeaderJson(c *gin.Context) bool {
+	accept := strings.ToLower(c.Request.Header.Get("Accept"))
+	return strings.Index(accept, "application/json") != -1
+}
+
+//Is this request including JSON as parameter or not
+func IsContentTypeJson(c *gin.Context) bool {
+	accept := strings.ToLower(c.Request.Header.Get("Content-Type"))
+	return strings.Index(accept, "application/json") != -1
+}
+
+//TODO:Get User Agent
+func GetUserAgent(c *gin.Context) string {
+	// "User-Agent":[]string{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36
+	// (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36"},
+	tmpUserAgent := c.Request.Header.Get("User-Agent")
+	return tmpUserAgent
+}
+
+//Get Language As Top priority
+func GetLanguage(c *gin.Context) string {
+	// "Accept-Language":[]string{"ja,en-US;q=0.8,en;q=0.6,de;q=0.4,nl;q=0.2"},
+	tmpLanguage := c.Request.Header.Get("Accept-Language")
+	if tmpLanguage != "" {
+		return strings.Split(tmpLanguage, ",")[0]
+	}
+	return ""
+}
+
+//Check Referer
+
+//Check Token For CSRF
+
+//Judge loged in or not.

@@ -1,0 +1,41 @@
+#local, heroku, docker, staging, production
+environment = "heroku"
+
+[server]
+host = "ginserver.herokuapp.com"
+port = 5000
+referer = "https://ginserver.herokuapp.com"
+
+[server.log]
+level = 1
+path = "/var/log/goweb/ginserver.log"
+
+[proxy]
+enable = false
+host = "127.0.0.1"
+
+[api]
+header = "X-Custom-Header-Gin"
+key = "key12345"
+only_ajax = true
+
+[mysql]
+host = "us-cdbr-iron-east-04.cleardb.net"
+port = 3306
+dbname = "heroku_53533e2ad9f9475"
+user = "bc19f40b56274b"
+pass = "cfee2ebd"
+
+[redis]
+host = "ec2-54-197-242-4.compute-1.amazonaws.com"
+port = 9769
+pass = "p7nkpdqindrp4o145oveqpet6ut"
+session = true
+
+[aws]
+access_key = "XXXXXXXXXXXX"
+secret_key = "XXXXXXXXXXXX"
+region = "ap-northeast-1"
+
+[profile]
+enable = false
