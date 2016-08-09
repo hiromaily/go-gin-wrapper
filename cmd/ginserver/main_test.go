@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	lg "github.com/hiromaily/golibs/log"
 	//u "github.com/hiromaily/golibs/utils"
@@ -14,11 +13,6 @@ import (
 	"os"
 	"testing"
 	"time"
-)
-
-var (
-	benchFlg = flag.Int("bc", 0, "Normal Test or Bench Test")
-	//tomlPath = flag.String("f", "", "Toml file path")
 )
 
 var r *gin.Engine
@@ -94,24 +88,26 @@ func setHttpHeaders(req *http.Request, headers []map[string]string) {
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Test Framework
+//-----------------------------------------------------------------------------
+
 func setup() {
 	lg.InitializeLog(lg.INFO_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB_TEST]", "/var/log/go/test.log")
 
-	if *benchFlg == 0 {
-	}
+	//TODO:Create test database and test data.
 
 	//Server On
 	r = SetHTTPServer(1, "../../")
 }
 
 func teardown() {
-	if *benchFlg == 0 {
-	}
+	//TODO:Drop test database and test data.
 }
 
 // Initialize
 func TestMain(m *testing.M) {
-	flag.Parse()
+	//flag.Parse()
 
 	setup()
 

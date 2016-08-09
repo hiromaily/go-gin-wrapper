@@ -1,0 +1,259 @@
+{{define "components/nav_side.tmpl"}}
+      <nav class="navbar-default navbar-side" role="navigation">
+        <div class="sidebar-collapse">
+          <ul class="nav" id="main-menu">
+            <li>
+              <div class="user-img-div">
+                <img src="assets/img/user.png" class="img-thumbnail" />
+                <div class="inner-text">Jhon Deo Alex
+                  <br />
+                  <small>Last Login : 2 Weeks Ago </small>
+                </div>
+              </div>
+            </li>
+            <li>
+              <a class="active-menu" href="/">
+                <i class="fa fa-dashboard "></i>TOP Page
+              </a>
+            </li>
+            <li>
+              <a href="/news">
+                <i class="fa fa-dashboard "></i>News Page
+              </a>
+            </li>
+            <li>
+              <a href="/login">
+                <i class="fa fa-dashboard "></i>Login Page
+              </a>
+            </li>
+            <li>
+              <a href="/logout" data-post="1" data-method="post">
+                <i class="fa fa-sign-in "></i>Logout
+              </a>
+            </li>
+            <li>
+              <a href="/logout" data-ajax="1" data-method="put">
+                <i class="fa fa-sign-in "></i>Logout(ajax)
+              </a>
+            </li>
+            <li>
+              <a href="/pricing">
+                <i class="fa fa-square-o "></i>After Login Page
+              </a>
+            </li>
+            <li>
+              <a href="/admin/">
+                <i class="fa fa-square-o "></i>Admin Page
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fa fa-yelp "></i>Ajax Request
+                <span class="fa arrow"></span>
+              </a>
+              <ul class="nav nav-second-level">
+                <li>
+                  <a href="/api/users" data-ajax="1" data-method="get">
+                    <i class="fa fa-coffee"></i>Get User List
+                  </a>
+                </li>
+                <li>
+                  <a href="/api/users" data-ajax="1" data-method="post" data-contype="form">
+                    <i class="fa fa-flash "></i>POST Register user
+                  </a>
+                </li>
+                <li>
+                  <a href="/api/users/1" data-ajax="1" data-method="get">
+                    <i class="fa fa-key "></i>Get User 1
+                  </a>
+                </li>
+                <li>
+                  <a href="/api/users/2" data-ajax="1" data-method="put" data-contype="json">
+                    <i class="fa fa-send "></i>Put Update User 1
+                  </a>
+                </li>
+                <li>
+                  <a href="/api/users/47" data-ajax="1" data-method="delete">
+                    <i class="fa fa-recycle "></i>Delete User 5
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fa fa-desktop "></i>NEWS API
+                <span class="fa arrow"></span>
+              </a>
+              <ul class="nav nav-second-level">
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/home.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - home
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/opinion.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - opinion
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/world.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - world
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/national.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - national
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/politics.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - politics
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/business.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - business
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/technology.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - technology
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/science.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - science
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/health.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - health
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/arts.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - arts
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/fashion.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - fashion
+                  </a>
+                </li>
+                <li>
+                  <a href="https://api.nytimes.com/svc/topstories/v2/travel.json" data-ajax="2">
+                    <i class="fa fa-toggle-on"></i>V2 Stories - travel
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fa fa-yelp "></i>Extra Pages
+                <span class="fa arrow"></span>
+              </a>
+              <ul class="nav nav-second-level">
+                <li>
+                  <a href="invoice.html">
+                    <i class="fa fa-coffee"></i>Invoice
+                  </a>
+                </li>
+                <li>
+                  <a href="pricing.html">
+                    <i class="fa fa-flash "></i>Pricing
+                  </a>
+                </li>
+                <li>
+                  <a href="component.html">
+                    <i class="fa fa-key "></i>Components
+                  </a>
+                </li>
+                <li>
+                  <a href="social.html">
+                    <i class="fa fa-send "></i>Social
+                  </a>
+                </li>
+                <li>
+                  <a href="message-task.html">
+                    <i class="fa fa-recycle "></i>Messages & Tasks
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="table.html">
+                <i class="fa fa-flash "></i>Data Tables
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fa fa-bicycle "></i>Forms
+                <span class="fa arrow"></span>
+              </a>
+              <ul class="nav nav-second-level">
+                <li>
+                  <a href="form.html">
+                    <i class="fa fa-desktop "></i>Basic
+                  </a>
+                </li>
+                <li>
+                  <a href="form-advance.html">
+                    <i class="fa fa-code "></i>Advance
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="gallery.html">
+                <i class="fa fa-anchor "></i>Gallery
+              </a>
+            </li>
+            <li>
+              <a href="error.html">
+                <i class="fa fa-bug "></i>Error Page
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fa fa-sitemap "></i>Multilevel Link
+                <span class="fa arrow"></span>
+              </a>
+              <ul class="nav nav-second-level">
+                <li>
+                  <a href="#">
+                    <i class="fa fa-bicycle "></i>Second Level Link
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <i class="fa fa-flask "></i>Second Level Link
+                  </a>
+                </li>
+                <li>
+                  <a href="#">Second Level Link
+                    <span class="fa arrow"></span>
+                  </a>
+                  <ul class="nav nav-third-level">
+                    <li>
+                      <a href="#">
+                        <i class="fa fa-plus "></i>Third Level Link
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <i class="fa fa-comments-o "></i>Third Level Link
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="blank.html">
+                <i class="fa fa-square-o "></i>Blank Page
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+{{end}}

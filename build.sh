@@ -7,11 +7,11 @@
 GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
-TEST_MODE=1
+TEST_MODE=0
 AUTO_EXEC=0
 GODEP_MODE=1
-AUTO_GITCOMMIT=1
-HEROKU_MODE=1
+AUTO_GITCOMMIT=0
+HEROKU_MODE=0
 DOCKER_MODE=0
 
 ###########################################################
@@ -86,8 +86,9 @@ if [ $TEST_MODE -eq 1 ]; then
 
     go test -v cmd/ginserver/*.go -f ../../configs/settings.toml
     EXIT_STATUS=$?
-    echo EXIT_STATUS
-
+    if [ $EXIT_STATUS -gt 0 ]; then
+        exit $EXIT_STATUS
+    fi
 fi
 #stress test
 #https://github.com/rakyll/boom

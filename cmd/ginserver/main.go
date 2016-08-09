@@ -10,10 +10,12 @@ import (
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/routes"
 	"github.com/hiromaily/golibs/db/mysql"
+	fl "github.com/hiromaily/golibs/files"
 	hrk "github.com/hiromaily/golibs/heroku"
 	lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/golibs/signal"
 	u "github.com/hiromaily/golibs/utils"
+	"html/template"
 	"os"
 )
 
@@ -36,6 +38,30 @@ func init() {
 	lg.Debugf("[Environment] : %s\n", conf.GetConfInstance().Environment)
 
 	//Database settings
+	initDatabase()
+
+	// debug mode
+	if conf.GetConfInstance().Environment == "local" {
+		//signal
+		go signal.StartSignal()
+	} else if conf.GetConfInstance().Environment == "production" {
+		//For release
+		gin.SetMode(gin.ReleaseMode)
+	}
+}
+
+func initConf() {
+	//config
+	if *tomlPath != "" {
+		conf.SetTomlPath(*tomlPath)
+	} else {
+		//default on localhost
+		tomlPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml"
+		conf.SetTomlPath(tomlPath)
+	}
+}
+
+func initDatabase() {
 	//if os.Getenv("HEROKU_FLG") == "1" {
 	if conf.GetConfInstance().Environment == "heroku" {
 		//Heroku
@@ -58,26 +84,6 @@ func init() {
 		//database
 		dbInfo := conf.GetConfInstance().MySQL
 		mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
-	}
-
-	// debug mode
-	if conf.GetConfInstance().Environment == "local" {
-		//signal
-		go signal.StartSignal()
-	} else if conf.GetConfInstance().Environment == "production" {
-		//For release
-		gin.SetMode(gin.ReleaseMode)
-	}
-}
-
-func initConf() {
-	//config
-	if *tomlPath != "" {
-		conf.SetTomlPath(*tomlPath)
-	} else {
-		//default on localhost
-		tomlPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml"
-		conf.SetTomlPath(tomlPath)
 	}
 }
 
@@ -139,6 +145,52 @@ func getPort() (port int) {
 	return
 }
 
+func loadTemplates(r *gin.Engine) {
+	//http://stackoverflow.com/questions/25745701/parseglob-what-is-the-pattern-to-parse-all-templates-recursively-within-a-direc
+
+	//r.LoadHTMLGlob("templates/*")
+	//r.LoadHTMLGlob("templates/**/*")
+
+	//It's impossible to call more than one. it was overwritten by final call.
+	//r.LoadHTMLGlob(path + "templates/pages/**/*")
+	//r.LoadHTMLGlob(path + "templates/components/*")
+
+	rootPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/"
+	ext := []string{"tmpl"}
+
+	files1 := fl.GetFileList(rootPath+"templates/pages", ext)
+	files2 := fl.GetFileList(rootPath+"templates/components", ext)
+	files3 := fl.GetFileList(rootPath+"templates/inner_js", ext)
+
+	joined1 := append(files1, files2...)
+	files := append(joined1, files3...)
+
+	tmpls := template.Must(template.ParseFiles(files...))
+	r.SetHTMLTemplate(tmpls)
+
+}
+
+func loadStaticFiles(r *gin.Engine) {
+	rootPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/"
+
+	//r.Static("/static", "/var/www")
+	r.Static("/statics", rootPath+"statics")
+	r.Static("/assets", rootPath+"statics/assets")
+
+	// /when location of html as layer level is not top, be careful.
+	//r.Static("/admin/assets", "statics/assets")
+}
+
+func run(r *gin.Engine) {
+	port := getPort()
+	if conf.GetConfInstance().Proxy.Enable {
+		//Proxy(Nginx) settings
+		fcgi.Run(r, fmt.Sprintf(":%d", port))
+	} else {
+		r.Run(fmt.Sprintf(":%d", port))
+	}
+}
+
 func setHTTPServer(testFlg uint8, path string) *gin.Engine {
 	//gin.SetMode(gin.ReleaseMode)
 
@@ -156,16 +208,10 @@ func setHTTPServer(testFlg uint8, path string) *gin.Engine {
 	setMiddleWare(r)
 
 	// Templates
-	//router.LoadHTMLGlob("templates/*")
-	//r.LoadHTMLGlob("templates/**/*")
-	r.LoadHTMLGlob(path + "templates/**/*")
+	loadTemplates(r)
 
 	// Static
-	//router.Static("/static", "/var/www")
-	r.Static("/statics", "statics")
-	r.Static("/assets", "statics/assets")
-	//when location of html as layer level is not top, be careful.
-	//r.Static("/admin/assets", "statics/assets")
+	loadStaticFiles(r)
 
 	// Set router
 	routes.SetHTTPUrls(r)
@@ -175,19 +221,14 @@ func setHTTPServer(testFlg uint8, path string) *gin.Engine {
 		ginpprof.Wrapper(r)
 	}
 
-	// Test
+	// When Testing
 	if testFlg == 1 {
 		return r
 	}
 
 	// Run
-	port := getPort()
-	if conf.GetConfInstance().Proxy.Enable {
-		//Proxy(Nginx) settings
-		fcgi.Run(r, fmt.Sprintf(":%d", port))
-	} else {
-		r.Run(fmt.Sprintf(":%d", port))
-	}
+	run(r)
+
 	return r
 }
 

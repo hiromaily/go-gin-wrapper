@@ -17,7 +17,7 @@ func IndexAction(c *gin.Context) {
 	lg.Debugf("user: %s", user)
 
 	//View
-	c.HTML(http.StatusOK, "admins/gallery.tmpl", gin.H{
+	c.HTML(http.StatusOK, "pages/admins/gallery.tmpl", gin.H{
 		"title": "Main website",
 	})
 }

@@ -22,7 +22,7 @@ func AccountsGetAction(c *gin.Context) {
 	}
 
 	//View
-	c.HTML(http.StatusOK, "accounts/accounts.tmpl", gin.H{
+	c.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", gin.H{
 		"title": "Main website",
 	})
 }

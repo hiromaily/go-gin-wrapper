@@ -1,0 +1,129 @@
+{{define "inner_js/index.js.tmpl"}}
+<script type="text/javascript">
+//add event handler to data-ajax elements.
+function getAjaxElem(){
+  ajax_elem = document.querySelectorAll('a[data-ajax="1"]');
+  for (var i = 0, len = ajax_elem.length; i < len; i++) {
+    ajax_elem[i].addEventListener("click", onAjax, false);
+  }
+}
+
+function getNewsAjaxElem(){
+  ajax_elem = document.querySelectorAll('a[data-ajax="2"]');
+  for (var i = 0, len = ajax_elem.length; i < len; i++) {
+    ajax_elem[i].addEventListener("click", onNewsAjax, false);
+  }
+}
+
+function getPostElem(){
+  post_elem = document.querySelectorAll('a[data-post="1"]');
+  for (var i = 0, len = post_elem.length; i < len; i++) {
+    post_elem[i].addEventListener("click", onPost, false);
+  }
+}
+
+
+//change href to ajax request.
+function onAjax(e){
+  e.preventDefault();
+  //console.log(e.target);
+  //console.log(e.target.href);
+  //console.log(e.target.getAttribute('data-method'));
+  //console.log(e.target.getAttribute('data-contype'));
+
+
+  //send ajax
+  sendAjax(e.target.href, e.target.getAttribute('data-method'), e.target.getAttribute('data-contype'));
+
+}
+
+//change href to ajax request.
+function onNewsAjax(e){
+  e.preventDefault();
+
+  //send ajax
+  sendNewsAjax(e.target.href);
+}
+
+function onPost(e){
+console.log("onPost");
+  e.preventDefault();
+
+  //send post
+  sendPost(e.target.href);
+}
+
+
+//send Ajax
+function sendAjax(url, method, content){
+  var contentType = "application/x-www-form-urlencoded";
+  var sendData;
+  if(method == "post"){
+    sendData = {'firstName':'kentaro','lastName':'asakura','email':'cccc@aa.jp', 'password':'password'};
+  }else if(method == "put"){
+    sendData = {'email':'test@abcde.com'};
+  }
+
+  //if(content == "json"){
+  //  contentType = "application/json";
+  //  sendData = JSON.stringify(sendData);
+  //}
+
+  //for JSON
+  $.ajax({
+	url: encodeURI(url),
+	type: method,
+	beforeSend: function (xhr) {
+		//xhr.setRequestHeader('X-Custom-Header-Gin', '{{ .key }}');
+		xhr.setRequestHeader('{{ .header }}', '{{ .key }}');
+	},
+    //cache    : false,
+    crossDomain: false,
+    contentType: contentType,         //content of request body
+    dataType   : 'json',              //data type from server
+	data:        sendData,
+  })
+  .done(function( data, textStatus, jqXHR ) {
+    console.log("success");
+    alert(JSON.stringify(data));
+  })
+  .fail(function( jqXHR, textStatus, errorThrown ) {
+    console.log("error");
+  });
+
+}
+
+//send News Ajax(Story)
+//http://developer.nytimes.com/
+function sendNewsAjax(url){
+
+  url += '?' + $.param({
+    'api-key': "52d32664c09c422d9032307cfaf63fde"
+  });
+
+  $.ajax({
+    url: url,
+    method: 'GET',
+  }).done(function(result) {
+    console.log(result);
+    console.log(JSON.stringify(result));
+
+  }).fail(function(err) {
+    throw err;
+  });
+}
+
+//send Post
+function sendPost(url){
+  //<form id="form_active"></form>
+  var form = document.getElementById("form_active");
+  //action設定
+  form.action = url;
+  form.submit();
+}
+
+document.addEventListener("DOMContentLoaded",getAjaxElem,false);
+document.addEventListener("DOMContentLoaded",getNewsAjaxElem,false);
+document.addEventListener("DOMContentLoaded",getPostElem,false);
+</script>
+{{end}}

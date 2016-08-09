@@ -159,12 +159,19 @@ func SetMetaData() gin.HandlerFunc {
 }
 
 //After request, handle aborted code or 500 error.
+//When 404 or 405 error occurred, response already been set in controllers/errors/errors.go
 func GlobalRecover() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//TODO:log can't work well in this func.
 		defer func(c *gin.Context) {
 			fmt.Println("[GlobalRecover] defer func()")
 			var errMsg string
+
+			refUrl := "/"
+			if c.Request.Header.Get("Referer") != "" {
+				refUrl = c.Request.Header.Get("Referer")
+			}
+
 			if c.IsAborted() {
 				fmt.Println("[GlobalRecover] c.IsAborted() is true")
 				if c.Errors != nil {
@@ -178,11 +185,13 @@ func GlobalRecover() gin.HandlerFunc {
 						"error": errMsg,
 					})
 				} else {
-					c.HTML(c.Writer.Status(), "errors/error.tmpl", gin.H{
-						"code":  fmt.Sprintf("%d", c.Writer.Status()),
-						"error": errMsg,
+					c.HTML(c.Writer.Status(), "pages/errors/error.tmpl", gin.H{
+						"code":    fmt.Sprintf("%d", c.Writer.Status()),
+						"message": errMsg,
+						"url":     refUrl,
 					})
 				}
+				return
 			}
 			//*
 			if rec := recover(); rec != nil {
@@ -197,11 +206,13 @@ func GlobalRecover() gin.HandlerFunc {
 						"error": rec,
 					})
 				} else {
-					c.HTML(http.StatusInternalServerError, "errors/error.tmpl", gin.H{
-						"code":  "500",
-						"error": rec,
+					c.HTML(http.StatusInternalServerError, "pages/errors/error.tmpl", gin.H{
+						"code":    "500",
+						"message": rec,
+						"url":     refUrl,
 					})
 				}
+				return
 			}
 		}(c)
 

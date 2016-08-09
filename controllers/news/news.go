@@ -15,7 +15,7 @@ func NewsGetAction(c *gin.Context) {
 	//_ = sess.IsLogin(c)
 
 	//View
-	c.HTML(http.StatusOK, "news/news.tmpl", gin.H{
+	c.HTML(http.StatusOK, "pages/news/news.tmpl", gin.H{
 		"title": "Main website",
 	})
 

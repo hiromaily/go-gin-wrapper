@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 )
 
+//TODO:base.tomlを用意し、差分のみを別のtomlに作るっていうようにしたい。
+
 /* singleton */
 var conf *Config
 

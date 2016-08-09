@@ -61,9 +61,13 @@ $ heroku config:add HEROKU_FLG=1
 ## Check
 $ heroku config | grep CLEARDB_DATABASE_URL
 $ heroku config | grep REDIS
+$ heroku ps -a ginserver
 
 ## Deploy
 $ git push -f heroku master
+
+## Access (For check hot to work)
+[site on heroku](https://ginserver.herokuapp.com/)
 
 ``` 
 

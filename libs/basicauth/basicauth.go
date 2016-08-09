@@ -53,7 +53,7 @@ func BasicAuthForRealm(accounts Accounts, realm string) gin.HandlerFunc {
 			//c.Abort()
 			//TODO:return specific error html
 			fmt.Println("[BasicAuthForRealm] before return html")
-			c.HTML(http.StatusUnauthorized, "errors/error.tmpl", gin.H{
+			c.HTML(http.StatusUnauthorized, "pages/errors/error.tmpl", gin.H{
 				"message": "401 errors",
 			})
 

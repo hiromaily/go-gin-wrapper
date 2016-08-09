@@ -5,10 +5,10 @@ import (
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
+	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
+	"github.com/hiromaily/go-gin-wrapper/models"
 	lg "github.com/hiromaily/golibs/log"
 	valid "github.com/hiromaily/golibs/validator"
-	//hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
-	"github.com/hiromaily/go-gin-wrapper/models"
 	"net/http"
 )
 
@@ -26,13 +26,23 @@ var ErrFmt = map[string]string{
 	"max":      "At a maximum %s of characters is allowed on %s",
 }
 
+//TODO:define as common use.
+func debugContext(c *gin.Context) {
+	lg.Debugf("[c *gin.Context]: %#v \n", c)
+	lg.Debugf("[c.Keys]: %#v \n", c.Keys)
+	lg.Debugf("[c.Request.Method]: %s \n", c.Request.Method)
+	lg.Debugf("[c.Request.Header]: %#v \n", c.Request.Header)
+	lg.Debugf("[c.Request.Body]: %#v \n", c.Request.Body)
+	lg.Debugf("[c.Request.URL]: %#v \n", c.Request.URL)
+	lg.Debugf("[c.Value(ajax)]: %s \n", c.Value("ajax"))
+	lg.Debugf("[hh.GetUrl(c)]: %s \n", hh.GetUrl(c))
+	lg.Debugf("[hh.GetProto(c)]: %s \n", hh.GetProto(c))
+}
+
 //Index
 func IndexAction(c *gin.Context) {
-	lg.Debugf("c *gin.Context :%#v\n", c)
-	lg.Debugf("c.Keys :%#v\n", c.Keys)
-	lg.Debugf("method: %s\n", c.Request.Method)
-	lg.Debugf("header: %#v\n", c.Request.Header)
-	lg.Debugf("ajax: %s\n", c.Value("ajax"))
+	//debug log
+	debugContext(c)
 
 	//return header and key
 	api := conf.GetConfInstance().Api
@@ -41,7 +51,7 @@ func IndexAction(c *gin.Context) {
 	lg.Debugf("api.Key: %#v\n", api.Key)
 
 	//View
-	c.HTML(http.StatusOK, "bases/index.tmpl", gin.H{
+	c.HTML(http.StatusOK, "pages/bases/index.tmpl", gin.H{
 		"title":  "Main website",
 		"header": api.Header,
 		"key":    api.Key,
@@ -50,15 +60,8 @@ func IndexAction(c *gin.Context) {
 
 //Login [GET]
 func LoginGetAction(c *gin.Context) {
-	lg.Debug("LoginGetAction")
-	//fmt.Printf("%#v\n", c)
-	//fmt.Printf("method: %s\n", c.Request.Method)
-	//fmt.Printf("header: %#v\n", c.Request.Header)
-	//fmt.Printf("body: %#v\n", c.Request.Body)
-
-	//fmt.Println(hh.GetUrl(c))
-	//fmt.Println(hh.GetProto(c))
-	//fmt.Printf("url: %#v\n", c.Request.URL)
+	//debug log
+	debugContext(c)
 
 	//If already loged in, go another page using redirect
 	//Judge loged in or not.
@@ -83,11 +86,11 @@ func LoginGetAction(c *gin.Context) {
 	token := csrf.CreateToken()
 	sess.SetTokenSession(c, token)
 
-	//when crossing request, context data can't be leave
-	//c.Set("getlogin", "gggggggg")
+	//when crossing request, context data can't be left.
+	//c.Set("getlogin", "xxx")
 
 	//View
-	c.HTML(http.StatusOK, "bases/login.tmpl", gin.H{
+	c.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
 		"message":  "nothing special",
 		"gintoken": token,
 	})
@@ -95,14 +98,8 @@ func LoginGetAction(c *gin.Context) {
 
 //Login [POST]
 func LoginPostAction(c *gin.Context) {
-	//
-
-	lg.Debug("LoginPostAction()")
-	//lg.Debugf("c *gin.Context :%#v", c)
-	//lg.Debugf("c.Keys :%#v", c.Keys)
-	//lg.Debugf("method: %s", c.Request.Method)
-	//lg.Debugf("header: %#v", c.Request.Header)
-	//lg.Debugf("body: %#v", c.Request.Body)
+	//debug log
+	debugContext(c)
 
 	//Get Post Parameters
 	inputEmail := c.PostForm("inputEmail") //return is string type
@@ -127,7 +124,7 @@ func LoginPostAction(c *gin.Context) {
 		sess.SetTokenSession(c, token)
 
 		//View
-		c.HTML(http.StatusOK, "bases/login.tmpl", gin.H{
+		c.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
 			"message":  "validation error happend",
 			"gintoken": token,
 		})
@@ -145,7 +142,7 @@ func LoginPostAction(c *gin.Context) {
 		sess.SetTokenSession(c, token)
 
 		//View
-		c.HTML(http.StatusOK, "bases/login.tmpl", gin.H{
+		c.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
 			"message":  "mailaddress and password may be wrong",
 			"gintoken": token,
 		})
@@ -170,15 +167,15 @@ func LoginPostAction(c *gin.Context) {
 //Logout [POST]
 func LogoutPostAction(c *gin.Context) {
 	lg.Debug("LogoutPostAction")
-	lg.Debug(sess.IsLogin(c))
+	//lg.Debug(sess.IsLogin(c))
 
 	//Session
 	sess.Logout(c)
 
-	lg.Debug(sess.IsLogin(c))
+	//lg.Debug(sess.IsLogin(c))
 
 	//View
-	c.HTML(http.StatusOK, "bases/logout.tmpl", gin.H{
+	c.HTML(http.StatusOK, "pages/bases/logout.tmpl", gin.H{
 		"message": "logout was done.",
 	})
 }
@@ -186,12 +183,12 @@ func LogoutPostAction(c *gin.Context) {
 //Logout [PUT] For Ajax
 func LogoutPutAction(c *gin.Context) {
 	lg.Debug("LogoutPutAction")
-	lg.Debug(sess.IsLogin(c))
+	//lg.Debug(sess.IsLogin(c))
 
 	//Session
 	sess.Logout(c)
 
-	lg.Debug(sess.IsLogin(c))
+	//lg.Debug(sess.IsLogin(c))
 
 	//View
 	c.JSON(http.StatusOK, gin.H{
