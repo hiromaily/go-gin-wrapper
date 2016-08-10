@@ -21,6 +21,11 @@
 			"Rev": "fc113767cd6b051980f260d6dbe84b2740c46ab0"
 		},
 		{
+			"ImportPath": "github.com/fatih/color",
+			"Comment": "v0.2.0",
+			"Rev": "87d4004f2ab62d0d255e0a38f1680aa534549fe3"
+		},
+		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
 			"Comment": "v1.0.0-1-gb8dc900",
 			"Rev": "b8dc90050f24c1a73a52f107f3f575be67b21b7c"
@@ -117,6 +122,15 @@
 			"Rev": "ee05b128a739a0fb76c7ebd3ae4810c1de808d6d"
 		},
 		{
+			"ImportPath": "github.com/mattn/go-colorable",
+			"Comment": "v0.0.6",
+			"Rev": "ed8eb9e318d7a84ce5915b495b7d35e0cfe7b5a8"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-isatty",
+			"Rev": "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8"
+		},
+		{
 			"ImportPath": "golang.org/x/crypto/pbkdf2",
 			"Rev": "575fdbe86e5dd89229707ebec0575ce7d088a4a6"
 		},
@@ -127,6 +141,10 @@
 		{
 			"ImportPath": "golang.org/x/net/context",
 			"Rev": "f841c39de738b1d0df95b5a7187744f0e03d8112"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "d9157a9621b69ad1d8d77a1933590c416593f24f"
 		},
 		{
 			"ImportPath": "gopkg.in/go-playground/validator.v8",

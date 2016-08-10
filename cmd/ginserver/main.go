@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/DeanThompson/ginpprof"
+	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/fcgi"
@@ -189,6 +190,7 @@ func run(r *gin.Engine) {
 	port := getPort()
 	if conf.GetConfInstance().Proxy.Enable {
 		//Proxy(Nginx) settings
+		color.Red("[WARNING] running on fcgi mode.")
 		lg.Info("running on fcgi mode.")
 		fcgi.Run(r, fmt.Sprintf(":%d", port))
 	} else {
