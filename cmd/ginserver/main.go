@@ -189,6 +189,7 @@ func run(r *gin.Engine) {
 	port := getPort()
 	if conf.GetConfInstance().Proxy.Enable {
 		//Proxy(Nginx) settings
+		lg.Info("running on fcgi mode.")
 		fcgi.Run(r, fmt.Sprintf(":%d", port))
 	} else {
 		r.Run(fmt.Sprintf(":%d", port))

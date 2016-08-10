@@ -11,7 +11,7 @@ level = 1
 path = "/var/log/goweb/ginserver.log"
 
 [proxy]
-enable = true
+enable = false          # be careful!
 host = "172.18.0.1"
 #host = "proxy-server"
 

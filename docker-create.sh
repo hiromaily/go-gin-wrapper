@@ -14,10 +14,11 @@ IMAGE_NAME=go-gin-wrapper:v1.1
 ###############################################################################
 # Remove Container And Image
 ###############################################################################
-DOCKER_PSID=`docker ps -af name="${CONTAINER_NAME}" -q`
-if [ ${#DOCKER_PSID} -ne 0 ]; then
-    docker rm -f ${CONTAINER_NAME}
-fi
+#DOCKER_PSID=`docker ps -af name="${CONTAINER_NAME}" -q`
+#if [ ${#DOCKER_PSID} -ne 0 ]; then
+#    docker rm -f ${CONTAINER_NAME}
+#fi
+docker rm -f $(docker ps -aq)
 
 DOCKER_IMGID=`docker images "${IMAGE_NAME}" -q`
 if [ ${#DOCKER_IMGID} -ne 0 ]; then
@@ -51,6 +52,12 @@ docker-compose logs
 # Docker-compose / down
 ###############################################################################
 #docker-compose -f ${COMPOSE_FILE} down
+
+###############################################################################
+# Check connection
+###############################################################################
+#mysql -u root -p -h 127.0.0.1 -P 13306
+#redis-cli -h 127.0.0.1 -p 16379 -a password
 
 #Access by browser
 #http://docker.hiromaily.com:9999/

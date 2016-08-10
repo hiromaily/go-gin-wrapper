@@ -10,7 +10,7 @@ services:
     image: mysql:5.7
     container_name: mysqld
     ports:
-      - "3306:3306"
+      - "13306:3306"
     volumes:
       - ./docker_build/mysql/conf:/etc/mysql/conf.d
       - ./docker_build/mysql/db_data:/var/lib/mysql
@@ -26,7 +26,7 @@ services:
     image: redis:3.2
     container_name: redisd
     ports:
-      - "6379:6379"
+      - "16379:6379"
     volumes:
       - ./docker_build/redis_data:/data
     restart: always
