@@ -48,6 +48,11 @@ type ApiConfig struct {
 }
 
 type MySQLConfig struct {
+	MySQLContentConfig
+	Test MySQLContentConfig `toml:"test"`
+}
+
+type MySQLContentConfig struct {
 	Host   string `toml:"host"`
 	Port   uint16 `toml:"port"`
 	DbName string `toml:"dbname"`

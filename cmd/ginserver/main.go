@@ -37,9 +37,6 @@ func init() {
 	//lg.Debugf("conf %#v\n", conf.GetConfInstance())
 	lg.Debugf("[Environment] : %s\n", conf.GetConfInstance().Environment)
 
-	//Database settings
-	initDatabase()
-
 	// debug mode
 	if conf.GetConfInstance().Environment == "local" {
 		//signal
@@ -61,7 +58,8 @@ func initConf() {
 	}
 }
 
-func initDatabase() {
+// initialize Database
+func initDatabase(testFlg uint8) {
 	//if os.Getenv("HEROKU_FLG") == "1" {
 	if conf.GetConfInstance().Environment == "heroku" {
 		//Heroku
@@ -82,8 +80,14 @@ func initDatabase() {
 		//For Localhost, Docker, Production
 
 		//database
-		dbInfo := conf.GetConfInstance().MySQL
-		mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
+		if testFlg == 0 {
+			dbInfo := conf.GetConfInstance().MySQL
+			mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
+		} else {
+			//For test
+			dbInfo := conf.GetConfInstance().MySQL.Test
+			mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
+		}
 	}
 }
 
@@ -259,6 +263,9 @@ func setHTTPSServer() {
 // Creates a gin router with default middleware:
 // logger and recovery (crash-free) middleware
 func main() {
+	//Database settings
+	initDatabase(0)
+
 	//HTTP
 	setHTTPServer(0, "")
 

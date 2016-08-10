@@ -91,11 +91,15 @@ func setHttpHeaders(req *http.Request, headers []map[string]string) {
 //-----------------------------------------------------------------------------
 // Test Framework
 //-----------------------------------------------------------------------------
+// Initialize
+func init() {
+	//flag.Parse()
+	lg.InitializeLog(lg.INFO_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB_TEST]", "/var/log/go/test.log")
+}
 
 func setup() {
-	lg.InitializeLog(lg.INFO_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB_TEST]", "/var/log/go/test.log")
-
-	//TODO:Create test database and test data.
+	//Create test database and test data.
+	InitDatabase(1)
 
 	//Server On
 	r = SetHTTPServer(1, "../../")
@@ -105,10 +109,7 @@ func teardown() {
 	//TODO:Drop test database and test data.
 }
 
-// Initialize
 func TestMain(m *testing.M) {
-	//flag.Parse()
-
 	setup()
 
 	code := m.Run()
@@ -118,6 +119,9 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+//-----------------------------------------------------------------------------
+// Test
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 // Get Request for HTML
 //-----------------------------------------------------------------------------

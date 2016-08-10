@@ -22,9 +22,17 @@ only_ajax = true
 [mysql]
 host = "localhost"
 port = 3306
+dbname = "maindb"
+user = "testuser"
+pass = "12345678"
+
+[mysql.test]
+host = "localhost"
+port = 3306
 dbname = "testdb"
 user = "testuser"
 pass = "12345678"
+
 
 [redis]
 host = "localhost"

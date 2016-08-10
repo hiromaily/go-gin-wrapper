@@ -23,11 +23,10 @@ DOCKER_MODE=0
 
 
 ###########################################################
-# Adjust version dependency of projects
+# Adjust version dependency of projects [Before]
 ###########################################################
 #cd ${GOPATH}/src/github.com/aws/aws-sdk-go
 #git checkout v0.9.17
-#git checkout master
 
 
 ###########################################################
@@ -84,6 +83,10 @@ fi
 if [ $TEST_MODE -eq 1 ]; then
     echo '============== test =============='
 
+    # Create Test Data
+    sh ./tests/setup.sh
+
+    # Execute
     go test -v cmd/ginserver/*.go -f ../../configs/settings.toml
     EXIT_STATUS=$?
     if [ $EXIT_STATUS -gt 0 ]; then
@@ -200,3 +203,9 @@ fi
 #godoc -http :8000
 #http://localhost:8000/pkg/
 
+
+###########################################################
+# Adjust version dependency of projects [After]
+###########################################################
+#cd ${GOPATH}/src/github.com/aws/aws-sdk-go
+#git checkout master

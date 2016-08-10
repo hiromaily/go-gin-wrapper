@@ -27,6 +27,13 @@ dbname = "hiromaily"
 user = "hiromaily"
 pass = "12345678"
 
+[mysql.test]
+host = "mysql-server"
+port = 3306
+dbname = "hiromaily2"
+user = "root"
+pass = ""
+
 [redis]
 host = "redis-server"
 port = 6379

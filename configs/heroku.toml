@@ -26,6 +26,14 @@ dbname = "heroku_53533e2ad9f9475"
 user = "bc19f40b56274b"
 pass = "cfee2ebd"
 
+[mysql.test]
+host = "us-cdbr-iron-east-04.cleardb.net"
+port = 3306
+dbname = "heroku_53533e2ad9f9475"
+user = "bc19f40b56274b"
+pass = "cfee2ebd"
+
+
 [redis]
 host = "ec2-54-197-242-4.compute-1.amazonaws.com"
 port = 9769
