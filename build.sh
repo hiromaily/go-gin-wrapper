@@ -12,7 +12,7 @@ AUTO_EXEC=0
 GODEP_MODE=1
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0
-DOCKER_MODE=0
+DOCKER_MODE=1  #0:off, 1:run server, 2:exec test on docker
 
 ###########################################################
 # Update all package
@@ -92,6 +92,13 @@ if [ $TEST_MODE -eq 1 ]; then
     if [ $EXIT_STATUS -gt 0 ]; then
         exit $EXIT_STATUS
     fi
+
+    #TOML_NAMES=("settings" "heroku")
+    #for domain in ${TOML_NAMES[@]}
+    #do
+    #    echo ${domain}.toml
+    #    go test -v cmd/ginserver/*.go -f ../../configs/${domain}.toml
+    #done
 fi
 #stress test
 #https://github.com/rakyll/boom
@@ -193,8 +200,39 @@ fi
 ###########################################################
 if [ $DOCKER_MODE -eq 1 ]; then
     echo '============== docker =============='
-    ./docker-create.sh
+    # create docker container
+    export RUN_TEST=0
+    sh ./docker-create.sh
+
+    #login
+    #docker exec -it web bash
+
+    sleep 5s
+    while :
+    do
+        #000 or 200 or 404
+        HTTP_STATUS=`curl -LI localhost:9999/ -w '%{http_code}\n' -s -o /dev/null`
+        echo $HTTP_STATUS
+        if [ $HTTP_STATUS -eq 000 ]; then
+            sleep 1s
+        else
+            docker logs web
+            break
+        fi
+    done
+
+elif [ $DOCKER_MODE -eq 2 ]; then
+    echo '============== docker test =============='
+    # create docker container
+    export RUN_TEST=1
+    sh ./docker-create.sh
 fi
+
+# check result
+#docker logs web
+
+# check db
+#mysql -u root -p -h 127.0.0.1 -P 13306
 
 
 ###########################################################

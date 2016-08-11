@@ -10,6 +10,9 @@ referer = "http://docker.hiromaily.com:9999"
 level = 1
 path = "/var/log/goweb/ginserver.log"
 
+[server.docs]
+path = "/go/src/github.com/hiromaily/go-gin-wrapper"
+
 [proxy]
 enable = false          # be careful!
 host = "172.18.0.1"
@@ -32,7 +35,7 @@ host = "mysql-server"
 port = 3306
 dbname = "hiromaily2"
 user = "root"
-pass = ""
+pass = "root"
 
 [redis]
 host = "redis-server"

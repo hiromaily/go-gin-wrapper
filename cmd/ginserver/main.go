@@ -54,7 +54,8 @@ func initConf() {
 		conf.SetTomlPath(*tomlPath)
 	} else {
 		//default on localhost
-		tomlPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml"
+		//tomlPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml"
+		tomlPath := conf.GetConfInstance().Server.Docs.Path + "/configs/settings.toml"
 		conf.SetTomlPath(tomlPath)
 	}
 }
@@ -160,12 +161,14 @@ func loadTemplates(r *gin.Engine) {
 	//r.LoadHTMLGlob(path + "templates/pages/**/*")
 	//r.LoadHTMLGlob(path + "templates/components/*")
 
-	rootPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/"
+	//rootPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper"
+	rootPath := conf.GetConfInstance().Server.Docs.Path
+
 	ext := []string{"tmpl"}
 
-	files1 := fl.GetFileList(rootPath+"templates/pages", ext)
-	files2 := fl.GetFileList(rootPath+"templates/components", ext)
-	files3 := fl.GetFileList(rootPath+"templates/inner_js", ext)
+	files1 := fl.GetFileList(rootPath+"/templates/pages", ext)
+	files2 := fl.GetFileList(rootPath+"/templates/components", ext)
+	files3 := fl.GetFileList(rootPath+"/templates/inner_js", ext)
 
 	joined1 := append(files1, files2...)
 	files := append(joined1, files3...)
@@ -176,11 +179,12 @@ func loadTemplates(r *gin.Engine) {
 }
 
 func loadStaticFiles(r *gin.Engine) {
-	rootPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/"
+	//rootPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper"
+	rootPath := conf.GetConfInstance().Server.Docs.Path
 
 	//r.Static("/static", "/var/www")
-	r.Static("/statics", rootPath+"statics")
-	r.Static("/assets", rootPath+"statics/assets")
+	r.Static("/statics", rootPath+"/statics")
+	r.Static("/assets", rootPath+"/statics/assets")
 
 	// /when location of html as layer level is not top, be careful.
 	//r.Static("/admin/assets", "statics/assets")

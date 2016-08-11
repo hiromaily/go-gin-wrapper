@@ -25,15 +25,20 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Host    string    `toml:"host"`
-	Port    int       `toml:"port"`
-	Referer string    `toml:"referer"`
-	Log     LogConfig `toml:"log"`
+	Host    string     `toml:"host"`
+	Port    int        `toml:"port"`
+	Referer string     `toml:"referer"`
+	Log     LogConfig  `toml:"log"`
+	Docs    DocsConfig `toml:"docs"`
 }
 
 type LogConfig struct {
 	Level uint8  `toml:"level"`
 	Path  string `toml:"path"`
+}
+
+type DocsConfig struct {
+	Path string `toml:"path"`
 }
 
 type ProxyConfig struct {

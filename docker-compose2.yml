@@ -57,5 +57,5 @@ services:
     stdin_open: true
     tty: true
     restart: always
-    command: bash
-    #command: bash ./docker-entrypoint.sh
+    #command: bash
+    command: bash ./docker-entrypoint.sh

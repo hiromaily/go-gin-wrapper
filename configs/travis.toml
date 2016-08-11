@@ -10,6 +10,9 @@ referer = "http://hiromaily.com:9999"
 level = 1
 path = "/var/log/goweb/ginserver.log"
 
+[server.docs]
+path = "."
+
 [proxy]
 enable = false
 host = "127.0.0.1"

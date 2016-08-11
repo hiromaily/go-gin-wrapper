@@ -3,6 +3,7 @@
 ###############################################################################
 # Using docker-composer for go-gin-wrapper
 ###############################################################################
+#echo $RUN_TEST
 
 ###############################################################################
 # Environment
@@ -32,9 +33,30 @@ fi
 docker-compose  build
 docker-compose  up -d
 
-#settings: moved to docker-compose.yml
-#docker exec -it ${CONTAINER_NAME} bash ./docker-entrypoint.sh
+if [ $RUN_TEST -eq 1 ]; then
+    # test mode
+    sleep 1s
 
+    # create test data on docker container mysql
+    export DB_PORT=13306
+    export DB_PASS=root
+    sh ./tests/setup.sh
+    #mysql -uroot -proot -h127.0.0.1 -P13306 < ./tests/createdb.sql
+
+    docker exec -it ${CONTAINER_NAME} /bin/bash -c "
+        export RUN_TEST=1;
+        go get -d -v ./...;
+        go test -v cmd/ginserver/*.go -f ../../configs/docker.toml;
+    "
+    docker exec -it  bash ./docker-entrypoint.sh
+else
+    # run server mode
+    # foreground
+    #docker exec -it ${CONTAINER_NAME} bash ./docker-entrypoint.sh
+
+    # background(trying)
+    docker exec -itd ${CONTAINER_NAME} bash ./docker-entrypoint.sh
+fi
 ###############################################################################
 # Docker-compose / check
 ###############################################################################
@@ -46,6 +68,12 @@ docker-compose logs
 # Exec
 ###############################################################################
 #docker exec -it web bash
+
+
+###############################################################################
+# Test
+###############################################################################
+
 
 
 ###############################################################################

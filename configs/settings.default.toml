@@ -10,6 +10,9 @@ referer = "http://localhost"
 level = 1
 path = "/var/log/goweb/ginserver.log"
 
+[server.docs]
+path = "/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper"
+
 [proxy]
 enable = false
 host = "127.0.0.1"

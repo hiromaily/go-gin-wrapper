@@ -33,6 +33,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	r.GET("/index", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
+	r.HEAD("/", func(c *gin.Context) {}) //For helth check
 
 	//Login
 	r.GET("/login", bases.LoginGetAction)
