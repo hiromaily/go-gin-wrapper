@@ -11,7 +11,7 @@ level = 1
 path = "/var/log/goweb/ginserver.log"
 
 [server.docs]
-path = "."
+path = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper"
 
 [proxy]
 enable = false
