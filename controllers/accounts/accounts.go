@@ -6,23 +6,18 @@ import (
 	"net/http"
 )
 
-//Pricing [GET]
+//Accounts [GET]
 func AccountsGetAction(c *gin.Context) {
-	//Param
-
-	//Logic
-
 	//judge login
 	if bRet, _ := sess.IsLogin(c); !bRet {
 		//Redirect[GET]
-		//c.Redirect(http.StatusMovedPermanently, "/login")
 		c.Redirect(http.StatusTemporaryRedirect, "/login")
-
 		return
 	}
 
 	//View
 	c.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", gin.H{
-		"title": "Main website",
+		"title":    "Accounts Page",
+		"navi_key": "/accounts/",
 	})
 }

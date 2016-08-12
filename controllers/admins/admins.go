@@ -18,6 +18,7 @@ func IndexAction(c *gin.Context) {
 
 	//View
 	c.HTML(http.StatusOK, "pages/admins/gallery.tmpl", gin.H{
-		"title": "Main website",
+		"title":    "Admin Page",
+		"navi_key": "/admin/",
 	})
 }

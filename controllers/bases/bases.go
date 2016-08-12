@@ -39,6 +39,33 @@ func debugContext(c *gin.Context) {
 	lg.Debugf("[hh.GetProto(c)]: %s \n", hh.GetProto(c))
 }
 
+// response for Login Page
+func resLogin(c *gin.Context, input *LoginRequest, msg string, errors []string) {
+	//token
+	token := csrf.CreateToken()
+	sess.SetTokenSession(c, token)
+
+	//when crossing request, context data can't be left.
+	//c.Set("getlogin", "xxx")
+
+	if msg == "" {
+		msg = "Enter Details to Login!!"
+	}
+
+	//it's better to not return nil
+	if input == nil {
+		input = &LoginRequest{}
+	}
+
+	//View
+	c.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
+		"message":  msg,
+		"input":    input,
+		"errors":   errors,
+		"gintoken": token,
+	})
+}
+
 //Index
 func IndexAction(c *gin.Context) {
 	//debug log
@@ -52,9 +79,10 @@ func IndexAction(c *gin.Context) {
 
 	//View
 	c.HTML(http.StatusOK, "pages/bases/index.tmpl", gin.H{
-		"title":  "Main website",
-		"header": api.Header,
-		"key":    api.Key,
+		"title":    "Top Page",
+		"navi_key": "/",
+		"header":   api.Header,
+		"key":      api.Key,
 	})
 }
 
@@ -69,31 +97,21 @@ func LoginGetAction(c *gin.Context) {
 		lg.Debugf("id: %d", id)
 
 		//Redirect[GET]
-		//FIXME:Browser cache request when redirecting at status code 301
+		//FIXME:Browser request cache data when redirecting at status code 301
 		//https://infra.xyz/archives/75
 		//301 Moved Permanently   (Do cache,   it's possible to change from POST to GET)
 		//302 Found               (Not cache,  it's possible to change from POST to GET)
 		//307 Temporary Redirect  (Not cache,  it's not possible to change from POST to GET)
 		//308 Moved Permanently   (Do cache,   it's not possible to change from POST to GET)
 
-		//c.Redirect(http.StatusMovedPermanently, "/accounts") //301
-		c.Redirect(http.StatusTemporaryRedirect, "/accounts") //307
+		//c.Redirect(http.StatusMovedPermanently, "/accounts/") //301
+		c.Redirect(http.StatusTemporaryRedirect, "/accounts/") //307
 
 		return
 	}
 
-	//token
-	token := csrf.CreateToken()
-	sess.SetTokenSession(c, token)
-
-	//when crossing request, context data can't be left.
-	//c.Set("getlogin", "xxx")
-
-	//View
-	c.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
-		"message":  "nothing special",
-		"gintoken": token,
-	})
+	//return
+	resLogin(c, nil, "", nil)
 }
 
 //Login [POST]
@@ -102,62 +120,42 @@ func LoginPostAction(c *gin.Context) {
 	debugContext(c)
 
 	//Get Post Parameters
-	inputEmail := c.PostForm("inputEmail") //return is string type
-	inputPassword := c.PostForm("inputPassword")
-	//tokenPosted := c.PostForm("gintoken")
-	lg.Debugf("inputEmail : %s\n", inputEmail)
-	lg.Debugf("inputPassword : %s\n", inputPassword)
-	//lg.Debugf("gintoken : %s\n", tokenPosted)
+	posted := &LoginRequest{
+		Email: c.PostForm("inputEmail"),
+		Pass:  c.PostForm("inputPassword"),
+	}
 
 	//Validation
-	posted := &LoginRequest{Email: inputEmail, Pass: inputPassword}
-	//FIXME: It doesn't work when passed address of struct type.
 	mRet := valid.CheckValidation(posted, false)
-	//map[string][]string{"pass":[]string{"min"}, "test":[]string{"nonempty"}}
 	if len(mRet) != 0 {
-		msgs := valid.ConvertErrorMsg(mRet, ErrFmt)
+		errors := valid.ConvertErrorMsgs(mRet, ErrFmt)
+		lg.Debugf("validation error: %#v", errors)
 
-		lg.Debugf("validation error: %#v", msgs)
-
-		//token
-		token := csrf.CreateToken()
-		sess.SetTokenSession(c, token)
-
-		//View
-		c.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
-			"message":  "validation error happend",
-			"gintoken": token,
-		})
+		//return
+		resLogin(c, posted, "", errors)
 		return
 	}
 
 	//Check inputed mail and password
-	//aaaa@aa.jp / password
-	userId, err := models.GetDBInstance().IsUserEmail(inputEmail, inputPassword)
+	userId, err := models.GetDBInstance().IsUserEmail(posted.Email, posted.Pass)
 	if err != nil {
-		lg.Debugf("login error: %#v", mRet)
+		errors := []string{"E-mail or Password is made a mistake."}
+		lg.Debugf("login error: %#v", errors)
 
-		//token
-		token := csrf.CreateToken()
-		sess.SetTokenSession(c, token)
-
-		//View
-		c.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
-			"message":  "mailaddress and password may be wrong",
-			"gintoken": token,
-		})
+		//return
+		resLogin(c, posted, "", errors)
 		return
 	}
 
+	//When login is successful
 	//Session
 	sess.SetUserSession(c, userId)
 
 	//token delete
 	sess.DelTokenSession(c)
 
-	//Change method post to get
+	//Change method POST to GET
 	//Redirect[GET]
-	//c.Redirect(http.StatusMovedPermanently, "/accounts")
 	//Status code 307 can't change post to get, 302 is suitable
 	c.Redirect(http.StatusFound, "/accounts")
 
@@ -176,7 +174,8 @@ func LogoutPostAction(c *gin.Context) {
 
 	//View
 	c.HTML(http.StatusOK, "pages/bases/logout.tmpl", gin.H{
-		"message": "logout was done.",
+		"title":    "Logout Page",
+		"navi_key": "/logout",
 	})
 }
 

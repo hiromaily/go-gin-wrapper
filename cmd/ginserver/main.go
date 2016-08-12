@@ -54,10 +54,10 @@ func initConf() {
 		conf.SetTomlPath(*tomlPath)
 	} else {
 		//default on localhost
-		//tomlPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml"
-		tomlPath := conf.GetConfInstance().Server.Docs.Path + "/configs/settings.toml"
+		tomlPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml"
 		conf.SetTomlPath(tomlPath)
 	}
+	conf.GetConfInstance()
 }
 
 // initialize Database

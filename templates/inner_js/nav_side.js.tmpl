@@ -1,4 +1,4 @@
-{{define "inner_js/index.js.tmpl"}}
+{{define "inner_js/nav_side.js.tmpl"}}
 <script type="text/javascript">
 //add event handler to data-ajax elements.
 function getAjaxElem(){
@@ -46,8 +46,10 @@ function onNewsAjax(e){
 }
 
 function onPost(e){
-console.log("onPost");
   e.preventDefault();
+
+  //console.log(e.target.href);
+  //console.log(e.target.getAttribute('href'));
 
   //send post
   sendPost(e.target.href);
@@ -115,9 +117,8 @@ function sendNewsAjax(url){
 
 //send Post
 function sendPost(url){
-  //<form id="form_active"></form>
+  //form action
   var form = document.getElementById("form_active");
-  //action設定
   form.action = url;
   form.submit();
 }

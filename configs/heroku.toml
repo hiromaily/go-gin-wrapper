@@ -6,12 +6,19 @@ host = "ginserver.herokuapp.com"
 port = 5000
 referer = "https://ginserver.herokuapp.com"
 
+[server.docs]
+path = "/app"
+
 [server.log]
 level = 1
 path = "/var/log/goweb/ginserver.log"
 
-[server.docs]
-path = "/app"
+[server.session]
+name = "go-web-ginserver"
+key = "secretskey123456"
+max_age =  300     #(s)
+secure = false    #set false in development environment, production environment requires true
+http_only = true
 
 [proxy]
 enable = false

@@ -40,7 +40,8 @@ if [ $RUN_TEST -eq 1 ]; then
     # create test data on docker container mysql
     export DB_PORT=13306
     export DB_PASS=root
-    sh ./tests/setup.sh
+    export DB_NAME=hiromaily2
+    sh ./z_dbdata/setup.sh
     #mysql -uroot -proot -h127.0.0.1 -P13306 < ./tests/createdb.sql
 
     docker exec -it ${CONTAINER_NAME} /bin/bash -c "

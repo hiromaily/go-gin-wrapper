@@ -79,43 +79,43 @@
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/cipher/hash",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mysql",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/files",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/heroku",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/log",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/regexp",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/signal",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/times",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/utils",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/validator",
-			"Rev": "5885b4312a29449436c06d7388d528948dfd082d"
+			"Rev": "5c9d775345b59786cef153a626d7d36aebcf7317"
 		},
 		{
 			"ImportPath": "github.com/manucorporat/sse",

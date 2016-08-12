@@ -25,11 +25,16 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Host    string     `toml:"host"`
-	Port    int        `toml:"port"`
-	Referer string     `toml:"referer"`
-	Log     LogConfig  `toml:"log"`
-	Docs    DocsConfig `toml:"docs"`
+	Host    string        `toml:"host"`
+	Port    int           `toml:"port"`
+	Referer string        `toml:"referer"`
+	Docs    DocsConfig    `toml:"docs"`
+	Log     LogConfig     `toml:"log"`
+	Session SessionConfig `toml:"session"`
+}
+
+type DocsConfig struct {
+	Path string `toml:"path"`
 }
 
 type LogConfig struct {
@@ -37,8 +42,12 @@ type LogConfig struct {
 	Path  string `toml:"path"`
 }
 
-type DocsConfig struct {
-	Path string `toml:"path"`
+type SessionConfig struct {
+	Name     string `toml:"name"`
+	Key      string `toml:"key"`
+	MaxAge   int    `toml:"max_age"`
+	Secure   bool   `toml:"secure"`
+	HttpOnly bool   `toml:"http_only"`
 }
 
 type ProxyConfig struct {

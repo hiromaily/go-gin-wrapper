@@ -6,12 +6,19 @@ host = "localhost"
 port = 9999
 referer = "http://localhost"
 
+[server.docs]
+path = "/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper"
+
 [server.log]
 level = 1
 path = "/var/log/goweb/ginserver.log"
 
-[server.docs]
-path = "/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper"
+[server.session]
+name = "go-web-ginserver"
+key = "secretskey123456"
+max_age =  300     #(s)
+secure = false    #set false in development environment, production environment requires true
+http_only = true
 
 [proxy]
 enable = false

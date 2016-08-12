@@ -4,23 +4,26 @@ import (
 	"errors"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	lg "github.com/hiromaily/golibs/log"
 )
 
-var sessionKey string = "secret123451234"
+//var sessionKey string = "secret123451234"
 
 //TODO:setting to toml
 func SetSession(r *gin.Engine, host, pass string) {
 
 	var store sessions.RedisStore
 	var err error
+	ses := conf.GetConfInstance().Server.Session
+
 	if host == "" {
 		//on memory
-		store = sessions.NewCookieStore([]byte(sessionKey))
+		store = sessions.NewCookieStore([]byte(ses.Key))
 	} else {
 		//session on Redis
 		//store, err = sessions.NewRedisStore(80, "tcp", "localhost:6379", "", []byte("secret1234512345"))
-		store, err = sessions.NewRedisStore(80, "tcp", host, pass, []byte(sessionKey))
+		store, err = sessions.NewRedisStore(80, "tcp", host, pass, []byte(ses.Key))
 		if err != nil {
 			panic(err)
 		}
@@ -31,12 +34,12 @@ func SetSession(r *gin.Engine, host, pass string) {
 		//Domain: "/",   //It's better not to use.
 		//MaxAge: 86400, //1day
 		//MaxAge: 3600,  //1hour
-		MaxAge:   300,   //5minutes
-		Secure:   false, //TODO: set false in development environment, production environment requires true
-		HttpOnly: true,
+		MaxAge:   ses.MaxAge, //5minutes
+		Secure:   ses.Secure, //TODO: Set false in development environment, production environment requires true
+		HttpOnly: ses.HttpOnly,
 	}
 	store.Options(*strOptions)
-	r.Use(sessions.Sessions("ginsession", store))
+	r.Use(sessions.Sessions(ses.Name, store))
 }
 
 //Set User

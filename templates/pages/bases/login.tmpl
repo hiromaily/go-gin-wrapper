@@ -11,13 +11,23 @@
     <link href="assets/css/font-awesome.css" rel="stylesheet" />
     <!-- GOOGLE FONTS-->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+
+<style type="text/css">
+img.logosize {
+  width: 50%;
+  height: 50%;
+}
+.error_msg {
+    color: red;
+}
+</style>
   </head>
   <body style="background-color: #E2E2E2;">
     <div class="container">
       <div class="row text-center " style="padding-top:100px;">
         <div class="col-md-12">
-          <img src="assets/img/logo-invoice.png" />
-          <h2>{{ .message }}</h2>
+          <img class="logosize" src="assets/img/hy.png" />
+          <h3>Welcome to this website!!</h3>
         </div>
       </div>
       <div class="row ">
@@ -26,19 +36,24 @@
             <form role="form" name="form1" action="#" method="post">
               <input type="hidden" name="gintoken" value="{{ .gintoken }}">
               <hr />
-              <h5>Enter Details to Login!!</h5>
+              <h5><span>{{ .message }}<span></h5>
+
+              <div id="msg_for_user">
+              {{range .errors}}<p class="error_msg">{{.}}</p>{{end}}
+              </div>
+
               <br />
               <div class="form-group input-group">
                 <span class="input-group-addon">
                   <i class="fa fa-tag" ></i>
                 </span>
-                <input type="text" id="inputEmail" name="inputEmail" class="form-control" placeholder="Your E-mail " />
+                <input type="text" id="inputEmail" name="inputEmail" value="{{ .input.Email }}" class="form-control" placeholder="Your E-mail " />
               </div>
               <div class="form-group input-group">
                 <span class="input-group-addon">
                   <i class="fa fa-lock" ></i>
                 </span>
-                <input type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Your Password" />
+                <input type="password" id="inputPassword" name="inputPassword" value="{{ .input.Pass }}" class="form-control" placeholder="Your Password" />
               </div>
               <div class="form-group">
                 <label class="checkbox-inline">
@@ -67,8 +82,18 @@ function chkAndGo(evt){
   //alert(1);
 
   //something error
-  if(document.getElementById("inputEmail").value == "") return false;
-  if(document.getElementById("inputPassword").value == "") return false;
+  if(document.getElementById("inputEmail").value == ""){
+    //document.getElementById("msg_for_user").style.color = "#FF0000";
+    //document.getElementById("msg_for_user").textContent = "Please input your email address!";
+    document.getElementById("msg_for_user").innerHTML = "<p class='error_msg'>Please input your email address!</p>";
+    return false;
+  }
+  if(document.getElementById("inputPassword").value == ""){
+    //document.getElementById("msg_for_user").style.color = "#FF0000";
+    //document.getElementById("msg_for_user").textContent = "Please input your password!";
+    document.getElementById("msg_for_user").innerHTML = "<p class='error_msg'>Please input your password!</p>";
+    return false;
+  }
 
   //send form
   var form = document.form1;

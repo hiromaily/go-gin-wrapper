@@ -176,6 +176,29 @@ func GlobalRecover() gin.HandlerFunc {
 				fmt.Println("[GlobalRecover] c.IsAborted() is true")
 				if c.Errors != nil {
 					errMsg = c.Errors.Last().Err.Error()
+				} else {
+					switch c.Writer.Status() {
+					case 400:
+						errMsg = http.StatusText(http.StatusBadRequest)
+					case 401:
+						errMsg = http.StatusText(http.StatusUnauthorized)
+					case 403:
+						errMsg = http.StatusText(http.StatusForbidden)
+					case 404:
+						errMsg = http.StatusText(http.StatusNotFound)
+					case 405:
+						errMsg = http.StatusText(http.StatusMethodNotAllowed)
+					case 406:
+						errMsg = http.StatusText(http.StatusNotAcceptable)
+					case 407:
+						errMsg = http.StatusText(http.StatusProxyAuthRequired)
+					case 408:
+						errMsg = http.StatusText(http.StatusRequestTimeout)
+					case 500:
+						errMsg = http.StatusText(http.StatusInternalServerError)
+					default:
+						errMsg = "something error is happend."
+					}
 				}
 
 				if IsXHR(c) {

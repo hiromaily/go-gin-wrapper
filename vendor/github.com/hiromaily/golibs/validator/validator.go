@@ -87,24 +87,6 @@ func getErrorMsgFmt(chkItem string, errFmt map[string]string) (string, error) {
 	}
 }
 
-func ConvertErrorMsg(data map[string][]string, errFmt map[string]string) []string {
-
-	msgs := []string{}
-	for key, val := range data {
-		fmtkey := strings.Split(val[1], "=")
-		strFmt, err := getErrorMsgFmt(fmtkey[0], errFmt)
-		if err == nil {
-			if len(fmtkey) == 1 {
-				msgs = append(msgs, fmt.Sprintf(strFmt, data[key][0]))
-			} else {
-				msgs = append(msgs, fmt.Sprintf(strFmt, fmtkey[1], data[key][0]))
-			}
-		}
-		//In case of error, skip.
-	}
-	return msgs
-}
-
 func checkValidation(str string, val string, disp string) []string {
 	ret := []string{disp}
 	strs := strings.Split(str, ",")
@@ -160,4 +142,22 @@ func CheckValidation(s interface{}, brankSkip bool) map[string][]string {
 	}
 
 	return mRet
+}
+
+func ConvertErrorMsgs(data map[string][]string, errFmt map[string]string) []string {
+
+	msgs := []string{}
+	for key, val := range data {
+		fmtkey := strings.Split(val[1], "=")
+		strFmt, err := getErrorMsgFmt(fmtkey[0], errFmt)
+		if err == nil {
+			if len(fmtkey) == 1 {
+				msgs = append(msgs, fmt.Sprintf(strFmt, data[key][0]))
+			} else {
+				msgs = append(msgs, fmt.Sprintf(strFmt, fmtkey[1], data[key][0]))
+			}
+		}
+		//In case of error, skip.
+	}
+	return msgs
 }
