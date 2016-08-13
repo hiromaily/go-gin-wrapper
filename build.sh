@@ -7,8 +7,8 @@
 GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
-TEST_MODE=0    #0:off, 1:after build, run test, 2:only run quickly
-AUTO_EXEC=0
+TEST_MODE=1    #0:off, 1:after build, run test, 2:quick test for customized
+AUTO_EXEC=0    #0.off, 1:after build, execute, 2:only run quickly
 GODEP_MODE=1
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0  #0:off, 1:deploy server, 2:exec test on heroku
@@ -17,14 +17,6 @@ DOCKER_MODE=0  #0:off, 1:run server,    2:exec test on docker
 GO_GET=0
 GO_LINT=0
 RESET_DB=0
-
-###########################################################
-# Run test quickly
-###########################################################
-if [ $TEST_MODE -eq 2 ]; then
-    go run ./cmd/ginserver/main.go
-    exit 0
-fi
 
 
 ###########################################################
@@ -47,13 +39,6 @@ if [ $GO_GET -eq 1 ]; then
     go get -u github.com/tools/godep
     go get -u github.com/lestrrat/go-server-starter/cmd/start_server
 fi
-
-
-###########################################################
-# Adjust version dependency of projects [Before]
-###########################################################
-#cd ${GOPATH}/src/github.com/aws/aws-sdk-go
-#git checkout v0.9.17
 
 
 ###########################################################
@@ -82,6 +67,22 @@ fi
 # go list for check import package
 ###########################################################
 #go list -f '{{.ImportPath}} -> {{join .Imports "\n"}}' ./cmd/ginserver/main.go
+
+
+###########################################################
+# Run test quickly
+###########################################################
+if [ $AUTO_EXEC -eq 2 ]; then
+    go run ./cmd/ginserver/main.go
+    exit 0
+fi
+
+
+###########################################################
+# Adjust version dependency of projects [Before]
+###########################################################
+#cd ${GOPATH}/src/github.com/aws/aws-sdk-go
+#git checkout v0.9.17
 
 
 ###########################################################
@@ -137,6 +138,13 @@ if [ $TEST_MODE -eq 1 ]; then
     #    echo ${domain}.toml
     #    go test -v cmd/ginserver/*.go -f ../../configs/${domain}.toml
     #done
+elif [ $TEST_MODE -eq 2 ]; then
+    echo '============== test quickly =============='
+    go test -run TestLogin -v cmd/ginserver/*.go -f ../../configs/settings.toml
+    EXIT_STATUS=$?
+    if [ $EXIT_STATUS -gt 0 ]; then
+        exit $EXIT_STATUS
+    fi
 fi
 #stress test
 #https://github.com/rakyll/boom

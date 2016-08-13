@@ -14,9 +14,9 @@ import (
 //TODO: it's not finished yet.
 func CheckHttpRefererAndCSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		lg.Info("[CheckHttpRefererAndCSRF]")
 		//Referer
 		url := hh.GetUrl(c)
-		lg.Debugf("url: %s", url)
 		//get referer data mapping table using url (map[string])
 		if refUrl, ok := RefererUrls[url]; ok {
 			//Check Referer
@@ -36,8 +36,8 @@ func CheckHttpRefererAndCSRF() gin.HandlerFunc {
 //TODO: it's not checked yet if it work well or not.
 func CheckHttpReferer() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		lg.Info("[heckHttpReferer]")
 		url := hh.GetUrl(c)
-		lg.Debugf("url: %s", url)
 		//get referer data mapping table using url (map[string])
 		if refUrl, ok := RefererUrls[url]; ok {
 			//Check Referer
@@ -50,6 +50,7 @@ func CheckHttpReferer() gin.HandlerFunc {
 //TODO: it's not finished yet.
 func CheckCSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		lg.Info("[CheckCSRF]")
 		sess.IsTokenSessionValid(c, c.PostForm("gintoken"))
 		c.Next()
 	}
@@ -58,12 +59,13 @@ func CheckCSRF() gin.HandlerFunc {
 //Check Http Header for Ajax request. (For REST)
 func CheckHttpHeader() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		lg.Info("[CheckHttpHeader]")
+
 		apiConf := conf.GetConfInstance().Api
 
 		lg.Debugf("[Request Header]\n%#v\n", c.Request.Header)
 		lg.Debugf("[Request Form]\n%#v\n", c.Request.Form)
 		lg.Debugf("[Request Body]\n%#v\n", c.Request.Body)
-
 		lg.Debugf("c.ClientIP() %s", c.ClientIP())
 
 		//IsAjax := c.Request.Header.Get("X-Requested-With")
@@ -108,6 +110,8 @@ func UpdateUserSession() gin.HandlerFunc {
 //Set Meta Data
 func SetMetaData() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		lg.Info("[SetMetaData]")
+
 		//Context Meta Data
 		//http.Header{
 		// "Referer":[]string{"http://localhost:9999/"},
@@ -123,9 +127,6 @@ func SetMetaData() gin.HandlerFunc {
 		// "X-Custom-Header-Gin":[]string{"key"},
 		// "Content-Type":[]string{"application/x-www-form-urlencoded"},
 		// "Accept-Encoding":[]string{"gzip, deflate, sdch"}}
-
-		//IP check
-		lg.Debugf("c.ClientIP() %s", c.ClientIP())
 
 		//Ajax
 		if IsXHR(c) {
@@ -162,9 +163,8 @@ func SetMetaData() gin.HandlerFunc {
 //When 404 or 405 error occurred, response already been set in controllers/errors/errors.go
 func GlobalRecover() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		//TODO:log can't work well in this func.
 		defer func(c *gin.Context) {
-			fmt.Println("[GlobalRecover] defer func()")
+			lg.Info("[GlobalRecover] defer func()")
 			var errMsg string
 
 			refUrl := "/"
@@ -173,10 +173,13 @@ func GlobalRecover() gin.HandlerFunc {
 			}
 
 			if c.IsAborted() {
-				fmt.Println("[GlobalRecover] c.IsAborted() is true")
+				lg.Debug("[GlobalRecover] c.IsAborted() is true")
 				if c.Errors != nil {
-					errMsg = c.Errors.Last().Err.Error()
-				} else {
+					if c.Errors.Last() != nil {
+						errMsg = c.Errors.Last().Err.Error()
+					}
+				}
+				if errMsg == "" {
 					switch c.Writer.Status() {
 					case 400:
 						errMsg = http.StatusText(http.StatusBadRequest)
@@ -218,7 +221,7 @@ func GlobalRecover() gin.HandlerFunc {
 			}
 			//*
 			if rec := recover(); rec != nil {
-				fmt.Printf("[GlobalRecover] recover() is not nil:\n %v", rec)
+				lg.Debugf("[GlobalRecover] recover() is not nil:\n %v", rec)
 				//TODO:How should response data be decided whether html or json?
 				//TODO:Ajax or not doesn't matter to response. HTTP header of Accept may be better.
 				//TODO:How precise should I follow specifications of HTTP header.
@@ -245,12 +248,13 @@ func GlobalRecover() gin.HandlerFunc {
 }
 
 //Reject specific IP.
-//TODO: it's not fixed yet.
+//TODO: working in progress yet.
 //TODO: it reject all without reverse　proxy ip address.
+//TODO:check registered IP address to reject
 func RejectSpecificIp() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		lg.Info("[RejectSpecificIp]")
 		ip := c.ClientIP()
-		//TODO:check registered IP address to reject
 		//proxy
 		if conf.GetConfInstance().Proxy.Enable {
 			if conf.GetConfInstance().Proxy.Host != ip {
@@ -269,6 +273,8 @@ func RejectSpecificIp() gin.HandlerFunc {
 //TODO: it's not fixed yet.
 func RejectNonHTTPS() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		lg.Info("[RejectNonHTTPS]")
+
 		//TODO:check protocol of url
 		//if strings.Index(c.url, "https://") == -1 {
 		//	c.AbortWithStatus(403)
@@ -311,9 +317,3 @@ func GetLanguage(c *gin.Context) string {
 	}
 	return ""
 }
-
-//Check Referer
-
-//Check Token For CSRF
-
-//Judge loged in or not.

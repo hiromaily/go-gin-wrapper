@@ -99,19 +99,28 @@ func GetTokenSession(c *gin.Context) string {
 
 //Check Token is valid
 func IsTokenSessionValid(c *gin.Context, token string) bool {
-	//default action
-	if GetTokenSession(c) != token {
-		//token error
-		lg.Debug("Token is invalid.")
+	strErr := ""
 
-		//token delete
-		DelTokenSession(c)
+	lg.Info("[IsTokenSessionValid]")
+	lg.Debugf("GetTokenSession(c): %v", GetTokenSession(c))
+	lg.Debugf("token: %v", token)
 
-		c.AbortWithError(400, errors.New(("Token is invalid.")))
-		return false
+	if GetTokenSession(c) == "" && token == "" {
+		strErr = "Token is not allowed as blank."
+	} else if GetTokenSession(c) == "" {
+		strErr = "Token is missing. Session might have expired."
+	} else if GetTokenSession(c) != token {
+		strErr = "Token is invalid."
+	} else {
+		return true
 	}
 
-	return true
+	//token delete
+	DelTokenSession(c)
+
+	lg.Error(strErr)
+	c.AbortWithError(400, errors.New((strErr)))
+	return false
 }
 
 //Set Count

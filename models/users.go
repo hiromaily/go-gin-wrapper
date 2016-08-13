@@ -26,7 +26,7 @@ type Users struct {
 func (us *Models) IsUserEmail(email string, password string) (int, error) {
 	sql := "SELECT user_id, email, password FROM t_users WHERE email=? AND delete_flg=?"
 	data, _, err := us.Db.SelectSQLAllField(sql, email, 0)
-	lg.Debugf("mysql data %+v", data)
+	//lg.Debugf("mysql data %+v", data)
 
 	if err != nil {
 		return 0, err

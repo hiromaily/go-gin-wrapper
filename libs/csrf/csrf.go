@@ -13,6 +13,7 @@ import (
 const TOKEN_SALT string = "goginwebservertoken"
 
 func CreateToken() string {
+	lg.Info("[CreateToken]")
 	//TODO: it may be ok to return just session key.
 	h := md5.New()
 

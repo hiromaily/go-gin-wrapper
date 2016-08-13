@@ -56,7 +56,6 @@ func GetUrl(c *gin.Context) string {
 	// User:(*url.Userinfo)(nil),
 	// Host:"",
 	// Path:"/login", RawPath:"", RawQuery:"", Fragment:""}
-	//fmt.Println(c.Request.URL)
 	url := c.Request.URL
 	return url.Scheme + url.Host + url.Path
 }

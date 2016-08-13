@@ -69,7 +69,7 @@ func resLogin(c *gin.Context, input *LoginRequest, msg string, errors []string) 
 //Index
 func IndexAction(c *gin.Context) {
 	//debug log
-	debugContext(c)
+	//debugContext(c)
 
 	//return header and key
 	api := conf.GetConfInstance().Api
@@ -89,7 +89,7 @@ func IndexAction(c *gin.Context) {
 //Login [GET]
 func LoginGetAction(c *gin.Context) {
 	//debug log
-	debugContext(c)
+	//debugContext(c)
 
 	//If already loged in, go another page using redirect
 	//Judge loged in or not.
@@ -117,7 +117,7 @@ func LoginGetAction(c *gin.Context) {
 //Login [POST]
 func LoginPostAction(c *gin.Context) {
 	//debug log
-	debugContext(c)
+	//debugContext(c)
 
 	//Get Post Parameters
 	posted := &LoginRequest{
