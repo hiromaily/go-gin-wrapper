@@ -87,7 +87,7 @@ function sendAjax(url, method, content){
   })
   .done(function( data, textStatus, jqXHR ) {
     console.log("success");
-    alert(JSON.stringify(data));
+    console.log(JSON.stringify(data));
   })
   .fail(function( jqXHR, textStatus, errorThrown ) {
     console.log("error");

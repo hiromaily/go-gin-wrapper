@@ -104,7 +104,7 @@ func insertUser(c *gin.Context, data *UserRequest) (int64, error) {
 }
 
 // update user
-func updateUser(c *gin.Context, data *UserRequest, id string) (int64, error) {
+func updateUser(data *UserRequest, id string) (int64, error) {
 
 	user := &models.Users{}
 	if data.FirstName != "" {
@@ -128,17 +128,14 @@ func updateUser(c *gin.Context, data *UserRequest, id string) (int64, error) {
 func UsersListGetAction(c *gin.Context) {
 	lg.Debug("[GET] UsersListGetAction")
 
-	//Param
-	//FirstName := c.Query("firstName")
-	//lg.Debug("firstName:", FirstName)
-
-	mapRet, err := models.GetDBInstance().GetUserList("")
+	var users []models.Users
+	_, err := models.GetDBInstance().GetUserList(&users, "", "")
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	} else {
 		//Make json for response and return
-		jslib.RtnUserJson(c, 0, js.CreateUserListJson(mapRet))
+		jslib.RtnUserJson(c, 0, js.CreateUserListJson(users))
 		return
 	}
 }
@@ -179,13 +176,18 @@ func UserGetAction(c *gin.Context) {
 		return
 	}
 
-	mapRet, err := models.GetDBInstance().GetUserList(userId)
+	var user models.Users
+	b, err := models.GetDBInstance().GetUserList(&user, userId, "")
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	} else {
 		//Make json for response and return
-		jslib.RtnUserJson(c, 0, js.CreateUserListJson(mapRet))
+		if b {
+			jslib.RtnUserJson(c, 0, js.CreateUserListJson([]models.Users{user}))
+		} else {
+			jslib.RtnUserJson(c, 0, js.CreateUserListJson(nil))
+		}
 		return
 	}
 }
@@ -203,10 +205,13 @@ func UserPutAction(c *gin.Context) {
 	}
 
 	// Update
-	_, err = updateUser(c, &uData, c.Param("id"))
+	affected, err := updateUser(&uData, c.Param("id"))
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
+	}
+	if affected == 0 {
+		lg.Debug("there was no updated data.")
 	}
 
 	jslib.RtnUserJson(c, 0, js.CreateUserJson(0))
@@ -225,10 +230,13 @@ func UserDeleteAction(c *gin.Context) {
 	}
 
 	//Delete
-	err := models.GetDBInstance().DeleteUser(c.Param("id"))
+	affected, err := models.GetDBInstance().DeleteUser(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
+	}
+	if affected == 0 {
+		lg.Debug("there was no updated data.")
 	}
 
 	jslib.RtnUserJson(c, 0, js.CreateUserJson(0))

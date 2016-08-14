@@ -1,7 +1,8 @@
 package jsons
 
 import (
-	u "github.com/hiromaily/golibs/utils"
+	//u "github.com/hiromaily/golibs/utils"
+	"github.com/hiromaily/go-gin-wrapper/models"
 )
 
 /***************** User Json *****************/
@@ -27,19 +28,20 @@ type UserResponse struct {
 }
 
 // Response for user list
-func CreateUserListJson(data []map[string]interface{}) *UserListResponse {
+//func CreateUserListJson(data []map[string]interface{}) *UserListResponse {
+func CreateUserListJson(us []models.Users) *UserListResponse {
 	users := []User{}
 	var (
 		code int    = 0
 		msg  string = ""
 	)
 
-	if data != nil {
-		for _, v := range data {
+	if us != nil {
+		for _, v := range us {
 			user := User{
-				Id:        u.Itoi(v["user_id"]),
-				FirstName: u.Itos(v["first_name"]),
-				LastName:  u.Itos(v["last_name"]),
+				Id:        v.Id,
+				FirstName: v.FirstName,
+				LastName:  v.LastName,
 			}
 			users = append(users, user)
 		}

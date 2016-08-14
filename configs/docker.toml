@@ -55,5 +55,6 @@ access_key = "XXXXXXXXXXXX"
 secret_key = "XXXXXXXXXXXX"
 region = "ap-northeast-1"
 
-[profile]
-enable = false
+[develop]
+profile_enable = false
+recover_enable = true

@@ -219,26 +219,28 @@ func GlobalRecover() gin.HandlerFunc {
 				}
 				return
 			}
-			//*
-			if rec := recover(); rec != nil {
-				lg.Debugf("[GlobalRecover] recover() is not nil:\n %v", rec)
-				//TODO:How should response data be decided whether html or json?
-				//TODO:Ajax or not doesn't matter to response. HTTP header of Accept may be better.
-				//TODO:How precise should I follow specifications of HTTP header.
 
-				if IsXHR(c) {
-					c.JSON(http.StatusInternalServerError, gin.H{
-						"code":  "500",
-						"error": rec,
-					})
-				} else {
-					c.HTML(http.StatusInternalServerError, "pages/errors/error.tmpl", gin.H{
-						"code":    "500",
-						"message": rec,
-						"url":     refUrl,
-					})
+			if conf.GetConfInstance().Develop.RecoverEnable {
+				if rec := recover(); rec != nil {
+					lg.Debugf("[GlobalRecover] recover() is not nil:\n %v", rec)
+					//TODO:How should response data be decided whether html or json?
+					//TODO:Ajax or not doesn't matter to response. HTTP header of Accept may be better.
+					//TODO:How precise should I follow specifications of HTTP header.
+
+					if IsXHR(c) {
+						c.JSON(http.StatusInternalServerError, gin.H{
+							"code":  "500",
+							"error": rec,
+						})
+					} else {
+						c.HTML(http.StatusInternalServerError, "pages/errors/error.tmpl", gin.H{
+							"code":    "500",
+							"message": rec,
+							"url":     refUrl,
+						})
+					}
+					return
 				}
-				return
 			}
 		}(c)
 

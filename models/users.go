@@ -12,11 +12,11 @@ import (
 // e.g. db, err := sql.Open("mysql", "root:@/?parseTime=true")
 // http://stackoverflow.com/questions/29341590/go-parse-time-from-database
 type Users struct {
-	//UserId    int       `column:"user_id"          db:"user_id"`
-	FirstName string `column:"first_name"       db:"first_name"`
-	LastName  string `column:"last_name"        db:"last_name"`
-	Email     string `column:"email"            db:"email"`
-	Password  string `column:"password"         db:"password"`
+	Id        int    `column:"user_id"`
+	FirstName string `column:"first_name"`
+	LastName  string `column:"last_name"`
+	Email     string `column:"email"`
+	Password  string `column:"password"`
 	//DeleteFlg string    `column:"delete_flg"       db:"delete_flg"`
 	//Created   time.Time `column:"create_datetime"  db:"create_datetime"`
 	//Updated   time.Time `column:"update_datetime"  db:"update_datetime"`
@@ -24,47 +24,56 @@ type Users struct {
 
 //User authorization when login
 func (us *Models) IsUserEmail(email string, password string) (int, error) {
-	sql := "SELECT user_id, email, password FROM t_users WHERE email=? AND delete_flg=?"
-	data, _, err := us.Db.SelectSQLAllField(sql, email, 0)
-	//lg.Debugf("mysql data %+v", data)
-
-	if err != nil {
-		return 0, err
+	type LoginUser struct {
+		Id       int
+		Email    string
+		Password string
 	}
 
-	if len(data) == 0 {
+	sql := "SELECT user_id, email, password FROM t_users WHERE email=? AND delete_flg=? LIMIT 1"
+
+	var user LoginUser
+	b := us.Db.SelectIns(sql, email, 0).ScanOne(&user)
+
+	if us.Db.Err != nil {
+		lg.Debugf("IsUserEmail() Error: %s", us.Db.Err)
+		return 0, us.Db.Err
+	}
+
+	//no data
+	if !b {
 		return 0, fmt.Errorf("email may be wrong.")
 	}
 
-	if u.Itos(data[0]["password"]) != hs.GetMD5Plus(password, "") {
-		lg.Debugf("data[0]['password'] : %s\n", u.Itos(data[0]["password"]))
-		lg.Debugf("data[0]['email'] : %s\n", u.Itos(data[0]["email"]))
-		lg.Debugf("GetMD5Plus : %s\n", hs.GetMD5Plus(password, u.Itos(data[0]["email"])))
-
+	if user.Password != hs.GetMD5Plus(password, "") {
 		return 0, fmt.Errorf("password is invalid.")
 	}
-	//
-	return u.Itoi(data[0]["user_id"]), nil
+	return user.Id, nil
 }
 
 // Get User List
-func (us *Models) GetUserList(id string) (data []map[string]interface{}, err error) {
-	sql := "SELECT user_id, first_name, last_name FROM t_users WHERE delete_flg=?"
+func (us *Models) GetUserList(users interface{}, id, sql string) (bool, error) {
+	defaultSql := "SELECT user_id, first_name, last_name, email, password FROM t_users WHERE delete_flg=?"
+	if sql == "" {
+		sql = defaultSql
+	}
+
+	//TODO: When Test for result is 0 record, set 1 to delFlg
+	delFlg := 0
+
+	var b bool
 	if id != "" {
 		sql += " AND user_id=?"
-		data, _, err = us.Db.SelectSQLAllField(sql, 0, u.Atoi(id))
+		b = us.Db.SelectIns(sql, delFlg, u.Atoi(id)).ScanOne(users)
 	} else {
-		//data, _, err := us.Db.SelectSQLAllField(sql, 1)
-		data, _, err = us.Db.SelectSQLAllField(sql, 0)
+		b = us.Db.SelectIns(sql, delFlg).Scan(users)
 	}
-	if err != nil {
-		lg.Errorf("SQL may be wrong. : %s\n", err.Error())
-		return nil, err
-	} else if len(data) == 0 {
-		lg.Info("No data.")
-		return nil, nil
+
+	if us.Db.Err != nil {
+		return false, us.Db.Err
 	}
-	return data, nil
+
+	return b, nil
 }
 
 // Insert User
@@ -72,7 +81,7 @@ func (us *Models) InsertUser(users *Users) (int64, error) {
 	sql := "INSERT INTO t_users (first_name, last_name, email, password) VALUES (?,?,?,?)"
 
 	//hash password
-	return us.Db.InesrtSQL(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""))
+	return us.Db.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""))
 }
 
 // Update User
@@ -105,27 +114,12 @@ func (us *Models) UpdateUser(users *Users, id string) (int64, error) {
 	//sql debug
 	//lg.Debugf("update sql: %s", sql)
 
-	return us.Db.UpdateSQL(sql, vals...)
+	//Update
+	return us.Db.Exec(sql, vals...)
 }
 
 // Delete User
-func (us *Models) DeleteUser(id string) error {
+func (us *Models) DeleteUser(id string) (int64, error) {
 	sql := "DELETE FROM t_users WHERE user_id=?"
-	return us.Db.ExecSQL(sql, u.Atoi(id))
+	return us.Db.Exec(sql, u.Atoi(id))
 }
-
-/*
-//time.Now().Format(msyqlDatetimeFormat)
-func NewUser(id int, firstN string, lastN string) Users {
-	return Users{
-		UserId:    id,
-		FirstName: firstN,
-		LastName:  lastN,
-		DeleteFlg: "0",
-		//Created:   time.Now().Format(msyqlDatetimeFormat),
-		//Updated:   time.Now().Format(msyqlDatetimeFormat),
-		Created: time.Now(),
-		Updated: time.Now(),
-	}
-}
-*/

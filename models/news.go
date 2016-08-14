@@ -19,7 +19,7 @@ func (self *Models) GetNewsList() ([]map[string]interface{}, error) {
 	sql := "SELECT news_id, article, create_datetime FROM t_news WHERE delete_flg='0' ORDER BY create_datetime DESC"
 	//TODO:handle correctly even if no parameter
 	//TODO:commonalize below code for models package.
-	data, _, err := self.Db.SelectSQLAllField(sql, nil)
+	data, _, err := self.Db.Select(sql, nil)
 	if err != nil {
 		lg.Errorf("SQL may be wrong. : %s\n", err.Error())
 		return nil, err

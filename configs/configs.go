@@ -21,7 +21,7 @@ type Config struct {
 	MySQL       MySQLConfig
 	Redis       RedisConfig
 	Aws         AwsConfig
-	Profile     ProfileConfig
+	Develop     DevelopConfig
 }
 
 type ServerConfig struct {
@@ -87,8 +87,9 @@ type AwsConfig struct {
 	Region    string `toml:"region"`
 }
 
-type ProfileConfig struct {
-	Enable bool `toml:"enable"`
+type DevelopConfig struct {
+	ProfileEnable bool `toml:"profile_enable"`
+	RecoverEnable bool `toml:"recover_enable"`
 }
 
 //check validation of config

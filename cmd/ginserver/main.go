@@ -228,7 +228,7 @@ func setHTTPServer(testFlg uint8, path string) *gin.Engine {
 	routes.SetHTTPUrls(r)
 
 	// Set Profiling
-	if conf.GetConfInstance().Profile.Enable {
+	if conf.GetConfInstance().Develop.ProfileEnable {
 		ginpprof.Wrapper(r)
 	}
 

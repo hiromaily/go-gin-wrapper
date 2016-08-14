@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/golibs/times"
 	u "github.com/hiromaily/golibs/utils"
 	"reflect"
@@ -35,6 +36,9 @@ type ServerInfo struct {
 
 var dbInfo MS
 
+//-----------------------------------------------------------------------------
+// Basic
+//-----------------------------------------------------------------------------
 func New(host, dbname, user, pass string, port uint16) {
 	var err error
 	if dbInfo.DB == nil {
@@ -46,7 +50,7 @@ func New(host, dbname, user, pass string, port uint16) {
 
 		dbInfo.DB, err = dbInfo.Connection()
 	}
-	//fmt.Printf("dbInfo.db %+v\n", *dbInfo.DB)
+	//lg.Debugf("dbInfo.db %+v\n", *dbInfo.DB)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -99,6 +103,9 @@ func (ms *MS) Close() {
 	ms.DB.Close()
 }
 
+//-----------------------------------------------------------------------------
+// Select
+//-----------------------------------------------------------------------------
 // SELECT Count: Get number of rows
 func (ms *MS) SelectCount(countSql string, args ...interface{}) (int, error) {
 	//field on table
@@ -114,26 +121,9 @@ func (ms *MS) SelectCount(countSql string, args ...interface{}) (int, error) {
 	return count, nil
 }
 
-// SELECT : Get All field you set(Though you get only record, use it.)
-func (ms *MS) SelectSQLAllField(selectSQL string, args ...interface{}) ([]map[string]interface{}, []string, error) {
-	defer times.Track(time.Now(), "SelectSQLAllField()")
-	//540.417µs
-
-	//If no args, set nil
-
-	//1. create sql and exec
-	//rows, err := self.db.Query("SELECT * FROM t_users WHERE delete_flg=?", "0")
-	rows, err := ms.DB.Query(selectSQL, args...)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return ms.convertRowsToMaps(rows)
-}
-
 //get Rows and return db instance
-func (ms *MS) SelectSQLAllFieldIns(selectSQL string, args ...interface{}) *MS {
-	defer times.Track(time.Now(), "SelectSQLAllFieldIns()")
+func (ms *MS) SelectIns(selectSQL string, args ...interface{}) *MS {
+	defer times.Track(time.Now(), "SelectIns()")
 	//SelectSQLAllFieldIns() took 471.577µs
 
 	//If no args, set nil
@@ -142,88 +132,141 @@ func (ms *MS) SelectSQLAllFieldIns(selectSQL string, args ...interface{}) *MS {
 	//rows, err := self.db.Query("SELECT * FROM t_users WHERE delete_flg=?", "0")
 	ms.Rows, ms.Err = ms.DB.Query(selectSQL, args...)
 	if ms.Err != nil {
-		fmt.Println("SelectSQLAllFieldIns():[Error]:", ms.Err)
+		lg.Errorf("SelectSQLAllFieldIns()->ms.DB.Query():error is %s, \n %s", ms.Err, selectSQL)
 	}
 
 	return ms
 }
 
 //set extracted data into parameter variable
-func (ms *MS) ScanOne(x interface{}) {
-	defer times.Track(time.Now(), "ScanOne()")
+func (ms *MS) ScanOne(x interface{}) bool {
+	//defer times.Track(time.Now(), "ScanOne()")
 	//ScanOne() took 5.23µs
 
 	if ms.Err != nil {
-		fmt.Println("ScanOne():[Error]:", ms.Err)
-		return
+		lg.Errorf("ScanOne(): ms.Err has error: %s", ms.Err)
+		return false
 	}
 
 	//e.g)v = person Person
 	v := reflect.ValueOf(x)
 	if v.Kind() != reflect.Ptr || v.IsNil() {
 		ms.Err = errors.New("parameter is not valid. it sould be pointer and not nil.")
-		return
+		return false
 	} else {
 		if v.Elem().Kind() == reflect.Struct {
 
-			//values := convertToSlice(v.Elem())
-			structType := v.Elem().Type()
-			values := make([]interface{}, structType.NumField())
-			scanArgs := make([]interface{}, len(values))
-			for i := range values {
-				scanArgs[i] = &values[i]
-			}
+			//create container to set scaned record on database
+			values, scanArgs := makeScanArgs(v.Elem().Type())
 
 			//check len(value) and column
-			columns, err := ms.Rows.Columns()
-			if err != nil {
-				//when Rows are closed, error occur.
-				ms.Err = err
-				return
-			}
-			if len(columns) != len(values) {
-				ms.Err = fmt.Errorf("number of struct field(%d) doesn't match to columns of sql(%d).", len(values), len(columns))
-				return
+			validateStructAndColumns(ms, values)
+			if ms.Err != nil {
+				return false
 			}
 
+			// rows.Next()
 			ret := ms.Rows.Next()
 			if !ret {
-				ms.Err = errors.New("Rows.Next(): No data")
+				//ms.Err = errors.New("nodata")
+				return false
 			}
 
-			//ms.Err = ms.Rows.Scan(values...)
+			// rows.Scan()
 			ms.Err = ms.Rows.Scan(scanArgs...)
 			if ms.Err != nil {
-				return
+				return false
 			}
+
 			//ms.Err = ms.Rows.Scan(v)
-			scan(values, v.Elem())
+			scanStruct(values, v.Elem())
 		} else {
 			ms.Err = errors.New("parameter should be pointer of struct slice or struct")
+			return false
 		}
 	}
+	return true
 }
 
-//TODO:work in progress
-//func (ms *MS) convertRowsToStruct(data interface{}) error {
-func (ms *MS) Scan(v ...interface{}) {
-	//use gorm source code as a reference
-	// gorm/callback_query.go
+func (ms *MS) Scan(x interface{}) bool {
+	//defer times.Track(time.Now(), "Scan()")
+	//Scan() took 465.971µs
 
-	rv := reflect.ValueOf(v)
-	if rv.Kind() != reflect.Ptr || rv.IsNil() {
-		ms.Err = errors.New("parameter is not valid. it sould be pointer and not nil.")
-		return
+	if ms.Err != nil {
+		lg.Errorf("Scan(): ms.Err has error: %s", ms.Err)
+		return false
 	}
 
-	ms.Rows.Next()
-	ms.Err = ms.Rows.Scan(v...)
+	//e.g)v = persons []Person
+	v := reflect.ValueOf(x)
 
-	return
+	if v.Kind() != reflect.Ptr || v.IsNil() {
+		ms.Err = errors.New("parameter is not valid. it sould be pointer and not nil.")
+		return false
+	} else {
+		if v.Elem().Kind() == reflect.Slice || v.Elem().Kind() == reflect.Array {
+			elemType := v.Elem().Type().Elem() //reflects_test.TeacherInfo
+			newElem := reflect.New(elemType).Elem()
+
+			//create container to set scaned record on database
+			values, scanArgs := makeScanArgs(newElem.Type())
+
+			//check len(value) and column
+			validateStructAndColumns(ms, values)
+			if ms.Err != nil {
+				return false
+			}
+
+			// rows.Next()
+			cnt := 0
+			for ms.Rows.Next() {
+				ms.Err = ms.Rows.Scan(scanArgs...)
+				if ms.Err != nil {
+					return false
+				}
+
+				scanStruct(values, newElem)
+				v.Elem().Set(reflect.Append(v.Elem(), newElem))
+				cnt++
+			}
+			if cnt == 0 {
+				return false
+			}
+		} else {
+			ms.Err = errors.New("parameter is not valid. it sould be pointer and not nil.")
+			return false
+		}
+	}
+
+	return true
+}
+
+func makeScanArgs(structType reflect.Type) ([]interface{}, []interface{}) {
+	values := make([]interface{}, structType.NumField())
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	return values, scanArgs
+}
+
+func validateStructAndColumns(ms *MS, values []interface{}) error {
+	columns, err := ms.Rows.Columns()
+	if err != nil {
+		//when Rows are closed, error occur.
+		ms.Err = err
+		return ms.Err
+	}
+	if len(columns) != len(values) {
+		ms.Err = fmt.Errorf("number of struct field(%d) doesn't match to columns of sql(%d).", len(values), len(columns))
+		return ms.Err
+	}
+	return nil
 }
 
 //Set data
-func scan(values []interface{}, v reflect.Value) {
+func scanStruct(values []interface{}, v reflect.Value) {
 	structType := v.Type()
 	for i := 0; i < structType.NumField(); i++ {
 		val := reflect.ValueOf(values[i])
@@ -246,16 +289,28 @@ func scan(values []interface{}, v reflect.Value) {
 		case reflect.Struct:
 			//time.Time
 			if u.CheckInterface(values[i]) == "time.Time" {
-				//v.Field(i).Set(reflect.ValueOf(u.ItoT(values[i])))
-				//plus format datetime
 				v.Field(i).Set(reflect.ValueOf(u.ItoT(values[i]).Format(tFomt)))
 			}
 		default: // reflect.Array, reflect.Struct, reflect.Interface
-			fmt.Println(val.Kind(), val.Type(), ":dafault")
 			v.Field(i).Set(reflect.ValueOf(values[i]))
 		}
 	}
 	return
+}
+
+// SELECT : Get All field you set(Though you get only record, use it.)
+func (ms *MS) Select(selectSQL string, args ...interface{}) ([]map[string]interface{}, []string, error) {
+	defer times.Track(time.Now(), "SelectSQLAllField()")
+	//540.417µs
+
+	//1. create sql and exec
+	//rows, err := self.db.Query("SELECT * FROM t_users WHERE delete_flg=?", "0")
+	rows, err := ms.DB.Query(selectSQL, args...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return ms.convertRowsToMaps(rows)
 }
 
 // Convert result of select into Map[] type. Return multiple array map and interface(plural lines)
@@ -269,21 +324,15 @@ func (ms *MS) convertRowsToMaps(rows *sql.Rows) ([]map[string]interface{}, []str
 		return nil, nil, err
 	}
 
-	//variable for stored each field data
-	//values := make([]sql.RawBytes, len(columns)) //it cause error
 	values := make([]interface{}, len(columns))
 
 	// rows.Scan は引数に `[]interface{}`が必要.
 	scanArgs := make([]interface{}, len(values))
 
 	for i := range values {
-		//I don't know why set address to another variable
-		//set address of value to variable for scan
 		scanArgs[i] = &values[i]
 	}
 
-	//retMaps := []map[string]string{}
-	//rowdata := map[string]string{}
 	retMaps := []map[string]interface{}{}
 	//
 	for rows.Next() { //true or false
@@ -298,16 +347,7 @@ func (ms *MS) convertRowsToMaps(rows *sql.Rows) ([]map[string]interface{}, []str
 
 		//var v string
 		for i, value := range values {
-			//Check type
-			//val := reflect.ValueOf(value) // ValueOfでreflect.Value型のオブジェクトを取得
-			//fmt.Println("val.Type()", val.Type(), "val.Kind()", val.Kind()) // Typeで変数の型を取得
-
 			if u.CheckInterface(value) == "[]uint8" {
-				//[]uint8 to []byte to string
-				//if tmp, ok := value.([]byte); ok {
-				//	//value = strconv.Itoa(int(tmp))
-				//	value = string(tmp)
-				//}
 				value = u.ItoBS(value)
 			} else if u.CheckInterface(value) == "time.Time" {
 				value = u.ItoT(value).Format(tFomt)
@@ -328,25 +368,19 @@ func (ms *MS) convertRowsToMaps(rows *sql.Rows) ([]map[string]interface{}, []str
 
 			//rowdata[columns[i]] = v
 			rowdata[columns[i]] = value
-			//fmt.Println(columns[i], ": ", v)
 		}
 		retMaps = append(retMaps, rowdata)
 	}
 	return retMaps, columns, nil
 }
 
-// Execution simply
-func (ms *MS) ExecSQL(sqlString string, args ...interface{}) error {
-	//result, err := self.db.Exec("INSERT t_users SET first_name=?, last_name=?", "Mika", "Haruda")
-	_, err := ms.DB.Exec(sqlString, args...)
-	return err
-}
-
-// INSERT
-func (self *MS) InesrtSQL(insertSQL string, args ...interface{}) (int64, error) {
+//-----------------------------------------------------------------------------
+// Insert
+//-----------------------------------------------------------------------------
+func (self *MS) Insert(sql string, args ...interface{}) (int64, error) {
 	//1.creates a prepared statement (placeholder)
 	//insertSQL := "INSERT t_users SET first_name=?, last_name=?"
-	stmt, err := self.DB.Prepare(insertSQL)
+	stmt, err := self.DB.Prepare(sql)
 	if err != nil {
 		return 0, err
 	}
@@ -365,12 +399,14 @@ func (self *MS) InesrtSQL(insertSQL string, args ...interface{}) (int64, error) 
 	return res.LastInsertId()
 }
 
-// UPDATE
-func (ms *MS) UpdateSQL(updateSQL string, args ...interface{}) (int64, error) {
+//-----------------------------------------------------------------------------
+// UPDATE / DELETE
+//-----------------------------------------------------------------------------
+func (ms *MS) Exec(sql string, args ...interface{}) (int64, error) {
 
 	//1.creates a prepared statement (placeholder)
 	//updateSQL := "UPDATE t_users SET first_name=? WHERE user_id=?"
-	stmt, err := ms.DB.Prepare(updateSQL)
+	stmt, err := ms.DB.Prepare(sql)
 	if err != nil {
 		return 0, err
 	}
@@ -387,4 +423,11 @@ func (ms *MS) UpdateSQL(updateSQL string, args ...interface{}) (int64, error) {
 	//3.Get number of changed rows
 	//rows, err := res.RowsAffected()
 	return res.RowsAffected()
+}
+
+// Execution simply
+func (ms *MS) Exec2(sql string, args ...interface{}) error {
+	//result, err := self.db.Exec("INSERT t_users SET first_name=?, last_name=?", "Mika", "Haruda")
+	_, err := ms.DB.Exec(sql, args...)
+	return err
 }
