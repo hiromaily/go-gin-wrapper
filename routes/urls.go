@@ -3,6 +3,7 @@ package routes
 import (
 	//"fmt"
 	"github.com/gin-gonic/gin"
+	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/controllers/accounts"
 	"github.com/hiromaily/go-gin-wrapper/controllers/admins"
 	us "github.com/hiromaily/go-gin-wrapper/controllers/api/users"
@@ -67,8 +68,9 @@ func SetHTTPUrls(r *gin.Engine) {
 	//-----------------------
 	//Admin [BasicAuth()]
 	//-----------------------
+	ba := conf.GetConfInstance().Server.BasicAuth
 	authorized := r.Group("/admin", gin.BasicAuth(gin.Accounts{
-		"web": "test",
+		ba.User: ba.Pass,
 	}))
 	//authorized := r.Group("/admin", ba.BasicAuth(ba.Accounts{
 	//	"web": "test",

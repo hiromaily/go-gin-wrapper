@@ -20,6 +20,10 @@ max_age =  300     #(s)
 secure = false    #set false in development environment, production environment requires true
 http_only = true
 
+[server.basic_auth]
+user = "web"
+pass = "test"
+
 [proxy]
 enable = false
 host = "127.0.0.1"

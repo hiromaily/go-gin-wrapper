@@ -3,8 +3,11 @@ package log
 import (
 	"fmt"
 	u "github.com/hiromaily/golibs/utils"
+	"github.com/shiena/ansicolor"
 	"log"
 	"os"
+	"runtime"
+	"strings"
 )
 
 //Output e.g.
@@ -46,16 +49,63 @@ var (
 )
 
 type LogObject struct {
-	logger *log.Logger
+	loggerStd    *log.Logger
+	loggerFile   *log.Logger
+	logLevel     uint8
+	logFileLevel uint8
 }
 
 var (
-	logStdOut  LogObject = LogObject{}
-	logFileOut LogObject = LogObject{}
+	logStdOut  *log.Logger
+	logFileOut *log.Logger
 )
 
+// get current func name
+func currentFunc(skip int) string {
+	programCounter, _, _, ok := runtime.Caller(skip)
+	if !ok {
+		return ""
+	}
+	sl := strings.Split(runtime.FuncForPC(programCounter).Name(), ".")
+	return sl[len(sl)-1]
+}
+
+func getStatus(key string) uint8 {
+	switch key {
+	case "Debug", "Debugf":
+		return DEBUG_STATUS
+	case "Info", "Infof":
+		return INFO_STATUS
+	case "Warn", "Warnf":
+		return WARNING_STATUS
+	case "Error", "Errorf":
+		return ERROR_STATUS
+	case "Fatal", "Fatalf":
+		return FATAL_STATUS
+	default:
+		return 0
+	}
+}
+
+func getPrefix(key string) string {
+	switch key {
+	case "Debug", "Debugf":
+		return DEBUG_PREFIX
+	case "Info", "Infof":
+		return INFO_PREFIX
+	case "Warn", "Warnf":
+		return WARNING_PREFIX
+	case "Error", "Errorf":
+		return ERROR_PREFIX
+	case "Fatal", "Fatalf":
+		return FATAL_PREFIX
+	default:
+		return ""
+	}
+}
+
 //for output log file
-func (self *LogObject) openFile(fileName string) {
+func openFile(logger *log.Logger, fileName string) {
 	if fileName == "" {
 		return
 	}
@@ -64,32 +114,116 @@ func (self *LogObject) openFile(fileName string) {
 	if err != nil {
 		log.Fatal("Error opening file :", err.Error())
 	}
-	self.logger.SetOutput(f)
+	logger.SetOutput(f)
+}
+
+// Set color
+func setColor() {
+	logStdOut.SetOutput(ansicolor.NewAnsiColorWriter(os.Stdout))
 }
 
 //Create New Original Object
-//e.g.
-// lg.New("[ProjectName] ", Ltime|Lshortfile, "/var/log/go/xxx.log")
-func New(prefix string, logFmt int, fileName string) (*log.Logger, error) {
-	logObj := log.New(os.Stderr, prefix, logFmt)
+func New(level, fileLevel uint8, logFmt int, prefix, fileName string) *LogObject {
+	logObj := &LogObject{}
+	logObj.logLevel = level
+	logObj.logFileLevel = fileLevel
 
-	if fileName != "" {
-		f, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-		if err != nil {
-			log.Fatal("Error opening logfile :", err.Error())
-			return nil, err
-		}
-		//logObj.SetOutput undefined (type *log.Logger has no field or method SetOutput) on golang version 1.4
-		logObj.SetOutput(f)
+	//Log File Path
+	if fileName == "" {
+		fileName = filePathName
 	}
 
-	return logObj, nil
+	//Log Format
+	if logFmt == 0 {
+		//logFmt = log.Ltime                               //2
+		logFmt = log.Ltime | log.Lshortfile //18
+		//logFmt = log.LstdFlags | log.Lshortfile          //19
+		//logFmt = log.Ldate | log.Ltime | log.Lshortfile  //19
+	}
+
+	logObj.loggerStd = log.New(os.Stderr, prefix, logFmt)
+	logObj.loggerFile = log.New(os.Stderr, prefix, logFmt)
+
+	if fileLevel != LOG_OFF_COUNT {
+		openFile(logObj.loggerFile, fileName)
+	}
+
+	return logObj
+}
+
+func (lo *LogObject) Out(key string, v ...interface{}) {
+	nv := u.Unshift(v, getPrefix(key))
+
+	if lo.logLevel <= getStatus(key) {
+		if lo.logFileLevel <= getStatus(key) {
+			lo.loggerFile.Output(2, fmt.Sprint(nv...))
+		} else {
+			lo.loggerStd.Output(2, fmt.Sprint(nv...))
+		}
+	}
+}
+
+func (lo *LogObject) Outf(key, format string, v ...interface{}) {
+	if lo.logLevel <= getStatus(key) {
+		if lo.logFileLevel <= getStatus(key) {
+			lo.loggerFile.Output(2, fmt.Sprintf(getPrefix(key)+format, v...))
+		} else {
+			lo.loggerStd.Output(2, fmt.Sprintf(getPrefix(key)+format, v...))
+		}
+	}
+}
+
+func (lo *LogObject) Debug(v ...interface{}) {
+	key := currentFunc(1)
+	lo.Out(key, v...)
+}
+
+func (lo *LogObject) Debugf(format string, v ...interface{}) {
+	key := currentFunc(1)
+	lo.Outf(key, format, v...)
+}
+
+func (lo *LogObject) Info(v ...interface{}) {
+	key := currentFunc(1)
+	lo.Out(key, v...)
+}
+
+func (lo *LogObject) Infof(format string, v ...interface{}) {
+	key := currentFunc(1)
+	lo.Outf(key, format, v...)
+}
+
+func (lo *LogObject) Warn(v ...interface{}) {
+	key := currentFunc(1)
+	lo.Out(key, v...)
+}
+
+func (lo *LogObject) Warnf(format string, v ...interface{}) {
+	key := currentFunc(1)
+	lo.Outf(key, format, v...)
+}
+
+func (lo *LogObject) Error(v ...interface{}) {
+	key := currentFunc(1)
+	lo.Out(key, v...)
+}
+
+func (lo *LogObject) Errorf(format string, v ...interface{}) {
+	key := currentFunc(1)
+	lo.Outf(key, format, v...)
+}
+
+func (lo *LogObject) Fatal(v ...interface{}) {
+	key := currentFunc(1)
+	lo.Out(key, v...)
+}
+
+func (lo *LogObject) Fatalf(format string, v ...interface{}) {
+	key := currentFunc(1)
+	lo.Outf(key, format, v...)
 }
 
 //Initialize base log object using default setting
-//filePath have to include file name.
-//e.g.
-// lg.InitializeLog(lg.DEBUG_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/goweb.log")
 func InitializeLog(level, fileLevel uint8, logFmt int, prefix, fileName string) {
 	logLevel = level
 	logFileLevel = fileLevel
@@ -108,152 +242,91 @@ func InitializeLog(level, fileLevel uint8, logFmt int, prefix, fileName string) 
 	}
 
 	//Log Object
-	logStdOut.logger = log.New(os.Stderr, prefix, logFmt)
+	logStdOut = log.New(os.Stderr, prefix, logFmt)
+	// color mode
+	setColor()
 
-	logFileOut.logger = log.New(os.Stderr, prefix, logFmt)
+	logFileOut = log.New(os.Stderr, prefix, logFmt)
 	if fileLevel != LOG_OFF_COUNT {
-		logFileOut.openFile(fileName)
+		openFile(logFileOut, fileName)
+	}
+}
+
+func out(key string, v ...interface{}) {
+	nv := u.Unshift(v, getPrefix(key))
+
+	if logLevel <= getStatus(key) {
+		if logFileLevel <= getStatus(key) {
+			//file
+			logFileOut.Output(2, fmt.Sprint(nv...))
+		} else {
+			logStdOut.Output(2, fmt.Sprint(nv...))
+		}
+	}
+}
+
+func outf(key, format string, v ...interface{}) {
+	if logLevel <= getStatus(key) {
+		if logFileLevel <= getStatus(key) {
+			//file
+			logFileOut.Output(2, fmt.Sprintf(getPrefix(key)+format, v...))
+		} else {
+			logStdOut.Output(2, fmt.Sprintf(getPrefix(key)+format, v...))
+		}
 	}
 }
 
 //Debug
 func Debug(v ...interface{}) {
-	//nv := append([]interface{}{DEBUG_PREFIX}, v...)
-	nv := u.Unshift(v, DEBUG_PREFIX)
-
-	if logLevel <= DEBUG_STATUS {
-		if logFileLevel <= DEBUG_STATUS {
-			//file
-			//logFileOut.logger.Print(nv...)
-			logFileOut.logger.Output(2, fmt.Sprint(nv...))
-		} else {
-			//logStdOut.logger.Print(nv...)
-			logStdOut.logger.Output(2, fmt.Sprint(nv...))
-		}
-	}
+	key := currentFunc(1)
+	out(key, v...)
 }
 
 func Debugf(format string, v ...interface{}) {
-	if logLevel <= DEBUG_STATUS {
-		if logFileLevel <= DEBUG_STATUS {
-			//file
-			//logFileOut.logger.Printf(DEBUG_PREFIX + format, v...)
-			logFileOut.logger.Output(2, fmt.Sprintf(DEBUG_PREFIX+format, v...))
-		} else {
-			//logStdOut.logger.Printf(DEBUG_PREFIX + format, v...)
-			logStdOut.logger.Output(2, fmt.Sprintf(DEBUG_PREFIX+format, v...))
-		}
-	}
+	key := currentFunc(1)
+	outf(key, format, v...)
 }
 
 //Info
 func Info(v ...interface{}) {
-	nv := u.Unshift(v, INFO_PREFIX)
-	if logLevel <= INFO_STATUS {
-		if logFileLevel <= INFO_STATUS {
-			//file
-			//logFileOut.logger.Print(nv...)
-			logFileOut.logger.Output(2, fmt.Sprint(nv...))
-		} else {
-			//logStdOut.logger.Print(nv...)
-			logStdOut.logger.Output(2, fmt.Sprint(nv...))
-		}
-	}
+	key := currentFunc(1)
+	out(key, v...)
 }
 
 func Infof(format string, v ...interface{}) {
-	if logLevel <= INFO_STATUS {
-		if logFileLevel <= INFO_STATUS {
-			//file
-			//logFileOut.logger.Printf(INFO_PREFIX + format, v...)
-			logFileOut.logger.Output(2, fmt.Sprintf(INFO_PREFIX+format, v...))
-		} else {
-			//logStdOut.logger.Printf(INFO_PREFIX + format, v...)
-			logStdOut.logger.Output(2, fmt.Sprintf(INFO_PREFIX+format, v...))
-		}
-	}
+	key := currentFunc(1)
+	outf(key, format, v...)
 }
 
 //Warn
 func Warn(v ...interface{}) {
-	nv := u.Unshift(v, WARNING_PREFIX)
-	if logLevel <= WARNING_STATUS {
-		if logFileLevel <= WARNING_STATUS {
-			//file
-			//logFileOut.logger.Print(nv...)
-			logFileOut.logger.Output(2, fmt.Sprint(nv...))
-		} else {
-			//logStdOut.logger.Print(nv...)
-			logStdOut.logger.Output(2, fmt.Sprint(nv...))
-		}
-	}
+	key := currentFunc(1)
+	out(key, v...)
 }
 
 func Warnf(format string, v ...interface{}) {
-	if logLevel <= WARNING_STATUS {
-		if logFileLevel <= WARNING_STATUS {
-			//file
-			//logFileOut.logger.Printf(WARNING_PREFIX + format, v...)
-			logFileOut.logger.Output(2, fmt.Sprintf(WARNING_PREFIX+format, v...))
-		} else {
-			//logStdOut.logger.Printf(WARNING_PREFIX + format, v...)
-			logStdOut.logger.Output(2, fmt.Sprintf(WARNING_PREFIX+format, v...))
-		}
-	}
+	key := currentFunc(1)
+	outf(key, format, v...)
 }
 
 //Error
 func Error(v ...interface{}) {
-	nv := u.Unshift(v, ERROR_PREFIX)
-	if logLevel <= ERROR_STATUS {
-		if logFileLevel <= ERROR_STATUS {
-			//file
-			//logFileOut.logger.Print(nv...)
-			logFileOut.logger.Output(2, fmt.Sprint(nv...))
-		} else {
-			//logStdOut.logger.Print(nv...)
-			logStdOut.logger.Output(2, fmt.Sprint(nv...))
-		}
-	}
+	key := currentFunc(1)
+	out(key, v...)
 }
 
 func Errorf(format string, v ...interface{}) {
-	if logLevel <= ERROR_STATUS {
-		if logFileLevel <= ERROR_STATUS {
-			//file
-			//logFileOut.logger.Printf(ERROR_PREFIX + format, v...)
-			logFileOut.logger.Output(2, fmt.Sprintf(ERROR_PREFIX+format, v...))
-		} else {
-			//logStdOut.logger.Printf(ERROR_PREFIX + format, v...)
-			logStdOut.logger.Output(2, fmt.Sprintf(ERROR_PREFIX+format, v...))
-		}
-	}
+	key := currentFunc(1)
+	outf(key, format, v...)
 }
 
 //Fatal
 func Fatal(v ...interface{}) {
-	nv := u.Unshift(v, FATAL_PREFIX)
-	if logLevel <= FATAL_STATUS {
-		if logFileLevel <= FATAL_STATUS {
-			//file
-			//logFileOut.logger.Print(nv...)
-			logFileOut.logger.Output(2, fmt.Sprint(nv...))
-		} else {
-			//logStdOut.logger.Print(nv...)
-			logStdOut.logger.Output(2, fmt.Sprint(nv...))
-		}
-	}
+	key := currentFunc(1)
+	out(key, v...)
 }
 
 func Fatalf(format string, v ...interface{}) {
-	if logLevel <= FATAL_STATUS {
-		if logFileLevel <= FATAL_STATUS {
-			//file
-			//logFileOut.logger.Printf(FATAL_PREFIX + format, v...)
-			logFileOut.logger.Output(2, fmt.Sprintf(FATAL_PREFIX+format, v...))
-		} else {
-			//logStdOut.logger.Printf(FATAL_PREFIX + format, v...)
-			logStdOut.logger.Output(2, fmt.Sprintf(FATAL_PREFIX+format, v...))
-		}
-	}
+	key := currentFunc(1)
+	outf(key, format, v...)
 }

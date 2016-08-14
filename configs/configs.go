@@ -1,12 +1,12 @@
 package configs
 
 import (
+	"errors"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	u "github.com/hiromaily/golibs/utils"
 	"io/ioutil"
 )
-
-//TODO:base.tomlを用意し、差分のみを別のtomlに作るっていうようにしたい。
 
 /* singleton */
 var conf *Config
@@ -25,12 +25,13 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Host    string        `toml:"host"`
-	Port    int           `toml:"port"`
-	Referer string        `toml:"referer"`
-	Docs    DocsConfig    `toml:"docs"`
-	Log     LogConfig     `toml:"log"`
-	Session SessionConfig `toml:"session"`
+	Host      string          `toml:"host"`
+	Port      int             `toml:"port"`
+	Referer   string          `toml:"referer"`
+	Docs      DocsConfig      `toml:"docs"`
+	Log       LogConfig       `toml:"log"`
+	Session   SessionConfig   `toml:"session"`
+	BasicAuth BasicAuthConfig `toml:"basic_auth"`
 }
 
 type DocsConfig struct {
@@ -48,6 +49,11 @@ type SessionConfig struct {
 	MaxAge   int    `toml:"max_age"`
 	Secure   bool   `toml:"secure"`
 	HttpOnly bool   `toml:"http_only"`
+}
+
+type BasicAuthConfig struct {
+	User string `toml:"user"`
+	Pass string `toml:"pass"`
 }
 
 type ProxyConfig struct {
@@ -92,37 +98,85 @@ type DevelopConfig struct {
 	RecoverEnable bool `toml:"recover_enable"`
 }
 
+var checkTomlKeys [][]string = [][]string{
+	{"environment"},
+	{"server", "host"},
+	{"server", "port"},
+	{"server", "referer"},
+	{"server", "docs", "path"},
+	{"server", "log", "level"},
+	{"server", "log", "path"},
+	{"server", "session", "name"},
+	{"server", "session", "key"},
+	{"server", "session", "max_age"},
+	{"server", "session", "secure"},
+	{"server", "session", "http_only"},
+	{"server", "basic_auth", "user"},
+	{"server", "basic_auth", "pass"},
+	{"proxy", "enable"},
+	{"proxy", "host"},
+	{"api", "header"},
+	{"api", "key"},
+	{"api", "only_ajax"},
+	{"mysql", "host"},
+	{"mysql", "port"},
+	{"mysql", "dbname"},
+	{"mysql", "user"},
+	{"mysql", "pass"},
+	{"mysql", "test", "host"},
+	{"mysql", "test", "port"},
+	{"mysql", "test", "dbname"},
+	{"mysql", "test", "user"},
+	{"mysql", "test", "pass"},
+	{"redis", "host"},
+	{"redis", "port"},
+	{"redis", "pass"},
+	{"redis", "session"},
+	{"aws", "access_key"},
+	{"aws", "secret_key"},
+	{"aws", "region"},
+	{"develop", "profile_enable"},
+	{"develop", "recover_enable"},
+}
+
 //check validation of config
 func validateConfig(conf *Config, md *toml.MetaData) error {
 	//for protection when debugging on non production environment
 	var errStrings []string
 
 	//Check added new items on toml
-	if !md.IsDefined("environment") {
-		errStrings = append(errStrings, "environment")
+	// environment
+	//if !md.IsDefined("environment") {
+	//	errStrings = append(errStrings, "environment")
+	//}
+
+	format := "[%s]"
+	inValid := false
+	for _, keys := range checkTomlKeys {
+		if !md.IsDefined(keys...) {
+			switch len(keys) {
+			case 1:
+				format = "[%s]"
+			case 2:
+				format = "[%s] %s"
+			case 3:
+				format = "[%s.%s] %s"
+			default:
+				//invalid check string
+				inValid = true
+				break
+			}
+			keysIfc := u.SliceStrToInterface(keys)
+			errStrings = append(errStrings, fmt.Sprintf(format, keysIfc...))
+		}
 	}
 
-	if !md.IsDefined("server", "host") {
-		errStrings = append(errStrings, "[server] host")
+	// Error
+	if inValid {
+		return errors.New("Error: Check Text has wrong number of parameter")
 	}
-	if !md.IsDefined("server", "port") {
-		errStrings = append(errStrings, "[server] port")
-	}
-	if !md.IsDefined("mysql", "host") {
-		errStrings = append(errStrings, "[mysql] host")
-	}
-	if !md.IsDefined("mysql", "dbname") {
-		errStrings = append(errStrings, "[mysql] dbname")
-	}
-	if !md.IsDefined("mysql", "user") {
-		errStrings = append(errStrings, "[mysql] user")
-	}
-	if !md.IsDefined("mysql", "pass") {
-		errStrings = append(errStrings, "[mysql] pass")
-	}
-
 	if len(errStrings) != 0 {
-		return fmt.Errorf("Error  There are lacks of keys : %#v \n", errStrings)
+		return fmt.Errorf("Error: There are lacks of keys : %#v \n", errStrings)
 	}
 
 	return nil

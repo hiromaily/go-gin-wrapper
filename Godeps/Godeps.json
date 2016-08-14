@@ -88,43 +88,43 @@
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/cipher/hash",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mysql",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/files",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/heroku",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/log",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/regexp",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/signal",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/times",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/utils",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/validator",
-			"Rev": "ad095edd59509f2f21a02001aa62a9bad611b3cb"
+			"Rev": "412852ac2af5f52291bc7c7a4d3bc44d93ae8f8a"
 		},
 		{
 			"ImportPath": "github.com/manucorporat/sse",
@@ -138,6 +138,10 @@
 		{
 			"ImportPath": "github.com/mattn/go-isatty",
 			"Rev": "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8"
+		},
+		{
+			"ImportPath": "github.com/shiena/ansicolor",
+			"Rev": "a422bbe96644373c5753384a59d678f7d261ff10"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/pbkdf2",

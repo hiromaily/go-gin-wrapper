@@ -255,32 +255,6 @@ func ItoTS(val interface{}) string {
 	return ""
 }
 
-// Interface型をその型を返すfuncを返す
-// TODO:型を判別して自動でその型にキャストしたい
-// It couldn't be possible.
-/*
-func ItoAuto(val interface{}) func(interface{}) bool {
-	//v := reflect.ValueOf(val).Type()
-	//v := reflect.ValueOf(val).Kind()
-
-	v := reflect.ValueOf(val).Kind()
-
-	switch v {
-	case reflect.Bool:
-		//utils/utils.go:241: cannot use Itob (type func(interface {}) bool) as type func() in return argument
-		return Itob
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return Itoi
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return ItoUi
-	case reflect.String:
-		return Itos
-	default:
-		return nil
-	}
-}
-*/
-
 // String型のError型への変更
 func Stoe(val string) error {
 	return errors.New(val)
@@ -342,7 +316,7 @@ func Unshift(base []interface{}, val interface{}) []interface{} {
 
 //change slice data to slice interdace
 //https://github.com/golang/go/wiki/InterfaceSlice
-func InterfaceSliceInt(dataSlice []int) []interface{} {
+func SliceIntToInterface(dataSlice []int) []interface{} {
 	var interfaceSlice []interface{} = make([]interface{}, len(dataSlice))
 	for i, d := range dataSlice {
 		interfaceSlice[i] = d
@@ -350,7 +324,7 @@ func InterfaceSliceInt(dataSlice []int) []interface{} {
 	return interfaceSlice
 }
 
-func InterfaceSliceMap(dataSlice []map[string]int) []interface{} {
+func SliceStrToInterface(dataSlice []string) []interface{} {
 	var interfaceSlice []interface{} = make([]interface{}, len(dataSlice))
 	for i, d := range dataSlice {
 		interfaceSlice[i] = d
@@ -358,27 +332,12 @@ func InterfaceSliceMap(dataSlice []map[string]int) []interface{} {
 	return interfaceSlice
 }
 
-//TODO:work in progress
-func GetStructField(strct interface{}) {
-	v := reflect.ValueOf(strct)
-	fmt.Println(v)
-	if v.Kind() != reflect.Struct {
-		//return false
-		fmt.Println("not struct:", v.Kind())
-		return
+func SliceMapToInterface(dataSlice []map[string]int) []interface{} {
+	var interfaceSlice []interface{} = make([]interface{}, len(dataSlice))
+	for i, d := range dataSlice {
+		interfaceSlice[i] = d
 	}
-	for i := 0; i < v.NumField(); i++ {
-		//lg.Debugf("v.Field(i).Kind(): %v", v.Field(i).Kind())
-		//lg.Debugf("v.Field(i).Pointer(): %v", v.Field(i).Pointer())
-		fmt.Printf("v.Field(i).Kind(): %v", v.Field(i).Kind())
-		fmt.Printf("v.Field(i).Pointer(): %v", v.Field(i).Pointer())
-		//if v.Field(i).Kind() != reflect.Ptr {
-		//	return false
-		//}
-		//if v.Field(0).Pointer() == 0 {
-		//	return false
-		//}
-	}
+	return interfaceSlice
 }
 
 //**********************************************************
