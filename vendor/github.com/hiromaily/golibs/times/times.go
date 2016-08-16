@@ -2,6 +2,7 @@ package times
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -20,6 +21,51 @@ const (
 
 // day of week
 var JAPANESE_WEEKDAYS = []string{"日", "月", "火", "水", "木", "金", "土"}
+
+var TimeLayouts = []string{
+	"Mon, _2 Jan 2006 15:04:05 MST",   //0
+	"Mon, _2 Jan 2006 15:04:05 -0700", //1
+	time.ANSIC,                        //2
+	time.UnixDate,                     //3
+	time.RubyDate,                     //4
+	time.RFC822,                       //5
+	time.RFC822Z,                      //6
+	time.RFC850,                       //7
+	time.RFC1123,                      //8
+	time.RFC1123Z,                     //9
+	time.RFC3339,                      //10
+	time.RFC3339Nano,                  //11
+}
+//[1 2 3 4 5 6 7 9 10 11]
+//[0 2 3 4 5 6 7 8 10 11]
+
+//return accessible format.
+func CheckParseTime(s string) []int {
+	s = strings.TrimSpace(s)
+	iRet := []int{}
+
+	for i, layout := range TimeLayouts {
+		_, err := time.Parse(layout, s)
+		if err == nil {
+			iRet = append(iRet, i)
+		}
+	}
+
+	return iRet
+}
+
+func ParseTime(str string) (t time.Time, err error) {
+	str = strings.TrimSpace(str)
+
+	for _, layout := range TimeLayouts {
+		t, err = time.Parse(layout, str)
+		if err == nil {
+			return t, err
+		}
+	}
+
+	return time.Time{}, err
+}
 
 //Formatter Date
 func GetFormatDate(strDate string, format string, addWeek bool) string {
@@ -63,6 +109,19 @@ func GetFormatTime(strTime string, format string) string {
 		return t.Format("15:04")
 	}
 
+}
+
+func PerseTimeForLastModified(lastModified string) (time.Time, error) {
+	//Tue, 16 Aug 2016 01:31:09 GMT
+	return time.Parse(time.RFC1123, lastModified)
+}
+
+func PerseTimeForRss(str string) (time.Time, error){
+	t, err := time.Parse(time.RFC1123, str)
+	if err != nil{
+		t, err = time.Parse(time.RFC1123Z, str)
+	}
+	return t, err
 }
 
 //Timer

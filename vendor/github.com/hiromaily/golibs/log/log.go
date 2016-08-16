@@ -258,9 +258,9 @@ func out(key string, v ...interface{}) {
 	if logLevel <= getStatus(key) {
 		if logFileLevel <= getStatus(key) {
 			//file
-			logFileOut.Output(2, fmt.Sprint(nv...))
+			logFileOut.Output(3, fmt.Sprint(nv...))
 		} else {
-			logStdOut.Output(2, fmt.Sprint(nv...))
+			logStdOut.Output(3, fmt.Sprint(nv...))
 		}
 	}
 }
@@ -269,9 +269,9 @@ func outf(key, format string, v ...interface{}) {
 	if logLevel <= getStatus(key) {
 		if logFileLevel <= getStatus(key) {
 			//file
-			logFileOut.Output(2, fmt.Sprintf(getPrefix(key)+format, v...))
+			logFileOut.Output(3, fmt.Sprintf(getPrefix(key)+format, v...))
 		} else {
-			logStdOut.Output(2, fmt.Sprintf(getPrefix(key)+format, v...))
+			logStdOut.Output(3, fmt.Sprintf(getPrefix(key)+format, v...))
 		}
 	}
 }

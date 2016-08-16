@@ -8,7 +8,7 @@ GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
 TEST_MODE=0    #0:off, 1:after build, run test, 2:quick test for customized
-AUTO_EXEC=0    #0.off, 1:after build, execute, 2:only run quickly
+AUTO_EXEC=1    #0.off, 1:after build, execute, 2:only run quickly
 GODEP_MODE=1
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0  #0:off, 1:deploy server, 2:exec test on heroku
@@ -18,6 +18,10 @@ GO_GET=0
 GO_LINT=0
 RESET_DB=0
 
+#docker stop redisd
+#ocker stop mysqld
+#docker start redisd
+#docker start mysqld
 
 ###########################################################
 # Reset Database (Restore)
@@ -123,6 +127,9 @@ if [ $TEST_MODE -eq 1 ]; then
 
     # Create Test Data
     export DB_NAME=hiromaily2
+    export DB_PORT=13306
+    export DB_USER=root
+    export DB_PASS=root
     sh ./z_dbdata/setup.sh
 
     # Execute
@@ -178,8 +185,6 @@ fi
 
 
 
-
-
 ###########################################################
 # godep
 ###########################################################
@@ -201,7 +206,7 @@ if [ $GODEP_MODE -eq 1 ]; then
 fi
 
 #Build
-#godep go build -o book ./cmd/book/
+#godep go build -o ginserver ./cmd/ginserver/
 
 #Restore
 #godep restore
@@ -267,6 +272,7 @@ if [ $DOCKER_MODE -eq 1 ]; then
     #login
     #docker exec -it web bash
 
+    #wait to be ready or not.
     sleep 5s
     while :
     do

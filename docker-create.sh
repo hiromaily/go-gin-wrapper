@@ -9,17 +9,30 @@
 # Environment
 ###############################################################################
 CONTAINER_NAME=web
+CONTAINER2_NAME=web-redis
+CONTAINER3_NAME=web-mysql
 IMAGE_NAME=go-gin-wrapper:v1.1
 
 
 ###############################################################################
 # Remove Container And Image
 ###############################################################################
-#DOCKER_PSID=`docker ps -af name="${CONTAINER_NAME}" -q`
-#if [ ${#DOCKER_PSID} -ne 0 ]; then
-#    docker rm -f ${CONTAINER_NAME}
-#fi
-docker rm -f $(docker ps -aq)
+DOCKER_PSID=`docker ps -af name="${CONTAINER_NAME}" -q`
+if [ ${#DOCKER_PSID} -ne 0 ]; then
+    docker rm -f ${CONTAINER_NAME}
+fi
+
+DOCKER_PSID=`docker ps -af name="${CONTAINER2_NAME}" -q`
+if [ ${#DOCKER_PSID} -ne 0 ]; then
+    docker rm -f ${CONTAINER2_NAME}
+fi
+
+DOCKER_PSID=`docker ps -af name="${CONTAINER3_NAME}" -q`
+if [ ${#DOCKER_PSID} -ne 0 ]; then
+    docker rm -f ${CONTAINER3_NAME}
+fi
+
+#docker rm -f $(docker ps -aq)
 
 DOCKER_IMGID=`docker images "${IMAGE_NAME}" -q`
 if [ ${#DOCKER_IMGID} -ne 0 ]; then
@@ -38,9 +51,10 @@ if [ $RUN_TEST -eq 1 ]; then
     sleep 1s
 
     # create test data on docker container mysql
-    export DB_PORT=13306
-    export DB_PASS=root
     export DB_NAME=hiromaily2
+    export DB_PORT=13306
+    export DB_USER=root
+    export DB_PASS=root
     sh ./z_dbdata/setup.sh
     #mysql -uroot -proot -h127.0.0.1 -P13306 < ./tests/createdb.sql
 

@@ -5,10 +5,10 @@
 version: '2'
 services:
   # MySQL
-  mysqld:
+  mysql:
     #env_file: .env
     image: mysql:5.7
-    container_name: mysqld
+    container_name: web-mysql
     ports:
       - "13306:3306"
     volumes:
@@ -22,9 +22,9 @@ services:
       MYSQL_USER: hiromaily
       MYSQL_PASSWORD: 12345678
   # Redis
-  redisd:
+  redis:
     image: redis:3.2
-    container_name: redisd
+    container_name: web-redis
     ports:
       - "16379:6379"
     volumes:
@@ -49,11 +49,11 @@ services:
       - ./docker_build/logs:/var/log/goweb
       - ./:/go/src/github.com/hiromaily/go-gin-wrapper
     links:
-      - mysqld:mysql-server
-      - redisd:redis-server
+      - mysql:mysql-server
+      - redis:redis-server
     depends_on:
-      - mysqld
-      - redisd
+      - mysql
+      - redis
     stdin_open: true
     tty: true
     restart: always
