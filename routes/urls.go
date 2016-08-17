@@ -68,7 +68,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	//-----------------------
 	//Admin [BasicAuth()]
 	//-----------------------
-	ba := conf.GetConfInstance().Server.BasicAuth
+	ba := conf.GetConf().Server.BasicAuth
 	authorized := r.Group("/admin", gin.BasicAuth(gin.Accounts{
 		ba.User: ba.Pass,
 	}))

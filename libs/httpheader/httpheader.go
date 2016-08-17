@@ -12,7 +12,7 @@ import (
 //Check Referer for posted page
 func IsRefererHostValid(c *gin.Context, pageFrom string) bool {
 
-	server := conf.GetConfInstance().Server
+	server := conf.GetConf().Server
 	//TODO:Add feature that switch https to http easily.
 	url := fmt.Sprintf("%s/%s", server.Referer, pageFrom)
 	lg.Debugf("expected url: %s", url)

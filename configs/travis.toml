@@ -53,6 +53,13 @@ port = 9769
 pass = "p7nkpdqindrp4o145oveqpet6ut"
 session = true
 
+[mongodb]
+host = "ds161495.mlab.com"
+port = 61495
+dbname = "heroku_7lbnd77m"
+user = "heroku_7lbnd77m"
+pass = "7r8f631nv2idt0fhj9ok9714j9"
+
 [aws]
 access_key = "XXXXXXXXXXXX"
 secret_key = "XXXXXXXXXXXX"

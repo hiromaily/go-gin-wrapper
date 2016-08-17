@@ -10,6 +10,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/libs/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/routes"
+	mongo "github.com/hiromaily/golibs/db/mongodb"
 	"github.com/hiromaily/golibs/db/mysql"
 	fl "github.com/hiromaily/golibs/files"
 	hrk "github.com/hiromaily/golibs/heroku"
@@ -32,17 +33,17 @@ func init() {
 	initConf()
 
 	//log
-	lg.InitializeLog(conf.GetConfInstance().Server.Log.Level, lg.LOG_OFF_COUNT, 0,
-		"[GOWEB]", conf.GetConfInstance().Server.Log.Path)
+	lg.InitializeLog(conf.GetConf().Server.Log.Level, lg.LOG_OFF_COUNT, 0,
+		"[GOWEB]", conf.GetConf().Server.Log.Path)
 
 	//lg.Debugf("conf %#v\n", conf.GetConfInstance())
-	lg.Debugf("[Environment] : %s\n", conf.GetConfInstance().Environment)
+	lg.Debugf("[Environment] : %s\n", conf.GetConf().Environment)
 
 	// debug mode
-	if conf.GetConfInstance().Environment == "local" {
+	if conf.GetConf().Environment == "local" {
 		//signal
 		go signal.StartSignal()
-	} else if conf.GetConfInstance().Environment == "production" {
+	} else if conf.GetConf().Environment == "production" {
 		//For release
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -53,13 +54,13 @@ func initConf() {
 	if *tomlPath != "" {
 		conf.SetTomlPath(*tomlPath)
 	}
-	conf.GetConfInstance()
+	conf.GetConf()
 }
 
 // initialize Database
 func initDatabase(testFlg uint8) {
 	//if os.Getenv("HEROKU_FLG") == "1" {
-	if conf.GetConfInstance().Environment == "heroku" {
+	if conf.GetConf().Environment == "heroku" {
 		//Heroku
 		lg.Debug("HEROKU mode")
 
@@ -79,21 +80,33 @@ func initDatabase(testFlg uint8) {
 
 		//database
 		if testFlg == 0 {
-			dbInfo := conf.GetConfInstance().MySQL
+			dbInfo := conf.GetConf().MySQL
 			mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
 		} else {
 			//For test
-			dbInfo := conf.GetConfInstance().MySQL.Test
+			dbInfo := conf.GetConf().MySQL.Test
 			mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
 		}
+	}
+
+	//MongoDB
+	initMongo()
+}
+
+func initMongo() {
+	c := conf.GetConf().Mongo
+	mongo.New(c.Host, c.DbName, c.User, c.Pass, c.Port)
+	if c.DbName != "" {
+		//GetMongo().GetDB("hiromaily")
+		mongo.GetMongo().GetDB(c.DbName)
 	}
 }
 
 // initialize session
 func initSession(r *gin.Engine) {
-	red := conf.GetConfInstance().Redis
+	red := conf.GetConf().Redis
 	//if os.Getenv("HEROKU_FLG") == "1" {
-	if conf.GetConfInstance().Environment == "heroku" {
+	if conf.GetConf().Environment == "heroku" {
 		host, pass, port, err := hrk.GetRedisInfo("")
 		if err == nil && host != "" && port != 0 {
 			red.Session = true
@@ -137,7 +150,7 @@ func setMiddleWare(r *gin.Engine) {
 
 func getPort() (port int) {
 	if os.Getenv("PORT") == "" {
-		port = conf.GetConfInstance().Server.Port
+		port = conf.GetConf().Server.Port
 	} else {
 		port = u.Atoi(os.Getenv("PORT"))
 		//conf.GetConfInstance().Server.Port = port
@@ -158,7 +171,7 @@ func loadTemplates(r *gin.Engine) {
 	//r.LoadHTMLGlob(path + "templates/components/*")
 
 	//rootPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper"
-	rootPath := conf.GetConfInstance().Server.Docs.Path
+	rootPath := conf.GetConf().Server.Docs.Path
 
 	ext := []string{"tmpl"}
 
@@ -176,7 +189,7 @@ func loadTemplates(r *gin.Engine) {
 
 func loadStaticFiles(r *gin.Engine) {
 	//rootPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper"
-	rootPath := conf.GetConfInstance().Server.Docs.Path
+	rootPath := conf.GetConf().Server.Docs.Path
 
 	//r.Static("/static", "/var/www")
 	r.Static("/statics", rootPath+"/statics")
@@ -188,7 +201,7 @@ func loadStaticFiles(r *gin.Engine) {
 
 func run(r *gin.Engine) {
 	port := getPort()
-	if conf.GetConfInstance().Proxy.Enable {
+	if conf.GetConf().Proxy.Enable {
 		//Proxy(Nginx) settings
 		color.Red("[WARNING] running on fcgi mode.")
 		lg.Info("running on fcgi mode.")
@@ -224,7 +237,7 @@ func setHTTPServer(testFlg uint8, path string) *gin.Engine {
 	routes.SetHTTPUrls(r)
 
 	// Set Profiling
-	if conf.GetConfInstance().Develop.ProfileEnable {
+	if conf.GetConf().Develop.ProfileEnable {
 		ginpprof.Wrapper(r)
 	}
 

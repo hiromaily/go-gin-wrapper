@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	js "github.com/hiromaily/go-gin-wrapper/jsons"
 	jslib "github.com/hiromaily/go-gin-wrapper/libs/json"
-	"github.com/hiromaily/go-gin-wrapper/models"
+	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/golibs/validator"
 )
@@ -100,7 +100,7 @@ func insertUser(c *gin.Context, data *UserRequest) (int64, error) {
 	}
 
 	//Insert
-	return models.GetDBInstance().InsertUser(user)
+	return models.GetDB().InsertUser(user)
 }
 
 // update user
@@ -121,7 +121,7 @@ func updateUser(data *UserRequest, id string) (int64, error) {
 	}
 
 	//Update
-	return models.GetDBInstance().UpdateUser(user, id)
+	return models.GetDB().UpdateUser(user, id)
 }
 
 //Users: get list [GET]
@@ -129,7 +129,7 @@ func UsersListGetAction(c *gin.Context) {
 	lg.Debug("[GET] UsersListGetAction")
 
 	var users []models.Users
-	_, err := models.GetDBInstance().GetUserList(&users, "", "")
+	_, err := models.GetDB().GetUserList(&users, "", "")
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
@@ -177,7 +177,7 @@ func UserGetAction(c *gin.Context) {
 	}
 
 	var user models.Users
-	b, err := models.GetDBInstance().GetUserList(&user, userId, "")
+	b, err := models.GetDB().GetUserList(&user, userId, "")
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
@@ -230,7 +230,7 @@ func UserDeleteAction(c *gin.Context) {
 	}
 
 	//Delete
-	affected, err := models.GetDBInstance().DeleteUser(c.Param("id"))
+	affected, err := models.GetDB().DeleteUser(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(500, err)
 		return

@@ -6,7 +6,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/libs/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
-	"github.com/hiromaily/go-gin-wrapper/models"
+	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	lg "github.com/hiromaily/golibs/log"
 	valid "github.com/hiromaily/golibs/validator"
 	"net/http"
@@ -72,7 +72,7 @@ func IndexAction(c *gin.Context) {
 	//debugContext(c)
 
 	//return header and key
-	api := conf.GetConfInstance().Api
+	api := conf.GetConf().Api
 
 	lg.Debugf("api.Header: %#v\n", api.Header)
 	lg.Debugf("api.Key: %#v\n", api.Key)
@@ -137,7 +137,7 @@ func LoginPostAction(c *gin.Context) {
 	}
 
 	//Check inputed mail and password
-	userId, err := models.GetDBInstance().IsUserEmail(posted.Email, posted.Pass)
+	userId, err := models.GetDB().IsUserEmail(posted.Email, posted.Pass)
 	if err != nil {
 		errors := []string{"E-mail or Password is made a mistake."}
 		lg.Debugf("login error: %#v", errors)

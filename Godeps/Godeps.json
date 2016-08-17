@@ -91,6 +91,10 @@
 			"Rev": "7157e9377549fab1e09c189c47827df56fa2eb69"
 		},
 		{
+			"ImportPath": "github.com/hiromaily/golibs/db/mongodb",
+			"Rev": "7157e9377549fab1e09c189c47827df56fa2eb69"
+		},
+		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mysql",
 			"Rev": "7157e9377549fab1e09c189c47827df56fa2eb69"
 		},
@@ -171,6 +175,26 @@
 			"ImportPath": "gopkg.in/go-playground/validator.v8",
 			"Comment": "v8.17.1",
 			"Rev": "014792cf3e266caff1e916876be12282b33059e0"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2016.02.04-1-gb6e2fa3",
+			"Rev": "b6e2fa371e64216a45e61072a96d4e3859f169da"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/bson",
+			"Comment": "r2016.02.04-1-gb6e2fa3",
+			"Rev": "b6e2fa371e64216a45e61072a96d4e3859f169da"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/sasl",
+			"Comment": "r2016.02.04-1-gb6e2fa3",
+			"Rev": "b6e2fa371e64216a45e61072a96d4e3859f169da"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/scram",
+			"Comment": "r2016.02.04-1-gb6e2fa3",
+			"Rev": "b6e2fa371e64216a45e61072a96d4e3859f169da"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",

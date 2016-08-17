@@ -21,6 +21,7 @@ type Config struct {
 	Api         ApiConfig
 	MySQL       MySQLConfig
 	Redis       RedisConfig
+	Mongo       MongoConfig `toml:"mongodb"`
 	Aws         AwsConfig
 	Develop     DevelopConfig
 }
@@ -88,6 +89,14 @@ type RedisConfig struct {
 	Session bool   `toml:"session"`
 }
 
+type MongoConfig struct {
+	Host   string `toml:"host"`
+	Port   uint16 `toml:"port"`
+	DbName string `toml:"dbname"`
+	User   string `toml:"user"`
+	Pass   string `toml:"pass"`
+}
+
 type AwsConfig struct {
 	AccessKey string `toml:"access_key"`
 	SecretKey string `toml:"secret_key"`
@@ -133,6 +142,11 @@ var checkTomlKeys [][]string = [][]string{
 	{"redis", "port"},
 	{"redis", "pass"},
 	{"redis", "session"},
+	{"mongodb", "host"},
+	{"mongodb", "port"},
+	{"mongodb", "dbname"},
+	{"mongodb", "user"},
+	{"mongodb", "pass"},
 	{"aws", "access_key"},
 	{"aws", "secret_key"},
 	{"aws", "region"},
@@ -223,7 +237,7 @@ func New() {
 }
 
 // singleton architecture
-func GetConfInstance() *Config {
+func GetConf() *Config {
 	var err error
 	if conf == nil {
 		conf, err = loadConfig()

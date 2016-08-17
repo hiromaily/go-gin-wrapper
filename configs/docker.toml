@@ -26,8 +26,7 @@ pass = "test"
 
 [proxy]
 enable = false          # be careful!
-host = "172.18.0.1"
-#host = "proxy-server"
+host = "172.18.0.1"     # "proxy-server"
 
 [api]
 header = "X-Custom-Header-Gin"
@@ -53,6 +52,13 @@ host = "redis-server"
 port = 6379
 pass = "password"
 session = true
+
+[mongodb]
+host = "localhost"
+port = 27017
+dbname = "hiromaily"
+user = "hiromaily"
+pass = "12345678"
 
 [aws]
 access_key = "XXXXXXXXXXXX"

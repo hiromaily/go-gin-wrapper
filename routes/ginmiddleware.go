@@ -61,7 +61,7 @@ func CheckHttpHeader() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHttpHeader]")
 
-		apiConf := conf.GetConfInstance().Api
+		apiConf := conf.GetConf().Api
 
 		lg.Debugf("[Request Header]\n%#v\n", c.Request.Header)
 		lg.Debugf("[Request Form]\n%#v\n", c.Request.Form)
@@ -220,7 +220,7 @@ func GlobalRecover() gin.HandlerFunc {
 				return
 			}
 
-			if conf.GetConfInstance().Develop.RecoverEnable {
+			if conf.GetConf().Develop.RecoverEnable {
 				if rec := recover(); rec != nil {
 					lg.Debugf("[GlobalRecover] recover() is not nil:\n %v", rec)
 					//TODO:How should response data be decided whether html or json?
@@ -258,8 +258,8 @@ func RejectSpecificIp() gin.HandlerFunc {
 		lg.Info("[RejectSpecificIp]")
 		ip := c.ClientIP()
 		//proxy
-		if conf.GetConfInstance().Proxy.Enable {
-			if conf.GetConfInstance().Proxy.Host != ip {
+		if conf.GetConf().Proxy.Enable {
+			if conf.GetConf().Proxy.Host != ip {
 				c.AbortWithStatus(403)
 				return
 			}

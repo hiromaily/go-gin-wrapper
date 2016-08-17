@@ -15,7 +15,7 @@ func SetSession(r *gin.Engine, host, pass string) {
 
 	var store sessions.RedisStore
 	var err error
-	ses := conf.GetConfInstance().Server.Session
+	ses := conf.GetConf().Server.Session
 
 	if host == "" {
 		//on memory

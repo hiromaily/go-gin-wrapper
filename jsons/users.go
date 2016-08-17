@@ -2,7 +2,7 @@ package jsons
 
 import (
 	//u "github.com/hiromaily/golibs/utils"
-	"github.com/hiromaily/go-gin-wrapper/models"
+	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 )
 
 /***************** User Json *****************/

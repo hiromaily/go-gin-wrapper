@@ -47,12 +47,18 @@ dbname = "testdb"
 user = "testuser"
 pass = "12345678"
 
-
 [redis]
 host = "localhost"
 port = 6379
 pass = ""
 session = false
+
+[mongodb]
+host = "localhost"
+port = 27017
+dbname = "hiromaily"
+user = "hiromaily"
+pass = "12345678"
 
 [aws]
 access_key = "XXXXXXXXXXXX"
