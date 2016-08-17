@@ -6,6 +6,7 @@ import (
 	"github.com/BurntSushi/toml"
 	u "github.com/hiromaily/golibs/utils"
 	"io/ioutil"
+	"os"
 )
 
 /* singleton */
@@ -137,6 +138,10 @@ var checkTomlKeys [][]string = [][]string{
 	{"aws", "region"},
 	{"develop", "profile_enable"},
 	{"develop", "recover_enable"},
+}
+
+func init() {
+	tomlFileName = os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml"
 }
 
 //check validation of config

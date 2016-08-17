@@ -36,6 +36,7 @@ var TimeLayouts = []string{
 	time.RFC3339,                      //10
 	time.RFC3339Nano,                  //11
 }
+
 //[1 2 3 4 5 6 7 9 10 11]
 //[0 2 3 4 5 6 7 8 10 11]
 
@@ -116,9 +117,9 @@ func PerseTimeForLastModified(lastModified string) (time.Time, error) {
 	return time.Parse(time.RFC1123, lastModified)
 }
 
-func PerseTimeForRss(str string) (time.Time, error){
+func PerseTimeForRss(str string) (time.Time, error) {
 	t, err := time.Parse(time.RFC1123, str)
-	if err != nil{
+	if err != nil {
 		t, err = time.Parse(time.RFC1123Z, str)
 	}
 	return t, err
