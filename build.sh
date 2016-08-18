@@ -9,7 +9,7 @@ CURRENTDIR=`pwd`
 
 TEST_MODE=0    #0:off, 1:after build, run test, 2:quick test for customized
 AUTO_EXEC=1    #0.off, 1:after build, execute, 2:only run quickly
-GODEP_MODE=1
+GODEP_MODE=0
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0  #0:off, 1:deploy server, 2:exec test on heroku
 DOCKER_MODE=0  #0:off, 1:run server,    2:exec test on docker

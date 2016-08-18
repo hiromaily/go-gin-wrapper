@@ -1,0 +1,18 @@
+{{define "components/wrapper_row_newslist.tmpl"}}
+          <div class="row">
+            <div class="col-md-6">
+              <div class="panel panel-default">
+                <div class="panel-heading">Alert Styles </div>
+                <div class="panel-body">
+{{range .items}}
+<div class="alert alert-success">
+<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    {{.Title}}
+    <a href="{{.Link}}" class="alert-link">Link</a>
+</div>
+{{end}}
+                </div>
+              </div>
+            </div>
+          </div>
+{{end}}
