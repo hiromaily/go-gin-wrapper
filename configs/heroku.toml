@@ -67,4 +67,4 @@ region = "ap-northeast-1"
 
 [develop]
 profile_enable = false
-recover_enable = true
+recover_enable = false

@@ -72,6 +72,7 @@ func initDatabase(testFlg uint8) {
 		lg.Debugf("[User]%s  [Pass]%s", user, pass)
 
 		if err != nil {
+			lg.Debug(err)
 			panic(err)
 		} else {
 			mysql.New(host, dbname, user, pass, 3306)

@@ -15,6 +15,8 @@ import (
 //Query and Projection Operators
 //https://docs.mongodb.com/manual/reference/operator/query/
 
+//TODO:Mongo session sometimes disconnect and it's not recover automatically.
+
 type MongoInfo struct {
 	Session *mgo.Session
 	Db      *mgo.Database
@@ -22,6 +24,8 @@ type MongoInfo struct {
 }
 
 var mgInfo MongoInfo
+var mongoUrl string
+var savedDbName string
 
 //-----------------------------------------------------------------------------
 // Settings
@@ -32,11 +36,12 @@ func New(host, db, user, pass string, port uint16) {
 	if mgInfo.Session == nil {
 		//[mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]
 		//mgInfo.session, _ = mgo.Dial("mongodb://user:pass@localhost:port/test")
-		mongoUrl := ""
+		mongoUrl = ""
 		if db == "" {
 			//session, err := mgo.Dial("localhost:40001")
 			mongoUrl = fmt.Sprintf("mongodb://%s:%d", host, port)
 		} else {
+			savedDbName = db
 			if user != "" && pass != "" {
 				mongoUrl = fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", user, pass, host, port, db)
 			} else {
@@ -54,25 +59,27 @@ func New(host, db, user, pass string, port uint16) {
 	}
 }
 
-func NewAdvanced(host, username, password, database string) {
-	var err error
+func getMongoSession(rtnSession uint8) *mgo.Session {
 	if mgInfo.Session == nil {
-		mgInfo.Session, err = mgo.DialWithInfo(&mgo.DialInfo{
-			Addrs:    []string{host},
-			Username: username,
-			Password: password,
-			Database: database,
-		})
+		var err error
+		mgInfo.Session, err = mgo.Dial(mongoUrl)
 		if err != nil {
 			panic(err)
+			//log.Fatal("Failed to start the Mongo session")
 		}
+	}
+	if rtnSession == 1 {
+		return mgInfo.Session.Clone()
+	} else {
+		return nil
 	}
 }
 
 // singleton architecture
 func GetMongo() *MongoInfo {
 	if mgInfo.Session == nil {
-		panic("Before call this, call New in addtion to arguments")
+		//panic("Before call this, call New in addtion to arguments")
+		getMongoSession(0)
 	}
 	return &mgInfo
 }
@@ -87,13 +94,16 @@ func (mi *MongoInfo) Close() {
 //-----------------------------------------------------------------------------
 // reset session.DB object to mi.db
 func (mi *MongoInfo) GetDB(dbName string) *mgo.Database {
+	savedDbName = dbName
 	//mi.db = mi.session.DB("test")
-	mi.Db = mi.Session.DB(dbName)
+	//mi.Db = mi.Session.DB(dbName)
+	mi.Db = getMongoSession(1).DB(dbName)
 	return mi.Db
 }
 
 func (mi *MongoInfo) DropDB(dbName string) error {
-	err := mi.Session.DB(dbName).DropDatabase()
+	//err := mi.Session.DB(dbName).DropDatabase()
+	err := getMongoSession(1).DB(dbName).DropDatabase()
 	return err
 }
 
@@ -117,16 +127,26 @@ func (mi *MongoInfo) SetExpireOnCollection(sessionExpire time.Duration) error {
 }
 
 // create collection
+/*
 func (mi *MongoInfo) CreateCol(colName string) error {
+	//gopkg.in/mgo.v2/bson.DocElem composite literal uses unkeyed fields
 	err := mi.Session.Run(bson.D{{"create", colName}}, nil)
 	if err == nil {
 		mi.C = mi.Db.C(colName)
 	}
 	return err
 }
+*/
 
 // get and set collection
 func (mi *MongoInfo) GetCol(colName string) *mgo.Collection {
+	if mi.Db == nil {
+		if savedDbName == "" {
+			mi.Db = getMongoSession(1).DB(savedDbName)
+		} else {
+			panic("mongo db instance is nil.")
+		}
+	}
 	mi.C = mi.Db.C(colName)
 	return mi.C
 }
