@@ -47,6 +47,7 @@ type Item2 struct {
 }
 
 func (mg *Models) GetNewsData() ([]News, error) {
+	//mg.Db.Session
 	mg.Db.GetCol(NEWS_COLLECTION)
 
 	var news []News
@@ -61,7 +62,26 @@ func (mg *Models) GetNewsData() ([]News, error) {
 	return news, nil
 }
 
-func (mg *Models) GetArticlesData(newsId int) ([]Item2, error) {
+func (mg *Models) GetArticlesData(newsId int) ([]Articles, error) {
+	mg.Db.GetCol(ARTICLES_COLLECTION)
+
+	var articles []Articles
+
+	//get
+	colQuerier := bson.M{}
+	if newsId != 0 {
+		colQuerier = bson.M{"news_id": newsId}
+	}
+
+	err := mg.Db.C.Find(colQuerier).Sort("news_id").All(&articles)
+	if err != nil {
+		return nil, err
+	}
+
+	return articles, nil
+}
+
+func (mg *Models) GetArticlesData2(newsId int) ([]Item2, error) {
 	mg.Db.GetCol(ARTICLES2_COLLECTION)
 
 	var items []Item2

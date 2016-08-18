@@ -1,4 +1,4 @@
-﻿{{define "pages/news/news.tmpl"}}
+﻿{{define "pages/news/news2.tmpl"}}
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -28,11 +28,12 @@
         <div id="page-inner">
            <!-- /. ROW 01 -->
            {{template "components/wrapper_row_01.tmpl" .}}
-{{range $index, $article := .articles}}
            <!-- /. ROW NewsList -->
-           {{$cls := strAry $.class $index}}
-           {{template "components/wrapper_row_newsarticle.tmpl" dict "Article" $article "Class" $cls}}
-{{end}}
+           {{template "components/wrapper_row_newslist.tmpl" .}}
+           <!-- /. ROW 10 -->
+           {{template "components/wrapper_row_10.tmpl" .}}
+           <!-- /. ROW 11 -->
+           {{template "components/wrapper_row_11.tmpl" .}}
         </div>
         <!-- /. PAGE INNER  -->
       </div>

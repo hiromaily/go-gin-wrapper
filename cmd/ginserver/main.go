@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/DeanThompson/ginpprof"
@@ -19,6 +20,7 @@ import (
 	u "github.com/hiromaily/golibs/utils"
 	"html/template"
 	"os"
+	"time"
 )
 
 var (
@@ -182,9 +184,45 @@ func loadTemplates(r *gin.Engine) {
 	joined1 := append(files1, files2...)
 	files := append(joined1, files3...)
 
-	tmpls := template.Must(template.ParseFiles(files...))
+	//tmpls := template.Must(template.ParseFiles(files...))
+	//tmpls := template.Must(template.ParseFiles(files...)).Funcs(getTempFunc())
+	tmpls := template.Must(template.New("").Funcs(getTempFunc()).ParseFiles(files...))
+	//
 	r.SetHTMLTemplate(tmpls)
+}
 
+// template FuncMap
+func getTempFunc() template.FuncMap {
+	//type FuncMap map[string]interface{}
+
+	funcMap := template.FuncMap{
+		"add": func(a, b int) int { return a + b },
+		"dict": func(values ...interface{}) (map[string]interface{}, error) {
+			if len(values)%2 != 0 {
+				return nil, errors.New("invalid dict call")
+			}
+			dict := make(map[string]interface{}, len(values)/2)
+			for i := 0; i < len(values); i += 2 {
+				key, ok := values[i].(string)
+				if !ok {
+					return nil, errors.New("dict keys must be strings")
+				}
+				dict[key] = values[i+1]
+			}
+			return dict, nil
+		},
+		"strAry": func(ary []string, i int) string {
+			return ary[i]
+		},
+		"dateFmt": func(t time.Time) string {
+			//fmt := "August 17, 2016 9:51 pm"
+			//fmt := "2006-01-02 15:04:05"
+			//fmt := "Mon Jan _2 15:04:05 2006"
+			fmt := "Mon Jan _2 15:04:05"
+			return t.Format(fmt)
+		},
+	}
+	return funcMap
 }
 
 func loadStaticFiles(r *gin.Engine) {

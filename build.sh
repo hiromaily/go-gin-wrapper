@@ -23,6 +23,9 @@ RESET_DB=0
 #docker start redisd
 #docker start mysqld
 
+# when using go 1.7 for the first time, delete all inside pkg directory and run go install.
+#go install -v ./...
+
 ###########################################################
 # Reset Database (Restore)
 ###########################################################

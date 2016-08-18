@@ -6,10 +6,40 @@ import (
 	"net/http"
 )
 
+type ParamNews struct {
+	Classes  []string
+	Articles []models.Articles
+}
+
 //News [GET]
 func NewsGetAction(c *gin.Context) {
 	//Get news
-	items, err := models.GetDB().GetArticlesData(0)
+	articles, err := models.GetDB().GetArticlesData(0)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	//Param
+	//params := ParamNews{
+	//	Classes: []string{"alert-success","alert-info","alert-warning","alert-danger"},
+	//	Articles: articles,
+	//}
+	className := []string{"alert-success", "alert-info", "alert-warning", "alert-danger"}
+
+	//View
+	c.HTML(http.StatusOK, "pages/news/news.tmpl", gin.H{
+		"title":    "News Page",
+		"navi_key": "/news",
+		//"params": params,
+		"articles": articles,
+		"class":    className,
+	})
+}
+
+func News2GetAction(c *gin.Context) {
+	//Get news
+	items, err := models.GetDB().GetArticlesData2(0)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
