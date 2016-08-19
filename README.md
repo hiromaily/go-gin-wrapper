@@ -55,6 +55,10 @@ $ heroku config | grep CLEARDB_DATABASE_URL
 $ heroku addons:create heroku-redis:hobby-dev -a ginserver 
 $ heroku config | grep REDIS
 
+# MongoDB
+* attach mongodb from news-mongo app on heroku because of sharing.
+* it's better to attach from dashboard.
+
 ## Environment variable
 $ heroku config:add HEROKU_FLG=1
 

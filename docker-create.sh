@@ -11,6 +11,7 @@
 CONTAINER_NAME=web
 CONTAINER2_NAME=web-redis
 CONTAINER3_NAME=web-mysql
+CONTAINER4_NAME=web-mongo
 IMAGE_NAME=go-gin-wrapper:v1.1
 
 
@@ -32,6 +33,11 @@ if [ ${#DOCKER_PSID} -ne 0 ]; then
     docker rm -f ${CONTAINER3_NAME}
 fi
 
+DOCKER_PSID=`docker ps -af name="${CONTAINER4_NAME}" -q`
+if [ ${#DOCKER_PSID} -ne 0 ]; then
+    docker rm -f ${CONTAINER4_NAME}
+fi
+
 #docker rm -f $(docker ps -aq)
 
 DOCKER_IMGID=`docker images "${IMAGE_NAME}" -q`
@@ -46,13 +52,19 @@ fi
 docker-compose  build
 docker-compose  up -d
 
+#mongo settings
+sleep 3s
+MONGO_PORT=30017
+mongo 127.0.0.1:${MONGO_PORT}/admin --eval "var port = ${MONGO_PORT};" ./docker_build/mongo/init.js
+mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker_build/mongo/dump/hiromaily
+
 if [ $RUN_TEST -eq 1 ]; then
     # test mode
     sleep 1s
 
     # create test data on docker container mysql
     export DB_NAME=hiromaily2
-    export DB_PORT=13306
+    export DB_PORT=23306
     export DB_USER=root
     export DB_PASS=root
     sh ./z_dbdata/setup.sh
@@ -63,7 +75,7 @@ if [ $RUN_TEST -eq 1 ]; then
         go get -d -v ./...;
         go test -v cmd/ginserver/*.go -f ../../configs/docker.toml;
     "
-    docker exec -it  bash ./docker-entrypoint.sh
+    #docker exec -it web bash ./docker-entrypoint.sh
 else
     # run server mode
     # foreground

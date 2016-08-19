@@ -10,7 +10,7 @@ services:
     image: mysql:5.7
     container_name: web-mysql
     ports:
-      - "13306:3306"
+      - "23306:3306"
     volumes:
       - ./docker_build/mysql/conf:/etc/mysql/conf.d
       - ./docker_build/mysql/db_data:/var/lib/mysql
@@ -26,11 +26,17 @@ services:
     image: redis:3.2
     container_name: web-redis
     ports:
-      - "16379:6379"
+      - "26379:6379"
     volumes:
       - ./docker_build/redis_data:/data
     restart: always
     command: redis-server --requirepass password --appendonly yes
+  # Mongo
+  mongo:
+    image: mongo:3.3
+    container_name: web-mongo
+    ports:
+      - "30017:27017"
   # golang:go-gin-wrapper
   web:
     build:
@@ -42,18 +48,18 @@ services:
     image: go-gin-wrapper:v1.1
     container_name: web
     ports:
-      - "9999:9999"
-    expose:
-      - "9999"
+      - "8888:9999"
     volumes:
       - ./docker_build/logs:/var/log/goweb
       - ./:/go/src/github.com/hiromaily/go-gin-wrapper
     links:
       - mysql:mysql-server
       - redis:redis-server
+      - mongo:mongo-server
     depends_on:
       - mysql
       - redis
+      - mongo
     stdin_open: true
     tty: true
     restart: always

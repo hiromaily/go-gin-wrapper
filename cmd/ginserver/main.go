@@ -76,7 +76,8 @@ func initDatabase(testFlg uint8) {
 			panic(err)
 		} else {
 			mysql.New(host, dbname, user, pass, 3306)
-			return
+			mysql.GetDBInstance().SetMaxIdleConns(50)
+			//return
 		}
 	} else {
 		//For Localhost, Docker, Production

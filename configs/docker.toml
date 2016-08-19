@@ -54,7 +54,7 @@ pass = "password"
 session = true
 
 [mongodb]
-host = "localhost"
+host = "web-mongo"
 port = 27017
 dbname = "hiromaily"
 user = "hiromaily"

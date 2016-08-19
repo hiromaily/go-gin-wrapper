@@ -281,7 +281,7 @@ if [ $DOCKER_MODE -eq 1 ]; then
     while :
     do
         #000 or 200 or 404
-        HTTP_STATUS=`curl -LI localhost:9999/ -w '%{http_code}\n' -s -o /dev/null`
+        HTTP_STATUS=`curl -LI localhost:8888/ -w '%{http_code}\n' -s -o /dev/null`
         echo $HTTP_STATUS
         if [ $HTTP_STATUS -eq 000 ]; then
             sleep 1s
@@ -302,7 +302,7 @@ fi
 #docker logs web
 
 # check db
-#mysql -u root -p -h 127.0.0.1 -P 13306
+#mysql -u root -p -h 127.0.0.1 -P 23306
 
 
 ###########################################################
