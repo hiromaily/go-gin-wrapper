@@ -241,7 +241,7 @@ func loadStaticFiles(r *gin.Engine) {
 
 func run(r *gin.Engine) {
 	port := getPort()
-	if conf.GetConf().Proxy.Enable {
+	if conf.GetConf().Proxy.Mode == 1 {
 		//Proxy(Nginx) settings
 		color.Red("[WARNING] running on fcgi mode.")
 		lg.Info("running on fcgi mode.")

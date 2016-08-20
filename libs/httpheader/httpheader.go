@@ -9,12 +9,18 @@ import (
 	lg "github.com/hiromaily/golibs/log"
 )
 
+func getURL(scheme, host string, port int) string {
+	return fmt.Sprintf("%s://%s:%d", scheme, host, port)
+}
+
 //Check Referer for posted page
 func IsRefererHostValid(c *gin.Context, pageFrom string) bool {
 
-	server := conf.GetConf().Server
+	srv := conf.GetConf().Server
+	webserverURL := getURL(srv.Scheme, srv.Host, srv.Port)
+
 	//TODO:Add feature that switch https to http easily.
-	url := fmt.Sprintf("%s/%s", server.Referer, pageFrom)
+	url := fmt.Sprintf("%s/%s", webserverURL, pageFrom)
 	lg.Debugf("expected url: %s", url)
 
 	//http://localhost:9999/login

@@ -258,8 +258,8 @@ func RejectSpecificIp() gin.HandlerFunc {
 		lg.Info("[RejectSpecificIp]")
 		ip := c.ClientIP()
 		//proxy
-		if conf.GetConf().Proxy.Enable {
-			if conf.GetConf().Proxy.Host != ip {
+		if conf.GetConf().Proxy.Mode != 0 {
+			if conf.GetConf().Proxy.Server.Host != ip {
 				c.AbortWithStatus(403)
 				return
 			}

@@ -2,9 +2,10 @@
 environment = "local"
 
 [server]
+scheme = "http"
 host = "localhost"
 port = 9999
-referer = "http://localhost"
+num = 1
 
 [server.docs]
 path = "/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper"
@@ -25,8 +26,16 @@ user = "web"
 pass = "test"
 
 [proxy]
-enable = false
+mode = 0   #0:off, 1:go, 2:nginx
+
+[proxy.server]
+scheme = "http"
 host = "127.0.0.1"
+port = 9990
+
+[proxy.server.log]
+level = 1
+path = "/var/log/goweb/proxy.log"
 
 [api]
 header = "X-Custom-Header-Gin"

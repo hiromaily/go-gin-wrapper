@@ -8,8 +8,8 @@ GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
 TEST_MODE=0    #0:off, 1:after build, run test, 2:quick test for customized
-AUTO_EXEC=1    #0.off, 1:after build, execute, 2:only run quickly
-GODEP_MODE=0
+AUTO_EXEC=0    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
+GODEP_MODE=1
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0  #0:off, 1:deploy server, 2:exec test on heroku
 DOCKER_MODE=0  #0:off, 1:run server,    2:exec test on docker
@@ -116,6 +116,15 @@ if [ $EXIT_STATUS -gt 0 ]; then
     exit $EXIT_STATUS
 fi
 
+# reverseproxy
+go build -i -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
+EXIT_STATUS=$?
+
+if [ $EXIT_STATUS -gt 0 ]; then
+    exit $EXIT_STATUS
+fi
+
+
 
 ###########################################################
 # cross-compile for linux
@@ -178,6 +187,11 @@ if [ $AUTO_EXEC -eq 1 ]; then
         #ginserver -f ${PWD}/configs/settings.toml
         ginserver -f ./configs/settings.toml
     fi
+elif [ $AUTO_EXEC -eq 3 ]; then
+    ginserver -f ./configs/settings.toml &
+    sleep 3s
+    reverseproxy -f ./configs/settings.toml
+    #proxy.hiromaily.com:9990
 fi
 
 ### Hot deplpy using go-server-starter

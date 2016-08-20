@@ -2,9 +2,10 @@
 environment = "heroku"
 
 [server]
+scheme = "http"
 host = "ginserver.herokuapp.com"
 port = 5000
-referer = "https://ginserver.herokuapp.com"
+num = 1
 
 [server.docs]
 path = "/app"
@@ -25,8 +26,16 @@ user = "web"
 pass = "test"
 
 [proxy]
-enable = false
+mode = 0   #0:off, 1:go, 2:nginx
+
+[proxy.server]
+scheme = "http"
 host = "127.0.0.1"
+port = 9990
+
+[proxy.server.log]
+level = 1
+path = "/var/log/goweb/proxy.log"
 
 [api]
 header = "X-Custom-Header-Gin"

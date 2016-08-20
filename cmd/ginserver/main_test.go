@@ -8,6 +8,7 @@ import (
 	"errors"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gin-gonic/gin"
+	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -24,6 +25,10 @@ var r *gin.Engine
 
 // Test Data
 var redirectErr error = errors.New("redirect")
+
+var (
+	configFiles = []string{"settings.default.toml", "settings.toml", "docker.toml", "heroku.toml", "travis.toml"}
+)
 
 var (
 	ajaxHeader       = map[string]string{"X-Requested-With": "XMLHttpRequest"}
@@ -264,6 +269,20 @@ func getToken(res *http.Response) (ret string) {
 //-----------------------------------------------------------------------------
 // Test
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Config
+//-----------------------------------------------------------------------------
+func TestConfigs(t *testing.T) {
+	//configFiles
+	path := "../../configs/"
+	for _, v := range configFiles {
+		conf.New(path + v)
+	}
+
+	//
+	conf.New(*tomlPath)
+}
+
 //-----------------------------------------------------------------------------
 // Get Request for HTML
 //-----------------------------------------------------------------------------

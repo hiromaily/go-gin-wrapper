@@ -27,9 +27,10 @@ type Config struct {
 }
 
 type ServerConfig struct {
+	Scheme    string          `toml:"scheme"`
 	Host      string          `toml:"host"`
 	Port      int             `toml:"port"`
-	Referer   string          `toml:"referer"`
+	Num       int             `toml:"num"`
 	Docs      DocsConfig      `toml:"docs"`
 	Log       LogConfig       `toml:"log"`
 	Session   SessionConfig   `toml:"session"`
@@ -59,8 +60,15 @@ type BasicAuthConfig struct {
 }
 
 type ProxyConfig struct {
-	Enable bool   `toml:"enable"`
-	Host   string `toml:"host"`
+	Mode   uint8             `toml:"mode"` //0:off, 1:go, 2,nginx
+	Server ProxyServerConfig `toml:"server"`
+}
+
+type ProxyServerConfig struct {
+	Scheme string    `toml:"scheme"`
+	Host   string    `toml:"host"`
+	Port   int       `toml:"port"`
+	Log    LogConfig `toml:"log"`
 }
 
 type ApiConfig struct {
@@ -110,9 +118,9 @@ type DevelopConfig struct {
 
 var checkTomlKeys [][]string = [][]string{
 	{"environment"},
+	{"server", "scheme"},
 	{"server", "host"},
 	{"server", "port"},
-	{"server", "referer"},
 	{"server", "docs", "path"},
 	{"server", "log", "level"},
 	{"server", "log", "path"},
@@ -123,8 +131,12 @@ var checkTomlKeys [][]string = [][]string{
 	{"server", "session", "http_only"},
 	{"server", "basic_auth", "user"},
 	{"server", "basic_auth", "pass"},
-	{"proxy", "enable"},
-	{"proxy", "host"},
+	{"proxy", "mode"},
+	{"proxy", "server", "scheme"},
+	{"proxy", "server", "host"},
+	{"proxy", "server", "port"},
+	{"proxy", "server", "log", "level"},
+	{"proxy", "server", "log", "path"},
 	{"api", "header"},
 	{"api", "key"},
 	{"api", "only_ajax"},
@@ -202,7 +214,11 @@ func validateConfig(conf *Config, md *toml.MetaData) error {
 }
 
 // load configfile
-func loadConfig() (*Config, error) {
+func loadConfig(fileName string) (*Config, error) {
+	if fileName != "" {
+		tomlFileName = fileName
+	}
+
 	d, err := ioutil.ReadFile(tomlFileName)
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -226,10 +242,10 @@ func loadConfig() (*Config, error) {
 }
 
 // singleton architecture
-func New() {
+func New(fileName string) {
 	var err error
 	if conf == nil {
-		conf, err = loadConfig()
+		conf, err = loadConfig(fileName)
 	}
 	if err != nil {
 		panic(err)
@@ -240,7 +256,7 @@ func New() {
 func GetConf() *Config {
 	var err error
 	if conf == nil {
-		conf, err = loadConfig()
+		conf, err = loadConfig("")
 	}
 	if err != nil {
 		panic(err)
