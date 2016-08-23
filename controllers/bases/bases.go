@@ -6,25 +6,10 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/libs/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
-	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
+	"github.com/hiromaily/go-gin-wrapper/libs/login"
 	lg "github.com/hiromaily/golibs/log"
-	valid "github.com/hiromaily/golibs/validator"
 	"net/http"
 )
-
-type LoginRequest struct {
-	Email string `valid:"nonempty,email,min=5,max=40" field:"email" dispName:"E-Mail"`
-	Pass  string `valid:"nonempty,min=8,max=20" field:"pass" dispName:"Password"`
-}
-
-//TODO: this should be defined as something common library.
-var ErrFmt = map[string]string{
-	"nonempty": "Empty is not allowed on %s",
-	"email":    "Format of %s is invalid",
-	"alphanum": "Only alphabet is allowd on %s",
-	"min":      "At least %s of characters is required on %s",
-	"max":      "At a maximum %s of characters is allowed on %s",
-}
 
 //TODO:define as common use.
 func debugContext(c *gin.Context) {
@@ -40,7 +25,7 @@ func debugContext(c *gin.Context) {
 }
 
 // response for Login Page
-func resLogin(c *gin.Context, input *LoginRequest, msg string, errors []string) {
+func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []string) {
 	//token
 	token := csrf.CreateToken()
 	sess.SetTokenSession(c, token)
@@ -54,7 +39,7 @@ func resLogin(c *gin.Context, input *LoginRequest, msg string, errors []string) 
 
 	//it's better to not return nil
 	if input == nil {
-		input = &LoginRequest{}
+		input = &login.LoginRequest{}
 	}
 
 	//View
@@ -119,32 +104,10 @@ func LoginPostAction(c *gin.Context) {
 	//debug log
 	//debugContext(c)
 
-	//Get Post Parameters
-	posted := &LoginRequest{
-		Email: c.PostForm("inputEmail"),
-		Pass:  c.PostForm("inputPassword"),
-	}
-
-	//Validation
-	mRet := valid.CheckValidation(posted, false)
-	if len(mRet) != 0 {
-		errors := valid.ConvertErrorMsgs(mRet, ErrFmt)
-		lg.Debugf("validation error: %#v", errors)
-
-		//return
-		resLogin(c, posted, "", errors)
-		return
-	}
-
-	//Check inputed mail and password
-	userId, err := models.GetDB().IsUserEmail(posted.Email, posted.Pass)
-	if err != nil {
-		errors := []string{"E-mail or Password is made a mistake."}
-		lg.Debugf("login error: %#v", errors)
-
-		//return
-		resLogin(c, posted, "", errors)
-		return
+	//check login
+	userId, posted, errs := login.CheckLoginHTML(c)
+	if errs != nil {
+		resLogin(c, posted, "", errs)
 	}
 
 	//When login is successful
@@ -171,11 +134,14 @@ func LogoutPostAction(c *gin.Context) {
 	sess.Logout(c)
 
 	//lg.Debug(sess.IsLogin(c))
+	api := conf.GetConf().Api
 
 	//View
 	c.HTML(http.StatusOK, "pages/bases/logout.tmpl", gin.H{
 		"title":    "Logout Page",
 		"navi_key": "/logout",
+		"header":   api.Header,
+		"key":      api.Key,
 	})
 }
 

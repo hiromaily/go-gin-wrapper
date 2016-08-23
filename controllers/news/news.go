@@ -2,6 +2,7 @@ package news
 
 import (
 	"github.com/gin-gonic/gin"
+	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	models "github.com/hiromaily/go-gin-wrapper/models/mongo"
 	"net/http"
 )
@@ -27,6 +28,8 @@ func NewsGetAction(c *gin.Context) {
 	//}
 	className := []string{"alert-success", "alert-info", "alert-warning", "alert-danger"}
 
+	api := conf.GetConf().Api
+
 	//View
 	c.HTML(http.StatusOK, "pages/news/news.tmpl", gin.H{
 		"title":    "News Page",
@@ -34,6 +37,8 @@ func NewsGetAction(c *gin.Context) {
 		//"params": params,
 		"articles": articles,
 		"class":    className,
+		"header":   api.Header,
+		"key":      api.Key,
 	})
 }
 

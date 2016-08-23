@@ -158,9 +158,10 @@
           </ul>
         </div>
       </nav>
-
+<form id="form_active" action="/logout" method="POST"></form>
 <script type="text/javascript">
 (function (){
+  //navi color
   var key={{ .navi_key }};
   //class="active-menu-top"
   //var el = document.querySelector("a.nav-menu");
@@ -170,6 +171,45 @@
       el[i].classList.add('active-menu');
     }
   }
+
+  //logout
+  //<a class="nav-menu" href="/logout" data-post="1" data-method="post">
+  function getPostElem(){
+    post_elem = document.querySelectorAll('a[data-post="1"]');
+    for (var i = 0, len = post_elem.length; i < len; i++) {
+      post_elem[i].addEventListener("click", onPost, false);
+    }
+  }
+
+  function getAjaxElem(){
+    ajax_elem = document.querySelectorAll('a[data-ajax="1"]');
+    for (var i = 0, len = ajax_elem.length; i < len; i++) {
+      ajax_elem[i].addEventListener("click", onAjax, false);
+    }
+  }
+
+  function onPost(e){
+    e.preventDefault();
+    sendPost(e.target.href);
+  }
+
+  function onAjax(e){
+    e.preventDefault();
+    //sendAjax(e.target.href, e.target.getAttribute('data-method'), e.target.getAttribute('data-contype'));
+    hm.sendAjax(e.target.href, e.target.getAttribute('data-method'), "form", "")
+  }
+
+  //send Post
+  function sendPost(url){
+    //form action
+    var form = document.getElementById("form_active");
+    form.action = url;
+    form.submit();
+  }
+
+
+document.addEventListener("DOMContentLoaded",getAjaxElem,false);
+document.addEventListener("DOMContentLoaded",getPostElem,false);
 })();
 </script>
 {{end}}

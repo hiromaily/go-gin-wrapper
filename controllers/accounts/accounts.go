@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"github.com/gin-gonic/gin"
+	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	"net/http"
 )
@@ -15,9 +16,13 @@ func AccountsGetAction(c *gin.Context) {
 		return
 	}
 
+	api := conf.GetConf().Api
+
 	//View
 	c.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", gin.H{
 		"title":    "Accounts Page",
 		"navi_key": "/accounts/",
+		"header":   api.Header,
+		"key":      api.Key,
 	})
 }

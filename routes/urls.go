@@ -104,7 +104,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	//-----------------------
 	jwt := r.Group("/api/jwt", CheckHttpHeader())
 	{
-		jwt.POST("", us.UsersListGetAction)      //jwt end point
+		jwt.POST("", us.UsersListGetAction) //jwt end point
 	}
 
 	//-----------------------

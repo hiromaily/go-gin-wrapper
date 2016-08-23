@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
-	lg "github.com/hiromaily/golibs/log"
+	//lg "github.com/hiromaily/golibs/log"
 	"net/http"
 )
 
@@ -15,8 +15,8 @@ func IndexAction(c *gin.Context) {
 
 	//return header and key
 	api := conf.GetConf().Api
-	lg.Debugf("api.Header: %#v\n", api.Header)
-	lg.Debugf("api.Key: %#v\n", api.Key)
+	//lg.Debugf("api.Header: %#v\n", api.Header)
+	//lg.Debugf("api.Key: %#v\n", api.Key)
 
 	//Get User ids
 	type UserId struct {
