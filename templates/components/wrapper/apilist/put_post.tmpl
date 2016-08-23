@@ -4,34 +4,27 @@
               <div class="panel panel-primary">
                 <div class="panel-heading">PUT API</div>
                 <div class="panel-body">
-                  <form role="form">
                     <div class="form-group"><!--has-error-->
                       <label>User ID</label>
                       <input id="putID" class="form-control" type="text">
-                      <p class="help-block">Help text here.</p>
                     </div>
                     <div class="form-group">
                       <label>First Name</label>
                       <input id="putFN" class="form-control" type="text">
-                      <p class="help-block">Help text here.</p>
                     </div>
                     <div class="form-group">
                       <label>Last Name</label>
                       <input id="putLN" class="form-control" type="text">
-                      <p class="help-block">Help text here.</p>
                     </div>
                     <div class="form-group">
                       <label>E-mail</label>
                       <input id="putEM" class="form-control" type="text">
-                      <p class="help-block">Help text here.</p>
                     </div>
                     <div class="form-group">
                       <label>Password</label>
                       <input id="putPW" class="form-control" type="password">
-                      <p class="help-block">Help text here.</p>
                     </div>
                     <button id="putBtn" type="button" class="btn btn-info">Update</button>
-                  </form>
                 </div>
               </div>
             </div>
@@ -42,25 +35,21 @@
                   <form role="form">
                     <div class="form-group">
                       <label>First Name</label>
-                      <input class="form-control" type="text">
-                      <p class="help-block">Help text here.</p>
+                      <input id="postFN" class="form-control" type="text">
                     </div>
                     <div class="form-group">
                       <label>Last Name</label>
-                      <input class="form-control" type="text">
-                      <p class="help-block">Help text here.</p>
+                      <input id="postLN" class="form-control" type="text">
                     </div>
                     <div class="form-group">
                       <label>E-mail</label>
-                      <input class="form-control" type="text">
-                      <p class="help-block">Help text here.</p>
+                      <input id="postEM" class="form-control" type="text">
                     </div>
                     <div class="form-group">
                       <label>Password</label>
-                      <input class="form-control" type="password">
-                      <p class="help-block">Help text here.</p>
+                      <input id="postPW" class="form-control" type="password">
                     </div>
-                    <button type="submit" class="btn btn-info">Register</button>
+                    <button id="postBtn" type="button" class="btn btn-info">Register</button>
                   </form>
                 </div>
               </div>
@@ -69,7 +58,10 @@
 <script type="text/javascript">
 (function (){
   var putBtn = document.getElementById("putBtn");
+  var postBtn = document.getElementById("postBtn");
   putBtn.addEventListener("click", putUser, false);
+  postBtn.addEventListener("click", postUser, false);
+
 
   function putUser(evt){
     var url;
@@ -81,6 +73,7 @@
         //id error
         console.log("id is invalid.");
         swal("warning!", "user id is invalid.", "warning");
+        //TODO:add has-error class to group
         return;
     }
 
@@ -103,6 +96,45 @@
     //send
     hm.sendAjax(url, "put", "form", sendData)
   }
+
+  function postUser(evt){
+    var url = "/api/users";
+    var sendData = new Object();
+
+    var errFlg = 0;
+    //create data
+    if (document.getElementById("postFN").value != ""){
+      sendData.firstName = document.getElementById("postFN").value;
+    }else{
+        errFlg=1;
+    }
+    if (document.getElementById("postLN").value != ""){
+      sendData.lastName = document.getElementById("postLN").value;
+    }else{
+        errFlg=1;
+    }
+    if (document.getElementById("postEM").value != ""){
+      sendData.email = document.getElementById("postEM").value;
+    }else{
+        errFlg=1;
+    }
+    if (document.getElementById("postPW").value != ""){
+      sendData.password = document.getElementById("postPW").value;
+    }else{
+        errFlg=1;
+    }
+
+    console.log(sendData)
+
+    if (errFlg==1){
+        swal("warning!", "blank filed is not allowed.", "warning");
+        return;
+    }
+
+    //send
+    hm.sendAjax(url, "post", "form", sendData)
+  }
+
 
 })();
 </script>

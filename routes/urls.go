@@ -28,7 +28,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	/******************************************************************************/
 	//TODO:When http request method is POST, check referer in advance automatically.
 	//-----------------------
-	//Base(Top Level)
+	// Base(Top Level)
 	//-----------------------
 	r.GET("/", bases.IndexAction)
 	//Redirect
@@ -46,7 +46,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	r.POST("/logout", bases.LogoutPostAction) //HTML
 
 	//-----------------------
-	//News
+	// News
 	//-----------------------
 	newsG := r.Group("/news")
 	{
@@ -56,7 +56,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	//r.GET("/news/", news.NewsGetAction)
 
 	//-----------------------
-	//API List
+	// API List
 	//-----------------------
 	apiListG := r.Group("/apilist")
 	{
@@ -65,7 +65,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	}
 
 	//-----------------------
-	//Account(MyPage)
+	// Account(MyPage)
 	//-----------------------
 	//After login
 	accountsG := r.Group("/accounts")
@@ -76,7 +76,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	//r.GET("/accounts/", accounts.AccountsGetAction)
 
 	//-----------------------
-	//Admin [BasicAuth()]
+	// Admin [BasicAuth()]
 	//-----------------------
 	ba := conf.GetConf().Server.BasicAuth
 	authorized := r.Group("/admin", gin.BasicAuth(gin.Accounts{
@@ -100,7 +100,15 @@ func SetHTTPUrls(r *gin.Engine) {
 	/************ REST API (For Ajax) *********************************************/
 	/******************************************************************************/
 	//-----------------------
-	//User
+	// JWT
+	//-----------------------
+	jwt := r.Group("/api/jwt", CheckHttpHeader())
+	{
+		jwt.POST("", us.UsersListGetAction)      //jwt end point
+	}
+
+	//-----------------------
+	// User
 	//-----------------------
 	//TODO: which is better to use CheckHttpHeader() for ajax request to check http header.
 	// if it's used as middle ware like as below.
@@ -117,7 +125,6 @@ func SetHTTPUrls(r *gin.Engine) {
 	}
 	//TODO:When user can use only method of GET and POST, X-HTTP-Method-Override header may be helpful.
 	//Or use parameter `_method`
-
 }
 
 //For HTTPS

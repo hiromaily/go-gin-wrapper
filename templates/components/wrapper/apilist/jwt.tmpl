@@ -1,0 +1,59 @@
+{{define "components/wrapper/apilist/jwt.tmpl"}}
+          <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <div class="panel panel-primary">
+                <div class="panel-heading">JWT API</div>
+                <div class="panel-body">
+                  <form role="form">
+                    <div class="form-group">
+                      <label>E-mail</label>
+                      <input id="jwtEM" class="form-control" type="text">
+                    </div>
+                    <div class="form-group">
+                      <label>Password</label>
+                      <input id="jwtPW" class="form-control" type="password">
+                    </div>
+                    <button id="jwtBtn" type="button" class="btn btn-info">Get User</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <div class="panel panel-info">
+                <div class="panel-heading">JWT CODE</div>
+                <div class="panel-body">
+                    <div class="form-group">
+                      <label for="disabledInput">jwt code</label>
+                      <input id="jwtCode" class="form-control" id="disabledInput" type="text" placeholder="" disabled="">
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<script type="text/javascript">
+(function (){
+  var getBtn = document.getElementById("jwtBtn");
+  jwtBtn.addEventListener("click", getJWT, false);
+
+  //
+  function getJWT(evt){
+    //
+    var url;
+    var sendData;
+    var id = getSelectText("slctIds");
+    if (id == "All"){
+        url = "/api/users";
+    }else{
+        url = "/api/users/" + id;
+    }
+
+    //create data
+
+    //send
+    hm.sendAjax(url, "get", "form", "")
+  }
+
+})();
+</script>
+{{end}}

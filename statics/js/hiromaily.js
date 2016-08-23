@@ -9,7 +9,7 @@
   var updateUserList = function(users){
     var strHtml = "";
     for (var i = 0, len = users.length; i < len; i++) {
-      console.log(users[i].id, users[i].firstName);
+      //console.log(users[i].id, users[i].firstName);
       strHtml += "<tr><td>"+users[i].id+"</td><td>"+users[i].firstName+"</td><td>"+users[i].lastName+"</td>";
       strHtml += "<td>"+users[i].email+"</td><td>*****</td><td>"+users[i].update+"</td>";
     }
@@ -49,20 +49,14 @@
 	  data:        sendData,
     })
     .done(function( data, textStatus, jqXHR ) {
-      //console.log("success");
       //console.log(JSON.stringify(data));
       //console.log(data);
-      if (method=="get"){
-        if(data.code==0){
+      if (method=="get" && data.code==0){
           updateUserList(data.users);
-        }
-      } else if (method=="delete"){
-        console.log("done delete");
       }
       swal("success!", "user was updated!", "success");
     })
     .fail(function( jqXHR, textStatus, errorThrown ) {
-      console.log("error");
       swal("error!", "validation error was occurred!", "error");
     });
   };
