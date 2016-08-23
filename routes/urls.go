@@ -6,6 +6,7 @@ import (
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/controllers/accounts"
 	"github.com/hiromaily/go-gin-wrapper/controllers/admins"
+	"github.com/hiromaily/go-gin-wrapper/controllers/api/jwt"
 	us "github.com/hiromaily/go-gin-wrapper/controllers/api/users"
 	"github.com/hiromaily/go-gin-wrapper/controllers/bases"
 	"github.com/hiromaily/go-gin-wrapper/controllers/errors"
@@ -102,9 +103,9 @@ func SetHTTPUrls(r *gin.Engine) {
 	//-----------------------
 	// JWT
 	//-----------------------
-	jwt := r.Group("/api/jwt", CheckHttpHeader())
+	jw := r.Group("/api/jwt", CheckHttpHeader())
 	{
-		jwt.POST("", us.UsersListGetAction) //jwt end point
+		jw.POST("", jwt.IndexAction) //jwt end point
 	}
 
 	//-----------------------
@@ -114,7 +115,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	// if it's used as middle ware like as below.
 	//  r.Use(routes.CheckHttpHeader())
 	//  it let us faster to develop instead of a bit less performance.
-	users := r.Group("/api/users", CheckHttpHeader())
+	users := r.Group("/api/users", CheckHttpHeader(), CheckJWT())
 	{
 		users.GET("", us.UsersListGetAction)      //Get user list
 		users.POST("", us.UserPostAction)         //Register for new user

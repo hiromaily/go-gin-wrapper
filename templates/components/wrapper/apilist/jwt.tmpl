@@ -13,7 +13,7 @@
                       <label>Password</label>
                       <input id="jwtPW" class="form-control" type="password">
                     </div>
-                    <button id="jwtBtn" type="button" class="btn btn-info">Get User</button>
+                    <button id="jwtBtn" type="button" class="btn btn-info">Get JWT</button>
                   </form>
                 </div>
               </div>
@@ -39,19 +39,30 @@
   //
   function getJWT(evt){
     //
-    var url;
-    var sendData;
-    var id = getSelectText("slctIds");
-    if (id == "All"){
-        url = "/api/users";
-    }else{
-        url = "/api/users/" + id;
-    }
+    var url = "/api/jwt";
+    var sendData = new Object();
 
     //create data
+    var errFlg = 0;
+    //create data
+    if (document.getElementById("jwtEM").value != ""){
+      sendData.inputEmail = document.getElementById("jwtEM").value;
+    }else{
+        errFlg=1;
+    }
+    if (document.getElementById("jwtPW").value != ""){
+      sendData.inputPassword = document.getElementById("jwtPW").value;
+    }else{
+        errFlg=1;
+    }
+
+    if (errFlg==1){
+        swal("warning!", "blank filed is not allowed.", "warning");
+        return;
+    }
 
     //send
-    hm.sendAjax(url, "get", "form", "")
+    hm.sendAjax(url, "post", "form", sendData)
   }
 
 })();

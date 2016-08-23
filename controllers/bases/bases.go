@@ -108,6 +108,7 @@ func LoginPostAction(c *gin.Context) {
 	userId, posted, errs := login.CheckLoginHTML(c)
 	if errs != nil {
 		resLogin(c, posted, "", errs)
+		return
 	}
 
 	//When login is successful

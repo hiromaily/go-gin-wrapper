@@ -1,11 +1,13 @@
 package routes
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
+	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"
 	"net/http"
 	"strings"
@@ -91,6 +93,38 @@ func CheckHttpHeader() gin.HandlerFunc {
 
 		//Context Meta Data
 		//SetMetaData(c)
+
+		c.Next()
+	}
+}
+
+func CheckJWT() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		lg.Info("[CheckJWT]")
+
+		var err error
+
+		IsAuth := c.Request.Header.Get("Authorization")
+		if IsAuth != "" {
+			aAry := strings.Split(IsAuth, " ")
+			if len(aAry) != 2 {
+				err = errors.New("Authorization header is invalid")
+			} else {
+				if aAry[0] != "Bearer" {
+					err = errors.New("Authorization header is invalid")
+				} else {
+					token := aAry[1]
+					err = jwt.JudgeJWT(token)
+				}
+			}
+		} else {
+			err = errors.New("Authorization header was missed.")
+		}
+
+		if err != nil {
+			c.AbortWithError(400, err)
+			return
+		}
 
 		c.Next()
 	}

@@ -17,6 +17,17 @@
     userListBody.innerHTML = strHtml;
   };
 
+  var setToken = function(token){
+    var jwtCode = document.getElementById("jwtCode");
+    jwtCode.value = token;
+  };
+
+  var getTokenHeader = function(){
+    var jwtCode = document.getElementById("jwtCode");
+    return jwtCode.value;
+  };
+
+
 //-------------------------------------------------------------------------
 //public
 //-------------------------------------------------------------------------
@@ -31,7 +42,13 @@
       sendData = JSON.stringify(sendData);
     }
 
-    var rtnData;
+    var token = getTokenHeader();
+    if (url != "/api/jwt" && token == ""){
+      swal("error!", "token is required for sending ajax!", "error");
+      return;
+    } else if(url != "/api/jwt"){
+      token = "Bearer " + token;
+    }
 
     //for JSON
     $.ajax({
@@ -41,6 +58,10 @@
 		//xhr.setRequestHeader('X-Custom-Header-Gin', '{{ .key }}');
 		//xhr.setRequestHeader('{{ .header }}', '{{ .key }}');
 		xhr.setRequestHeader(hiromaily_header, hiromaily_key);
+        //'Authorization': 'Bearer ' + 'YOUR_CURRENT_TOKEN'
+        if (token != ""){
+		  xhr.setRequestHeader('Authorization', token);
+        }
 	  },
       //cache    : false,
       crossDomain: false,
@@ -50,9 +71,12 @@
     })
     .done(function( data, textStatus, jqXHR ) {
       //console.log(JSON.stringify(data));
-      //console.log(data);
+      console.log(data);
       if (method=="get" && data.code==0){
-          updateUserList(data.users);
+        updateUserList(data.users);
+      }else if (method=="post" && data.token != null){
+        console.log(data.token);
+        setToken(data.token);
       }
       swal("success!", "user was updated!", "success");
     })
