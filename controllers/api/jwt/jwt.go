@@ -8,7 +8,6 @@ import (
 	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"
 	u "github.com/hiromaily/golibs/utils"
-	"os"
 	"time"
 )
 
@@ -21,16 +20,6 @@ func IndexAction(c *gin.Context) {
 	userId, mail, err := login.CheckLoginAPI(c)
 	if err != nil {
 		c.AbortWithError(400, err)
-		return
-	}
-
-	//TODO:use conf it, and move to main()
-	// get token of jwt
-	priKey := os.Getenv("HOME") + "/.ssh/jwt.rsa"
-	pubKey := os.Getenv("HOME") + "/.ssh/jwt.rsa.pub"
-	err = jwt.InitKeys(priKey, pubKey)
-	if err != nil {
-		c.AbortWithError(500, err)
 		return
 	}
 

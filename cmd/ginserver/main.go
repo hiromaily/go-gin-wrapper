@@ -11,6 +11,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/libs/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/routes"
+	"github.com/hiromaily/golibs/auth/jwt"
 	mongo "github.com/hiromaily/golibs/db/mongodb"
 	"github.com/hiromaily/golibs/db/mysql"
 	fl "github.com/hiromaily/golibs/files"
@@ -41,6 +42,9 @@ func init() {
 	//lg.Debugf("conf %#v\n", conf.GetConfInstance())
 	lg.Debugf("[Environment] : %s\n", conf.GetConf().Environment)
 
+	//auth settings
+	initAuth()
+
 	// debug mode
 	if conf.GetConf().Environment == "local" {
 		//signal
@@ -59,6 +63,22 @@ func initConf() {
 	conf.GetConf()
 }
 
+func initAuth() {
+	auth := conf.GetConf().Api.Auth
+	if auth.Enable {
+		if auth.Secret != "" {
+			jwt.InitEncrypted(jwt.HMAC)
+			jwt.InitSecretKey(auth.Secret)
+		} else {
+			err := jwt.InitKeys(auth.PrivateKey, auth.PublicKey)
+			if err != nil {
+				lg.Error(err)
+				panic(err)
+			}
+		}
+	}
+}
+
 // initialize Database
 func initDatabase(testFlg uint8) {
 	//if os.Getenv("HEROKU_FLG") == "1" {
@@ -72,7 +92,7 @@ func initDatabase(testFlg uint8) {
 		lg.Debugf("[User]%s  [Pass]%s", user, pass)
 
 		if err != nil {
-			lg.Debug(err)
+			lg.Error(err)
 			panic(err)
 		} else {
 			mysql.New(host, dbname, user, pass, 3306)

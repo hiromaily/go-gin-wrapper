@@ -42,6 +42,12 @@ header = "X-Custom-Header-Gin"
 key = "key12345"
 only_ajax = true
 
+[api.auth]
+enable = true
+secret_code = ""
+private_key = "/Users/hy/.ssh/jwt_rsa"
+public_key = "/Users/hy/.ssh/jwt_rsa.pub"
+
 [mysql]
 host = "localhost"
 port = 3306

@@ -115,7 +115,13 @@ func SetHTTPUrls(r *gin.Engine) {
 	// if it's used as middle ware like as below.
 	//  r.Use(routes.CheckHttpHeader())
 	//  it let us faster to develop instead of a bit less performance.
-	users := r.Group("/api/users", CheckHttpHeader(), CheckJWT())
+	var handlers []gin.HandlerFunc = []gin.HandlerFunc{CheckHttpHeader()}
+	if conf.GetConf().Api.Auth.Enable {
+		handlers = append(handlers, CheckJWT())
+	}
+
+	//users := r.Group("/api/users", CheckHttpHeader(), CheckJWT())
+	users := r.Group("/api/users", handlers...)
 	{
 		users.GET("", us.UsersListGetAction)      //Get user list
 		users.POST("", us.UserPostAction)         //Register for new user

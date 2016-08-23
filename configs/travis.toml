@@ -42,6 +42,12 @@ header = "X-Custom-Header-Gin"
 key = "key12345"
 only_ajax = true
 
+[api.auth]
+enable = false
+secret_code = "secret1234567890"
+private_key = ""
+public_key = ""
+
 [mysql]
 host = "us-cdbr-iron-east-04.cleardb.net"
 port = 3306

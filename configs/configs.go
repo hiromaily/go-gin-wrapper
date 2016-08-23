@@ -72,9 +72,17 @@ type ProxyServerConfig struct {
 }
 
 type ApiConfig struct {
-	Header string `toml:"header"`
-	Key    string `toml:"key"`
-	Ajax   bool   `toml:"only_ajax"`
+	Header string     `toml:"header"`
+	Key    string     `toml:"key"`
+	Ajax   bool       `toml:"only_ajax"`
+	Auth   AuthConfig `toml:"auth"`
+}
+
+type AuthConfig struct {
+	Enable     bool   `toml:"enable"`
+	Secret     string `toml:"secret_code"`
+	PrivateKey string `toml:"private_key"`
+	PublicKey  string `toml:"public_key"`
 }
 
 type MySQLConfig struct {
@@ -140,6 +148,10 @@ var checkTomlKeys [][]string = [][]string{
 	{"api", "header"},
 	{"api", "key"},
 	{"api", "only_ajax"},
+	{"api", "auth", "enable"},
+	{"api", "auth", "secret_code"},
+	{"api", "auth", "private_key"},
+	{"api", "auth", "public_key"},
 	{"mysql", "host"},
 	{"mysql", "port"},
 	{"mysql", "dbname"},
