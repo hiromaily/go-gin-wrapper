@@ -11,6 +11,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/controllers/errors"
 	"github.com/hiromaily/go-gin-wrapper/controllers/news"
 	//ba "github.com/hiromaily/go-gin-wrapper/libs/basicauth"
+	"github.com/hiromaily/go-gin-wrapper/controllers/apilist"
 	"net/http"
 )
 
@@ -53,6 +54,15 @@ func SetHTTPUrls(r *gin.Engine) {
 		newsG.GET("/", news.NewsGetAction)
 	}
 	//r.GET("/news/", news.NewsGetAction)
+
+	//-----------------------
+	//API List
+	//-----------------------
+	apiListG := r.Group("/apilist")
+	{
+		//Top
+		apiListG.GET("/", apilist.IndexAction)
+	}
 
 	//-----------------------
 	//Account(MyPage)

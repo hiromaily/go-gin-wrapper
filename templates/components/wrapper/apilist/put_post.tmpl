@@ -1,0 +1,109 @@
+{{define "components/wrapper/apilist/put_post.tmpl"}}
+          <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <div class="panel panel-primary">
+                <div class="panel-heading">PUT API</div>
+                <div class="panel-body">
+                  <form role="form">
+                    <div class="form-group"><!--has-error-->
+                      <label>User ID</label>
+                      <input id="putID" class="form-control" type="text">
+                      <p class="help-block">Help text here.</p>
+                    </div>
+                    <div class="form-group">
+                      <label>First Name</label>
+                      <input id="putFN" class="form-control" type="text">
+                      <p class="help-block">Help text here.</p>
+                    </div>
+                    <div class="form-group">
+                      <label>Last Name</label>
+                      <input id="putLN" class="form-control" type="text">
+                      <p class="help-block">Help text here.</p>
+                    </div>
+                    <div class="form-group">
+                      <label>E-mail</label>
+                      <input id="putEM" class="form-control" type="text">
+                      <p class="help-block">Help text here.</p>
+                    </div>
+                    <div class="form-group">
+                      <label>Password</label>
+                      <input id="putPW" class="form-control" type="password">
+                      <p class="help-block">Help text here.</p>
+                    </div>
+                    <button id="putBtn" type="button" class="btn btn-info">Update</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <div class="panel panel-default">
+                <div class="panel-heading">POST API</div>
+                <div class="panel-body">
+                  <form role="form">
+                    <div class="form-group">
+                      <label>First Name</label>
+                      <input class="form-control" type="text">
+                      <p class="help-block">Help text here.</p>
+                    </div>
+                    <div class="form-group">
+                      <label>Last Name</label>
+                      <input class="form-control" type="text">
+                      <p class="help-block">Help text here.</p>
+                    </div>
+                    <div class="form-group">
+                      <label>E-mail</label>
+                      <input class="form-control" type="text">
+                      <p class="help-block">Help text here.</p>
+                    </div>
+                    <div class="form-group">
+                      <label>Password</label>
+                      <input class="form-control" type="password">
+                      <p class="help-block">Help text here.</p>
+                    </div>
+                    <button type="submit" class="btn btn-info">Register</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+<script type="text/javascript">
+(function (){
+  var putBtn = document.getElementById("putBtn");
+  putBtn.addEventListener("click", putUser, false);
+
+  function putUser(evt){
+    var url;
+    var sendData = new Object();
+    var id = document.getElementById("putID").value;
+    if (id != "" && !isNaN(id)){
+        url = "/api/users/" + id;
+    }else{
+        //id error
+        console.log("id is invalid.");
+        swal("warning!", "user id is invalid.", "warning");
+        return;
+    }
+
+    //create data
+    if (document.getElementById("putFN").value != ""){
+      sendData.firstName = document.getElementById("putFN").value;
+    }
+    if (document.getElementById("putLN").value != ""){
+      sendData.lastName = document.getElementById("putLN").value;
+    }
+    if (document.getElementById("putEM").value != ""){
+      sendData.email = document.getElementById("putEM").value;
+    }
+    if (document.getElementById("putPW").value != ""){
+      sendData.password = document.getElementById("putPW").value;
+    }
+
+    console.log(sendData)
+
+    //send
+    hm.sendAjax(url, "put", "form", sendData)
+  }
+
+})();
+</script>
+{{end}}

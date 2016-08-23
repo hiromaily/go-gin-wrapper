@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 	hs "github.com/hiromaily/golibs/cipher/hash"
+	"github.com/hiromaily/golibs/db/mysql"
 	lg "github.com/hiromaily/golibs/log"
 	u "github.com/hiromaily/golibs/utils"
 )
@@ -12,14 +13,22 @@ import (
 // e.g. db, err := sql.Open("mysql", "root:@/?parseTime=true")
 // http://stackoverflow.com/questions/29341590/go-parse-time-from-database
 type Users struct {
-	Id        int    `column:"user_id"`
-	FirstName string `column:"first_name"`
-	LastName  string `column:"last_name"`
-	Email     string `column:"email"`
-	Password  string `column:"password"`
+	Id        int    `column:"user_id" json:"id"`
+	FirstName string `column:"first_name" json:"firstName"`
+	LastName  string `column:"last_name" json:"lastName"`
+	Email     string `column:"email" json:"email"`
+	Password  string `column:"password" json:"password"`
 	//DeleteFlg string    `column:"delete_flg"       db:"delete_flg"`
 	//Created   time.Time `column:"create_datetime"  db:"create_datetime"`
-	//Updated   time.Time `column:"update_datetime"  db:"update_datetime"`
+	Updated string `column:"update_datetime" json:"update"`
+}
+
+type UsersSL struct {
+	Id        int    `column:"user_id" json:"id"`
+	FirstName string `column:"first_name" json:"firstName"`
+	LastName  string `column:"last_name" json:"lastName"`
+	Email     string `column:"email" json:"email"`
+	Updated   string `column:"update_datetime" json:"update"`
 }
 
 //User authorization when login
@@ -51,12 +60,29 @@ func (us *Models) IsUserEmail(email string, password string) (int, error) {
 	return user.Id, nil
 }
 
-// Get User List
-func (us *Models) GetUserList(users interface{}, id, sql string) (bool, error) {
-	defaultSql := "SELECT user_id, first_name, last_name, email, password FROM t_users WHERE delete_flg=?"
-	if sql == "" {
-		sql = defaultSql
+// Get User Ids
+func (us *Models) GetUserIds(users interface{}) error {
+	sql := "SELECT user_id FROM t_users WHERE delete_flg=?"
+
+	us.Db.SelectIns(sql, 0).Scan(users)
+
+	if us.Db.Err != nil {
+		return us.Db.Err
 	}
+
+	return nil
+}
+
+// Get User List
+func (us *Models) GetUserList(users interface{}, id string) (bool, error) {
+	//lg.Debug(mysql.ColumnForSQL(users))
+
+	//remove password
+	//fields := strings.Replace(mysql.ColumnForSQL(users), "password,", "", 1)
+	//lg.Debug(fields)
+
+	sql := "SELECT %s FROM t_users WHERE delete_flg=?"
+	sql = fmt.Sprintf(sql, mysql.ColumnForSQL(users))
 
 	//TODO: When Test for result is 0 record, set 1 to delFlg
 	delFlg := 0
@@ -78,7 +104,10 @@ func (us *Models) GetUserList(users interface{}, id, sql string) (bool, error) {
 
 // Insert User
 func (us *Models) InsertUser(users *Users) (int64, error) {
+	lg.Debug(mysql.ColumnForSQL(users))
+
 	sql := "INSERT INTO t_users (first_name, last_name, email, password) VALUES (?,?,?,?)"
+	//sql = fmt.Sprintf(sql, mysql.ColumnForSQL(users))
 
 	//hash password
 	return us.Db.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""))
@@ -86,6 +115,8 @@ func (us *Models) InsertUser(users *Users) (int64, error) {
 
 // Update User
 func (us *Models) UpdateUser(users *Users, id string) (int64, error) {
+	//lg.Debug(mysql.ColumnForSQL(users))
+
 	vals := []interface{}{}
 	sql := "UPDATE t_users SET"
 	if users.FirstName != "" {
@@ -104,6 +135,11 @@ func (us *Models) UpdateUser(users *Users, id string) (int64, error) {
 		sql += " password=?,"
 		vals = append(vals, hs.GetMD5Plus(users.Password, ""))
 	}
+	if users.Updated != "" {
+		sql += " update_datetime=?,"
+		vals = append(vals, users.Updated)
+	}
+
 	//remove last comma
 	sql = string(sql[:(len(sql) - 1)])
 

@@ -1,11 +1,14 @@
-{{define "components/wrapper_row_newslist.tmpl"}}
+{{define "components/wrapper/news/article.tmpl"}}
           <div class="row">
             <div class="col-md-6">
               <div class="panel panel-default">
-                <div class="panel-heading">Alert Styles </div>
+                <div class="panel-heading" style="text-align: center;">
+                  <span style="float: left;">{{.Article.Title}}</span>
+                  <span style="color: #708090; font-size: 8pt"; float: right;>&lt;{{.Article.Date | dateFmt}}&gt;</span>
+                </div>
                 <div class="panel-body">
-{{range .items}}
-<div class="alert alert-success">
+{{range .Article.Items}}
+<div class="alert {{$.Class}}">
 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
     {{.Title}}
     <a href="{{.Link}}" class="alert-link">Link</a>

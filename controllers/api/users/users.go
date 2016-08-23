@@ -8,6 +8,7 @@ import (
 	jslib "github.com/hiromaily/go-gin-wrapper/libs/json"
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	lg "github.com/hiromaily/golibs/log"
+	"github.com/hiromaily/golibs/times"
 	"github.com/hiromaily/golibs/validator"
 )
 
@@ -119,6 +120,8 @@ func updateUser(data *UserRequest, id string) (int64, error) {
 	if data.Password != "" {
 		user.Password = data.Password
 	}
+	//update date
+	user.Updated = times.GetCurrentTimeByStr()
 
 	//Update
 	return models.GetDB().UpdateUser(user, id)
@@ -128,8 +131,8 @@ func updateUser(data *UserRequest, id string) (int64, error) {
 func UsersListGetAction(c *gin.Context) {
 	lg.Debug("[GET] UsersListGetAction")
 
-	var users []models.Users
-	_, err := models.GetDB().GetUserList(&users, "", "")
+	var users []models.UsersSL
+	_, err := models.GetDB().GetUserList(&users, "")
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
@@ -176,15 +179,15 @@ func UserGetAction(c *gin.Context) {
 		return
 	}
 
-	var user models.Users
-	b, err := models.GetDB().GetUserList(&user, userId, "")
+	var user models.UsersSL
+	b, err := models.GetDB().GetUserList(&user, userId)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	} else {
 		//Make json for response and return
 		if b {
-			jslib.RtnUserJson(c, 0, js.CreateUserListJson([]models.Users{user}))
+			jslib.RtnUserJson(c, 0, js.CreateUserListJson([]models.UsersSL{user}))
 		} else {
 			jslib.RtnUserJson(c, 0, js.CreateUserListJson(nil))
 		}

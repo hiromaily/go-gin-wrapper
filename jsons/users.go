@@ -8,17 +8,19 @@ import (
 /***************** User Json *****************/
 // User List
 type UserListResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Users   []User `json:"users"`
+	Code    int              `json:"code"`
+	Message string           `json:"message"`
+	Users   []models.UsersSL `json:"users"`
 }
 
 // User
+/*
 type User struct {
 	Id        int    `json:"id"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 }
+*/
 
 // User Response
 type UserResponse struct {
@@ -29,23 +31,13 @@ type UserResponse struct {
 
 // Response for user list
 //func CreateUserListJson(data []map[string]interface{}) *UserListResponse {
-func CreateUserListJson(us []models.Users) *UserListResponse {
-	users := []User{}
+func CreateUserListJson(users []models.UsersSL) *UserListResponse {
 	var (
 		code int    = 0
 		msg  string = ""
 	)
 
-	if us != nil {
-		for _, v := range us {
-			user := User{
-				Id:        v.Id,
-				FirstName: v.FirstName,
-				LastName:  v.LastName,
-			}
-			users = append(users, user)
-		}
-	} else {
+	if users == nil {
 		code = 1
 		msg = "no users"
 	}

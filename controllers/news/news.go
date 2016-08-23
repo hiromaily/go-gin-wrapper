@@ -30,7 +30,7 @@ func NewsGetAction(c *gin.Context) {
 	//View
 	c.HTML(http.StatusOK, "pages/news/news.tmpl", gin.H{
 		"title":    "News Page",
-		"navi_key": "/news",
+		"navi_key": "/news/",
 		//"params": params,
 		"articles": articles,
 		"class":    className,

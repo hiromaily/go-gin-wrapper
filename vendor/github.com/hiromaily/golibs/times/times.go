@@ -112,6 +112,12 @@ func GetFormatTime(strTime string, format string) string {
 
 }
 
+func GetCurrentTimeByStr() string {
+	t := time.Now()
+	layout := "2006-01-02 15:04:05"
+	return t.Format(layout)
+}
+
 func PerseTimeForLastModified(lastModified string) (time.Time, error) {
 	//Tue, 16 Aug 2016 01:31:09 GMT
 	return time.Parse(time.RFC1123, lastModified)

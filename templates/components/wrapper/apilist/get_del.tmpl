@@ -1,0 +1,90 @@
+{{define "components/wrapper/apilist/get_del.tmpl"}}
+          <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <div class="panel panel-info">
+                <div class="panel-heading">GET API</div>
+                <div class="panel-body">
+                  <form role="form">
+                    <div class="form-group">
+                      <label>Select user id</label>
+                      <select id="slctIds" class="form-control">
+                        <option>All</option>
+{{range .ids}}
+    <option>{{.Id}}</option>
+{{end}}
+                      </select>
+                    </div>
+                    <button id="getBtn" type="button" class="btn btn-info">Get User</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <div class="panel panel-danger">
+                <div class="panel-heading">DELETE API</div>
+                <div class="panel-body">
+                  <form role="form">
+                    <div class="form-group">
+                      <label>Select user id</label>
+                      <select id="slctDelIds" class="form-control">
+{{range .ids}}
+    <option>{{.Id}}</option>
+{{end}}
+                      </select>
+                    </div>
+                    <input type="hidden" name="userid" value="12345">
+                    <button id="delBtn" type="button" class="btn btn-danger">Delete User</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+<script type="text/javascript">
+(function (){
+  var getBtn = document.getElementById("getBtn");
+  var delBtn = document.getElementById("delBtn");
+  getBtn.addEventListener("click", getUserList, false);
+  delBtn.addEventListener("click", delUser, false);
+
+  //get select text
+  function getSelectText(id){
+    // Get Slect box text
+    var slctIds = document.getElementById(id);
+    var idx = slctIds.selectedIndex;
+    //var value = slctIds.options[idx].value;
+    var text  = slctIds.options[idx].text;
+
+    return text;
+  }
+
+  //
+  function getUserList(evt){
+    //
+    var url;
+    var sendData;
+    var id = getSelectText("slctIds");
+    if (id == "All"){
+        url = "/api/users";
+    }else{
+        url = "/api/users/" + id;
+    }
+
+    //create data
+
+    //send
+    hm.sendAjax(url, "get", "form", "")
+  }
+
+  function delUser(evt){
+    //
+    var id = getSelectText("slctDelIds");
+    var url = "/api/users/" + id;
+
+    //send
+    hm.sendAjax(url, "delete", "form", "")
+  }
+
+})();
+</script>
+{{end}}

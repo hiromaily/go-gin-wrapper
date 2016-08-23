@@ -431,3 +431,40 @@ func (ms *MS) Exec2(sql string, args ...interface{}) error {
 	_, err := ms.DB.Exec(sql, args...)
 	return err
 }
+
+//-----------------------------------------------------------------------------
+// Util
+//-----------------------------------------------------------------------------
+func ColumnForSQL(s interface{}) string {
+	v := reflect.ValueOf(s)
+	if v.Elem().Kind() == reflect.Slice || v.Elem().Kind() == reflect.Array {
+		elemType := v.Elem().Type().Elem()
+		newElem := reflect.New(elemType).Elem()
+		return scanColumn(newElem)
+	} else if v.Elem().Kind() == reflect.Struct {
+		return scanColumn(v.Elem())
+	}
+	return ""
+}
+
+func scanColumn(val reflect.Value) string {
+	var fieldName string
+
+	for i := 0; i < val.NumField(); i++ {
+
+		typeField := val.Type().Field(i)
+		tag := typeField.Tag
+
+		valid := tag.Get("column")
+
+		if valid != "" {
+			fieldName += valid + ","
+		}
+	}
+	if fieldName != "" {
+		//remove last comma
+		fieldName = string(fieldName[:(len(fieldName) - 1)])
+	}
+
+	return fieldName
+}
