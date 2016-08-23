@@ -40,6 +40,12 @@ If you want to use original toml file, use command line arguments ```-f filepath
 ```
 ginserver -f /app/configs/yourfile.toml
 ```
+#### Authentication for API
+It's implemented by JWT(Json Web TOken) for authentication.
+Set ```[api.auth]``` on toml file.
+You can choose HMAC or RSA as signature pattern.
+When using RSA, set ```private_key``` and ```public_key``` on toml file.
+WHen using HMAC, set ```secret_code```.
 
 
 ### 2. On heroku
