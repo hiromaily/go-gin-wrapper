@@ -6,3 +6,8 @@ docker_build/logs
 docker_build/mysql/db_data/*
 docker_build/redis_data/*
 docker_build/go-gin-wrapper
+work_js/node_modules/
+work_js/test.sh
+work_js/reset.sh
+work_js/dist/
+work_js/package.json.bk
