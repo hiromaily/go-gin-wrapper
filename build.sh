@@ -19,9 +19,12 @@ GO_LINT=0
 RESET_DB=0
 
 #docker stop redisd
-#ocker stop mysqld
-#docker start redisd
-#docker start mysqld
+#docker stop mysqld
+#docker stop mongod
+
+docker start redisd
+docker start mysqld
+docker start mongod
 
 # when using go 1.7 for the first time, delete all inside pkg directory and run go install.
 #go install -v ./...

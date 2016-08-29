@@ -20,6 +20,7 @@
     "gulp-regex-rename": "^0.1.0",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.6.0",
+    "superagent": "^2.2.0",
     "vinyl-source-stream": "^1.1.0"
   }
 }

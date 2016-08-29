@@ -1,7 +1,7 @@
 (function(){
-  var hm = function(){};
+  var hy = function(){};
   //public
-  hm.debug = 1;
+  hy.debug = 1;
 
 //-------------------------------------------------------------------------
 //private
@@ -32,10 +32,10 @@
 //public
 //-------------------------------------------------------------------------
   //initialize
-  hm.init = function(){};
+  hy.init = function(){};
 
   //ajax
-  hm.sendAjax = function(url, method, content, sendData){
+  hy.sendAjax = function(url, method, content, sendData){
     var contentType = "application/x-www-form-urlencoded";
     if(content == "json"){
       contentType = "application/json";
@@ -85,5 +85,5 @@
     });
   };
 
-  window.hm = hm;
+  window.hy = hy;
 })();

@@ -146,6 +146,9 @@ elif [ $BUILD_MODE -eq 2 ]; then
     npm install --save-dev browserify
     npm install --save-dev babelify
     npm install --save-dev vinyl-source-stream
+
+    # others
+    npm install --save-dev superagent
     
     # setup gulpfile.js
     touch gulpfile.babel.js
