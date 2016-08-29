@@ -8,9 +8,39 @@ let log = () => {
   console.log("ECMAScript2015")
 }
 
-alert(11)
+// class Hy
+class Hy {
+    constructor(x, y) {
+        //public
+        this.x = x
+        this.y = y
+    }
 
-log()
+    //public
+    static distance(a, b) {
+        const dx = a.x - b.x
+        const dy = a.y - b.y
 
-let name = 'Harry'
-console.log(`Hello, ${name}`)
+        return Math.sqrt(dx*dx + dy*dy)
+    }
+}
+
+//main()
+function main(){
+  alert(11)
+
+  log()
+
+  //fmt.Printf的な
+  let name = 'Harry'
+  console.log(`Hello, ${name}`)
+
+  //class
+  const p1 = new Hy(5, 5)
+  const p2 = new Hy(10, 10)
+
+  console.log(Hy.distance(p1, p2))
+  
+}
+
+main()

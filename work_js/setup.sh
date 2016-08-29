@@ -1,30 +1,36 @@
 #!/bin/sh
 
 ###############################################################################
-## when setup environment, don't use setup.sh. it's for first configuration'
-#npm install
-
-## it requires jq command
-#brew install jq
-
-## global
-# babel
-#npm install -g babel-cli
-#babel -V
-
-# gulp
-#npm install -g gulp
-#npm install -g gulp-babel
-
-# eslint
-#npm install -g eslint
-#eslint -v
-###############################################################################
-
-###############################################################################
 ## Environment Valiable
 ###############################################################################
+EXEC_ONCE=0        #0:off, 1:exec (it's ok just once execution')
 BUILD_MODE=2       #1:Browserify (watchify) + babelify, 2:gulp + gulp-babel
+
+
+###############################################################################
+## Initialize environment
+###############################################################################
+if [ $EXEC_ONCE -eq 1 ]; then
+
+    ## when setup environment, don't use setup.sh. it's for first configuration'
+    npm install
+
+    ## it requires jq command
+    brew install jq
+
+    # babel
+    npm install -g babel-cli
+    #babel -V
+
+    # gulp
+    npm install -g gulp
+    npm install -g gulp-babel
+
+    # eslint
+    npm install -g eslint
+    #eslint -v
+fi
+
 
 ###############################################################################
 ## for projects
@@ -34,6 +40,7 @@ npm init -y
 
 # ES2015
 npm install --save-dev babel-preset-es2015
+npm install --save-dev babel-plugin-transform-es2015-modules-commonjs
 
 # setup eslint
 touch .eslintrc.json
@@ -67,10 +74,10 @@ EOF
 touch .babelrc
 cat <<EOF > .babelrc
 {
-  "presets": ["es2015"]
+  "presets": ["es2015"],
+  "plugins": ["transform-es2015-modules-commonjs"]
 }
 EOF
-
 
 # create src directories
 mkdir dist
@@ -135,35 +142,56 @@ elif [ $BUILD_MODE -eq 2 ]; then
     #npm install --save-dev gulp-rename
     npm install --save-dev gulp-regex-rename
 
+    # browserify
+    npm install --save-dev browserify
+    npm install --save-dev babelify
+    npm install --save-dev vinyl-source-stream
+    
     # setup gulpfile.js
-    touch gulpfile.js
-    cat <<EOF > gulpfile.js
-var gulp = require('gulp');
-var babel = require('gulp-babel');
-var plumber = require('gulp-plumber');
-var sourcemaps = require("gulp-sourcemaps"); /* source-map */
-var rename = require('gulp-regex-rename')
+    touch gulpfile.babel.js
+    cat <<EOF > gulpfile.bebel.js
+import gulp from 'gulp'
+import babel from 'gulp-babel'
+import plumber from 'gulp-plumber'
+import sourcemaps from 'gulp-sourcemaps'
+import rename from 'gulp-regex-rename'
 
-var src = ['src/*.js', 'src/**/*.js'];
+import browserify from "browserify"
+import babelify from "babelify"
+import source from "vinyl-source-stream"
 
-gulp.task('babel', function () {
+
+var src = ['src/*.js', 'src/**/*.js']
+var out = './dist'
+
+
+gulp.task('babel', () => {
   return gulp.src(src)
     .pipe(plumber())
     .pipe(sourcemaps.init()) /* source-map */
     .pipe(babel())
     .pipe(rename(/\.es6\.js$/, '.js'))
     .pipe(sourcemaps.write(".")) /* source-map */
-    .pipe(gulp.dest('./dist'));
-});
+    .pipe(gulp.dest(out))
+})
+
+gulp.task('browserify', function () {
+  return browserify('./src/module_import.es6.js')
+        .transform(babelify, {presets: ['es2015']})
+        .bundle()
+        .pipe(source('bundle.js'))
+        .pipe(gulp.dest(out))
+})
 
 gulp.task('watch', function () {
-  gulp.watch(src, ['babel']);
-});
+  gulp.watch(src, ['babel'])
+})
 
-gulp.task('default', ['babel']);
+gulp.task('default', ['babel'])
 EOF
 
     ## auto compile
     #gulp watch
+    #gulp browserify
 
 fi
