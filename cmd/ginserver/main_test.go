@@ -21,6 +21,9 @@ import (
 	"time"
 )
 
+//TODO:change toml settings automatically as program code.
+//TODO:test for jwt, first code have to be got.
+
 var r *gin.Engine
 
 // Test Data
@@ -108,7 +111,7 @@ var loginTests = []struct {
 	{"/login", http.StatusFound, "POST", loginHeaders, "/accounts", "aaaa@test.jp", "password", true, redirectErr},
 }
 
-// Test Data for ajax API
+// Test Data for ajax API (Not use JWT Auth)
 var userId int = 12
 var getApiTests = []struct {
 	url     string
@@ -140,9 +143,9 @@ func init() {
 	//flag.Parse()
 
 	//when changing loglevel
-	lg.InitializeLog(lg.DEBUG_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
+	//lg.InitializeLog(lg.DEBUG_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
 	//lg.InitializeLog(lg.INFO_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
-	//lg.InitializeLog(lg.WARNING_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
+	lg.InitializeLog(lg.WARNING_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
 }
 
 func setup() {

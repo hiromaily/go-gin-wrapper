@@ -33,10 +33,12 @@ func init() {
 }
 
 func InitEncrypted(mode uint8) {
+	encrypted = RSA
 	encrypted = mode
 }
 
 func InitSecretKey(str string) {
+	encrypted = HMAC
 	secret = str
 }
 

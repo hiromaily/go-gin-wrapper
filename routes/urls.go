@@ -116,7 +116,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	//  r.Use(routes.CheckHttpHeader())
 	//  it let us faster to develop instead of a bit less performance.
 	var handlers []gin.HandlerFunc = []gin.HandlerFunc{CheckHttpHeader()}
-	if conf.GetConf().Api.Auth.Enable {
+	if conf.GetConf().Api.Auth.Mode != 0 {
 		handlers = append(handlers, CheckJWT())
 	}
 

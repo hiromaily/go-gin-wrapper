@@ -79,7 +79,7 @@ type ApiConfig struct {
 }
 
 type AuthConfig struct {
-	Enable     bool   `toml:"enable"`
+	Mode       uint8  `toml:"mode"`
 	Secret     string `toml:"secret_code"`
 	PrivateKey string `toml:"private_key"`
 	PublicKey  string `toml:"public_key"`
@@ -148,7 +148,7 @@ var checkTomlKeys [][]string = [][]string{
 	{"api", "header"},
 	{"api", "key"},
 	{"api", "only_ajax"},
-	{"api", "auth", "enable"},
+	{"api", "auth", "mode"},
 	{"api", "auth", "secret_code"},
 	{"api", "auth", "private_key"},
 	{"api", "auth", "public_key"},

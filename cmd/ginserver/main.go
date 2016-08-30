@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/DeanThompson/ginpprof"
 	"github.com/fatih/color"
+	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/fcgi"
@@ -17,7 +18,7 @@ import (
 	fl "github.com/hiromaily/golibs/files"
 	hrk "github.com/hiromaily/golibs/heroku"
 	lg "github.com/hiromaily/golibs/log"
-	"github.com/hiromaily/golibs/signal"
+	//"github.com/hiromaily/golibs/signal"
 	u "github.com/hiromaily/golibs/utils"
 	"html/template"
 	"os"
@@ -46,10 +47,11 @@ func init() {
 	initAuth()
 
 	// debug mode
-	if conf.GetConf().Environment == "local" {
-		//signal
-		go signal.StartSignal()
-	} else if conf.GetConf().Environment == "production" {
+	//if conf.GetConf().Environment == "local" {
+	//	//signal
+	//	//go signal.StartSignal()
+	//}
+	if conf.GetConf().Environment == "production" {
 		//For release
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -65,17 +67,17 @@ func initConf() {
 
 func initAuth() {
 	auth := conf.GetConf().Api.Auth
-	if auth.Enable {
-		if auth.Secret != "" {
-			jwt.InitEncrypted(jwt.HMAC)
-			jwt.InitSecretKey(auth.Secret)
-		} else {
-			err := jwt.InitKeys(auth.PrivateKey, auth.PublicKey)
-			if err != nil {
-				lg.Error(err)
-				panic(err)
-			}
+	if auth.Mode == jwt.HMAC && auth.Secret != "" {
+		jwt.InitSecretKey(auth.Secret)
+	} else if auth.Mode == jwt.RSA && auth.PrivateKey != "" && auth.PublicKey != "" {
+		err := jwt.InitKeys(auth.PrivateKey, auth.PublicKey)
+		if err != nil {
+			lg.Error(err)
+			panic(err)
 		}
+	} else {
+		jwt.InitEncrypted(jwt.HMAC)
+		//lg.Debug("JWT Auth is not available because of toml settings.")
 	}
 }
 
@@ -261,13 +263,15 @@ func loadStaticFiles(r *gin.Engine) {
 
 func run(r *gin.Engine) {
 	port := getPort()
-	if conf.GetConf().Proxy.Mode == 1 {
+	if conf.GetConf().Proxy.Mode == 2 {
 		//Proxy(Nginx) settings
 		color.Red("[WARNING] running on fcgi mode.")
 		lg.Info("running on fcgi mode.")
 		fcgi.Run(r, fmt.Sprintf(":%d", port))
 	} else {
-		r.Run(fmt.Sprintf(":%d", port))
+		//r.Run(fmt.Sprintf(":%d", port))
+		//change to endless for Zero downtime restarts
+		endless.ListenAndServe(fmt.Sprintf(":%d", port), r)
 	}
 }
 

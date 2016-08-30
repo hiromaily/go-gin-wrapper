@@ -8,11 +8,12 @@ GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
 TEST_MODE=0    #0:off, 1:after build, run test, 2:quick test for customized
-AUTO_EXEC=1    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
-GODEP_MODE=0
+AUTO_EXEC=0    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
+GODEP_MODE=1
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0  #0:off, 1:deploy server, 2:exec test on heroku
 DOCKER_MODE=0  #0:off, 1:run server,    2:exec test on docker
+LOCAL_DB_DOCKER=0 #0:off, 1:Start, 2:Off
 
 GO_GET=0
 GO_LINT=0
@@ -22,9 +23,9 @@ RESET_DB=0
 #docker stop mysqld
 #docker stop mongod
 
-docker start redisd
-docker start mysqld
-docker start mongod
+#docker start redisd
+#docker start mysqld
+#docker start mongod
 
 # when using go 1.7 for the first time, delete all inside pkg directory and run go install.
 #go install -v ./...
@@ -149,7 +150,9 @@ if [ $TEST_MODE -eq 1 ]; then
     sh ./z_dbdata/setup.sh
 
     # Execute
-    go test -v cmd/ginserver/*.go -f ../../configs/settings.toml
+    #go test -v cmd/ginserver/*.go -f ../../configs/settings.toml
+    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go -f ../../configs/settings.toml
+
     EXIT_STATUS=$?
     if [ $EXIT_STATUS -gt 0 ]; then
         exit $EXIT_STATUS
