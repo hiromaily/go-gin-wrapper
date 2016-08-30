@@ -1,0 +1,21 @@
+{
+  "name": "go-gin-wrapper",
+  "description": "web framework based on gin-gonic/gin and reverse proxy",
+  "keywords": [ "golang", "go-gin", "hiromaily" ],
+  "repository": "https://github.com/hiromaily/go-gin-wrapper",
+  "logo": "https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/gopher.png",
+  "website": "https://github.com/hiromaily/go-gin-wrapper",
+  "success_url": "/",
+  "env" : {
+    "HEROKU_FLG": {
+      "description": "set environment as Heroku",
+      "value": 1
+    }
+  },
+  "image": "heroku/go",
+  "addons": [
+    "cleardb",
+    "heroku-redis:hobby-dev",
+    "mongolab:sandbox"
+  ]
+}

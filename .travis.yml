@@ -7,13 +7,19 @@ services:
   - mysql
   - redis-server
 
+env:
+  global:
+    - secure: "liPR8UOmUpRzDGYLqdN2hnYQGpGTkibj5CobixmVXMJLVP1GlJ0EQM1xWZsGNC71Wu8n19TO0kULm5NgzEJ7qvI7YhD2TlN/MuvC7cBV4reNztZvMHRPqhz/CrVzMDtPlz/FlUrLtz3ueWYJla2xAMHfBpfhSEoTtov41Zjq4nvR/6lQxuBkE1N0QljDM9kzlyyOwDsLdgP/TrPSHMXOGLlFkJpwfSz9304cD+RiB5+Xv8mjo7D+AIFQwuacqBsWHC3bzUD3ipHJgDwx1qLIZdSVRgYgJvPvBVZlhA0ki5dEH+VnWzS+XRv4m67ntI78KD3C/ZG3GpVeRn8FPrdb74u2mPoahk1h/n2Zyukt9wfyrHoFrcsxHEi4/ciTvEkISoAGFgdazp585Y//KF2hai4rxdp44GKJi2CU8AAH4cJnOAGFvh92B30PQMsNiGVhmu4bmjUluASbBtjrqhxy9J2fRXqNTdH164Z5yqxQsgLy9ME8ymEUjTILpfwy+IDLMRin11ohdvUrWmCxD77B/ho+Gdu8wr9YnV363IMMZR2CV3PRNRjABXXhH2u16Q/LSBtNdGqzT5mixcBmvPvOGelktjjX3trzx+u9koHtJuQLSKqwTyd8+63DLEKOGwr4tc68xWysSuM110WaTxFcdIWYLqaHDrSqazKA+7wCbQs="
+
 script:
   - go fmt ./...
   - go vet $(go list ./... | grep -v /vendor/)
   - go test -v cmd/ginserver/*.go -f ../../configs/travis.toml
+  # - goveralls -coverprofile=profile.cov -service=travis-ci
 
 before_install:
   - go get github.com/tools/godep
+  - go get github.com/mattn/goveralls
 
 branches:
   only:

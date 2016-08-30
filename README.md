@@ -1,5 +1,8 @@
 # go-gin-wrapper
+
 [![Build Status](https://travis-ci.org/hiromaily/go-gin-wrapper.svg?branch=master)](https://travis-ci.org/hiromaily/go-gin-wrapper)
+[![Coverage Status](https://coveralls.io/repos/github/hiromaily/go-gin-wrapper/badge.svg)](https://coveralls.io/github/hiromaily/go-gin-wrapper)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hiromaily/go-gin-wrapper)
 
 Go-gin-wrapper is wrapper of go gin web framework.  
  [gin-gonic/gin](https://github.com/gin-gonic/gin)
