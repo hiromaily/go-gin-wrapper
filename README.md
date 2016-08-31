@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/hiromaily/go-gin-wrapper/badge.svg)](https://coveralls.io/github/hiromaily/go-gin-wrapper)
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hiromaily/go-gin-wrapper)
 
-Go-gin-wrapper is wrapper of go gin web framework.  
+Go-gin-wrapper is wrapper of go gin web framework plus reverseproxy.
  [gin-gonic/gin](https://github.com/gin-gonic/gin)
 
 
@@ -47,8 +47,6 @@ ginserver -f /app/configs/yourfile.toml
 It's implemented by JWT(Json Web TOken) for authentication.
 Set ```[api.auth]``` on toml file.
 You can choose HMAC or RSA as signature pattern.
-When using RSA, set ```private_key``` and ```public_key``` on toml file.
-WHen using HMAC, set ```secret_code```.
 
 
 ### 2. On heroku
