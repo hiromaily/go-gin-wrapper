@@ -32,7 +32,9 @@ var (
 func init() {
 	//command-line
 	flag.Parse()
+}
 
+func setupMain() {
 	//conf
 	initConf()
 
@@ -55,6 +57,9 @@ func init() {
 		//For release
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	//Database settings
+	initDatabase(0)
 }
 
 func initConf() {
@@ -62,7 +67,8 @@ func initConf() {
 	if *tomlPath != "" {
 		conf.SetTomlPath(*tomlPath)
 	}
-	conf.GetConf()
+	conf.New("")
+	//conf.GetConf()
 }
 
 func initAuth() {
@@ -343,8 +349,7 @@ func setHTTPSServer() {
 // Creates a gin router with default middleware:
 // logger and recovery (crash-free) middleware
 func main() {
-	//Database settings
-	initDatabase(0)
+	setupMain()
 
 	//HTTP
 	setHTTPServer(0, "")

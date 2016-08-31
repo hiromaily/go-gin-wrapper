@@ -6,6 +6,7 @@ import (
 	//u "github.com/hiromaily/golibs/utils"
 	"bytes"
 	"errors"
+	"flag"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
@@ -24,13 +25,13 @@ import (
 //TODO:change toml settings automatically as program code.
 //TODO:test for jwt, first code have to be got.
 
-var r *gin.Engine
-
-// Test Data
-var redirectErr error = errors.New("redirect")
-
 var (
-	configFiles = []string{"settings.default.toml", "settings.toml", "docker.toml", "heroku.toml", "travis.toml"}
+	r *gin.Engine
+	// Test Data
+	redirectErr error = errors.New("redirect")
+	// configs
+	configFiles []string = []string{"settings.default.toml", "settings.toml", "docker.toml", "heroku.toml", "travis.toml"}
+	authMode    *uint    = flag.Uint("om", 0, "auth mode")
 )
 
 var (
@@ -135,6 +136,29 @@ var getApiTests = []struct {
 	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
 }
 
+// Test Data for ajax API (use JWT Auth)
+var getApiJwtTests = []struct {
+	url     string
+	code    int
+	method  string
+	headers []map[string]string
+	err     error
+}{
+	{"/api/users", http.StatusBadRequest, "GET", rightHeaders, nil},
+	{"/api/users", http.StatusBadRequest, "GET", wrongKeyHeaders, nil},
+	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
+	{"/api/users", http.StatusBadRequest, "GET", onlyKeyHeaders, nil},
+	{"/api/users", http.StatusBadRequest, "GET", nil, nil},
+	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, //TODO:value is necessary
+	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
+	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "GET", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userId), http.StatusNotFound, "POST", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
+	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "DELETE", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "GET", rightHeaders, nil}, //TODO:no resource is right
+}
+
 //-----------------------------------------------------------------------------
 // Test Framework
 //-----------------------------------------------------------------------------
@@ -149,6 +173,15 @@ func init() {
 }
 
 func setup() {
+	//conf
+	initConf()
+
+	//overwrite mode
+	conf.GetConf().Api.Auth.Mode = uint8(*authMode)
+
+	//auth settings
+	initAuth()
+
 	//Create test database and test data.
 	InitDatabase(1)
 
@@ -341,14 +374,14 @@ func TestGetRequestOnTable(t *testing.T) {
 		} else {
 			//check expected status code
 			if res.StatusCode != tt.code {
-				t.Errorf("[%s] status code is not correct. \n return code is %d / expected %d", tt.url, res.StatusCode, tt.code)
+				t.Errorf("[%d][%s] status code is not correct. \n return code is %d / expected %d", i+1, tt.url, res.StatusCode, tt.code)
 			}
 		}
 		//check next page
 		if isUrlErr && urlError.Err.Error() == redirectErr.Error() {
 			//t.Log(res.Header["Location"])
 			if tt.nextPage != res.Header["Location"][0] {
-				t.Errorf("[%s] redirect url is not correct. \n url is %s / expected %s", tt.url, res.Header["Location"][0], tt.nextPage)
+				t.Errorf("[%d][%s] redirect url is not correct. \n url is %s / expected %s", i+1, tt.url, res.Header["Location"][0], tt.nextPage)
 			}
 		}
 		res.Body.Close()
@@ -407,14 +440,14 @@ func TestLogin(t *testing.T) {
 		} else {
 			//check expected status code
 			if res.StatusCode != tt.code {
-				t.Errorf("[%s] status code is not correct. \n return code is %d / expected %d", tt.url, res.StatusCode, tt.code)
+				t.Errorf("[%d][%s] status code is not correct. \n return code is %d / expected %d", i+1, tt.url, res.StatusCode, tt.code)
 			}
 		}
 		//check next page
 		if isUrlErr && urlError.Err.Error() == redirectErr.Error() {
 			//t.Log(res.Header["Location"])
 			if tt.nextPage != res.Header["Location"][0] {
-				t.Errorf("[%s] redirect url is not correct. \n url is %s / expected %s", tt.url, res.Header["Location"][0], tt.nextPage)
+				t.Errorf("[%d][%s] redirect url is not correct. \n url is %s / expected %s", i+1, tt.url, res.Header["Location"][0], tt.nextPage)
 			}
 		}
 
@@ -438,6 +471,7 @@ func TestLogin(t *testing.T) {
 // Get Request for API (Ajax)
 //-----------------------------------------------------------------------------
 func TestGetAPIRequestOnTable(t *testing.T) {
+
 	//request
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -449,7 +483,14 @@ func TestGetAPIRequestOnTable(t *testing.T) {
 		},
 	}
 
-	for i, tt := range getApiTests {
+	getApiTestsData := getApiTests
+	if conf.GetConf().Api.Auth.Mode != 0 {
+		//Auth is on
+		getApiTestsData = getApiJwtTests
+	}
+
+	//for i, tt := range getApiTests {
+	for i, tt := range getApiTestsData {
 		fmt.Printf("%d [%s] %s\n", i+1, tt.method, ts.URL+tt.url)
 
 		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
@@ -466,10 +507,11 @@ func TestGetAPIRequestOnTable(t *testing.T) {
 			//check expected status code
 			if res.StatusCode != tt.code {
 				t.Logf("%#v", tt)
-				t.Errorf("[%s] status code is not correct. \n return code is %d / expected %d", tt.url, res.StatusCode, tt.code)
+				t.Errorf("[%d][%s] status code is not correct. \n return code is %d / expected %d", i+1, tt.url, res.StatusCode, tt.code)
 			}
 		}
 
 		res.Body.Close()
 	}
+
 }

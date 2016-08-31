@@ -14,7 +14,7 @@ env:
 script:
   - go fmt ./...
   - go vet $(go list ./... | grep -v /vendor/)
-  - go test -v cmd/ginserver/*.go -f ../../configs/travis.toml
+  - go test -v cmd/ginserver/*.go -f ../../configs/travis.toml -om 0
   # - goveralls -coverprofile=profile.cov -service=travis-ci
 
 before_install:

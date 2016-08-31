@@ -7,9 +7,9 @@
 GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
-TEST_MODE=0    #0:off, 1:after build, run test, 2:quick test for customized
+TEST_MODE=1    #0:off, 1:after build, run test, 2:quick test for customized
 AUTO_EXEC=0    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
-GODEP_MODE=1
+GODEP_MODE=0
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0  #0:off, 1:deploy server, 2:exec test on heroku
 DOCKER_MODE=0  #0:off, 1:run server,    2:exec test on docker
@@ -151,7 +151,11 @@ if [ $TEST_MODE -eq 1 ]; then
 
     # Execute
     #go test -v cmd/ginserver/*.go -f ../../configs/settings.toml
-    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go -f ../../configs/settings.toml
+    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go -f ../../configs/settings.toml -om 0
+    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go -run TestGetAPIRequestOnTable \
+    -f ../../configs/settings.toml -om 1
+    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go -run TestGetAPIRequestOnTable \
+    -f ../../configs/settings.toml -om 2
 
     EXIT_STATUS=$?
     if [ $EXIT_STATUS -gt 0 ]; then
