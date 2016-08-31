@@ -82,6 +82,8 @@ func CheckHttpHeader() gin.HandlerFunc {
 		IsContentType := c.Request.Header.Get("Content-Type")
 		lg.Debugf("[Content-Type] %s", IsContentType)
 
+		//TODO:if no Content-Type, how sould be handled.
+
 		//check
 		//if IsXHR(c) || IsKey != "key" || IsContentType != "application/json" {
 		//if IsXHR(c) && IsKey != "key" {

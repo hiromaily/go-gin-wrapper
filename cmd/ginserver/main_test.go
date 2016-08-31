@@ -5,6 +5,7 @@ import (
 	lg "github.com/hiromaily/golibs/log"
 	//u "github.com/hiromaily/golibs/utils"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"flag"
 	"github.com/PuerkitoBio/goquery"
@@ -32,6 +33,7 @@ var (
 	// configs
 	configFiles []string = []string{"settings.default.toml", "settings.toml", "docker.toml", "heroku.toml", "travis.toml"}
 	authMode    *uint    = flag.Uint("om", 0, "auth mode")
+	jwtCode     string
 )
 
 var (
@@ -41,11 +43,14 @@ var (
 	basicAuthHeaders = map[string]string{"Authorization": "Basic d2ViOnRlc3Q="}
 	contentType      = map[string]string{"Content-Type": "application/x-www-form-urlencoded"}
 	refererLogin     = map[string]string{"Referer": "http://hiromaily.com:9999/login"}
+	jwtAuth          = map[string]string{"Authorization": "Bearer %s"}
 	loginHeaders     = []map[string]string{contentType, refererLogin}
 	rightHeaders     = []map[string]string{ajaxHeader, keyHeader}
 	wrongKeyHeaders  = []map[string]string{ajaxHeader, keyHeaderWrong}
 	onlyAjaxHeaders  = []map[string]string{ajaxHeader}
 	onlyKeyHeaders   = []map[string]string{keyHeader}
+	jwtHeaders       = []map[string]string{ajaxHeader, keyHeader, contentType}
+	//rightHeadersWithJWT = []map[string]string{ajaxHeader, keyHeader, jwtAuth}
 )
 
 var getTests = []struct {
@@ -112,9 +117,9 @@ var loginTests = []struct {
 	{"/login", http.StatusFound, "POST", loginHeaders, "/accounts", "aaaa@test.jp", "password", true, redirectErr},
 }
 
-// Test Data for ajax API (Not use JWT Auth)
+// Test Data for ajax API (When JWT is off)
 var userId int = 12
-var getApiTests = []struct {
+var getUserApiTests = []struct {
 	url     string
 	code    int
 	method  string
@@ -134,16 +139,18 @@ var getApiTests = []struct {
 	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
 	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "DELETE", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
+	//TODO:with post data, put data
 }
 
-// Test Data for ajax API (use JWT Auth)
-var getApiJwtTests = []struct {
+// Test Data for ajax API (When JWT is on)
+var getUserApiTests2 = []struct {
 	url     string
 	code    int
 	method  string
 	headers []map[string]string
 	err     error
 }{
+	//no jwt token
 	{"/api/users", http.StatusBadRequest, "GET", rightHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", wrongKeyHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
@@ -157,6 +164,41 @@ var getApiJwtTests = []struct {
 	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
 	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "DELETE", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "GET", rightHeaders, nil}, //TODO:no resource is right
+	//TODO:with post data, put data
+	//TODO:with jwt token
+}
+
+// Test Data for ajax API (When JWT is on, plus jwt)
+var getUserApiTests3 = []struct {
+	url     string
+	code    int
+	method  string
+	headers []map[string]string
+	err     error
+}{
+	//with jwt token
+	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "GET", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "DELETE", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
+	//TODO:with post data, put data
+}
+
+// Test Data for ajax API (JWT)
+var getJWTApiTests = []struct {
+	url     string
+	code    int
+	method  string
+	headers []map[string]string
+	email   string
+	pass    string
+	err     error
+}{
+	//without content-type, it doesn't work.
+	{"/api/jwt", http.StatusNotFound, "GET", jwtHeaders, "aaaa@test.jp", "password", nil},
+	{"/api/jwt", http.StatusBadRequest, "POST", rightHeaders, "aaaa@test.jp", "password", nil},
+	{"/api/jwt", http.StatusBadRequest, "POST", jwtHeaders, "aaaa@test.jp", "", nil},
+	{"/api/jwt", http.StatusOK, "POST", jwtHeaders, "aaaa@test.jp", "password", nil},
 }
 
 //-----------------------------------------------------------------------------
@@ -168,8 +210,8 @@ func init() {
 
 	//when changing loglevel
 	//lg.InitializeLog(lg.DEBUG_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
-	//lg.InitializeLog(lg.INFO_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
-	lg.InitializeLog(lg.WARNING_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
+	lg.InitializeLog(lg.INFO_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
+	//lg.InitializeLog(lg.WARNING_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
 }
 
 func setup() {
@@ -220,13 +262,14 @@ func createSendData(email, pass, ginToken string) url.Values {
 }
 
 // Parse Response
-func parseResponse(res *http.Response) (string, int) {
+func parseResponse(res *http.Response) ([]byte, int) {
 	defer res.Body.Close()
 	contents, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		panic(err)
 	}
-	return string(contents), res.StatusCode
+	//return string(contents), res.StatusCode
+	return contents, res.StatusCode
 }
 
 // Set HTTP Header
@@ -301,6 +344,21 @@ func getToken(res *http.Response) (ret string) {
 	})
 
 	return
+}
+
+func getJWT(res *http.Response) (string, error) {
+	type ResJWT struct {
+		Code  uint8  `json:"code"`
+		Token string `json:"token"`
+	}
+	var jwt ResJWT
+
+	body, _ := parseResponse(res)
+	err := json.Unmarshal(body, &jwt)
+	if err != nil {
+		return "", err
+	}
+	return jwt.Token, nil
 }
 
 //-----------------------------------------------------------------------------
@@ -468,9 +526,12 @@ func TestLogin(t *testing.T) {
 }
 
 //-----------------------------------------------------------------------------
-// Get Request for API (Ajax)
+// Get Request for Jwt API (Ajax)
 //-----------------------------------------------------------------------------
-func TestGetAPIRequestOnTable(t *testing.T) {
+func TestGetJwtAPIRequestOnTable(t *testing.T) {
+	if conf.GetConf().Api.Auth.Mode == 0 {
+		t.SkipNow()
+	}
 
 	//request
 	ts := httptest.NewServer(r)
@@ -483,17 +544,16 @@ func TestGetAPIRequestOnTable(t *testing.T) {
 		},
 	}
 
-	getApiTestsData := getApiTests
-	if conf.GetConf().Api.Auth.Mode != 0 {
-		//Auth is on
-		getApiTestsData = getApiJwtTests
-	}
-
 	//for i, tt := range getApiTests {
-	for i, tt := range getApiTestsData {
+	for i, tt := range getJWTApiTests {
 		fmt.Printf("%d [%s] %s\n", i+1, tt.method, ts.URL+tt.url)
 
-		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
+		//data
+		sendData := createSendData(tt.email, tt.pass, "")
+
+		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, bytes.NewBuffer([]byte(sendData.Encode())))
+		//req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
+
 		//Set Http Headers
 		if tt.headers != nil {
 			setHttpHeaders(req, tt.headers)
@@ -511,7 +571,71 @@ func TestGetAPIRequestOnTable(t *testing.T) {
 			}
 		}
 
+		//get jwt for next request
+		if res.StatusCode == 200 {
+			jwtCode, err = getJWT(res)
+			if err != nil {
+				t.Errorf("[%d][%s] jwt code was not got from response. error is %s", i+1, tt.url, err)
+			}
+		}
+
 		res.Body.Close()
 	}
+}
 
+//-----------------------------------------------------------------------------
+// Get Request for User API (Ajax)
+//-----------------------------------------------------------------------------
+func TestGetUserAPIRequestOnTable(t *testing.T) {
+
+	//request
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	client := &http.Client{
+		Timeout: time.Duration(3) * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return errors.New("redirect")
+		},
+	}
+
+	getApiTestsData := getUserApiTests
+	if conf.GetConf().Api.Auth.Mode != 0 {
+		//Auth is on
+		if jwtCode == "" {
+			getApiTestsData = getUserApiTests2
+		} else {
+			getApiTestsData = getUserApiTests3
+			//TODO:set JWT to header
+			jwtAuth["Authorization"] = fmt.Sprintf(jwtAuth["Authorization"], jwtCode)
+		}
+	}
+
+	//for i, tt := range getApiTests {
+	for i, tt := range getApiTestsData {
+		fmt.Printf("%d [%s] %s\n", i+1, tt.method, ts.URL+tt.url)
+
+		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
+		//Set Http Headers
+		if tt.headers != nil {
+			if jwtCode != "" {
+				tt.headers = append(tt.headers, jwtAuth)
+			}
+			setHttpHeaders(req, tt.headers)
+		}
+		res, err := client.Do(req)
+
+		urlError, isUrlErr := err.(*url.Error)
+		if isUrlErr && urlError.Err.Error() != tt.err.Error() {
+			t.Errorf("[%s] this page can't be access. \n error is %s", tt.url, urlError.Err)
+		} else {
+			//check expected status code
+			if res.StatusCode != tt.code {
+				t.Logf("%#v", tt)
+				t.Errorf("[%d][%s] status code is not correct. \n return code is %d / expected %d", i+1, tt.url, res.StatusCode, tt.code)
+			}
+		}
+
+		res.Body.Close()
+	}
 }

@@ -150,11 +150,23 @@ if [ $TEST_MODE -eq 1 ]; then
     sh ./z_dbdata/setup.sh
 
     # Execute
-    #go test -v cmd/ginserver/*.go -f ../../configs/settings.toml
-    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go -f ../../configs/settings.toml -om 0
-    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go -run TestGetAPIRequestOnTable \
+    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
+    -f ../../configs/settings.toml -om 0
+
+    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
+    -run "TestGetUserAPIRequestOnTable" \
     -f ../../configs/settings.toml -om 1
-    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go -run TestGetAPIRequestOnTable \
+
+    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
+    -run "TestGetUserAPIRequestOnTable" \
+    -f ../../configs/settings.toml -om 2
+
+    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
+    -run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
+    -f ../../configs/settings.toml -om 1
+
+    go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
+    -run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
     -f ../../configs/settings.toml -om 2
 
     EXIT_STATUS=$?
