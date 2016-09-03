@@ -6,6 +6,7 @@ import (
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
+	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	lg "github.com/hiromaily/golibs/log"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -39,6 +40,8 @@ var (
 	}
 )
 
+const GoogleAuth string = "1"
+
 //Sign In [GET]
 func SignInAction(c *gin.Context) {
 	lg.Info("SignInAction()")
@@ -62,6 +65,15 @@ func SignInAction(c *gin.Context) {
 func LoginAction(c *gin.Context) {
 	lg.Info("LoginAction()")
 
+	/*
+		https://accounts.google.com/o/oauth2/auth?
+		scope=openid+email+profile&
+		state=G6OJI79YNaokmJNIGJRooGk4zUQVTRyi&
+		redirect_uri=https://courses.edx.org/auth/complete/google-oauth2/&
+		response_type=code&
+		client_id=370673641490-nd3s6q740l96uvk1vivsab65rltkgoc0.apps.googleusercontent.com
+	*/
+	//TODO:What is difference of parameter between sign in and login
 }
 
 //Callback [GET]
@@ -111,10 +123,56 @@ func CallbackAction(c *gin.Context) {
 
 	lg.Debugf("response body is %+s", resGoogle)
 
-	//TODO: 成功時は登録成功ページにジャンプ
-	//View
-	c.HTML(http.StatusOK, "pages/oauth2/callback.tmpl", gin.H{
-		"title": "News Page",
-	})
+	//4.check Email
+	lg.Debugf("email is %s", resGoogle.Email)
+	userAuth, err := models.GetDB().OauthLogin(resGoogle.Email)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
 
+	if userAuth == nil {
+		lg.Debug("no user on t_users")
+		//0:no user -> register and login
+		user := &models.Users{
+			FirstName: resGoogle.FirstName,
+			LastName:  resGoogle.LastName,
+			Email:     resGoogle.Email,
+			Password:  "google-password",
+			Oauth2Flg: GoogleAuth,
+		}
+
+		lg.Debug("InsertUser()")
+		id, err := models.GetDB().InsertUser(user)
+		if err != nil {
+			c.AbortWithError(500, err)
+			return
+		}
+		//Session
+		sess.SetUserSession(c, int(id))
+
+	} else {
+		lg.Debug("There is user: %v", userAuth)
+		//oauth_flg //0, 1:google, 2:facebook
+		if userAuth.Id != 0 && userAuth.Auth == GoogleAuth {
+			lg.Debug("login proceduer")
+			//1:existing user (google) -> login procedure
+			//Session
+			sess.SetUserSession(c, userAuth.Id)
+		} else {
+			lg.Debug("redirect login page")
+			//2:existing user (no auth or another auth) -> err
+			c.Redirect(http.StatusTemporaryRedirect, "/login") //307
+			return
+		}
+	}
+
+	//Login
+	//token delete
+	sess.DelTokenSession(c)
+
+	//Redirect[GET]
+	c.Redirect(http.StatusTemporaryRedirect, "/accounts") //307
+
+	return
 }

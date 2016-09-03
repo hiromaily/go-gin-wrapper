@@ -18,6 +18,7 @@ type Users struct {
 	LastName  string `column:"last_name" json:"lastName"`
 	Email     string `column:"email" json:"email"`
 	Password  string `column:"password" json:"password"`
+	Oauth2Flg string `column:"oauth2_flg" json:"oauth2_flg"`
 	//DeleteFlg string    `column:"delete_flg"       db:"delete_flg"`
 	//Created   time.Time `column:"create_datetime"  db:"create_datetime"`
 	Updated string `column:"update_datetime" json:"update"`
@@ -29,6 +30,11 @@ type UsersSL struct {
 	LastName  string `column:"last_name" json:"lastName"`
 	Email     string `column:"email" json:"email"`
 	Updated   string `column:"update_datetime" json:"update"`
+}
+
+type UserAuth struct {
+	Id   int
+	Auth string
 }
 
 //User authorization when login
@@ -58,6 +64,29 @@ func (us *Models) IsUserEmail(email string, password string) (int, error) {
 		return 0, fmt.Errorf("password is invalid.")
 	}
 	return user.Id, nil
+}
+
+func (us *Models) OauthLogin(email string) (*UserAuth, error) {
+	//0:no user -> register and login
+	//1:existing user (google) -> login
+	//2:existing user (no auth or another auth) -> err
+	sql := "SELECT user_id, oauth2_flg FROM t_users WHERE email=? AND delete_flg=?"
+
+	var user UserAuth
+
+	b := us.Db.SelectIns(sql, email, 0).ScanOne(&user)
+	if us.Db.Err != nil {
+		//0:no user -> register and login
+		return nil, us.Db.Err
+	}
+
+	//no data
+	if !b {
+		return nil, nil
+	}
+
+	return &user, nil
+
 }
 
 // Get User Ids
@@ -108,6 +137,11 @@ func (us *Models) InsertUser(users *Users) (int64, error) {
 
 	sql := "INSERT INTO t_users (first_name, last_name, email, password) VALUES (?,?,?,?)"
 	//sql = fmt.Sprintf(sql, mysql.ColumnForSQL(users))
+	if users.Oauth2Flg != "" {
+		sql := "INSERT INTO t_users (first_name, last_name, email, password, oauth2_flg) VALUES (?,?,?,?,?)"
+		//hash password
+		return us.Db.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""), users.Oauth2Flg)
+	}
 
 	//hash password
 	return us.Db.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""))

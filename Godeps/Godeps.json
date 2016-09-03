@@ -7,6 +7,16 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "cloud.google.com/go/compute/metadata",
+			"Comment": "v0.1.0-68-gde848b0",
+			"Rev": "de848b02a4b8d92be5baa2a7ecb17c8ce0194d06"
+		},
+		{
+			"ImportPath": "cloud.google.com/go/internal",
+			"Comment": "v0.1.0-68-gde848b0",
+			"Rev": "de848b02a4b8d92be5baa2a7ecb17c8ce0194d06"
+		},
+		{
 			"ImportPath": "github.com/BurntSushi/toml",
 			"Comment": "v0.2.0-21-g9906417",
 			"Rev": "99064174e013895bbd9b025c31100bd1d9b590ca"
@@ -38,10 +48,6 @@
 			"ImportPath": "github.com/fatih/color",
 			"Comment": "v0.2.0",
 			"Rev": "87d4004f2ab62d0d255e0a38f1680aa534549fe3"
-		},
-		{
-			"ImportPath": "github.com/fvbock/endless",
-			"Rev": "67d0a784ad8ab10a69d12107f6de220db0c18002"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
@@ -97,47 +103,47 @@
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/auth/jwt",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/cipher/hash",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mongodb",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mysql",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/files",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/heroku",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/log",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/regexp",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/times",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/utils",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/validator",
-			"Rev": "155ffed67b9c1e956b26873d1e6f6b4a89ee2072"
+			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
 		},
 		{
 			"ImportPath": "github.com/manucorporat/sse",
@@ -169,6 +175,10 @@
 			"Rev": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf"
 		},
 		{
+			"ImportPath": "golang.org/x/net/context/ctxhttp",
+			"Rev": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf"
+		},
+		{
 			"ImportPath": "golang.org/x/net/html",
 			"Rev": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf"
 		},
@@ -177,8 +187,60 @@
 			"Rev": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf"
 		},
 		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/google",
+			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/internal",
+			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/jws",
+			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/jwt",
+			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
+		},
+		{
 			"ImportPath": "golang.org/x/sys/unix",
 			"Rev": "d9157a9621b69ad1d8d77a1933590c416593f24f"
+		},
+		{
+			"ImportPath": "google.golang.org/appengine",
+			"Rev": "4f7eeb5305a4ba1966344836ba4af9996b7b4e05"
+		},
+		{
+			"ImportPath": "google.golang.org/appengine/internal",
+			"Rev": "4f7eeb5305a4ba1966344836ba4af9996b7b4e05"
+		},
+		{
+			"ImportPath": "google.golang.org/appengine/internal/app_identity",
+			"Rev": "4f7eeb5305a4ba1966344836ba4af9996b7b4e05"
+		},
+		{
+			"ImportPath": "google.golang.org/appengine/internal/base",
+			"Rev": "4f7eeb5305a4ba1966344836ba4af9996b7b4e05"
+		},
+		{
+			"ImportPath": "google.golang.org/appengine/internal/datastore",
+			"Rev": "4f7eeb5305a4ba1966344836ba4af9996b7b4e05"
+		},
+		{
+			"ImportPath": "google.golang.org/appengine/internal/log",
+			"Rev": "4f7eeb5305a4ba1966344836ba4af9996b7b4e05"
+		},
+		{
+			"ImportPath": "google.golang.org/appengine/internal/modules",
+			"Rev": "4f7eeb5305a4ba1966344836ba4af9996b7b4e05"
+		},
+		{
+			"ImportPath": "google.golang.org/appengine/internal/remote_api",
+			"Rev": "4f7eeb5305a4ba1966344836ba4af9996b7b4e05"
 		},
 		{
 			"ImportPath": "gopkg.in/go-playground/validator.v8",
