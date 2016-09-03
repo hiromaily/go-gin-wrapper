@@ -7,8 +7,8 @@
 GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
-TEST_MODE=1    #0:off, 1:after build, run test, 2:quick test for customized
-AUTO_EXEC=0    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
+TEST_MODE=0    #0:off, 1:after build, run test, 2:quick test for customized
+AUTO_EXEC=1    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
 INSTALL_PKG=0
 GODEP_MODE=0
 AUTO_GITCOMMIT=0

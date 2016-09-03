@@ -51,9 +51,9 @@ private_key = ""
 public_key = ""
 
 [auth.google]
-client_id = "xxxxx.apps.googleusercontent.com"
-client_secret = "xxxxx"
-call_back_url = "/oauth2/callback"
+client_id = "275878174798-gvfvcb1ek6bqm2j6raduvbpcska44g45.apps.googleusercontent.com"
+client_secret = "sigGN3AbOD-Z0tPMQXxLAKXZ"
+call_back_url = "https://ginserver.herokuapp.com/oauth2/callback"
 
 [mysql]
 host = "us-cdbr-iron-east-04.cleardb.net"

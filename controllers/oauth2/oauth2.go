@@ -42,7 +42,7 @@ var (
 
 const GoogleAuth string = "1"
 
-//Sign In [GET]
+//Sign In by Google[GET]
 func SignInAction(c *gin.Context) {
 	lg.Info("SignInAction()")
 
@@ -61,7 +61,7 @@ func SignInAction(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, url) //307
 }
 
-//Login [GET]
+//Login by Google[GET]
 func LoginAction(c *gin.Context) {
 	lg.Info("LoginAction()")
 
@@ -76,9 +76,18 @@ func LoginAction(c *gin.Context) {
 	//TODO:What is difference of parameter between sign in and login
 }
 
-//Callback [GET]
+//Callback from Google[GET]
 func CallbackAction(c *gin.Context) {
 	lg.Info("CallbackAction()")
+
+	//0.check deny
+	//When user choose access deny
+	//http://localhost:9999/oauth2/callback?error=access_denied&state=66bc8679a5629423463943f679383b57
+	qeyErr, _ := c.GetQuery("error")
+	if qeyErr != "" {
+		lg.Debugf("error is %s", qeyErr)
+		c.Redirect(http.StatusTemporaryRedirect, "/login") //307
+	}
 
 	//1.Confirm State(token)
 	state, _ := c.GetQuery("state")
@@ -160,7 +169,7 @@ func CallbackAction(c *gin.Context) {
 			//Session
 			sess.SetUserSession(c, userAuth.Id)
 		} else {
-			lg.Debug("redirect login page")
+			lg.Debug("redirect login page. user is already exsisting.")
 			//2:existing user (no auth or another auth) -> err
 			c.Redirect(http.StatusTemporaryRedirect, "/login") //307
 			return
