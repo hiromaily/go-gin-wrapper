@@ -18,7 +18,7 @@ type Config struct {
 	Environment string
 	Server      ServerConfig
 	Proxy       ProxyConfig
-	Api         ApiConfig
+	Auth        AuthConfig
 	MySQL       MySQLConfig
 	Redis       RedisConfig
 	Mongo       MongoConfig `toml:"mongodb"`
@@ -71,18 +71,29 @@ type ProxyServerConfig struct {
 	Log    LogConfig `toml:"log"`
 }
 
-type ApiConfig struct {
-	Header string     `toml:"header"`
-	Key    string     `toml:"key"`
-	Ajax   bool       `toml:"only_ajax"`
-	Auth   AuthConfig `toml:"auth"`
+type AuthConfig struct {
+	Api    ApiConfig    `toml:"api"`
+	Jwt    JwtConfig    `toml:"jwt"`
+	Google GoogleConfig `toml:"google"`
 }
 
-type AuthConfig struct {
+type ApiConfig struct {
+	Header string `toml:"header"`
+	Key    string `toml:"key"`
+	Ajax   bool   `toml:"only_ajax"`
+}
+
+type JwtConfig struct {
 	Mode       uint8  `toml:"mode"`
 	Secret     string `toml:"secret_code"`
 	PrivateKey string `toml:"private_key"`
 	PublicKey  string `toml:"public_key"`
+}
+
+type GoogleConfig struct {
+	ClientID     string `toml:"client_id"`
+	ClientSecret string `toml:"client_secret"`
+	CallbackURL  string `toml:"call_back_url"`
 }
 
 type MySQLConfig struct {
@@ -145,13 +156,16 @@ var checkTomlKeys [][]string = [][]string{
 	{"proxy", "server", "port"},
 	{"proxy", "server", "log", "level"},
 	{"proxy", "server", "log", "path"},
-	{"api", "header"},
-	{"api", "key"},
-	{"api", "only_ajax"},
-	{"api", "auth", "mode"},
-	{"api", "auth", "secret_code"},
-	{"api", "auth", "private_key"},
-	{"api", "auth", "public_key"},
+	{"auth", "api", "header"},
+	{"auth", "api", "key"},
+	{"auth", "api", "only_ajax"},
+	{"auth", "jwt", "mode"},
+	{"auth", "jwt", "secret_code"},
+	{"auth", "jwt", "private_key"},
+	{"auth", "jwt", "public_key"},
+	{"auth", "google", "client_id"},
+	{"auth", "google", "client_secret"},
+	{"auth", "google", "call_back_url"},
 	{"mysql", "host"},
 	{"mysql", "port"},
 	{"mysql", "dbname"},

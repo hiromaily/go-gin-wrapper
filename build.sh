@@ -7,8 +7,9 @@
 GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
-TEST_MODE=1    #0:off, 1:after build, run test, 2:quick test for customized
-AUTO_EXEC=0    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
+TEST_MODE=0    #0:off, 1:after build, run test, 2:quick test for customized
+AUTO_EXEC=1    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
+INSTALL_PKG=0
 GODEP_MODE=0
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0  #0:off, 1:deploy server, 2:exec test on heroku
@@ -113,7 +114,11 @@ fi
 #go build -a -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
 
 #build and install
-go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
+if [ $INSTALL_PKG -eq 1 ]; then
+    go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
+else
+    go build -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
+fi
 EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -gt 0 ]; then
@@ -121,7 +126,11 @@ if [ $EXIT_STATUS -gt 0 ]; then
 fi
 
 # reverseproxy
-go build -i -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
+if [ $INSTALL_PKG -eq 1 ]; then
+    go build -i -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
+else
+    go build -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
+fi
 EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -gt 0 ]; then

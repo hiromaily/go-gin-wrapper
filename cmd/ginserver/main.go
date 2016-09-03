@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/DeanThompson/ginpprof"
 	"github.com/fatih/color"
-	"github.com/fvbock/endless"
+	//"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/fcgi"
@@ -72,7 +72,7 @@ func initConf() {
 }
 
 func initAuth() {
-	auth := conf.GetConf().Api.Auth
+	auth := conf.GetConf().Auth.Jwt
 	if auth.Mode == jwt.HMAC && auth.Secret != "" {
 		jwt.InitSecretKey(auth.Secret)
 	} else if auth.Mode == jwt.RSA && auth.PrivateKey != "" && auth.PublicKey != "" {
@@ -275,9 +275,9 @@ func run(r *gin.Engine) {
 		lg.Info("running on fcgi mode.")
 		fcgi.Run(r, fmt.Sprintf(":%d", port))
 	} else {
-		//r.Run(fmt.Sprintf(":%d", port))
+		r.Run(fmt.Sprintf(":%d", port))
 		//change to endless for Zero downtime restarts
-		endless.ListenAndServe(fmt.Sprintf(":%d", port), r)
+		//endless.ListenAndServe(fmt.Sprintf(":%d", port), r)
 	}
 }
 

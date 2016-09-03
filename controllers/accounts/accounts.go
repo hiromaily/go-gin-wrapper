@@ -16,7 +16,7 @@ func AccountsGetAction(c *gin.Context) {
 		return
 	}
 
-	api := conf.GetConf().Api
+	api := conf.GetConf().Auth.Api
 
 	//View
 	c.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", gin.H{

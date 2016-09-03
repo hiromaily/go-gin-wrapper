@@ -37,16 +37,23 @@ port = 9990
 level = 1
 path = "/var/log/goweb/proxy.log"
 
-[api]
+[auth]
+
+[auth.api]
 header = "X-Custom-Header-Gin"
 key = "key12345"
 only_ajax = true
 
-[api.auth]
+[auth.jwt]
 mode = 1   #0:off, 1:HMAC, 2:RSA
 secret_code = "secret1234567890"
 private_key = ""
 public_key = ""
+
+[auth.google]
+client_id = "xxxxx.apps.googleusercontent.com"
+client_secret = "xxxxx"
+call_back_url = "/oauth2/callback"
 
 [mysql]
 host = "us-cdbr-iron-east-04.cleardb.net"

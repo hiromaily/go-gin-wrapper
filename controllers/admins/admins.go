@@ -14,7 +14,7 @@ func IndexAction(c *gin.Context) {
 	user := c.MustGet(gin.AuthUserKey).(string)
 	lg.Debugf("[---]gin.AuthUserKey: %s", user)
 
-	api := conf.GetConf().Api
+	api := conf.GetConf().Auth.Api
 
 	//View
 	c.HTML(http.StatusOK, "pages/admins/gallery.tmpl", gin.H{

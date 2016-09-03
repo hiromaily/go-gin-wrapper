@@ -28,7 +28,7 @@ func NewsGetAction(c *gin.Context) {
 	//}
 	className := []string{"alert-success", "alert-info", "alert-warning", "alert-danger"}
 
-	api := conf.GetConf().Api
+	api := conf.GetConf().Auth.Api
 
 	//View
 	c.HTML(http.StatusOK, "pages/news/news.tmpl", gin.H{

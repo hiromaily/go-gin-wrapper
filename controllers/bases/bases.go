@@ -1,6 +1,7 @@
 package bases
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/csrf"
@@ -24,11 +25,28 @@ func debugContext(c *gin.Context) {
 	lg.Debugf("[hh.GetProto(c)]: %s \n", hh.GetProto(c))
 }
 
+func googleUrl(token string) string {
+	//TODO: move to config
+	base := "https://accounts.google.com/o/oauth2/v2/auth"
+	clientId := "275878174798-fn57e2017fp30ikecfho446gjntfiff2.apps.googleusercontent.com"
+	scope := "openid%20email"
+	redirectUrl := "http://localhost:9999/oauth2/callback"
+	state := token
+
+	format := "%s?client_id=%s&response_type=code&scope=%s&redirect_uri=%s&state=%s"
+
+	return fmt.Sprintf(format, base, clientId, scope, redirectUrl, state)
+}
+
 // response for Login Page
 func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []string) {
 	//token
 	token := csrf.CreateToken()
 	sess.SetTokenSession(c, token)
+
+	//Google Open ID
+	//gURL := googleUrl(token)
+	gURL := "/oauth2/signin"
 
 	//when crossing request, context data can't be left.
 	//c.Set("getlogin", "xxx")
@@ -48,6 +66,7 @@ func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []st
 		"input":    input,
 		"errors":   errors,
 		"gintoken": token,
+		"gURL":     gURL,
 	})
 }
 
@@ -57,7 +76,7 @@ func IndexAction(c *gin.Context) {
 	//debugContext(c)
 
 	//return header and key
-	api := conf.GetConf().Api
+	api := conf.GetConf().Auth.Api
 
 	lg.Debugf("api.Header: %#v\n", api.Header)
 	lg.Debugf("api.Key: %#v\n", api.Key)
@@ -135,7 +154,7 @@ func LogoutPostAction(c *gin.Context) {
 	sess.Logout(c)
 
 	//lg.Debug(sess.IsLogin(c))
-	api := conf.GetConf().Api
+	api := conf.GetConf().Auth.Api
 
 	//View
 	c.HTML(http.StatusOK, "pages/bases/logout.tmpl", gin.H{

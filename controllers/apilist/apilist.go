@@ -14,7 +14,7 @@ func IndexAction(c *gin.Context) {
 	//debugContext(c)
 
 	//return header and key
-	api := conf.GetConf().Api
+	api := conf.GetConf().Auth.Api
 	//lg.Debugf("api.Header: %#v\n", api.Header)
 	//lg.Debugf("api.Key: %#v\n", api.Key)
 

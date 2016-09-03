@@ -11,6 +11,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/controllers/bases"
 	"github.com/hiromaily/go-gin-wrapper/controllers/errors"
 	"github.com/hiromaily/go-gin-wrapper/controllers/news"
+	oauth "github.com/hiromaily/go-gin-wrapper/controllers/oauth2"
 	//ba "github.com/hiromaily/go-gin-wrapper/libs/basicauth"
 	"github.com/hiromaily/go-gin-wrapper/controllers/apilist"
 	"net/http"
@@ -66,6 +67,19 @@ func SetHTTPUrls(r *gin.Engine) {
 	}
 
 	//-----------------------
+	// OAuth2 Callback
+	//-----------------------
+	oauth2G := r.Group("/oauth2")
+	{
+		//Sign in
+		oauth2G.GET("/signin", oauth.SignInAction)
+		//login
+		oauth2G.GET("/login", oauth.LoginAction)
+		//Callback
+		oauth2G.GET("/callback", oauth.CallbackAction)
+	}
+
+	//-----------------------
 	// Account(MyPage)
 	//-----------------------
 	//After login
@@ -116,7 +130,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	//  r.Use(routes.CheckHttpHeader())
 	//  it let us faster to develop instead of a bit less performance.
 	var handlers []gin.HandlerFunc = []gin.HandlerFunc{CheckHttpHeader()}
-	if conf.GetConf().Api.Auth.Mode != 0 {
+	if conf.GetConf().Auth.Jwt.Mode != 0 {
 		handlers = append(handlers, CheckJWT())
 	}
 
