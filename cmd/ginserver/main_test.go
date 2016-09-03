@@ -219,7 +219,7 @@ func setup() {
 	initConf()
 
 	//overwrite mode
-	conf.GetConf().Api.Auth.Mode = uint8(*authMode)
+	conf.GetConf().Auth.Jwt.Mode = uint8(*authMode)
 
 	//auth settings
 	initAuth()
@@ -529,7 +529,7 @@ func TestLogin(t *testing.T) {
 // Get Request for Jwt API (Ajax)
 //-----------------------------------------------------------------------------
 func TestGetJwtAPIRequestOnTable(t *testing.T) {
-	if conf.GetConf().Api.Auth.Mode == 0 {
+	if conf.GetConf().Auth.Jwt.Mode == 0 {
 		t.SkipNow()
 	}
 
@@ -600,7 +600,7 @@ func TestGetUserAPIRequestOnTable(t *testing.T) {
 	}
 
 	getApiTestsData := getUserApiTests
-	if conf.GetConf().Api.Auth.Mode != 0 {
+	if conf.GetConf().Auth.Jwt.Mode != 0 {
 		//Auth is on
 		if jwtCode == "" {
 			getApiTestsData = getUserApiTests2
