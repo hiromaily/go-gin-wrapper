@@ -9,6 +9,7 @@ import (
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	lg "github.com/hiromaily/golibs/log"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
 	"io/ioutil"
 	"net/http"
@@ -27,6 +28,47 @@ type ResGoogle struct {
 	Locale        string `json:"locale"`
 }
 
+type ResFacebook struct {
+	Id            string `json:"id"`
+	Email         string `json:"email"`
+	VerifiedEmail bool   `json:"verified"`
+	Name          string `json:"name"`       //full name
+	FirstName     string `json:"first_name"` //first name
+	LastName      string `json:"last_name"`  //last name
+	Link          string `json:"link"`
+	Picture       FBPic  `json:"picture"`
+	Gender        string `json:"gender"`
+	Locale        string `json:"locale"`
+}
+
+type FBPic struct {
+	Data struct {
+		IsSilhouette bool   `json:"is_silhouette"`
+		Url          string `json:"url"`
+	}
+}
+
+/*
+{
+  "": "Hiroki",
+  "": "Yasui",
+  "link": "https://www.facebook.com/app_scoped_user_id/899687916708450/",
+  "picture": {
+    "data": {
+      "is_silhouette": false,
+      "url": "https://scontent.xx.fbcdn.net/v/t1.0-1/c170.50.621.621/s50x50/306944_461420307201882_1705679624_n.jpg?oh=c0720e265c867dc0d356c23b72f4179a&oe=584D18F3"
+    }
+  },
+  "gender": "male",
+  "locale": "en_US"
+}
+*/
+
+const (
+	GoogleAuth   string = "1"
+	FacebookAuth string = "2"
+)
+
 var (
 	googleOauthConfig = &oauth2.Config{
 		RedirectURL:  "",
@@ -38,13 +80,20 @@ var (
 		},
 		Endpoint: google.Endpoint,
 	}
+
+	facebookOauthConfig = &oauth2.Config{
+		RedirectURL:  "",
+		ClientID:     "",
+		ClientSecret: "",
+		Scopes:       []string{"public_profile", "email"},
+		//Scopes:   []string{"first_name", "last_name", "link", "picture", "email"},
+		Endpoint: facebook.Endpoint,
+	}
 )
 
-const GoogleAuth string = "1"
-
 //Sign In by Google[GET]
-func SignInAction(c *gin.Context) {
-	lg.Info("SignInAction()")
+func SignInGoogleAction(c *gin.Context) {
+	lg.Info("SignInGoogleAction()")
 
 	auth := conf.GetConf().Auth.Google
 
@@ -57,14 +106,35 @@ func SignInAction(c *gin.Context) {
 	sess.SetTokenSession(c, token)
 
 	url := googleOauthConfig.AuthCodeURL(token)
-	//http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	c.Redirect(http.StatusTemporaryRedirect, url) //307
+}
+
+//Sign In by Facebook[GET]
+func SignInFacebookAction(c *gin.Context) {
+	lg.Info("SignInFacebookAction()")
+
+	auth := conf.GetConf().Auth.Facebook
+
+	facebookOauthConfig.RedirectURL = auth.CallbackURL
+	facebookOauthConfig.ClientID = auth.ClientID
+	facebookOauthConfig.ClientSecret = auth.ClientSecret
+
+	//token
+	token := csrf.CreateToken()
+	sess.SetTokenSession(c, token)
+
+	url := facebookOauthConfig.AuthCodeURL(token)
+
+	//add display and auth_type
+	//url = url + "&display=popup&auth_type=reauthenticate"
+	url = url + "&display=popup"
+
 	c.Redirect(http.StatusTemporaryRedirect, url) //307
 }
 
 //Login by Google[GET]
 func LoginAction(c *gin.Context) {
 	lg.Info("LoginAction()")
-
 	/*
 		https://accounts.google.com/o/oauth2/auth?
 		scope=openid+email+profile&
@@ -76,20 +146,23 @@ func LoginAction(c *gin.Context) {
 	//TODO:What is difference of parameter between sign in and login
 }
 
-//Callback from Google[GET]
-func CallbackAction(c *gin.Context) {
-	lg.Info("CallbackAction()")
+func checkError(c *gin.Context) bool {
+	lg.Info("checkError()")
 
-	//0.check deny
 	//When user choose access deny
 	//http://localhost:9999/oauth2/callback?error=access_denied&state=66bc8679a5629423463943f679383b57
 	qeyErr, _ := c.GetQuery("error")
 	if qeyErr != "" {
 		lg.Debugf("error is %s", qeyErr)
 		c.Redirect(http.StatusTemporaryRedirect, "/login") //307
+		return false
 	}
+	return true
+}
 
-	//1.Confirm State(token)
+func checkState(c *gin.Context) bool {
+	lg.Info("checkState()")
+
 	state, _ := c.GetQuery("state")
 	//lg.Debugf("state is %s", state)
 	//lg.Debugf("saved state is %s", sess.GetTokenSession(c))
@@ -97,59 +170,80 @@ func CallbackAction(c *gin.Context) {
 		//error
 		lg.Error("state is invalid.")
 		c.Redirect(http.StatusTemporaryRedirect, "/") //307
-		return
+		return false
+	}
+	return true
+}
+
+func getToken(c *gin.Context, mode string) (token *oauth2.Token) {
+	lg.Info("getToken()")
+
+	var err error
+
+	code, _ := c.GetQuery("code")
+
+	switch mode {
+	case GoogleAuth:
+		token, err = googleOauthConfig.Exchange(oauth2.NoContext, code)
+	case FacebookAuth:
+		token, err = facebookOauthConfig.Exchange(oauth2.NoContext, code)
+	default:
+		return nil
 	}
 
-	//2.connection server to server
-	code, _ := c.GetQuery("code")
-	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
 		//error
 		lg.Errorf("Code exchange failed with '%s'", err)
 		c.Redirect(http.StatusTemporaryRedirect, "/") //307
-		return
+		return nil
+	}
+	return token
+}
+
+func getUserInfo(c *gin.Context, token *oauth2.Token, res interface{}, mode string) bool {
+	lg.Info("getUserInfo()")
+
+	var url string
+
+	switch mode {
+	case GoogleAuth:
+		url = "https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken
+	case FacebookAuth:
+		url = "https://graph.facebook.com/me?access_token=" + token.AccessToken
+		url += "&fields=id,email,verified,name,first_name,last_name,link,picture,gender,locale"
+		//client := facebookOauthConfig.Client(oauth2.NoContext, token)
+		//response, err := client.Get("https://graph.facebook.com/me")
+	default:
+		return false
 	}
 
-	//3.get user info
-	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+	response, err := http.Get(url)
 	if err != nil {
 		//error
 		lg.Errorf("Get user info failed with '%s'", err)
 		c.Redirect(http.StatusTemporaryRedirect, "/") //307
-		return
+		return false
 	}
 
 	defer response.Body.Close()
 	contents, _ := ioutil.ReadAll(response.Body)
 
-	resGoogle := ResGoogle{}
-	err = json.Unmarshal(contents, &resGoogle)
+	err = json.Unmarshal(contents, res)
 	if err != nil {
 		lg.Errorf("Parse of response as json failed with '%s'", err)
 		c.Redirect(http.StatusTemporaryRedirect, "/") //307
-		return
+		return false
 	}
 
-	lg.Debugf("response body is %+s", resGoogle)
+	return true
+}
 
-	//4.check Email
-	lg.Debugf("email is %s", resGoogle.Email)
-	userAuth, err := models.GetDB().OauthLogin(resGoogle.Email)
-	if err != nil {
-		c.AbortWithError(500, err)
-		return
-	}
+func registerOrLogin(c *gin.Context, mode string, uA *models.UserAuth, user *models.Users) {
+	lg.Info("registerOrLogin()")
 
-	if userAuth == nil {
+	if uA == nil {
 		lg.Debug("no user on t_users")
 		//0:no user -> register and login
-		user := &models.Users{
-			FirstName: resGoogle.FirstName,
-			LastName:  resGoogle.LastName,
-			Email:     resGoogle.Email,
-			Password:  "google-password",
-			Oauth2Flg: GoogleAuth,
-		}
 
 		lg.Debug("InsertUser()")
 		id, err := models.GetDB().InsertUser(user)
@@ -161,13 +255,13 @@ func CallbackAction(c *gin.Context) {
 		sess.SetUserSession(c, int(id))
 
 	} else {
-		lg.Debug("There is user: %v", userAuth)
+		lg.Debug("There is user: %v", uA)
 		//oauth_flg //0, 1:google, 2:facebook
-		if userAuth.Id != 0 && userAuth.Auth == GoogleAuth {
+		if uA.Id != 0 && uA.Auth == mode {
 			lg.Debug("login proceduer")
 			//1:existing user (google) -> login procedure
 			//Session
-			sess.SetUserSession(c, userAuth.Id)
+			sess.SetUserSession(c, uA.Id)
 		} else {
 			lg.Debug("redirect login page. user is already exsisting.")
 			//2:existing user (no auth or another auth) -> err
@@ -182,6 +276,113 @@ func CallbackAction(c *gin.Context) {
 
 	//Redirect[GET]
 	c.Redirect(http.StatusTemporaryRedirect, "/accounts") //307
+
+	return
+}
+
+//Callback from Google[GET]
+func CallbackGoogleAction(c *gin.Context) {
+	lg.Info("CallbackGoogleAction()")
+	mode := GoogleAuth
+
+	//0.check deny
+	bRet := checkError(c)
+	if !bRet {
+		return
+	}
+
+	//1.Confirm State(token)
+	bRet = checkState(c)
+	if !bRet {
+		return
+	}
+
+	//2.connection server to server
+	token := getToken(c, mode)
+	if token == nil {
+		return
+	}
+
+	//3.get user info
+	resGoogle := ResGoogle{}
+	bRet = getUserInfo(c, token, &resGoogle, mode)
+	if !bRet {
+		return
+	}
+
+	lg.Debugf("response body is %+s", resGoogle)
+
+	//4.check Email
+	lg.Debugf("email is %s", resGoogle.Email)
+	userAuth, err := models.GetDB().OauthLogin(resGoogle.Email)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	//5. register or login
+	user := &models.Users{
+		FirstName: resGoogle.FirstName,
+		LastName:  resGoogle.LastName,
+		Email:     resGoogle.Email,
+		Password:  "google-password",
+		Oauth2Flg: mode,
+	}
+	registerOrLogin(c, mode, userAuth, user)
+
+	return
+}
+
+//Callback from Facebook[GET]
+func CallbackFacebookAction(c *gin.Context) {
+	lg.Info("CallbackFacebookAction()")
+	mode := FacebookAuth
+
+	//0.check deny
+	bRet := checkError(c)
+	if !bRet {
+		return
+	}
+
+	//1.Confirm State(token)
+	bRet = checkState(c)
+	if !bRet {
+		return
+	}
+
+	//2.connection server to server
+	token := getToken(c, mode)
+	if token == nil {
+		return
+	}
+
+	//3.get user info
+	resFacebook := ResFacebook{}
+	bRet = getUserInfo(c, token, &resFacebook, mode)
+	if !bRet {
+		return
+	}
+
+	lg.Debugf("response body is %+s", resFacebook)
+	//img := "https://graph.facebook.com/" + id + "/picture?width=180&height=180"
+
+	//4.check Email
+	lg.Debugf("email is %s", resFacebook.Email)
+	userAuth, err := models.GetDB().OauthLogin(resFacebook.Email)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	//5. register or login
+	user := &models.Users{
+		FirstName: resFacebook.FirstName,
+		LastName:  resFacebook.LastName,
+		Email:     resFacebook.Email,
+		Password:  "facebook-password",
+		Oauth2Flg: mode,
+	}
+	registerOrLogin(c, mode, userAuth, user)
 
 	return
 }

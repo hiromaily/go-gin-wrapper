@@ -53,7 +53,12 @@ public_key = ""
 [auth.google]
 client_id = "xxxxx.apps.googleusercontent.com"
 client_secret = "xxxxx"
-call_back_url = "/oauth2/callback"
+call_back_url = "/oauth2/google/callback"
+
+[auth.facebook]
+client_id = ""     #app_id
+client_secret = "" #app secret
+call_back_url = "http://xxxxx/oauth2/facebook/callback"
 
 [mysql]
 host = "mysql-server"

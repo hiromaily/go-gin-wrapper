@@ -191,6 +191,10 @@
 			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
 		},
 		{
+			"ImportPath": "golang.org/x/oauth2/facebook",
+			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
+		},
+		{
 			"ImportPath": "golang.org/x/oauth2/google",
 			"Rev": "3c3a985cb79f52a3190fbc056984415ca6763d01"
 		},

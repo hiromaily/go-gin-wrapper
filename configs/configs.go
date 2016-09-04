@@ -72,9 +72,10 @@ type ProxyServerConfig struct {
 }
 
 type AuthConfig struct {
-	Api    ApiConfig    `toml:"api"`
-	Jwt    JwtConfig    `toml:"jwt"`
-	Google GoogleConfig `toml:"google"`
+	Api      ApiConfig      `toml:"api"`
+	Jwt      JwtConfig      `toml:"jwt"`
+	Google   GoogleConfig   `toml:"google"`
+	Facebook FacebookConfig `toml:"facebook"`
 }
 
 type ApiConfig struct {
@@ -91,6 +92,12 @@ type JwtConfig struct {
 }
 
 type GoogleConfig struct {
+	ClientID     string `toml:"client_id"`
+	ClientSecret string `toml:"client_secret"`
+	CallbackURL  string `toml:"call_back_url"`
+}
+
+type FacebookConfig struct {
 	ClientID     string `toml:"client_id"`
 	ClientSecret string `toml:"client_secret"`
 	CallbackURL  string `toml:"call_back_url"`

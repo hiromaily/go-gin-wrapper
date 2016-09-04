@@ -4,11 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
+	lg "github.com/hiromaily/golibs/log"
 	"net/http"
 )
 
 //Accounts [GET]
 func AccountsGetAction(c *gin.Context) {
+	lg.Info("AccountsGetAction()")
+
 	//judge login
 	if bRet, _ := sess.IsLogin(c); !bRet {
 		//Redirect[GET]

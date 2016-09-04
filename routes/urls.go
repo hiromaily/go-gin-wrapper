@@ -71,12 +71,16 @@ func SetHTTPUrls(r *gin.Engine) {
 	//-----------------------
 	oauth2G := r.Group("/oauth2")
 	{
+		//--Google--
 		//Sign in
-		oauth2G.GET("/signin", oauth.SignInAction)
-		//login
-		oauth2G.GET("/login", oauth.LoginAction)
+		oauth2G.GET("/google/signin", oauth.SignInGoogleAction)
 		//Callback
-		oauth2G.GET("/callback", oauth.CallbackAction)
+		oauth2G.GET("/google/callback", oauth.CallbackGoogleAction)
+		//--Facebook--
+		//Sign in
+		oauth2G.GET("/facebook/signin", oauth.SignInFacebookAction)
+		//Callback
+		oauth2G.GET("/facebook/callback", oauth.CallbackFacebookAction)
 	}
 
 	//-----------------------

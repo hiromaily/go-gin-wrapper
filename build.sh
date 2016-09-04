@@ -8,9 +8,9 @@ GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
 TEST_MODE=0    #0:off, 1:after build, run test, 2:quick test for customized
-AUTO_EXEC=1    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
-INSTALL_PKG=0
-GODEP_MODE=0
+AUTO_EXEC=0    #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
+INSTALL_PKG=1
+GODEP_MODE=1
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0  #0:off, 1:deploy server, 2:exec test on heroku
 DOCKER_MODE=0  #0:off, 1:run server,    2:exec test on docker

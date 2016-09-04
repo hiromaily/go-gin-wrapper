@@ -46,7 +46,8 @@ func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []st
 
 	//Google Open ID
 	//gURL := googleUrl(token)
-	gURL := "/oauth2/signin"
+	gURL := "/oauth2/google/signin"
+	fURL := "/oauth2/facebook/signin"
 
 	//when crossing request, context data can't be left.
 	//c.Set("getlogin", "xxx")
@@ -67,6 +68,7 @@ func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []st
 		"errors":   errors,
 		"gintoken": token,
 		"gURL":     gURL,
+		"fURL":     fURL,
 	})
 }
 
