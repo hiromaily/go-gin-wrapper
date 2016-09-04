@@ -8,7 +8,7 @@ go build -v -o /go/bin/ginserver ./cmd/ginserver/
 
 ginserver -f ./configs/docker.toml
 # Error
-#panic: set Environment Valuable: ENC_KEY, ENC_IV
+#panic: set Environment Variable: ENC_KEY, ENC_IV
 
 #it was impossible to passs environment variable from build.sh
 #if [ $RUN_TEST -eq 1 ]; then

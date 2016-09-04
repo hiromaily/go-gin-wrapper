@@ -64,34 +64,34 @@ call_back_url = "http://localhost:9999/oauth2/facebook/callback"
 
 [mysql]
 encrypted = true
-host = "us-cdbr-iron-east-04.cleardb.net"
+host = "V3thdTLItfVkuSYOSED0iU1wT3WspcFYPzK4Wawg0pg="
 port = 3306
-dbname = "heroku_53533e2ad9f9475"
-user = "bc19f40b56274b"
-pass = "cfee2ebd"
+dbname = "fw1LcS2+7H0aUf3WsIKLCZgpBioCzwGNRQuah3nGgZ8="
+user = "AaDHChFkMG1SFFIGtxqKhA=="
+pass = "t/gil33PoC+8ejUxV7bmGg=="
 
 [mysql.test]
 encrypted = true
-host = "us-cdbr-iron-east-04.cleardb.net"
+host = "V3thdTLItfVkuSYOSED0iU1wT3WspcFYPzK4Wawg0pg="
 port = 3306
-dbname = "heroku_53533e2ad9f9475"
-user = "bc19f40b56274b"
-pass = "cfee2ebd"
+dbname = "fw1LcS2+7H0aUf3WsIKLCZgpBioCzwGNRQuah3nGgZ8="
+user = "AaDHChFkMG1SFFIGtxqKhA=="
+pass = "t/gil33PoC+8ejUxV7bmGg=="
 
 [redis]
 encrypted = true
-host = "ec2-54-197-242-4.compute-1.amazonaws.com"
+host = "ag3OSWgL80j4UIxZxjOnsIgErPqeR34I8jO0sjXTqboc2CkMCnA9dJqqQTGnYyLO"
 port = 9769
-pass = "p7nkpdqindrp4o145oveqpet6ut"
+pass = "GjxxrquD3+VV7sftoJlDTQZLAALyXfhgapkPeFKc0mg="
 session = true
 
 [mongodb]
 encrypted = true
-host = "ds161495.mlab.com"
+host = "k2Cq14y2yjvdlPdtAyIHnAh/Vmx0Zw7ZH+2v9OIDMRk="
 port = 61495
-dbname = "heroku_7lbnd77m"
-user = "heroku_7lbnd77m"
-pass = "7r8f631nv2idt0fhj9ok9714j9"
+dbname = "I2pC5pwBCO11SFbvE2tcyw=="
+user = "I2pC5pwBCO11SFbvE2tcyw=="
+pass = "pcK4iAT4ARALfbF6SU/2CYOwZVYOnBGuFd4v2WgntLg="
 
 [aws]
 encrypted = true

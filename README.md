@@ -100,14 +100,14 @@ Docker environment set configs/docker.toml when starting to run.
 * ./docker_build/*
 
 
-## Environment valuable e.g.
+## Environment variable e.g.
 ### 1. For Heroku environment
 | NAME              | Value            |
 |:------------------|:-----------------|
 | HEROKU_FLG        | 1                |
 | PORT              | 9999             |
 
-Heroku server use ```PORT``` automatically as environment valuable.
+Heroku server use ```PORT``` automatically as environment variable.
 
 
 

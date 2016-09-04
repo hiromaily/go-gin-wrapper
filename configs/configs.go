@@ -73,8 +73,8 @@ type ProxyServerConfig struct {
 }
 
 type AuthConfig struct {
-	Api      ApiConfig       `toml:"api"`
-	Jwt      JwtConfig       `toml:"jwt"`
+	Api      *ApiConfig      `toml:"api"`
+	Jwt      *JwtConfig      `toml:"jwt"`
 	Google   *GoogleConfig   `toml:"google"`
 	Facebook *FacebookConfig `toml:"facebook"`
 }

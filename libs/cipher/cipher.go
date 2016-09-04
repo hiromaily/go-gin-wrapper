@@ -11,7 +11,7 @@ func Setup() {
 	iv := os.Getenv("ENC_IV")
 
 	if key == "" || iv == "" {
-		panic("set Environment Valuable: ENC_KEY, ENC_IV")
+		panic("set Environment Variable: ENC_KEY, ENC_IV")
 	}
 
 	enc.NewCrypt(size, key, iv)
