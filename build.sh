@@ -1,6 +1,12 @@
 #!/bin/sh
 
 ###########################################################
+# precondition
+###########################################################
+#export ENC_KEY='xxxxxxxxxkeykey'
+#export ENC_IV='xxxxxxxxxxxxiviv'
+
+###########################################################
 # Variable
 ###########################################################
 #export GOTRACEBACK=single
@@ -322,11 +328,12 @@ if [ $DOCKER_MODE -eq 1 ]; then
     #docker exec -it web bash
 
     #wait to be ready or not.
-    sleep 5s
+    echo 'building now. it may be take over 40s.'
+    sleep 30s
     while :
     do
         #000 or 200 or 404
-        HTTP_STATUS=`curl -LI localhost:8888/ -w '%{http_code}\n' -s -o /dev/null`
+        HTTP_STATUS=`curl -LI localhost:9999/ -w '%{http_code}\n' -s -o /dev/null`
         echo $HTTP_STATUS
         if [ $HTTP_STATUS -eq 000 ]; then
             sleep 1s

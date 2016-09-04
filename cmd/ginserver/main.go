@@ -9,6 +9,7 @@ import (
 	//"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
+	"github.com/hiromaily/go-gin-wrapper/libs/cipher"
 	"github.com/hiromaily/go-gin-wrapper/libs/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/routes"
@@ -32,6 +33,9 @@ var (
 func init() {
 	//command-line
 	flag.Parse()
+
+	//cipher
+	cipher.Setup()
 }
 
 func setupMain() {
@@ -68,6 +72,7 @@ func initConf() {
 		conf.SetTomlPath(*tomlPath)
 	}
 	conf.New("")
+	conf.Cipher()
 	//conf.GetConf()
 }
 
@@ -96,30 +101,32 @@ func initDatabase(testFlg uint8) {
 
 		//database
 		host, dbname, user, pass, err := hrk.GetMySQLInfo("")
-		lg.Debugf("[HOST]%s  [Database]%s", host, dbname)
-		lg.Debugf("[User]%s  [Pass]%s", user, pass)
+		//lg.Debugf("[HOST]%s  [Database]%s", host, dbname)
+		//lg.Debugf("[User]%s  [Pass]%s", user, pass)
 
 		if err != nil {
 			lg.Error(err)
 			panic(err)
 		} else {
-			mysql.New(host, dbname, user, pass, 3306)
-			mysql.GetDBInstance().SetMaxIdleConns(50)
-			//return
-		}
-	} else {
-		//For Localhost, Docker, Production
-
-		//database
-		if testFlg == 0 {
 			dbInfo := conf.GetConf().MySQL
-			mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
-		} else {
-			//For test
-			dbInfo := conf.GetConf().MySQL.Test
-			mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
+			dbInfo.Host = host
+			dbInfo.DbName = dbname
+			dbInfo.User = user
+			dbInfo.Pass = pass
+			dbInfo.Port = 3306
 		}
 	}
+
+	//database
+	if testFlg == 0 {
+		dbInfo := conf.GetConf().MySQL
+		mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
+	} else {
+		//For test
+		dbInfo := conf.GetConf().MySQL.Test
+		mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
+	}
+	mysql.GetDBInstance().SetMaxIdleConns(50)
 
 	//MongoDB
 	initMongo()
@@ -127,6 +134,18 @@ func initDatabase(testFlg uint8) {
 
 func initMongo() {
 	c := conf.GetConf().Mongo
+
+	if conf.GetConf().Environment == "heroku" {
+		host, dbname, user, pass, port, err := hrk.GetMongoInfo("")
+		if err == nil {
+			c.Host = host
+			c.DbName = dbname
+			c.User = user
+			c.Pass = pass
+			c.Port = uint16(port)
+		}
+	}
+
 	mongo.New(c.Host, c.DbName, c.User, c.Pass, c.Port)
 	if c.DbName != "" {
 		//GetMongo().GetDB("hiromaily")

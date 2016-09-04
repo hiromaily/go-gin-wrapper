@@ -51,43 +51,50 @@ private_key = ""
 public_key = ""
 
 [auth.google]
-client_id = "275878174798-gvfvcb1ek6bqm2j6raduvbpcska44g45.apps.googleusercontent.com"
-client_secret = "sigGN3AbOD-Z0tPMQXxLAKXZ"
+encrypted = true
+client_id = "HC/Tl3lSXPc//PhSP3XgznaU4mgUk7gZ820SG46V+PbhjfC7I58TngiprkepNm4/+StFfhSredc1g/MNiXBKVBxEQ5BtoxqPIyl5SW8c5lk="
+client_secret = "x3S1U1d23Y63euKsg5Ytqjt6n/WLORz7npw/oqyIArE="
 call_back_url = "https://ginserver.herokuapp.com/oauth2/google/callback"
 
 [auth.facebook]
-client_id = "645539375620361"     #app_id
-client_secret = "33971295f1f1d41dc399d57f135edc6c" #app secret
+encrypted = true
+client_id = "25XF6XoUu5tbky0h7z+zUg=="                          #app_id
+client_secret = "EBN/1raNRI2Fvzk6rJ+K++c5KkMsstxp6AiHGFlE8nY="  #app secret
 call_back_url = "https://ginserver.herokuapp.com/oauth2/facebook/callback"
 
 [mysql]
-host = "us-cdbr-iron-east-04.cleardb.net"
+encrypted = false
+host = ""
 port = 3306
-dbname = "heroku_53533e2ad9f9475"
-user = "bc19f40b56274b"
-pass = "cfee2ebd"
+dbname = ""
+user = ""
+pass = ""
 
 [mysql.test]
-host = "us-cdbr-iron-east-04.cleardb.net"
+encrypted = false
+host = ""
 port = 3306
-dbname = "heroku_53533e2ad9f9475"
-user = "bc19f40b56274b"
-pass = "cfee2ebd"
+dbname = ""
+user = ""
+pass = ""
 
 [redis]
-host = "ec2-54-197-242-4.compute-1.amazonaws.com"
-port = 9769
-pass = "p7nkpdqindrp4o145oveqpet6ut"
+encrypted = false
+host = ""
+port = 0
+pass = ""
 session = true
 
 [mongodb]
-host = "ds161495.mlab.com"
-port = 61495
-dbname = "heroku_7lbnd77m"
-user = "heroku_7lbnd77m"
-pass = "7r8f631nv2idt0fhj9ok9714j9"
+encrypted = false
+host = ""
+port = 0
+dbname = ""
+user = ""
+pass = ""
 
 [aws]
+encrypted = false
 access_key = "XXXXXXXXXXXX"
 secret_key = "XXXXXXXXXXXX"
 region = "ap-northeast-1"

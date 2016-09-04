@@ -51,16 +51,19 @@ private_key = ""
 public_key = ""
 
 [auth.google]
-client_id = "xxxxx.apps.googleusercontent.com"
-client_secret = "xxxxx"
-call_back_url = "/oauth2/google/callback"
+encrypted = true
+client_id = "kPmVQs1VcRWa7lm9afOcZzd2wxfLE4Ws441Y5H+MeAs735CVMgSLbUDsqR5vMJSkVLeWP1ScpLmS1hiEvfkTNcOYic3iMojstNDNSQLrUaU="
+client_secret = "vWl5RU38iFcid5JI/j610qcp0aoHOEvWI6+Q/QrKRbY="
+call_back_url = "http://localhost:9999/oauth2/google/callback"
 
 [auth.facebook]
-client_id = ""     #app_id
-client_secret = "" #app secret
-call_back_url = "http://xxxxx/oauth2/facebook/callback"
+encrypted = true
+client_id = "VZSYxmfcqQFZNUP7Tzchtg=="                         #app_id
+client_secret = "aVd1AHW1PVsChVWcI0uhim0etWgg+9Mj2x+puSBTHHM=" #app secret
+call_back_url = "http://localhost:9999/oauth2/facebook/callback"
 
 [mysql]
+encrypted = true
 host = "us-cdbr-iron-east-04.cleardb.net"
 port = 3306
 dbname = "heroku_53533e2ad9f9475"
@@ -68,6 +71,7 @@ user = "bc19f40b56274b"
 pass = "cfee2ebd"
 
 [mysql.test]
+encrypted = true
 host = "us-cdbr-iron-east-04.cleardb.net"
 port = 3306
 dbname = "heroku_53533e2ad9f9475"
@@ -75,12 +79,14 @@ user = "bc19f40b56274b"
 pass = "cfee2ebd"
 
 [redis]
+encrypted = true
 host = "ec2-54-197-242-4.compute-1.amazonaws.com"
 port = 9769
 pass = "p7nkpdqindrp4o145oveqpet6ut"
 session = true
 
 [mongodb]
+encrypted = true
 host = "ds161495.mlab.com"
 port = 61495
 dbname = "heroku_7lbnd77m"
@@ -88,6 +94,7 @@ user = "heroku_7lbnd77m"
 pass = "7r8f631nv2idt0fhj9ok9714j9"
 
 [aws]
+encrypted = true
 access_key = "XXXXXXXXXXXX"
 secret_key = "XXXXXXXXXXXX"
 region = "ap-northeast-1"

@@ -48,22 +48,6 @@ type FBPic struct {
 	}
 }
 
-/*
-{
-  "": "Hiroki",
-  "": "Yasui",
-  "link": "https://www.facebook.com/app_scoped_user_id/899687916708450/",
-  "picture": {
-    "data": {
-      "is_silhouette": false,
-      "url": "https://scontent.xx.fbcdn.net/v/t1.0-1/c170.50.621.621/s50x50/306944_461420307201882_1705679624_n.jpg?oh=c0720e265c867dc0d356c23b72f4179a&oe=584D18F3"
-    }
-  },
-  "gender": "male",
-  "locale": "en_US"
-}
-*/
-
 const (
 	GoogleAuth   string = "1"
 	FacebookAuth string = "2"

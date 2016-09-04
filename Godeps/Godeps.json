@@ -103,47 +103,51 @@
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/auth/jwt",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
+		},
+		{
+			"ImportPath": "github.com/hiromaily/golibs/cipher/encryption",
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/cipher/hash",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mongodb",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mysql",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/files",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/heroku",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/log",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/regexp",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/times",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/utils",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/validator",
-			"Rev": "c3e5962b906418f754378db58de253e70c105ec7"
+			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
 		{
 			"ImportPath": "github.com/manucorporat/sse",

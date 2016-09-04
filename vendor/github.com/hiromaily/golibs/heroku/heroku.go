@@ -51,3 +51,28 @@ func GetRedisInfo(url string) (host, pass string, port int, err error) {
 
 	return
 }
+
+func GetMongoInfo(url string) (host, dbname, user, pass string, port int, err error) {
+	//MONGODB_URI: mongodb://heroku_7lbnd77m:7r8f631nv2idt0fhj9ok9714j9@ds161495.mlab.com:61495/heroku_7lbnd77m
+	if url == "" {
+		url = os.Getenv("MONGODB_URI")
+		if url == "" {
+			err = fmt.Errorf("MONGODB_URI was not found.")
+			return
+		}
+	}
+	//_, err = fmt.Sscanf(url, "mobngod://%s:%s@%s/%s?reconnect=true", &user, &pass, &host, &dbname)
+	tmp := strings.Split(url, "//")
+	tmp = strings.Split(tmp[1], ":")
+	user = tmp[0]
+
+	tmp2 := strings.Split(tmp[2], "/")
+	port = u.Atoi(tmp2[0])
+	dbname = tmp2[1]
+
+	tmp = strings.Split(tmp[1], "@")
+	pass = tmp[0]
+	host = tmp[1]
+
+	return
+}

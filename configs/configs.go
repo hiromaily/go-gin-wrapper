@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	enc "github.com/hiromaily/golibs/cipher/encryption"
 	u "github.com/hiromaily/golibs/utils"
 	"io/ioutil"
 	"os"
@@ -18,11 +19,11 @@ type Config struct {
 	Environment string
 	Server      ServerConfig
 	Proxy       ProxyConfig
-	Auth        AuthConfig
-	MySQL       MySQLConfig
-	Redis       RedisConfig
-	Mongo       MongoConfig `toml:"mongodb"`
-	Aws         AwsConfig
+	Auth        *AuthConfig
+	MySQL       *MySQLConfig
+	Redis       *RedisConfig
+	Mongo       *MongoConfig `toml:"mongodb"`
+	Aws         *AwsConfig
 	Develop     DevelopConfig
 }
 
@@ -72,10 +73,10 @@ type ProxyServerConfig struct {
 }
 
 type AuthConfig struct {
-	Api      ApiConfig      `toml:"api"`
-	Jwt      JwtConfig      `toml:"jwt"`
-	Google   GoogleConfig   `toml:"google"`
-	Facebook FacebookConfig `toml:"facebook"`
+	Api      ApiConfig       `toml:"api"`
+	Jwt      JwtConfig       `toml:"jwt"`
+	Google   *GoogleConfig   `toml:"google"`
+	Facebook *FacebookConfig `toml:"facebook"`
 }
 
 type ApiConfig struct {
@@ -92,46 +93,52 @@ type JwtConfig struct {
 }
 
 type GoogleConfig struct {
+	Encrypted    bool   `toml:"encrypted"`
 	ClientID     string `toml:"client_id"`
 	ClientSecret string `toml:"client_secret"`
 	CallbackURL  string `toml:"call_back_url"`
 }
 
 type FacebookConfig struct {
+	Encrypted    bool   `toml:"encrypted"`
 	ClientID     string `toml:"client_id"`
 	ClientSecret string `toml:"client_secret"`
 	CallbackURL  string `toml:"call_back_url"`
 }
 
 type MySQLConfig struct {
-	MySQLContentConfig
-	Test MySQLContentConfig `toml:"test"`
+	*MySQLContentConfig
+	Test *MySQLContentConfig `toml:"test"`
 }
 
 type MySQLContentConfig struct {
-	Host   string `toml:"host"`
-	Port   uint16 `toml:"port"`
-	DbName string `toml:"dbname"`
-	User   string `toml:"user"`
-	Pass   string `toml:"pass"`
+	Encrypted bool   `toml:"encrypted"`
+	Host      string `toml:"host"`
+	Port      uint16 `toml:"port"`
+	DbName    string `toml:"dbname"`
+	User      string `toml:"user"`
+	Pass      string `toml:"pass"`
 }
 
 type RedisConfig struct {
-	Host    string `toml:"host"`
-	Port    uint16 `toml:"port"`
-	Pass    string `toml:"pass"`
-	Session bool   `toml:"session"`
+	Encrypted bool   `toml:"encrypted"`
+	Host      string `toml:"host"`
+	Port      uint16 `toml:"port"`
+	Pass      string `toml:"pass"`
+	Session   bool   `toml:"session"`
 }
 
 type MongoConfig struct {
-	Host   string `toml:"host"`
-	Port   uint16 `toml:"port"`
-	DbName string `toml:"dbname"`
-	User   string `toml:"user"`
-	Pass   string `toml:"pass"`
+	Encrypted bool   `toml:"encrypted"`
+	Host      string `toml:"host"`
+	Port      uint16 `toml:"port"`
+	DbName    string `toml:"dbname"`
+	User      string `toml:"user"`
+	Pass      string `toml:"pass"`
 }
 
 type AwsConfig struct {
+	Encrypted bool   `toml:"encrypted"`
 	AccessKey string `toml:"access_key"`
 	SecretKey string `toml:"secret_key"`
 	Region    string `toml:"region"`
@@ -170,28 +177,38 @@ var checkTomlKeys [][]string = [][]string{
 	{"auth", "jwt", "secret_code"},
 	{"auth", "jwt", "private_key"},
 	{"auth", "jwt", "public_key"},
+	{"auth", "google", "encrypted"},
 	{"auth", "google", "client_id"},
 	{"auth", "google", "client_secret"},
 	{"auth", "google", "call_back_url"},
+	{"auth", "facebook", "encrypted"},
+	{"auth", "facebook", "client_id"},
+	{"auth", "facebook", "client_secret"},
+	{"auth", "facebook", "call_back_url"},
+	{"mysql", "encrypted"},
 	{"mysql", "host"},
 	{"mysql", "port"},
 	{"mysql", "dbname"},
 	{"mysql", "user"},
 	{"mysql", "pass"},
+	{"mysql", "test", "encrypted"},
 	{"mysql", "test", "host"},
 	{"mysql", "test", "port"},
 	{"mysql", "test", "dbname"},
 	{"mysql", "test", "user"},
 	{"mysql", "test", "pass"},
+	{"redis", "encrypted"},
 	{"redis", "host"},
 	{"redis", "port"},
 	{"redis", "pass"},
 	{"redis", "session"},
+	{"mongodb", "encrypted"},
 	{"mongodb", "host"},
 	{"mongodb", "port"},
 	{"mongodb", "dbname"},
 	{"mongodb", "user"},
 	{"mongodb", "pass"},
+	{"aws", "encrypted"},
 	{"aws", "access_key"},
 	{"aws", "secret_key"},
 	{"aws", "region"},
@@ -300,4 +317,56 @@ func GetConf() *Config {
 
 func SetTomlPath(path string) {
 	tomlFileName = path
+}
+
+func Cipher() {
+	crypt := enc.GetCryptInstance()
+
+	if conf.Auth.Google.Encrypted {
+		c := conf.Auth.Google
+		c.ClientID, _ = crypt.DecryptBase64(c.ClientID)
+		c.ClientSecret, _ = crypt.DecryptBase64(c.ClientSecret)
+	}
+
+	if conf.Auth.Facebook.Encrypted {
+		c := conf.Auth.Facebook
+		c.ClientID, _ = crypt.DecryptBase64(c.ClientID)
+		c.ClientSecret, _ = crypt.DecryptBase64(c.ClientSecret)
+	}
+
+	if conf.MySQL.Encrypted {
+		c := conf.MySQL
+		c.Host, _ = crypt.DecryptBase64(c.Host)
+		c.DbName, _ = crypt.DecryptBase64(c.DbName)
+		c.User, _ = crypt.DecryptBase64(c.User)
+		c.Pass, _ = crypt.DecryptBase64(c.Pass)
+	}
+
+	if conf.MySQL.Test.Encrypted {
+		c := conf.MySQL.Test
+		c.Host, _ = crypt.DecryptBase64(c.Host)
+		c.DbName, _ = crypt.DecryptBase64(c.DbName)
+		c.User, _ = crypt.DecryptBase64(c.User)
+		c.Pass, _ = crypt.DecryptBase64(c.Pass)
+	}
+
+	if conf.Redis.Encrypted {
+		c := conf.Redis
+		c.Host, _ = crypt.DecryptBase64(c.Host)
+		c.Pass, _ = crypt.DecryptBase64(c.Pass)
+	}
+
+	if conf.Mongo.Encrypted {
+		c := conf.Mongo
+		c.Host, _ = crypt.DecryptBase64(c.Host)
+		c.DbName, _ = crypt.DecryptBase64(c.DbName)
+		c.User, _ = crypt.DecryptBase64(c.User)
+		c.Pass, _ = crypt.DecryptBase64(c.Pass)
+	}
+
+	if conf.Aws.Encrypted {
+		c := conf.Aws
+		c.AccessKey, _ = crypt.DecryptBase64(c.AccessKey)
+		c.SecretKey, _ = crypt.DecryptBase64(c.SecretKey)
+	}
 }

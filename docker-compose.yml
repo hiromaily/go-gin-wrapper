@@ -48,10 +48,13 @@ services:
     image: go-gin-wrapper:v1.1
     container_name: web
     ports:
-      - "8888:9999"
+      - "9999:9999"
     volumes:
       - ./docker_build/logs:/var/log/goweb
       - ./:/go/src/github.com/hiromaily/go-gin-wrapper
+    environment:
+      ENC_KEY: ${ENC_KEY}
+      ENC_IV: ${ENC_IV}
     links:
       - mysql:mysql-server
       - redis:redis-server
