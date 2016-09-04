@@ -6,6 +6,9 @@
 #export ENC_KEY='xxxxxxxxxkeykey'
 #export ENC_IV='xxxxxxxxxxxxiviv'
 
+#heroku config:add ENC_KEY='xxxxxxxxxkeykey'
+#heroku config:add ENC_IV='xxxxxxxxxxxxiviv'
+
 ###########################################################
 # Variable
 ###########################################################

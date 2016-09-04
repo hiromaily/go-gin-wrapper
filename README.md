@@ -68,6 +68,8 @@ $ heroku config | grep REDIS
 
 ## Environment variable
 $ heroku config:add HEROKU_FLG=1
+$ heroku config:add ENC_KEY=xxxxx
+$ heroku config:add ENC_IV=xxxxx
 
 ## Check
 $ heroku config | grep CLEARDB_DATABASE_URL
