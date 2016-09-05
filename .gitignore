@@ -10,3 +10,4 @@ work_js/node_modules/
 work_js/test.sh
 work_js/reset.sh
 work_js/dist/
+profile.cov

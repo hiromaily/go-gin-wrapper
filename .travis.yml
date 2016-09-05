@@ -9,17 +9,19 @@ services:
 
 env:
   global:
-    - secure: "Fz2cGldOhMdqpcJqFTrxysgzlwmsUor/HsACKdToQaykZhq0q2zZjBMBCQUUf4zHT6CXfV8rJZPYg3tLYpY0FUVEbB6vMPArqx/cdHuQpUXweAFZ0X6x+y2dQAYcmOzBZT2SGrCcywg+yQnoyKm6YJqyMaKM9Qf1sNcjGKkI3gENclbNz3zcU14txHLgpZYDl2XfjJJAzw/GMGrRrG7Pu5IhON/P99HuDRNNgxiaeufGm2dUtmrezkuW4AxLyMIEYS8RkHJQmB2liM/xoods/hsVH+XWP42vjUB+Bep+WsKYScTfhltlVlS8VP6+KnZ5JHt1D9kDMTzJho2zcpgTvLqXMO9ZitKXA7vXYHNQBo6RLkBGifpwfdtU08NSBvffqDNj32YtNk8IPNCe0xt11chLt8BeBQQOEDpNvzCNu0PLv34fEmwriz4ag/Roafl2yIqk6ka6H9wXqVJaMbGO0wynQudwUuVMK4utP6sLwXLYHPH8qrbWXPqc9tb9sJfW1NmwvoQP2J48HbekqwUTHzuV9qVJNBsE1BnARsPwxnaOvKBRMKbiXfWt06ZrcMCfDef/B7plPymne4eQYoroLPRiDVX0srvCSDGEik7pWszo4zMAptvvBTfdVP/GcYYJAD17wngA9QkgSjdrZ2HTLDlNCVtikwyyi1dGeRu5aa4="
-
-script:
-  - go fmt ./...
-  - go vet $(go list ./... | grep -v /vendor/)
-  - go test -v cmd/ginserver/*.go -f ../../configs/travis.toml -om 0
-  # - goveralls -coverprofile=profile.cov -service=travis-ci
+    - GO_GIN_PATH='/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/cmd/ginserver/'
 
 before_install:
   - go get github.com/tools/godep
   - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+
+script:
+  - go fmt ./...
+  - go vet $(go list ./... | grep -v /vendor/)
+  # - go test -v cmd/ginserver/*.go -f ../../configs/travis.toml -om 0
+  - cd ${GO_GIN_PATH};go test -v -covermode=count -coverprofile=profile.cov -f ../../configs/travis.toml -om 0
+  - cd ${GO_GIN_PATH};goveralls -coverprofile=profile.cov -service=travis-ci
 
 branches:
   only:
