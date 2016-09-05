@@ -32,6 +32,9 @@ This is the easiest way to configure whole environment.
 If you store session data on Redis, Redis is required. 
 But it's not indispensable.
 
+#### MongoDB
+It's used for news information. Another worker program make data regularly.
+
 #### TOML file
 ```
 $ cp configs/settings.default.toml configs/settings.toml
@@ -43,6 +46,10 @@ If you want to use original toml file, use command line arguments ```-f filepath
 ```
 ginserver -f /app/configs/yourfile.toml
 ```
+
+#### Authentication for Login
+It's available using Google or Facebook account using OAuth2 authentication.
+
 #### Authentication for API
 It's implemented by JWT(Json Web TOken) for authentication.
 Set ```[api.auth]``` on toml file.
@@ -101,7 +108,13 @@ Docker environment set configs/docker.toml when starting to run.
 
 
 ## Environment variable e.g.
-### 1. For Heroku environment
+### 1. Common
+| NAME              | Value            |
+|:------------------|:-----------------|
+| ENC_KEY           | xxxxx            |
+| ENC_IV            | xxxxx            |
+
+### 2. For Heroku environment
 | NAME              | Value            |
 |:------------------|:-----------------|
 | HEROKU_FLG        | 1                |
