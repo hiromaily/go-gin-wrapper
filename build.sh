@@ -49,7 +49,7 @@ RESET_DB=0
 ###########################################################
 if [ $RESET_DB -eq 1 ]; then
     export DB_NAME=hiromaily
-    sh ./z_dbdata/setup.sh
+    sh ./data/sql/setup.sh
 fi
 
 
@@ -169,7 +169,7 @@ if [ $TEST_MODE -eq 1 ]; then
     export DB_PORT=13306
     export DB_USER=root
     export DB_PASS=root
-    sh ./z_dbdata/setup.sh
+    sh ./data/sql/setup.sh
 
     # Execute
     go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \

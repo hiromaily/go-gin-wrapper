@@ -67,7 +67,7 @@ if [ $RUN_TEST -eq 1 ]; then
     export DB_PORT=23306
     export DB_USER=root
     export DB_PASS=root
-    sh ./z_dbdata/setup.sh
+    sh ./data/sql/setup.sh
     #mysql -uroot -proot -h127.0.0.1 -P13306 < ./tests/createdb.sql
 
     docker exec -it ${CONTAINER_NAME} /bin/bash -c "

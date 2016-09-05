@@ -11,7 +11,7 @@ DB_HOST=127.0.0.1
 
 #DB_NAME=hiromaily2
 
-WORK_DIR=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/z_dbdata
+WORK_DIR=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/data/sql
 
 # Dump
 #mysqldump -u root -p hiromaily > data_hiromaily.sql

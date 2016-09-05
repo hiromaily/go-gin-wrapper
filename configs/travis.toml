@@ -47,8 +47,8 @@ only_ajax = true
 [auth.jwt]
 mode = 0   #0:off, 1:HMAC, 2:RSA
 secret_code = "secret1234567890"
-private_key = ""
-public_key = ""
+private_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/data/rsakey/jwttest_rsa"
+public_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/data/rsakey/jwttest_rsa.pub"
 
 [auth.google]
 encrypted = true
