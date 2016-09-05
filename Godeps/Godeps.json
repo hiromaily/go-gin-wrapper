@@ -102,6 +102,11 @@
 			"Rev": "56ba4b0a11da87516629a57408a5f7e4c8ea7b0b"
 		},
 		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Comment": "v1.0.0-20-ga69d25b",
+			"Rev": "a69d25be2fe2923a97c2af6849b2f52426f68fc0"
+		},
+		{
 			"ImportPath": "github.com/hiromaily/golibs/auth/jwt",
 			"Rev": "97d0827c9c518d7576c5b388616c366041d50bd5"
 		},
@@ -161,6 +166,10 @@
 		{
 			"ImportPath": "github.com/mattn/go-isatty",
 			"Rev": "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8"
+		},
+		{
+			"ImportPath": "github.com/olahol/melody",
+			"Rev": "d1854c24f007c55b68192df6974311e9a076303d"
 		},
 		{
 			"ImportPath": "github.com/shiena/ansicolor",

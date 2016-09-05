@@ -14,6 +14,8 @@ import (
 	oauth "github.com/hiromaily/go-gin-wrapper/controllers/oauth2"
 	//ba "github.com/hiromaily/go-gin-wrapper/libs/basicauth"
 	"github.com/hiromaily/go-gin-wrapper/controllers/apilist"
+	"github.com/hiromaily/go-gin-wrapper/controllers/chat"
+	"github.com/olahol/melody"
 	"net/http"
 )
 
@@ -25,6 +27,8 @@ var RefererUrls = map[string]string{
 
 //For HTTP
 func SetHTTPUrls(r *gin.Engine) {
+	m := melody.New()
+
 	/******************************************************************************/
 	/******** Return HTML *********************************************************/
 	/******************************************************************************/
@@ -65,6 +69,22 @@ func SetHTTPUrls(r *gin.Engine) {
 		//Top
 		apiListG.GET("/", apilist.IndexAction)
 	}
+
+	//-----------------------
+	// Chat (Work in progress)
+	//-----------------------
+	chatG := r.Group("/chat")
+	{
+		//Top
+		chatG.GET("/", chat.IndexAction)
+	}
+
+	r.GET("/ws", func(c *gin.Context) {
+		m.HandleRequest(c.Writer, c.Request)
+	})
+	//m.HandleMessage(func(s *melody.Session, msg []byte) {
+	//	m.Broadcast(msg)
+	//})
 
 	//-----------------------
 	// OAuth2 Callback
