@@ -29,7 +29,7 @@ func initConf() {
 	if *tomlPath != "" {
 		conf.SetTomlPath(*tomlPath)
 	}
-	conf.GetConf()
+	conf.New("")
 
 	//log
 	lg.InitializeLog(conf.GetConf().Proxy.Server.Log.Level, lg.LOG_OFF_COUNT, 0,

@@ -33,9 +33,11 @@ If you store session data on Redis, Redis is required.
 But it's not indispensable.
 
 #### MongoDB
-It's used for news information. Another worker program make data regularly.
+It's used for news information. Another worker program make data regularly.  
+[go-news-mongodb](https://github.com/hiromaily/go-news-mongodb)
 
 #### TOML file
+This is for configuration.
 ```
 $ cp configs/settings.default.toml configs/settings.toml
 
@@ -47,11 +49,21 @@ If you want to use original toml file, use command line arguments ```-f filepath
 ginserver -f /app/configs/yourfile.toml
 ```
 
+* server
+* proxy
+* auth
+* mysql
+* redis
+* mongodb
+* aws  
+
+※ As needed, secret information can be ciphered.(using AES encryption)
+
 #### Authentication for Login
 It's available using Google or Facebook account using OAuth2 authentication.
 
 #### Authentication for API
-It's implemented by JWT(Json Web TOken) for authentication.
+It's implemented by JWT(Json Web Token) for authentication.
 Set ```[api.auth]``` on toml file.
 You can choose HMAC or RSA as signature pattern.
 
