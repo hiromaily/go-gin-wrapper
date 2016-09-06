@@ -20,6 +20,12 @@ func IsTmplFile(target string) bool {
 	return CheckRegexp(`^.*\.tmpl$`, target)
 }
 
+func IsStaticFile(target string) bool {
+	//is there any suffix
+	//.+\.(csv|pdf)
+	return CheckRegexp(`^.*\.`, target)
+}
+
 func IsExtFile(target, ext string) bool {
 	return CheckRegexp(`^.*\.`+ext+`$`, target)
 }

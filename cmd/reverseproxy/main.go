@@ -14,6 +14,7 @@ import (
 
 var (
 	tomlPath = flag.String("f", "", "Toml file path")
+	ports    []int
 )
 
 func init() {
@@ -40,6 +41,7 @@ func getURL(scheme, host string, port int) string {
 	return fmt.Sprintf("%s://%s:%d", scheme, host, port)
 }
 
+//Single Reverse Proxy
 func singleReverseProxy() {
 	lg.Info("singleReverseProxy()")
 	//Web Server
@@ -58,20 +60,23 @@ func singleReverseProxy() {
 	server.ListenAndServe()
 }
 
-func multipleReverseProxy(num int) {
-	lg.Info("multipleReverseProxy() number of servers is %d", num)
+// Multiple Reverse Proxy
+func multipleReverseProxy() {
+	lg.Infof("multipleReverseProxy(): number of servers is %d", len(ports))
 	//As precondition, increment port number by one.
 
 	//web servers
 	srv := conf.GetConf().Server
-	hostRing := ring.New(num)
-	for i := 0; i < num; i++ {
-		url, _ := url.Parse(getURL(srv.Scheme, srv.Host, srv.Port+i))
+	hostRing := ring.New(len(ports))
+	for _, port := range ports {
+		//url, _ := url.Parse(getURL(srv.Scheme, srv.Host, srv.Port+i))
+		url, _ := url.Parse(getURL(srv.Scheme, srv.Host, port))
 		hostRing.Value = url
 		hostRing = hostRing.Next()
 	}
 
 	mutex := sync.Mutex{}
+	//access server alternately
 	director := func(request *http.Request) {
 		mutex.Lock()
 		defer mutex.Unlock()
@@ -92,12 +97,14 @@ func multipleReverseProxy(num int) {
 }
 
 func main() {
-	//TODO:define on outer file.
-	serverNum := 1
+	ports = conf.GetConf().Proxy.Server.WebPort
 
-	if serverNum == 1 {
+	fmt.Printf("proxy is runnig ... using Port: %d\n", conf.GetConf().Proxy.Server.Port)
+
+	if len(ports) == 1 {
 		singleReverseProxy()
-	} else if serverNum > 1 {
-		multipleReverseProxy(serverNum)
+	} else if len(ports) > 1 {
+		multipleReverseProxy()
 	}
+
 }

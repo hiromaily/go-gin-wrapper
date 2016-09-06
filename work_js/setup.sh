@@ -3,9 +3,10 @@
 ###############################################################################
 ## Environment Valiable
 ###############################################################################
-EXEC_ONCE=0        #0:off, 1:exec (it's ok just once execution')
-BUILD_MODE=2       #1:Browserify (watchify) + babelify, 2:gulp + gulp-babel
-
+EXEC_ONCE=0         #0:off, 1:exec (it's ok just once execution')
+BUILD_MODE=0        #0:off, 1:Browserify (watchify) + babelify,
+                    #       2:gulp + gulp-babel
+REACT_FLG=1
 
 ###############################################################################
 ## Initialize environment
@@ -35,16 +36,19 @@ fi
 ###############################################################################
 ## for projects
 ###############################################################################
-# create package json
-npm init -y
+#if [ $BUILD_MODE -ge 1 ]; then
+if [ $BUILD_MODE -ne 0 ]; then
 
-# ES2015
-npm install --save-dev babel-preset-es2015
-npm install --save-dev babel-plugin-transform-es2015-modules-commonjs
+    # create package json
+    npm init -y
 
-# setup eslint
-touch .eslintrc.json
-cat <<EOF > .eslintrc.json
+    # ES2015
+    npm install --save-dev babel-preset-es2015
+    npm install --save-dev babel-plugin-transform-es2015-modules-commonjs
+
+    # setup eslint
+    touch .eslintrc.json
+    cat <<EOF > .eslintrc.json
 {
     "extends": ["eslint:recommended"],
     "plugins": [],
@@ -70,19 +74,19 @@ cat <<EOF > .eslintrc.json
 EOF
 
 
-# setup babel
-touch .babelrc
-cat <<EOF > .babelrc
+    # setup babel
+    touch .babelrc
+    cat <<EOF > .babelrc
 {
   "presets": ["es2015"],
   "plugins": ["transform-es2015-modules-commonjs"]
 }
 EOF
 
-# create src directories
-mkdir dist
-#touch src/hiromaily.es6.js
-
+    # create src directories
+    mkdir dist
+    #touch src/hiromaily.es6.js
+fi
 
 #####################################
 # Browserify (watchify) + babelify
@@ -196,5 +200,14 @@ EOF
     ## auto compile
     #gulp watch
     #gulp browserify
+
+fi
+
+
+#####################################
+# REACT
+#####################################
+if [ $REACT_FLG -eq 1 ]; then
+    npm install --save react react-dom
 
 fi

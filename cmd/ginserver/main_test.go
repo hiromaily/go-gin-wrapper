@@ -114,7 +114,7 @@ var loginTests = []struct {
 	//8.access by GET again
 	{"/login", http.StatusOK, "GET", nil, "/login", "", "", false, nil},
 	// access by POST with right data. expect to access next page.
-	{"/login", http.StatusFound, "POST", loginHeaders, "/accounts", "aaaa@test.jp", "password", true, redirectErr},
+	{"/login", http.StatusFound, "POST", loginHeaders, "/accounts/", "aaaa@test.jp", "password", true, redirectErr},
 }
 
 // Test Data for ajax API (When JWT is off)
@@ -209,8 +209,8 @@ func init() {
 	//flag.Parse()
 
 	//when changing loglevel
-	//lg.InitializeLog(lg.DEBUG_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
-	lg.InitializeLog(lg.INFO_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
+	lg.InitializeLog(lg.DEBUG_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
+	//lg.InitializeLog(lg.INFO_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
 	//lg.InitializeLog(lg.WARNING_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
 }
 
@@ -220,6 +220,9 @@ func setup() {
 
 	//overwrite mode
 	conf.GetConf().Auth.Jwt.Mode = uint8(*authMode)
+
+	//Referer for test( set this on header automatically)
+	refererLogin["Referer"] = fmt.Sprintf("http://%s:%d/login", conf.GetConf().Server.Host, conf.GetConf().Server.Port)
 
 	//auth settings
 	initAuth()

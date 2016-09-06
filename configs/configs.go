@@ -17,7 +17,7 @@ var tomlFileName string = "./configs/settings.toml"
 
 type Config struct {
 	Environment string
-	Server      ServerConfig
+	Server      *ServerConfig
 	Proxy       ProxyConfig
 	Auth        *AuthConfig
 	MySQL       *MySQLConfig
@@ -31,7 +31,6 @@ type ServerConfig struct {
 	Scheme    string          `toml:"scheme"`
 	Host      string          `toml:"host"`
 	Port      int             `toml:"port"`
-	Num       int             `toml:"num"`
 	Docs      DocsConfig      `toml:"docs"`
 	Log       LogConfig       `toml:"log"`
 	Session   SessionConfig   `toml:"session"`
@@ -66,10 +65,11 @@ type ProxyConfig struct {
 }
 
 type ProxyServerConfig struct {
-	Scheme string    `toml:"scheme"`
-	Host   string    `toml:"host"`
-	Port   int       `toml:"port"`
-	Log    LogConfig `toml:"log"`
+	Scheme  string    `toml:"scheme"`
+	Host    string    `toml:"host"`
+	Port    int       `toml:"port"`
+	WebPort []int     `toml:"web_port"`
+	Log     LogConfig `toml:"log"`
 }
 
 type AuthConfig struct {

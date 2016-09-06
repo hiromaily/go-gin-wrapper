@@ -49,9 +49,6 @@ func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []st
 	gURL := "/oauth2/google/signin"
 	fURL := "/oauth2/facebook/signin"
 
-	//when crossing request, context data can't be left.
-	//c.Set("getlogin", "xxx")
-
 	if msg == "" {
 		msg = "Enter Details to Login!!"
 	}
@@ -142,7 +139,7 @@ func LoginPostAction(c *gin.Context) {
 	//Change method POST to GET
 	//Redirect[GET]
 	//Status code 307 can't change post to get, 302 is suitable
-	c.Redirect(http.StatusFound, "/accounts")
+	c.Redirect(http.StatusFound, "/accounts/")
 
 	return
 }

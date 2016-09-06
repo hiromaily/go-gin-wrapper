@@ -13,132 +13,34 @@ import (
 	"strings"
 )
 
-//TODO: it's not finished yet.
-func CheckHttpRefererAndCSRF() gin.HandlerFunc {
+//TODO:skip static files like (jpg, gif, png, js, css, woff)
+
+//-----------------------------------------------------------------------------
+// Common
+//-----------------------------------------------------------------------------
+//Reject specific IP.
+//TODO: working in progress yet.
+//TODO: it reject all without reverse　proxy ip address.
+// Check registered IP address to reject
+func RejectSpecificIp() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		lg.Info("[CheckHttpRefererAndCSRF]")
-		//Referer
-		url := hh.GetUrl(c)
-		//get referer data mapping table using url (map[string])
-		if refUrl, ok := RefererUrls[url]; ok {
-			//Check Referer
-			if !hh.IsRefererHostValid(c, refUrl) {
-				c.Next()
+		if hh.IsStaticFile(c) {
+			c.Next()
+			return
+		}
+		lg.Info("[RejectSpecificIp]")
+
+		ip := c.ClientIP()
+		//proxy
+		if conf.GetConf().Proxy.Mode != 0 {
+			if conf.GetConf().Proxy.Server.Host != ip {
+				c.AbortWithStatus(403)
 				return
 			}
 		}
-
-		//CSRF
-		sess.IsTokenSessionValid(c, c.PostForm("gintoken"))
-		c.Next()
-	}
-}
-
-//Check Http Referer.
-//TODO: it's not checked yet if it work well or not.
-func CheckHttpReferer() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		lg.Info("[heckHttpReferer]")
-		url := hh.GetUrl(c)
-		//get referer data mapping table using url (map[string])
-		if refUrl, ok := RefererUrls[url]; ok {
-			//Check Referer
-			hh.IsRefererHostValid(c, refUrl)
-		}
-		c.Next()
-	}
-}
-
-//TODO: it's not finished yet.
-func CheckCSRF() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		lg.Info("[CheckCSRF]")
-		sess.IsTokenSessionValid(c, c.PostForm("gintoken"))
-		c.Next()
-	}
-}
-
-//Check Http Header for Ajax request. (For REST)
-func CheckHttpHeader() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		lg.Info("[CheckHttpHeader]")
-
-		apiConf := conf.GetConf().Auth.Api
-
-		lg.Debugf("[Request Header]\n%#v\n", c.Request.Header)
-		lg.Debugf("[Request Form]\n%#v\n", c.Request.Form)
-		lg.Debugf("[Request Body]\n%#v\n", c.Request.Body)
-		lg.Debugf("c.ClientIP() %s", c.ClientIP())
-
-		//IsAjax := c.Request.Header.Get("X-Requested-With")
-		//lg.Debugf("[X-Requested-With] %s", IsAjax)
-
-		//IsKey := c.Request.Header.Get("X-Custom-Header-Gin")
-		//lg.Debugf("[X-Custom-Header-Gin] %s", IsKey)
-
-		IsKey := c.Request.Header.Get(apiConf.Header)
-		lg.Debugf("[%s] %s", apiConf.Header, IsKey)
-
-		IsContentType := c.Request.Header.Get("Content-Type")
-		lg.Debugf("[Content-Type] %s", IsContentType)
-
-		//TODO:if no Content-Type, how sould be handled.
-
-		//check
-		//if IsXHR(c) || IsKey != "key" || IsContentType != "application/json" {
-		//if IsXHR(c) && IsKey != "key" {
-		if (apiConf.Ajax && !IsXHR(c)) || IsKey != apiConf.Key {
-			//error
-			c.AbortWithStatus(400)
-			return
-		}
-
-		//Context Meta Data
-		//SetMetaData(c)
-
-		c.Next()
-	}
-}
-
-func CheckJWT() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		lg.Info("[CheckJWT]")
-
-		var err error
-
-		IsAuth := c.Request.Header.Get("Authorization")
-		if IsAuth != "" {
-			aAry := strings.Split(IsAuth, " ")
-			if len(aAry) != 2 {
-				err = errors.New("Authorization header is invalid")
-			} else {
-				if aAry[0] != "Bearer" {
-					err = errors.New("Authorization header is invalid")
-				} else {
-					token := aAry[1]
-					err = jwt.JudgeJWT(token)
-				}
-			}
-		} else {
-			err = errors.New("Authorization header was missed.")
-		}
-
-		if err != nil {
-			c.AbortWithError(400, err)
-			return
-		}
-
-		c.Next()
-	}
-}
-
-//Update user session expire.
-//TODO:When session has already started, update session expired
-func UpdateUserSession() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if bRet, uid := sess.IsLogin(c); bRet {
-			sess.SetUserSession(c, uid)
-		}
+		//if ip != "127.0.0.1" {
+		//	c.AbortWithStatus(403)
+		//}
 		c.Next()
 	}
 }
@@ -146,6 +48,10 @@ func UpdateUserSession() gin.HandlerFunc {
 //Set Meta Data
 func SetMetaData() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if hh.IsStaticFile(c) {
+			c.Next()
+			return
+		}
 		lg.Info("[SetMetaData]")
 
 		//Context Meta Data
@@ -195,12 +101,36 @@ func SetMetaData() gin.HandlerFunc {
 	}
 }
 
+//Update user session expire.
+//TODO:When session has already started, update session expired
+func UpdateUserSession() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if hh.IsStaticFile(c) {
+			c.Next()
+			return
+		}
+		lg.Info("[UpdateUserSession]")
+		if bRet, uid := sess.IsLogin(c); bRet {
+			sess.SetUserSession(c, uid)
+		}
+		c.Next()
+	}
+}
+
 //After request, handle aborted code or 500 error.
 //When 404 or 405 error occurred, response already been set in controllers/errors/errors.go
 func GlobalRecover() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func(c *gin.Context) {
+			if hh.IsStaticFile(c) {
+				c.Next()
+				return
+			}
 			lg.Info("[GlobalRecover] defer func()")
+
+			//when crossing request, context data can't be left.
+			//c.Set("skipMiddleWare", "1")
+
 			var errMsg string
 
 			refUrl := "/"
@@ -285,24 +215,50 @@ func GlobalRecover() gin.HandlerFunc {
 	}
 }
 
-//Reject specific IP.
-//TODO: working in progress yet.
-//TODO: it reject all without reverse　proxy ip address.
-//TODO:check registered IP address to reject
-func RejectSpecificIp() gin.HandlerFunc {
+//-----------------------------------------------------------------------------
+// Respective
+//-----------------------------------------------------------------------------
+//TODO: it's not finished yet.
+func CheckHttpRefererAndCSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		lg.Info("[RejectSpecificIp]")
-		ip := c.ClientIP()
-		//proxy
-		if conf.GetConf().Proxy.Mode != 0 {
-			if conf.GetConf().Proxy.Server.Host != ip {
-				c.AbortWithStatus(403)
+		lg.Info("[CheckHttpRefererAndCSRF]")
+		//Referer
+		url := hh.GetUrl(c)
+		//get referer data mapping table using url (map[string])
+		if refUrl, ok := RefererUrls[url]; ok {
+			//Check Referer
+			if !hh.IsRefererHostValid(c, refUrl) {
+				c.Next()
 				return
 			}
 		}
-		//if ip != "127.0.0.1" {
-		//	c.AbortWithStatus(403)
-		//}
+
+		//CSRF
+		sess.IsTokenSessionValid(c, c.PostForm("gintoken"))
+		c.Next()
+	}
+}
+
+//Check Http Referer.
+//TODO: it's not checked yet if it work well or not.
+func CheckHttpReferer() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		lg.Info("[heckHttpReferer]")
+		url := hh.GetUrl(c)
+		//get referer data mapping table using url (map[string])
+		if refUrl, ok := RefererUrls[url]; ok {
+			//Check Referer
+			hh.IsRefererHostValid(c, refUrl)
+		}
+		c.Next()
+	}
+}
+
+//TODO: it's not finished yet.
+func CheckCSRF() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		lg.Info("[CheckCSRF]")
+		sess.IsTokenSessionValid(c, c.PostForm("gintoken"))
 		c.Next()
 	}
 }
@@ -321,6 +277,86 @@ func RejectNonHTTPS() gin.HandlerFunc {
 	}
 }
 
+//-----------------------------------------------------------------------------
+// For Web API
+//-----------------------------------------------------------------------------
+//Check Http Header for Ajax request. (For REST)
+func CheckHttpHeader() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		lg.Info("[CheckHttpHeader]")
+
+		apiConf := conf.GetConf().Auth.Api
+
+		lg.Debugf("[Request Header]\n%#v\n", c.Request.Header)
+		lg.Debugf("[Request Form]\n%#v\n", c.Request.Form)
+		lg.Debugf("[Request Body]\n%#v\n", c.Request.Body)
+		lg.Debugf("c.ClientIP() %s", c.ClientIP())
+
+		//IsAjax := c.Request.Header.Get("X-Requested-With")
+		//lg.Debugf("[X-Requested-With] %s", IsAjax)
+
+		//IsKey := c.Request.Header.Get("X-Custom-Header-Gin")
+		//lg.Debugf("[X-Custom-Header-Gin] %s", IsKey)
+
+		IsKey := c.Request.Header.Get(apiConf.Header)
+		lg.Debugf("[%s] %s", apiConf.Header, IsKey)
+
+		IsContentType := c.Request.Header.Get("Content-Type")
+		lg.Debugf("[Content-Type] %s", IsContentType)
+
+		//TODO:if no Content-Type, how sould be handled.
+
+		//check
+		//if IsXHR(c) || IsKey != "key" || IsContentType != "application/json" {
+		//if IsXHR(c) && IsKey != "key" {
+		if (apiConf.Ajax && !IsXHR(c)) || IsKey != apiConf.Key {
+			//error
+			c.AbortWithStatus(400)
+			return
+		}
+
+		//Context Meta Data
+		//SetMetaData(c)
+
+		c.Next()
+	}
+}
+
+func CheckJWT() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		lg.Info("[CheckJWT]")
+
+		var err error
+
+		IsAuth := c.Request.Header.Get("Authorization")
+		if IsAuth != "" {
+			aAry := strings.Split(IsAuth, " ")
+			if len(aAry) != 2 {
+				err = errors.New("Authorization header is invalid")
+			} else {
+				if aAry[0] != "Bearer" {
+					err = errors.New("Authorization header is invalid")
+				} else {
+					token := aAry[1]
+					err = jwt.JudgeJWT(token)
+				}
+			}
+		} else {
+			err = errors.New("Authorization header was missed.")
+		}
+
+		if err != nil {
+			c.AbortWithError(400, err)
+			return
+		}
+
+		c.Next()
+	}
+}
+
+//-----------------------------------------------------------------------------
+// functions
+//-----------------------------------------------------------------------------
 //Is this request Ajax or not
 func IsXHR(c *gin.Context) bool {
 	return strings.ToLower(c.Request.Header.Get("X-Requested-With")) == "xmlhttprequest"

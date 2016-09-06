@@ -19,15 +19,15 @@ import (
 	fl "github.com/hiromaily/golibs/files"
 	hrk "github.com/hiromaily/golibs/heroku"
 	lg "github.com/hiromaily/golibs/log"
-	//"github.com/hiromaily/golibs/signal"
-	u "github.com/hiromaily/golibs/utils"
+	"github.com/hiromaily/golibs/signal"
+	//u "github.com/hiromaily/golibs/utils"
 	"html/template"
-	"os"
 	"time"
 )
 
 var (
 	tomlPath = flag.String("f", "", "Toml file path")
+	portNum  = flag.Int("P", 0, "Port of server")
 )
 
 func init() {
@@ -53,10 +53,10 @@ func setupMain() {
 	initAuth()
 
 	// debug mode
-	//if conf.GetConf().Environment == "local" {
-	//	//signal
-	//	//go signal.StartSignal()
-	//}
+	if conf.GetConf().Environment == "local" {
+		//signal
+		go signal.StartSignal()
+	}
 	if conf.GetConf().Environment == "production" {
 		//For release
 		gin.SetMode(gin.ReleaseMode)
@@ -177,6 +177,7 @@ func initSession(r *gin.Engine) {
 
 //Global middleware
 func setMiddleWare(r *gin.Engine) {
+	//TODO:skip static files like (jpg, gif, png, js, css, woff)
 
 	r.Use(gin.Logger())
 
@@ -191,20 +192,22 @@ func setMiddleWare(r *gin.Engine) {
 	//when using load balancer or reverse proxy, set specific IP
 	r.Use(routes.RejectSpecificIp())
 
-	//auto session(expire) update
-	r.Use(routes.UpdateUserSession())
-
 	//meta data for each rogic
 	r.Use(routes.SetMetaData())
 
+	//auto session(expire) update
+	r.Use(routes.UpdateUserSession())
 }
 
 func getPort() (port int) {
-	if os.Getenv("PORT") == "" {
-		port = conf.GetConf().Server.Port
+	//For Heroku
+	//if os.Getenv("PORT") != "" {
+	if *portNum != 0 {
+		//port = u.Atoi(os.Getenv("PORT"))
+		port = *portNum
+		conf.GetConf().Server.Port = port
 	} else {
-		port = u.Atoi(os.Getenv("PORT"))
-		//conf.GetConfInstance().Server.Port = port
+		port = conf.GetConf().Server.Port
 	}
 	lg.Debugf("port:%d", port)
 
@@ -281,6 +284,7 @@ func loadStaticFiles(r *gin.Engine) {
 	//r.Static("/static", "/var/www")
 	r.Static("/statics", rootPath+"/statics")
 	r.Static("/assets", rootPath+"/statics/assets")
+	r.Static("/favicon.ico", rootPath+"/statics/favicon.ico")
 
 	// /when location of html as layer level is not top, be careful.
 	//r.Static("/admin/assets", "statics/assets")

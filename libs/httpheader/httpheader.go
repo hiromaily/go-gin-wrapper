@@ -7,6 +7,7 @@ import (
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	lg "github.com/hiromaily/golibs/log"
+	reg "github.com/hiromaily/golibs/regexp"
 )
 
 func getURL(scheme, host string, port int) string {
@@ -30,7 +31,7 @@ func IsRefererHostValid(c *gin.Context, pageFrom string) bool {
 	//default action
 	if url != c.Request.Referer() {
 		//Invalid access
-		lg.Debug("Referer is invalid.")
+		lg.Error("Referer is invalid.")
 
 		//token delete
 		sess.DelTokenSession(c)
@@ -64,6 +65,11 @@ func GetUrl(c *gin.Context) string {
 	// Path:"/login", RawPath:"", RawQuery:"", Fragment:""}
 	url := c.Request.URL
 	return url.Scheme + url.Host + url.Path
+}
+
+func IsStaticFile(c *gin.Context) bool {
+	url := GetUrl(c)
+	return reg.IsStaticFile(url)
 }
 
 //Get Proto
