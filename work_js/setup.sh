@@ -78,7 +78,7 @@ EOF
     touch .babelrc
     cat <<EOF > .babelrc
 {
-  "presets": ["es2015"],
+  "presets": ["react", "es2015"],
   "plugins": ["transform-es2015-modules-commonjs"]
 }
 EOF
@@ -208,6 +208,8 @@ fi
 # REACT
 #####################################
 if [ $REACT_FLG -eq 1 ]; then
+    npm install -g react-tools
     npm install --save react react-dom
-
+    #npm install --save react-redux
+    npm install --save-dev babel-preset-react
 fi
