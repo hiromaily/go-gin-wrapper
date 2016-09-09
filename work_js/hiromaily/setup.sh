@@ -29,6 +29,7 @@ if [ $EXEC_ONCE -eq 1 ]; then
 
     # eslint
     npm install -g eslint
+    npm install -g eslint-plugin-react
     #eslint -v
 fi
 

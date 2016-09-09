@@ -1,6 +1,6 @@
 {
     "extends": ["eslint:recommended"],
-    "plugins": [],
+    "plugins": ["react"],
     "parserOptions": {
         "ecmaVersion": 6,
         "sourceType": "module",
