@@ -140,7 +140,7 @@ func ListGetAction(c *gin.Context) {
 	}
 
 	//Make json for response and return
-	jslib.RtnUserJson(c, 0, js.CreateUserListJSON(users))
+	jslib.RtnUserJSON(c, 0, js.CreateUserListJSON(users))
 }
 
 // InsertPostAction is register for new user [POST]
@@ -162,7 +162,7 @@ func InsertPostAction(c *gin.Context) {
 		return
 	}
 
-	jslib.RtnUserJson(c, 0, js.CreateUserJSON(id))
+	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(id))
 	return
 }
 
@@ -188,9 +188,9 @@ func GetAction(c *gin.Context) {
 
 	//Make json for response and return
 	if b {
-		jslib.RtnUserJson(c, 0, js.CreateUserListJSON([]models.UsersSL{user}))
+		jslib.RtnUserJSON(c, 0, js.CreateUserListJSON([]models.UsersSL{user}))
 	} else {
-		jslib.RtnUserJson(c, 0, js.CreateUserListJSON(nil))
+		jslib.RtnUserJSON(c, 0, js.CreateUserListJSON(nil))
 	}
 }
 
@@ -216,7 +216,7 @@ func PutAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.RtnUserJson(c, 0, js.CreateUserJSON(0))
+	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(0))
 	return
 }
 
@@ -241,6 +241,6 @@ func DeleteAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.RtnUserJson(c, 0, js.CreateUserJSON(0))
+	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(0))
 	return
 }

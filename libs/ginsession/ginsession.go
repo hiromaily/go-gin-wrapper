@@ -8,9 +8,7 @@ import (
 	lg "github.com/hiromaily/golibs/log"
 )
 
-//var sessionKey string = "secret123451234"
-
-//TODO:setting to toml
+// SetSession is for session
 func SetSession(r *gin.Engine, host, pass string) {
 
 	var store sessions.RedisStore
@@ -42,17 +40,17 @@ func SetSession(r *gin.Engine, host, pass string) {
 	r.Use(sessions.Sessions(ses.Name, store))
 }
 
-//Set User
-func SetUserSession(c *gin.Context, userId int) {
+// SetUserSession is set user session data
+func SetUserSession(c *gin.Context, userID int) {
 	session := sessions.Default(c)
 	v := session.Get("uid")
 	if v == nil {
-		session.Set("uid", userId)
+		session.Set("uid", userID)
 		session.Save()
 	}
 }
 
-//Is Login
+// IsLogin is whether user have already loged in or not.
 func IsLogin(c *gin.Context) (bRet bool, uid int) {
 	session := sessions.Default(c)
 	v := session.Get("uid")
@@ -67,27 +65,28 @@ func IsLogin(c *gin.Context) (bRet bool, uid int) {
 	return
 }
 
+// Logout is to clear session
 func Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
 }
 
-//Set Token
+//SetTokenSession is to set token
 func SetTokenSession(c *gin.Context, token string) {
 	session := sessions.Default(c)
 	session.Set("token", token)
 	session.Save()
 }
 
-//Del Token
+// DelTokenSession is to delete token
 func DelTokenSession(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Delete("token")
 	session.Save()
 }
 
-//Get Token
+// GetTokenSession is to get token
 func GetTokenSession(c *gin.Context) string {
 	session := sessions.Default(c)
 	v := session.Get("token")
@@ -97,7 +96,7 @@ func GetTokenSession(c *gin.Context) string {
 	return v.(string)
 }
 
-//Check Token is valid
+// IsTokenSessionValid is whether check token is valid or not
 func IsTokenSessionValid(c *gin.Context, token string) bool {
 	strErr := ""
 
@@ -123,10 +122,10 @@ func IsTokenSessionValid(c *gin.Context, token string) bool {
 	return false
 }
 
-//Set Count
+// SetCountSession is for test (TODO:delete this func)
 func SetCountSession(c *gin.Context) {
 	session := sessions.Default(c)
-	var count int = 0
+	var count int
 	v := session.Get("count")
 	if v != nil {
 		count = v.(int) + 1

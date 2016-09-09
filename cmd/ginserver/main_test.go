@@ -219,7 +219,7 @@ func setup() {
 	initConf()
 
 	//overwrite mode
-	conf.GetConf().Auth.Jwt.Mode = uint8(*authMode)
+	conf.GetConf().Auth.JWT.Mode = uint8(*authMode)
 
 	//Referer for test( set this on header automatically)
 	refererLogin["Referer"] = fmt.Sprintf("http://%s:%d/login", conf.GetConf().Server.Host, conf.GetConf().Server.Port)
@@ -532,7 +532,7 @@ func TestLogin(t *testing.T) {
 // Get Request for Jwt API (Ajax)
 //-----------------------------------------------------------------------------
 func TestGetJwtAPIRequestOnTable(t *testing.T) {
-	if conf.GetConf().Auth.Jwt.Mode == 0 {
+	if conf.GetConf().Auth.JWT.Mode == 0 {
 		t.SkipNow()
 	}
 
@@ -603,7 +603,7 @@ func TestGetUserAPIRequestOnTable(t *testing.T) {
 	}
 
 	getAPITestsData := getUserAPITests
-	if conf.GetConf().Auth.Jwt.Mode != 0 {
+	if conf.GetConf().Auth.JWT.Mode != 0 {
 		//Auth is on
 		if jwtCode == "" {
 			getAPITestsData = getUserAPITests2

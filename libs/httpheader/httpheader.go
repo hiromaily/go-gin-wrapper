@@ -14,7 +14,7 @@ func getURL(scheme, host string, port int) string {
 	return fmt.Sprintf("%s://%s:%d", scheme, host, port)
 }
 
-//Check Referer for posted page
+// IsRefererHostValid is check referer for posted page
 func IsRefererHostValid(c *gin.Context, pageFrom string) bool {
 
 	srv := conf.GetConf().Server
@@ -43,20 +43,8 @@ func IsRefererHostValid(c *gin.Context, pageFrom string) bool {
 	return true
 }
 
-//Get URL
-/*
-type URL struct {
-	Scheme   string
-	Opaque   string    // encoded opaque data
-	User     *Userinfo // username and password information
-	Host     string    // host or host:port
-	Path     string
-	RawPath  string // encoded path hint (Go 1.5 and later only; see EscapedPath method)
-	RawQuery string // encoded query values, without '?'
-	Fragment string // fragment for references, without '#'
-}
-*/
-func GetUrl(c *gin.Context) string {
+// GetURL is to get request URL
+func GetURL(c *gin.Context) string {
 	//&url.URL{
 	// Scheme:"",
 	// Opaque:"",
@@ -67,18 +55,19 @@ func GetUrl(c *gin.Context) string {
 	return url.Scheme + url.Host + url.Path
 }
 
+// IsStaticFile is whether request url is for static file or golang page
 func IsStaticFile(c *gin.Context) bool {
-	url := GetUrl(c)
+	url := GetURL(c)
 	return reg.IsStaticFile(url)
 }
 
-//Get Proto
+// GetProto is to get protocol
 func GetProto(c *gin.Context) string {
 	//HTTP/1.1
 	return c.Request.Proto
 }
 
-//Set HTTP Request Header
+// SetRquestHeaderForSecurity is to set HTTP request header
 func SetRquestHeaderForSecurity(c *gin.Context) {
 	c.Request.Header.Set("X-Content-Type-Options", "nosniff")
 	c.Request.Header.Set("X-XSS-Protection", "1, mode=block")
@@ -87,7 +76,7 @@ func SetRquestHeaderForSecurity(c *gin.Context) {
 	//c.Request.Header.Set("Strict-Transport-Security", "max-age=15768000")
 }
 
-//Set HTTP Response Header
+// SetResponseHeaderForSecurity is to set HTTP response header
 func SetResponseHeaderForSecurity(c *gin.Context) {
 	//http://qiita.com/roothybrid7/items/34578037d883c9a99ca8
 
@@ -101,7 +90,7 @@ func SetResponseHeaderForSecurity(c *gin.Context) {
 	//c.Writer.WriteString()
 }
 
-//Set HTTP Response Header [???]
+// SetResponseHeader is set HTTP response header (TODO: work in progress)
 func SetResponseHeader(c *gin.Context, data []map[string]string) {
 	for _, header := range data {
 		for key, val := range header {

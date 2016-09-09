@@ -10,15 +10,18 @@ import (
 	"time"
 )
 
-const TOKEN_SALT string = "goginwebservertoken"
+//TODO: set on TOML
+// tokenSalt is key for md5 encryption
+const tokenSalt string = "goginwebservertoken"
 
+// CreateToken is to create token string
 func CreateToken() string {
 	lg.Info("[CreateToken]")
 	//TODO: it may be ok to return just session key.
 	h := md5.New()
 
 	io.WriteString(h, strconv.FormatInt(time.Now().Unix(), 10))
-	io.WriteString(h, TOKEN_SALT)
+	io.WriteString(h, tokenSalt)
 
 	token := fmt.Sprintf("%x", h.Sum(nil))
 

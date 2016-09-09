@@ -20,12 +20,12 @@ func debugContext(c *gin.Context) {
 	lg.Debugf("[c.Request.Body]: %#v \n", c.Request.Body)
 	lg.Debugf("[c.Request.URL]: %#v \n", c.Request.URL)
 	lg.Debugf("[c.Value(ajax)]: %s \n", c.Value("ajax"))
-	lg.Debugf("[hh.GetUrl(c)]: %s \n", hh.GetUrl(c))
+	lg.Debugf("[hh.GetUrl(c)]: %s \n", hh.GetURL(c))
 	lg.Debugf("[hh.GetProto(c)]: %s \n", hh.GetProto(c))
 }
 
 // response for Login Page
-func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []string) {
+func resLogin(c *gin.Context, input *login.Request, msg string, errors []string) {
 	//token
 	token := csrf.CreateToken()
 	sess.SetTokenSession(c, token)
@@ -40,7 +40,7 @@ func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []st
 
 	//it's better to not return nil
 	if input == nil {
-		input = &login.LoginRequest{}
+		input = &login.Request{}
 	}
 
 	//View
@@ -108,7 +108,7 @@ func LoginPostAction(c *gin.Context) {
 	//debugContext(c)
 
 	//check login
-	userID, posted, errs := login.CheckLoginHTML(c)
+	userID, posted, errs := login.CheckLoginOnHTML(c)
 	if errs != nil {
 		resLogin(c, posted, "", errs)
 		return

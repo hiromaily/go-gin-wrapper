@@ -17,7 +17,7 @@ func IndexPostAction(c *gin.Context) {
 
 	//login
 	//check login
-	userID, mail, err := login.CheckLoginAPI(c)
+	userID, mail, err := login.CheckLoginOnAPI(c)
 	if err != nil {
 		c.AbortWithError(400, err)
 		return
@@ -32,6 +32,6 @@ func IndexPostAction(c *gin.Context) {
 	lg.Debugf("token: %s", token)
 
 	//Make json for response and return
-	jslib.RtnUserJson(c, 0, js.CreateJWTJson(token))
+	jslib.RtnUserJSON(c, 0, js.CreateJWTJson(token))
 	return
 }

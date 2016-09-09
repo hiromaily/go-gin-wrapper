@@ -7,7 +7,8 @@ import (
 	"net/http"
 )
 
-func RtnUserJson(c *gin.Context, code int, obj interface{}) {
+// RtnUserJSON is Return user json
+func RtnUserJSON(c *gin.Context, code int, obj interface{}) {
 	//Set Header
 	hh.SetResponseHeaderForSecurity(c)
 

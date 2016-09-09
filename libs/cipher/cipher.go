@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// Setup is for setup
 func Setup() {
 	size := 16
 	key := os.Getenv("ENC_KEY")

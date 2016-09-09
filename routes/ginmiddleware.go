@@ -223,7 +223,7 @@ func CheckHttpRefererAndCSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHttpRefererAndCSRF]")
 		//Referer
-		url := hh.GetUrl(c)
+		url := hh.GetURL(c)
 		//get referer data mapping table using url (map[string])
 		if refUrl, ok := RefererUrls[url]; ok {
 			//Check Referer
@@ -244,7 +244,7 @@ func CheckHttpRefererAndCSRF() gin.HandlerFunc {
 func CheckHttpReferer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[heckHttpReferer]")
-		url := hh.GetUrl(c)
+		url := hh.GetURL(c)
 		//get referer data mapping table using url (map[string])
 		if refUrl, ok := RefererUrls[url]; ok {
 			//Check Referer

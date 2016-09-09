@@ -8,12 +8,14 @@ import (
 	valid "github.com/hiromaily/golibs/validator"
 )
 
-type LoginRequest struct {
+// Request is request structure for login
+type Request struct {
 	Email string `valid:"nonempty,email,min=5,max=40" field:"email" dispName:"E-Mail"`
 	Pass  string `valid:"nonempty,min=8,max=20" field:"pass" dispName:"Password"`
 }
 
-//TODO: this should be defined as something common library.
+// ErrFmt is error message for validation package
+// TODO: Should this be defined as something common library?
 var ErrFmt = map[string]string{
 	"nonempty": "Empty is not allowed on %s",
 	"email":    "Format of %s is invalid",
@@ -22,9 +24,10 @@ var ErrFmt = map[string]string{
 	"max":      "At a maximum %s of characters is allowed on %s",
 }
 
-func CheckLoginHTML(c *gin.Context) (int, *LoginRequest, []string) {
+// CheckLoginOnHTML is check login on html page.
+func CheckLoginOnHTML(c *gin.Context) (int, *Request, []string) {
 	//Get Post Parameters
-	posted := &LoginRequest{
+	posted := &Request{
 		Email: c.PostForm("inputEmail"),
 		Pass:  c.PostForm("inputPassword"),
 	}
@@ -41,7 +44,7 @@ func CheckLoginHTML(c *gin.Context) (int, *LoginRequest, []string) {
 	}
 
 	//Check inputed mail and password
-	userId, err := models.GetDB().IsUserEmail(posted.Email, posted.Pass)
+	userID, err := models.GetDB().IsUserEmail(posted.Email, posted.Pass)
 	if err != nil {
 		errs := []string{"E-mail or Password is made a mistake."}
 		lg.Debugf("login error: %#v", errs)
@@ -50,11 +53,12 @@ func CheckLoginHTML(c *gin.Context) (int, *LoginRequest, []string) {
 		//resLogin(c, posted, "", errs)
 		return 0, posted, errs
 	}
-	return userId, nil, nil
+	return userID, nil, nil
 }
 
-func CheckLoginAPI(c *gin.Context) (int, string, error) {
-	posted := &LoginRequest{
+// CheckLoginOnAPI is check login on API
+func CheckLoginOnAPI(c *gin.Context) (int, string, error) {
+	posted := &Request{
 		Email: c.PostForm("inputEmail"),
 		Pass:  c.PostForm("inputPassword"),
 	}
@@ -66,9 +70,9 @@ func CheckLoginAPI(c *gin.Context) (int, string, error) {
 	}
 
 	//Check inputed mail and password
-	userId, err := models.GetDB().IsUserEmail(posted.Email, posted.Pass)
+	userID, err := models.GetDB().IsUserEmail(posted.Email, posted.Pass)
 	if err != nil {
 		return 0, "", errors.New("login error")
 	}
-	return userId, c.PostForm("inputEmail"), nil
+	return userID, c.PostForm("inputEmail"), nil
 }
