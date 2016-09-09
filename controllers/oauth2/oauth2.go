@@ -246,11 +246,11 @@ func registerOrLogin(c *gin.Context, mode string, uA *models.UserAuth, user *mod
 	} else {
 		lg.Debug("There is user: %v", uA)
 		//oauth_flg //0, 1:google, 2:facebook
-		if uA.Id != 0 && uA.Auth == mode {
+		if uA.ID != 0 && uA.Auth == mode {
 			lg.Debug("login proceduer")
 			//1:existing user (google) -> login procedure
 			//Session
-			sess.SetUserSession(c, uA.Id)
+			sess.SetUserSession(c, uA.ID)
 		} else {
 			lg.Debug("redirect login page. user is already exsisting.")
 			//2:existing user (no auth or another auth) -> err
@@ -303,7 +303,7 @@ func CallbackGoogleAction(c *gin.Context) {
 
 	//4.check Email
 	lg.Debugf("email is %s", resGoogle.Email)
-	userAuth, err := models.GetDB().OauthLogin(resGoogle.Email)
+	userAuth, err := models.GetDB().OAuth2Login(resGoogle.Email)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
@@ -315,7 +315,7 @@ func CallbackGoogleAction(c *gin.Context) {
 		LastName:  resGoogle.LastName,
 		Email:     resGoogle.Email,
 		Password:  "google-password",
-		Oauth2Flg: mode,
+		OAuth2Flg: mode,
 	}
 	registerOrLogin(c, mode, userAuth, user)
 
@@ -357,7 +357,7 @@ func CallbackFacebookAction(c *gin.Context) {
 
 	//4.check Email
 	lg.Debugf("email is %s", resFacebook.Email)
-	userAuth, err := models.GetDB().OauthLogin(resFacebook.Email)
+	userAuth, err := models.GetDB().OAuth2Login(resFacebook.Email)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
@@ -369,7 +369,7 @@ func CallbackFacebookAction(c *gin.Context) {
 		LastName:  resFacebook.LastName,
 		Email:     resFacebook.Email,
 		Password:  "facebook-password",
-		Oauth2Flg: mode,
+		OAuth2Flg: mode,
 	}
 	registerOrLogin(c, mode, userAuth, user)
 

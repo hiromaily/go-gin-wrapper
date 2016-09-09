@@ -30,7 +30,7 @@ HEROKU_MODE=0      #0:off, 1:deploy server, 2:exec test on heroku
 DOCKER_MODE=0      #0:off, 1:run server,    2:exec test on docker
 
 GO_GET=0
-GO_LINT=0
+GO_LINT=1
 RESET_DB=0
 
 # when using go 1.7 for the first time, delete all inside pkg directory and run go install.

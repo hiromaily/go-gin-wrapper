@@ -19,14 +19,14 @@ import (
 	"net/http"
 )
 
-//RefererUrl key->request url, value->refer url
-var RefererUrls = map[string]string{
+// RefererURLs key->request url, value->refer url
+var RefererURLs = map[string]string{
 	"/login": "login",
 	"/user":  "user",
 }
 
-//For HTTP
-func SetHTTPUrls(r *gin.Engine) {
+// SetURLOnHTTP is for HTTP
+func SetURLOnHTTP(r *gin.Engine) {
 	//m := melody.New()
 
 	/******************************************************************************/
@@ -45,7 +45,7 @@ func SetHTTPUrls(r *gin.Engine) {
 
 	//Login
 	r.GET("/login", bases.LoginGetAction)
-	r.POST("/login", CheckHttpRefererAndCSRF(), bases.LoginPostAction)
+	r.POST("/login", CheckHTTPRefererAndCSRF(), bases.LoginPostAction)
 
 	//Loout
 	r.PUT("/logout", bases.LogoutPutAction)   //For Ajax
@@ -138,7 +138,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	//-----------------------
 	// JWT
 	//-----------------------
-	jw := r.Group("/api/jwt", CheckHttpHeader())
+	jw := r.Group("/api/jwt", CheckHTTPHeader())
 	{
 		jw.POST("", jwt.IndexPostAction) //jwt end point
 	}
@@ -150,7 +150,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	// if it's used as middle ware like as below.
 	//  r.Use(routes.CheckHttpHeader())
 	//  it let us faster to develop instead of a bit less performance.
-	var handlers []gin.HandlerFunc = []gin.HandlerFunc{CheckHttpHeader()}
+	var handlers = []gin.HandlerFunc{CheckHTTPHeader()}
 	if conf.GetConf().Auth.JWT.Mode != 0 {
 		handlers = append(handlers, CheckJWT())
 	}
@@ -169,7 +169,8 @@ func SetHTTPUrls(r *gin.Engine) {
 	//Or use parameter `_method`
 }
 
-//For HTTPS
-func SetHTTPSUrls(r *gin.Engine) {
+// SetURLOnHTTPS is for HTTPS
+// TODO: it may not be necessary
+func SetURLOnHTTPS(r *gin.Engine) {
 
 }

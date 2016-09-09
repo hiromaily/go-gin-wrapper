@@ -18,11 +18,11 @@ import (
 //-----------------------------------------------------------------------------
 // Common
 //-----------------------------------------------------------------------------
-//Reject specific IP.
-//TODO: working in progress yet.
-//TODO: it reject all without reverse　proxy ip address.
-// Check registered IP address to reject
-func RejectSpecificIp() gin.HandlerFunc {
+
+// RejectSpecificIP is to check registered IP address to reject
+// TODO: working in progress yet.
+// TODO: it reject all without reverse　proxy ip address.
+func RejectSpecificIP() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if hh.IsStaticFile(c) {
 			c.Next()
@@ -45,7 +45,7 @@ func RejectSpecificIp() gin.HandlerFunc {
 	}
 }
 
-//Set Meta Data
+// SetMetaData is to set meta data
 func SetMetaData() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if hh.IsStaticFile(c) {
@@ -78,14 +78,14 @@ func SetMetaData() gin.HandlerFunc {
 		}
 
 		//Response Data
-		if IsAcceptHeaderJson(c) {
+		if IsAcceptHeaderJSON(c) {
 			c.Set("responseData", "json")
 		} else {
 			c.Set("responseData", "html")
 		}
 
 		//Requested Data
-		if IsContentTypeJson(c) {
+		if IsContentTypeJSON(c) {
 			c.Set("requestData", "json")
 		} else {
 			c.Set("requestData", "data")
@@ -101,7 +101,7 @@ func SetMetaData() gin.HandlerFunc {
 	}
 }
 
-//Update user session expire.
+// UpdateUserSession is update user session expire
 //TODO:When session has already started, update session expired
 func UpdateUserSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -117,8 +117,8 @@ func UpdateUserSession() gin.HandlerFunc {
 	}
 }
 
-//After request, handle aborted code or 500 error.
-//When 404 or 405 error occurred, response already been set in controllers/errors/errors.go
+// GlobalRecover is after request, handle aborted code or 500 error.
+// When 404 or 405 error occurred, response already been set in controllers/errors/errors.go
 func GlobalRecover() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func(c *gin.Context) {
@@ -133,9 +133,9 @@ func GlobalRecover() gin.HandlerFunc {
 
 			var errMsg string
 
-			refUrl := "/"
+			refURL := "/"
 			if c.Request.Header.Get("Referer") != "" {
-				refUrl = c.Request.Header.Get("Referer")
+				refURL = c.Request.Header.Get("Referer")
 			}
 
 			if c.IsAborted() {
@@ -180,7 +180,7 @@ func GlobalRecover() gin.HandlerFunc {
 					c.HTML(c.Writer.Status(), "pages/errors/error.tmpl", gin.H{
 						"code":    fmt.Sprintf("%d", c.Writer.Status()),
 						"message": errMsg,
-						"url":     refUrl,
+						"url":     refURL,
 					})
 				}
 				return
@@ -202,7 +202,7 @@ func GlobalRecover() gin.HandlerFunc {
 						c.HTML(http.StatusInternalServerError, "pages/errors/error.tmpl", gin.H{
 							"code":    "500",
 							"message": rec,
-							"url":     refUrl,
+							"url":     refURL,
 						})
 					}
 					return
@@ -218,16 +218,18 @@ func GlobalRecover() gin.HandlerFunc {
 //-----------------------------------------------------------------------------
 // Respective
 //-----------------------------------------------------------------------------
-//TODO: it's not finished yet.
-func CheckHttpRefererAndCSRF() gin.HandlerFunc {
+
+// CheckHTTPRefererAndCSRF is to check referer and CSRF token
+// TODO: it's not finished yet.
+func CheckHTTPRefererAndCSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		lg.Info("[CheckHttpRefererAndCSRF]")
+		lg.Info("[CheckHTTPRefererAndCSRF]")
 		//Referer
 		url := hh.GetURL(c)
 		//get referer data mapping table using url (map[string])
-		if refUrl, ok := RefererUrls[url]; ok {
+		if refURL, ok := RefererURLs[url]; ok {
 			//Check Referer
-			if !hh.IsRefererHostValid(c, refUrl) {
+			if !hh.IsRefererHostValid(c, refURL) {
 				c.Next()
 				return
 			}
@@ -239,22 +241,23 @@ func CheckHttpRefererAndCSRF() gin.HandlerFunc {
 	}
 }
 
-//Check Http Referer.
-//TODO: it's not checked yet if it work well or not.
-func CheckHttpReferer() gin.HandlerFunc {
+// CheckHTTPReferer is to check HTTP Referer.
+// TODO: it's not checked yet if it work well or not.
+func CheckHTTPReferer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[heckHttpReferer]")
 		url := hh.GetURL(c)
 		//get referer data mapping table using url (map[string])
-		if refUrl, ok := RefererUrls[url]; ok {
+		if refURL, ok := RefererURLs[url]; ok {
 			//Check Referer
-			hh.IsRefererHostValid(c, refUrl)
+			hh.IsRefererHostValid(c, refURL)
 		}
 		c.Next()
 	}
 }
 
-//TODO: it's not finished yet.
+// CheckCSRF is to check CSRF token
+// TODO: it's not finished yet.
 func CheckCSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckCSRF]")
@@ -263,8 +266,8 @@ func CheckCSRF() gin.HandlerFunc {
 	}
 }
 
-//Reject non HTTPS access.
-//TODO: it's not fixed yet.
+// RejectNonHTTPS is to reject non HTTPS access.
+// TODO: it's not fixed yet.
 func RejectNonHTTPS() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[RejectNonHTTPS]")
@@ -280,8 +283,9 @@ func RejectNonHTTPS() gin.HandlerFunc {
 //-----------------------------------------------------------------------------
 // For Web API
 //-----------------------------------------------------------------------------
-//Check Http Header for Ajax request. (For REST)
-func CheckHttpHeader() gin.HandlerFunc {
+
+// CheckHTTPHeader is to check HTTP Header for Ajax request. (For REST)
+func CheckHTTPHeader() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHttpHeader]")
 
@@ -322,6 +326,7 @@ func CheckHttpHeader() gin.HandlerFunc {
 	}
 }
 
+// CheckJWT is to check JWT token code
 func CheckJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckJWT]")
@@ -357,24 +362,26 @@ func CheckJWT() gin.HandlerFunc {
 //-----------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------
-//Is this request Ajax or not
+
+// IsXHR is whether request is Ajax or not
 func IsXHR(c *gin.Context) bool {
 	return strings.ToLower(c.Request.Header.Get("X-Requested-With")) == "xmlhttprequest"
 }
 
-//Is this request to require JSON or not
-func IsAcceptHeaderJson(c *gin.Context) bool {
+// IsAcceptHeaderJSON is whether request require JSON or not
+func IsAcceptHeaderJSON(c *gin.Context) bool {
 	accept := strings.ToLower(c.Request.Header.Get("Accept"))
 	return strings.Index(accept, "application/json") != -1
 }
 
-//Is this request including JSON as parameter or not
-func IsContentTypeJson(c *gin.Context) bool {
+// IsContentTypeJSON is whether data format of request is JSON or not
+func IsContentTypeJSON(c *gin.Context) bool {
 	accept := strings.ToLower(c.Request.Header.Get("Content-Type"))
 	return strings.Index(accept, "application/json") != -1
 }
 
-//TODO:Get User Agent
+// GetUserAgent is get user agent
+// TODO: work in progress
 func GetUserAgent(c *gin.Context) string {
 	// "User-Agent":[]string{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36
 	// (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36"},
@@ -382,7 +389,8 @@ func GetUserAgent(c *gin.Context) string {
 	return tmpUserAgent
 }
 
-//Get Language As Top priority
+// GetLanguage is to get Language of top priority
+// TODO: work in progress
 func GetLanguage(c *gin.Context) string {
 	// "Accept-Language":[]string{"ja,en-US;q=0.8,en;q=0.6,de;q=0.4,nl;q=0.2"},
 	tmpLanguage := c.Request.Header.Get("Accept-Language")

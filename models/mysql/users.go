@@ -12,35 +12,39 @@ import (
 //Be careful when parsing is required on Date type
 // e.g. db, err := sql.Open("mysql", "root:@/?parseTime=true")
 // http://stackoverflow.com/questions/29341590/go-parse-time-from-database
+
+// Users is for t_users table structure. This is used on Insert, Update method.
 type Users struct {
-	Id        int    `column:"user_id" json:"id"`
+	ID        int    `column:"user_id" json:"id"`
 	FirstName string `column:"first_name" json:"firstName"`
 	LastName  string `column:"last_name" json:"lastName"`
 	Email     string `column:"email" json:"email"`
 	Password  string `column:"password" json:"password"`
-	Oauth2Flg string `column:"oauth2_flg" json:"oauth2_flg"`
+	OAuth2Flg string `column:"oauth2_flg" json:"oauth2_flg"`
 	//DeleteFlg string    `column:"delete_flg"       db:"delete_flg"`
 	//Created   time.Time `column:"create_datetime"  db:"create_datetime"`
 	Updated string `column:"update_datetime" json:"update"`
 }
 
+// UsersSL is for t_users table structure. This is used on Select method.
 type UsersSL struct {
-	Id        int    `column:"user_id" json:"id"`
+	ID        int    `column:"user_id" json:"id"`
 	FirstName string `column:"first_name" json:"firstName"`
 	LastName  string `column:"last_name" json:"lastName"`
 	Email     string `column:"email" json:"email"`
 	Updated   string `column:"update_datetime" json:"update"`
 }
 
+// UserAuth is response when OAuth2 login is used.
 type UserAuth struct {
-	Id   int
+	ID   int
 	Auth string
 }
 
-//User authorization when login
+// IsUserEmail is for User authorization when trying login
 func (us *Models) IsUserEmail(email string, password string) (int, error) {
 	type LoginUser struct {
-		Id       int
+		ID       int
 		Email    string
 		Password string
 	}
@@ -57,16 +61,17 @@ func (us *Models) IsUserEmail(email string, password string) (int, error) {
 
 	//no data
 	if !b {
-		return 0, fmt.Errorf("email may be wrong.")
+		return 0, fmt.Errorf("email may be wrong")
 	}
 
 	if user.Password != hs.GetMD5Plus(password, "") {
-		return 0, fmt.Errorf("password is invalid.")
+		return 0, fmt.Errorf("password is invalid")
 	}
-	return user.Id, nil
+	return user.ID, nil
 }
 
-func (us *Models) OauthLogin(email string) (*UserAuth, error) {
+// OAuth2Login is for OAuth2 login
+func (us *Models) OAuth2Login(email string) (*UserAuth, error) {
 	//0:no user -> register and login
 	//1:existing user (google) -> login
 	//2:existing user (no auth or another auth) -> err
@@ -89,7 +94,7 @@ func (us *Models) OauthLogin(email string) (*UserAuth, error) {
 
 }
 
-// Get User Ids
+// GetUserIds is to get user IDs
 func (us *Models) GetUserIds(users interface{}) error {
 	sql := "SELECT user_id FROM t_users WHERE delete_flg=?"
 
@@ -102,7 +107,7 @@ func (us *Models) GetUserIds(users interface{}) error {
 	return nil
 }
 
-// Get User List
+// GetUserList is to get user list
 func (us *Models) GetUserList(users interface{}, id string) (bool, error) {
 	//lg.Debug(mysql.ColumnForSQL(users))
 
@@ -131,23 +136,23 @@ func (us *Models) GetUserList(users interface{}, id string) (bool, error) {
 	return b, nil
 }
 
-// Insert User
+// InsertUser is to insert user
 func (us *Models) InsertUser(users *Users) (int64, error) {
 	lg.Debug(mysql.ColumnForSQL(users))
 
 	sql := "INSERT INTO t_users (first_name, last_name, email, password) VALUES (?,?,?,?)"
 	//sql = fmt.Sprintf(sql, mysql.ColumnForSQL(users))
-	if users.Oauth2Flg != "" {
+	if users.OAuth2Flg != "" {
 		sql := "INSERT INTO t_users (first_name, last_name, email, password, oauth2_flg) VALUES (?,?,?,?,?)"
 		//hash password
-		return us.Db.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""), users.Oauth2Flg)
+		return us.Db.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""), users.OAuth2Flg)
 	}
 
 	//hash password
 	return us.Db.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""))
 }
 
-// Update User
+// UpdateUser is to update user
 func (us *Models) UpdateUser(users *Users, id string) (int64, error) {
 	//lg.Debug(mysql.ColumnForSQL(users))
 
@@ -188,7 +193,7 @@ func (us *Models) UpdateUser(users *Users, id string) (int64, error) {
 	return us.Db.Exec(sql, vals...)
 }
 
-// Delete User
+// DeleteUser is to delete user
 func (us *Models) DeleteUser(id string) (int64, error) {
 	sql := "DELETE FROM t_users WHERE user_id=?"
 	return us.Db.Exec(sql, u.Atoi(id))

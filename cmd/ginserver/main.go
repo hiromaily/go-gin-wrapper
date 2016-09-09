@@ -190,7 +190,7 @@ func setMiddleWare(r *gin.Engine) {
 	//TODO:set ip to toml or redis server
 	//check ip address to refuse specific IP Address
 	//when using load balancer or reverse proxy, set specific IP
-	r.Use(routes.RejectSpecificIp())
+	r.Use(routes.RejectSpecificIP())
 
 	//meta data for each rogic
 	r.Use(routes.SetMetaData())
@@ -327,7 +327,7 @@ func setHTTPServer(testFlg uint8, path string) *gin.Engine {
 	loadStaticFiles(r)
 
 	// Set router
-	routes.SetHTTPUrls(r)
+	routes.SetURLOnHTTP(r)
 
 	// Set Profiling
 	if conf.GetConf().Develop.ProfileEnable {
@@ -363,7 +363,7 @@ func setHTTPSServer() {
 	r.Static("/assets", "statics/assets")
 
 	//set router
-	routes.SetHTTPSUrls(r)
+	routes.SetURLOnHTTPS(r)
 
 	// [HTTPS] TSL
 	//r.RunTLS(addr string, certFile string, keyFile string)
