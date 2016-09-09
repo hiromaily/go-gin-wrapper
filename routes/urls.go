@@ -120,9 +120,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	authorized := r.Group("/admin", gin.BasicAuth(gin.Accounts{
 		ba.User: ba.Pass,
 	}))
-	//authorized := r.Group("/admin", ba.BasicAuth(ba.Accounts{
-	//	"web": "test",
-	//}))
+
 	authorized.GET("/", admins.IndexAction)
 	authorized.GET("/index", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")
