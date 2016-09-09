@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// Index[GET]
+// IndexAction is top page of chat [GET]
 func IndexAction(c *gin.Context) {
 	lg.Info("SignInGoogleAction()")
 

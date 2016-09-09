@@ -9,8 +9,10 @@ import (
 	"strconv"
 )
 
+// Basic Auth User Key
 const AuthUserKey = "user"
 
+// Basic Auth Struct
 type (
 	Accounts map[string]string
 	authPair struct {

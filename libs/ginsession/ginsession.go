@@ -36,7 +36,7 @@ func SetSession(r *gin.Engine, host, pass string) {
 		//MaxAge: 3600,  //1hour
 		MaxAge:   ses.MaxAge, //5minutes
 		Secure:   ses.Secure, //TODO: Set false in development environment, production environment requires true
-		HttpOnly: ses.HttpOnly,
+		HttpOnly: ses.HTTPOnly,
 	}
 	store.Options(*strOptions)
 	r.Use(sessions.Sessions(ses.Name, store))

@@ -69,7 +69,7 @@ func setupMain() {
 func initConf() {
 	//config
 	if *tomlPath != "" {
-		conf.SetTomlPath(*tomlPath)
+		conf.SetTOMLPath(*tomlPath)
 	}
 	conf.New("")
 	conf.Cipher()
@@ -77,7 +77,7 @@ func initConf() {
 }
 
 func initAuth() {
-	auth := conf.GetConf().Auth.Jwt
+	auth := conf.GetConf().Auth.JWT
 	if auth.Mode == jwt.HMAC && auth.Secret != "" {
 		jwt.InitSecretKey(auth.Secret)
 	} else if auth.Mode == jwt.RSA && auth.PrivateKey != "" && auth.PublicKey != "" {

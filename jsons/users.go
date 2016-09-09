@@ -5,36 +5,25 @@ import (
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 )
 
-/***************** User Json *****************/
-// User List
+// UserListResponse is for user list
 type UserListResponse struct {
 	Code    int              `json:"code"`
 	Message string           `json:"message"`
 	Users   []models.UsersSL `json:"users"`
 }
 
-// User
-/*
-type User struct {
-	Id        int    `json:"id"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-}
-*/
-
-// User Response
+// UserResponse is for single user response
 type UserResponse struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
-	Id      int    `json:"id"`
+	ID      int    `json:"id"`
 }
 
-// Response for user list
-//func CreateUserListJson(data []map[string]interface{}) *UserListResponse {
-func CreateUserListJson(users []models.UsersSL) *UserListResponse {
+// CreateUserListJSON is for response for user list
+func CreateUserListJSON(users []models.UsersSL) *UserListResponse {
 	var (
-		code int    = 0
-		msg  string = ""
+		code int
+		msg  string
 	)
 
 	if users == nil {
@@ -50,17 +39,17 @@ func CreateUserListJson(users []models.UsersSL) *UserListResponse {
 	return &userList
 }
 
-// Response for user
-func CreateUserJson(id int64) *UserResponse {
+// CreateUserJSON is response for single user
+func CreateUserJSON(id int64) *UserResponse {
 	var (
-		code int    = 0
-		msg  string = ""
+		code int
+		msg  string
 	)
 
 	user := UserResponse{
 		Code:    code,
 		Message: msg,
-		Id:      int(id),
+		ID:      int(id),
 	}
 	return &user
 }

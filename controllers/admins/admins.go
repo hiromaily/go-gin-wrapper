@@ -9,12 +9,12 @@ import (
 
 // get user, it was set by the BasicAuth middleware
 
-//Index [GET]
+//IndexAction [GET]
 func IndexAction(c *gin.Context) {
 	user := c.MustGet(gin.AuthUserKey).(string)
 	lg.Debugf("[---]gin.AuthUserKey: %s", user)
 
-	api := conf.GetConf().Auth.Api
+	api := conf.GetConf().Auth.API
 
 	//View
 	c.HTML(http.StatusOK, "pages/admins/gallery.tmpl", gin.H{

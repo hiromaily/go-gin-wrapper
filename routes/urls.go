@@ -57,7 +57,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	newsG := r.Group("/news")
 	{
 		//Top
-		newsG.GET("/", news.NewsGetAction)
+		newsG.GET("/", news.IndexAction)
 	}
 	//r.GET("/news/", news.NewsGetAction)
 
@@ -109,7 +109,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	accountsG := r.Group("/accounts")
 	{
 		//Top
-		accountsG.GET("/", accounts.AccountsGetAction)
+		accountsG.GET("/", accounts.IndexAction)
 	}
 	//r.GET("/accounts/", accounts.AccountsGetAction)
 
@@ -142,7 +142,7 @@ func SetHTTPUrls(r *gin.Engine) {
 	//-----------------------
 	jw := r.Group("/api/jwt", CheckHttpHeader())
 	{
-		jw.POST("", jwt.IndexAction) //jwt end point
+		jw.POST("", jwt.IndexPostAction) //jwt end point
 	}
 
 	//-----------------------
@@ -153,18 +153,18 @@ func SetHTTPUrls(r *gin.Engine) {
 	//  r.Use(routes.CheckHttpHeader())
 	//  it let us faster to develop instead of a bit less performance.
 	var handlers []gin.HandlerFunc = []gin.HandlerFunc{CheckHttpHeader()}
-	if conf.GetConf().Auth.Jwt.Mode != 0 {
+	if conf.GetConf().Auth.JWT.Mode != 0 {
 		handlers = append(handlers, CheckJWT())
 	}
 
 	//users := r.Group("/api/users", CheckHttpHeader(), CheckJWT())
 	users := r.Group("/api/users", handlers...)
 	{
-		users.GET("", us.UsersListGetAction)      //Get user list
-		users.POST("", us.UserPostAction)         //Register for new user
-		users.GET("/:id", us.UserGetAction)       //Get specific user
-		users.PUT("/:id", us.UserPutAction)       //Update specific user
-		users.DELETE("/:id", us.UserDeleteAction) //Delete specific user
+		users.GET("", us.ListGetAction)       //Get user list
+		users.POST("", us.InsertPostAction)   //Register for new user
+		users.GET("/:id", us.GetAction)       //Get specific user
+		users.PUT("/:id", us.PutAction)       //Update specific user
+		users.DELETE("/:id", us.DeleteAction) //Delete specific user
 		//for unnecessary parameter, use *XXXX. e.g. /user/:name/*action
 	}
 	//TODO:When user can use only method of GET and POST, X-HTTP-Method-Override header may be helpful.

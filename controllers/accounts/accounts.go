@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-//Accounts [GET]
-func AccountsGetAction(c *gin.Context) {
+//IndexAction [GET]
+func IndexAction(c *gin.Context) {
 	lg.Info("AccountsGetAction()")
 
 	//judge login
@@ -19,7 +19,7 @@ func AccountsGetAction(c *gin.Context) {
 		return
 	}
 
-	api := conf.GetConf().Auth.Api
+	api := conf.GetConf().Auth.API
 
 	//View
 	c.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", gin.H{

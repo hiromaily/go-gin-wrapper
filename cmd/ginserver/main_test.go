@@ -29,10 +29,10 @@ import (
 var (
 	r *gin.Engine
 	// Test Data
-	redirectErr error = errors.New("redirect")
+	errRedirect = errors.New("redirect")
 	// configs
-	configFiles []string = []string{"settings.default.toml", "settings.toml", "docker.toml", "heroku.toml", "travis.toml"}
-	authMode    *uint    = flag.Uint("om", 0, "auth mode")
+	configFiles = []string{"settings.default.toml", "settings.toml", "docker.toml", "heroku.toml", "travis.toml"}
+	authMode    = flag.Uint("om", 0, "auth mode")
 	jwtCode     string
 )
 
@@ -62,11 +62,11 @@ var getTests = []struct {
 	err      error
 }{
 	{"/", http.StatusOK, "GET", nil, "", nil},
-	{"/index", http.StatusMovedPermanently, "GET", nil, "/", redirectErr},
+	{"/index", http.StatusMovedPermanently, "GET", nil, "/", errRedirect},
 	{"/login", http.StatusOK, "GET", nil, "", nil},
 	{"/logout", http.StatusNotFound, "GET", nil, "", nil},
 	{"/news/", http.StatusOK, "GET", nil, "", nil},
-	{"/accounts/", http.StatusTemporaryRedirect, "GET", nil, "/login", redirectErr},
+	{"/accounts/", http.StatusTemporaryRedirect, "GET", nil, "/login", errRedirect},
 	{"/admin/", http.StatusUnauthorized, "GET", nil, "", nil},
 	{"/admin/", http.StatusOK, "GET", []map[string]string{basicAuthHeaders}, "", nil},
 }
@@ -114,12 +114,12 @@ var loginTests = []struct {
 	//8.access by GET again
 	{"/login", http.StatusOK, "GET", nil, "/login", "", "", false, nil},
 	// access by POST with right data. expect to access next page.
-	{"/login", http.StatusFound, "POST", loginHeaders, "/accounts/", "aaaa@test.jp", "password", true, redirectErr},
+	{"/login", http.StatusFound, "POST", loginHeaders, "/accounts/", "aaaa@test.jp", "password", true, errRedirect},
 }
 
 // Test Data for ajax API (When JWT is off)
-var userId int = 12
-var getUserApiTests = []struct {
+var userID = 12
+var getUserAPITests = []struct {
 	url     string
 	code    int
 	method  string
@@ -134,16 +134,16 @@ var getUserApiTests = []struct {
 	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, //TODO:value is necessary
 	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
 	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "GET", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusNotFound, "POST", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
 	//TODO:with post data, put data
 }
 
 // Test Data for ajax API (When JWT is on)
-var getUserApiTests2 = []struct {
+var getUserAPITests2 = []struct {
 	url     string
 	code    int
 	method  string
@@ -159,17 +159,17 @@ var getUserApiTests2 = []struct {
 	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, //TODO:value is necessary
 	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
 	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "GET", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusNotFound, "POST", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusBadRequest, "GET", rightHeaders, nil}, //TODO:no resource is right
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusBadRequest, "DELETE", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil}, //TODO:no resource is right
 	//TODO:with post data, put data
 	//TODO:with jwt token
 }
 
 // Test Data for ajax API (When JWT is on, plus jwt)
-var getUserApiTests3 = []struct {
+var getUserAPITests3 = []struct {
 	url     string
 	code    int
 	method  string
@@ -178,9 +178,9 @@ var getUserApiTests3 = []struct {
 }{
 	//with jwt token
 	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "GET", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userId), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
 	//TODO:with post data, put data
 }
 
@@ -276,7 +276,7 @@ func parseResponse(res *http.Response) ([]byte, int) {
 }
 
 // Set HTTP Header
-func setHttpHeaders(req *http.Request, headers []map[string]string) {
+func setHTTPHeaders(req *http.Request, headers []map[string]string) {
 	//req.Header.Set("Authorization", "Bearer access-token")
 	for _, header := range headers {
 		for k, v := range header {
@@ -314,12 +314,12 @@ func getCookies2(strURL, key string, jar *cookiejar.Jar) (val string) {
 }
 
 // check sent http headers
-func checkHttpHeader(req *http.Request) {
+func checkHTTPHeader(req *http.Request) {
 	b, err := httputil.DumpRequestOut(req, true)
 	if err != nil {
-		fmt.Printf("[checkHttpHeader] error: %s\n", err)
+		fmt.Printf("[checkHTTPHeader] error: %s\n", err)
 	} else {
-		fmt.Printf("[checkHttpHeader] headers:\n%s\n", b)
+		fmt.Printf("[checkHTTPHeader] headers:\n%s\n", b)
 	}
 
 	//POST /login HTTP/1.1
@@ -422,15 +422,15 @@ func TestGetRequestOnTable(t *testing.T) {
 		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
 		//Set Http Headers
 		if tt.headers != nil {
-			setHttpHeaders(req, tt.headers)
+			setHTTPHeaders(req, tt.headers)
 		}
 		res, err := client.Do(req)
 		//res, err := client.Get(ts.URL + tt.url)
 
 		//t.Logf("%#v", err)
 		//&url.Error{Op:"Get", URL:"/", Err:(*errors.errorString)(0xc8202101b0)}
-		urlError, isUrlErr := err.(*url.Error)
-		if isUrlErr && urlError.Err.Error() != tt.err.Error() {
+		urlError, isURLErr := err.(*url.Error)
+		if isURLErr && urlError.Err.Error() != tt.err.Error() {
 			t.Errorf("[%s] this page can't be access. \n error is %s", tt.url, urlError.Err)
 		} else {
 			//check expected status code
@@ -439,7 +439,7 @@ func TestGetRequestOnTable(t *testing.T) {
 			}
 		}
 		//check next page
-		if isUrlErr && urlError.Err.Error() == redirectErr.Error() {
+		if isURLErr && urlError.Err.Error() == errRedirect.Error() {
 			//t.Log(res.Header["Location"])
 			if tt.nextPage != res.Header["Location"][0] {
 				t.Errorf("[%d][%s] redirect url is not correct. \n url is %s / expected %s", i+1, tt.url, res.Header["Location"][0], tt.nextPage)
@@ -490,13 +490,13 @@ func TestLogin(t *testing.T) {
 
 		//Set Http Headers
 		if tt.headers != nil {
-			setHttpHeaders(req, tt.headers)
+			setHTTPHeaders(req, tt.headers)
 		}
 
 		res, err := client.Do(req)
 
-		urlError, isUrlErr := err.(*url.Error)
-		if isUrlErr && urlError.Err.Error() != tt.err.Error() {
+		urlError, isURLErr := err.(*url.Error)
+		if isURLErr && urlError.Err.Error() != tt.err.Error() {
 			t.Errorf("[%s] this page can't be access. \n error is %s", tt.url, urlError.Err)
 		} else {
 			//check expected status code
@@ -505,7 +505,7 @@ func TestLogin(t *testing.T) {
 			}
 		}
 		//check next page
-		if isUrlErr && urlError.Err.Error() == redirectErr.Error() {
+		if isURLErr && urlError.Err.Error() == errRedirect.Error() {
 			//t.Log(res.Header["Location"])
 			if tt.nextPage != res.Header["Location"][0] {
 				t.Errorf("[%d][%s] redirect url is not correct. \n url is %s / expected %s", i+1, tt.url, res.Header["Location"][0], tt.nextPage)
@@ -521,7 +521,7 @@ func TestLogin(t *testing.T) {
 
 		//check requested http header
 		// As you know, cookie is sent without intentional addition
-		//checkHttpHeader(req)
+		//checkHTTPHeader(req)
 
 		// Close body
 		res.Body.Close()
@@ -559,12 +559,12 @@ func TestGetJwtAPIRequestOnTable(t *testing.T) {
 
 		//Set Http Headers
 		if tt.headers != nil {
-			setHttpHeaders(req, tt.headers)
+			setHTTPHeaders(req, tt.headers)
 		}
 		res, err := client.Do(req)
 
-		urlError, isUrlErr := err.(*url.Error)
-		if isUrlErr && urlError.Err.Error() != tt.err.Error() {
+		urlError, isURLErr := err.(*url.Error)
+		if isURLErr && urlError.Err.Error() != tt.err.Error() {
 			t.Errorf("[%s] this page can't be access. \n error is %s", tt.url, urlError.Err)
 		} else {
 			//check expected status code
@@ -602,20 +602,20 @@ func TestGetUserAPIRequestOnTable(t *testing.T) {
 		},
 	}
 
-	getApiTestsData := getUserApiTests
+	getAPITestsData := getUserAPITests
 	if conf.GetConf().Auth.Jwt.Mode != 0 {
 		//Auth is on
 		if jwtCode == "" {
-			getApiTestsData = getUserApiTests2
+			getAPITestsData = getUserAPITests2
 		} else {
-			getApiTestsData = getUserApiTests3
+			getAPITestsData = getUserAPITests3
 			//TODO:set JWT to header
 			jwtAuth["Authorization"] = fmt.Sprintf(jwtAuth["Authorization"], jwtCode)
 		}
 	}
 
 	//for i, tt := range getApiTests {
-	for i, tt := range getApiTestsData {
+	for i, tt := range getAPITestsData {
 		fmt.Printf("%d [%s] %s\n", i+1, tt.method, ts.URL+tt.url)
 
 		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
@@ -624,12 +624,12 @@ func TestGetUserAPIRequestOnTable(t *testing.T) {
 			if jwtCode != "" {
 				tt.headers = append(tt.headers, jwtAuth)
 			}
-			setHttpHeaders(req, tt.headers)
+			setHTTPHeaders(req, tt.headers)
 		}
 		res, err := client.Do(req)
 
-		urlError, isUrlErr := err.(*url.Error)
-		if isUrlErr && urlError.Err.Error() != tt.err.Error() {
+		urlError, isURLErr := err.(*url.Error)
+		if isURLErr && urlError.Err.Error() != tt.err.Error() {
 			t.Errorf("[%s] this page can't be access. \n error is %s", tt.url, urlError.Err)
 		} else {
 			//check expected status code

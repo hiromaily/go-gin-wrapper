@@ -15,8 +15,9 @@ import (
 	"net/http"
 )
 
+// ResGoogle is for response data from google
 type ResGoogle struct {
-	Id            string `json:"id"`
+	ID            string `json:"id"`
 	Email         string `json:"email"`
 	VerifiedEmail bool   `json:"verified_email"`
 	Name          string `json:"name"`        //full name
@@ -28,8 +29,9 @@ type ResGoogle struct {
 	Locale        string `json:"locale"`
 }
 
+// ResFacebook is for response data from facebook
 type ResFacebook struct {
-	Id            string `json:"id"`
+	ID            string `json:"id"`
 	Email         string `json:"email"`
 	VerifiedEmail bool   `json:"verified"`
 	Name          string `json:"name"`       //full name
@@ -41,15 +43,18 @@ type ResFacebook struct {
 	Locale        string `json:"locale"`
 }
 
+// FBPic is structure of picture on facebook
 type FBPic struct {
 	Data struct {
 		IsSilhouette bool   `json:"is_silhouette"`
-		Url          string `json:"url"`
+		URL          string `json:"url"`
 	}
 }
 
 const (
-	GoogleAuth   string = "1"
+	// GoogleAuth is for google
+	GoogleAuth string = "1"
+	// FacebookAuth is for Facebook
 	FacebookAuth string = "2"
 )
 
@@ -75,7 +80,7 @@ var (
 	}
 )
 
-//Sign In by Google[GET]
+// SignInGoogleAction is sign in by Google [GET]
 func SignInGoogleAction(c *gin.Context) {
 	lg.Info("SignInGoogleAction()")
 
@@ -93,7 +98,7 @@ func SignInGoogleAction(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, url) //307
 }
 
-//Sign In by Facebook[GET]
+// SignInFacebookAction is sign in by Facebook [GET]
 func SignInFacebookAction(c *gin.Context) {
 	lg.Info("SignInFacebookAction()")
 
@@ -116,7 +121,7 @@ func SignInFacebookAction(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, url) //307
 }
 
-//Login by Google[GET]
+// LoginAction is login by Google. (work in progress) [GET]
 func LoginAction(c *gin.Context) {
 	lg.Info("LoginAction()")
 	/*
@@ -264,7 +269,7 @@ func registerOrLogin(c *gin.Context, mode string, uA *models.UserAuth, user *mod
 	return
 }
 
-//Callback from Google[GET]
+// CallbackGoogleAction is callback from Google[GET]
 func CallbackGoogleAction(c *gin.Context) {
 	lg.Info("CallbackGoogleAction()")
 	mode := GoogleAuth
@@ -317,7 +322,7 @@ func CallbackGoogleAction(c *gin.Context) {
 	return
 }
 
-//Callback from Facebook[GET]
+// CallbackFacebookAction is callback from Facebook [GET]
 func CallbackFacebookAction(c *gin.Context) {
 	lg.Info("CallbackFacebookAction()")
 	mode := FacebookAuth

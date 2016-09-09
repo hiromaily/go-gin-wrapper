@@ -1,7 +1,6 @@
 package bases
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/csrf"
@@ -25,19 +24,6 @@ func debugContext(c *gin.Context) {
 	lg.Debugf("[hh.GetProto(c)]: %s \n", hh.GetProto(c))
 }
 
-func googleUrl(token string) string {
-	//TODO: move to config
-	base := "https://accounts.google.com/o/oauth2/v2/auth"
-	clientId := "275878174798-fn57e2017fp30ikecfho446gjntfiff2.apps.googleusercontent.com"
-	scope := "openid%20email"
-	redirectUrl := "http://localhost:9999/oauth2/callback"
-	state := token
-
-	format := "%s?client_id=%s&response_type=code&scope=%s&redirect_uri=%s&state=%s"
-
-	return fmt.Sprintf(format, base, clientId, scope, redirectUrl, state)
-}
-
 // response for Login Page
 func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []string) {
 	//token
@@ -45,7 +31,6 @@ func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []st
 	sess.SetTokenSession(c, token)
 
 	//Google Open ID
-	//gURL := googleUrl(token)
 	gURL := "/oauth2/google/signin"
 	fURL := "/oauth2/facebook/signin"
 
@@ -69,13 +54,13 @@ func resLogin(c *gin.Context, input *login.LoginRequest, msg string, errors []st
 	})
 }
 
-//Index
+// IndexAction is top page
 func IndexAction(c *gin.Context) {
 	//debug log
 	//debugContext(c)
 
 	//return header and key
-	api := conf.GetConf().Auth.Api
+	api := conf.GetConf().Auth.API
 
 	lg.Debugf("api.Header: %#v\n", api.Header)
 	lg.Debugf("api.Key: %#v\n", api.Key)
@@ -89,7 +74,7 @@ func IndexAction(c *gin.Context) {
 	})
 }
 
-//Login [GET]
+// LoginGetAction is for login page [GET]
 func LoginGetAction(c *gin.Context) {
 	//debug log
 	//debugContext(c)
@@ -117,13 +102,13 @@ func LoginGetAction(c *gin.Context) {
 	resLogin(c, nil, "", nil)
 }
 
-//Login [POST]
+// LoginPostAction is to receive user request from login page [POST]
 func LoginPostAction(c *gin.Context) {
 	//debug log
 	//debugContext(c)
 
 	//check login
-	userId, posted, errs := login.CheckLoginHTML(c)
+	userID, posted, errs := login.CheckLoginHTML(c)
 	if errs != nil {
 		resLogin(c, posted, "", errs)
 		return
@@ -131,7 +116,7 @@ func LoginPostAction(c *gin.Context) {
 
 	//When login is successful
 	//Session
-	sess.SetUserSession(c, userId)
+	sess.SetUserSession(c, userID)
 
 	//token delete
 	sess.DelTokenSession(c)
@@ -144,7 +129,7 @@ func LoginPostAction(c *gin.Context) {
 	return
 }
 
-//Logout [POST]
+// LogoutPostAction is for logout [POST]
 func LogoutPostAction(c *gin.Context) {
 	lg.Debug("LogoutPostAction")
 	//lg.Debug(sess.IsLogin(c))
@@ -153,7 +138,7 @@ func LogoutPostAction(c *gin.Context) {
 	sess.Logout(c)
 
 	//lg.Debug(sess.IsLogin(c))
-	api := conf.GetConf().Auth.Api
+	api := conf.GetConf().Auth.API
 
 	//View
 	c.HTML(http.StatusOK, "pages/bases/logout.tmpl", gin.H{
@@ -164,7 +149,7 @@ func LogoutPostAction(c *gin.Context) {
 	})
 }
 
-//Logout [PUT] For Ajax
+// LogoutPutAction is for logout by Ajax [PUT]
 func LogoutPutAction(c *gin.Context) {
 	lg.Debug("LogoutPutAction")
 	//lg.Debug(sess.IsLogin(c))

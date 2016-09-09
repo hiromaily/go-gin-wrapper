@@ -8,21 +8,21 @@ import (
 	"net/http"
 )
 
-//Index
+// IndexAction is top page for API List
 func IndexAction(c *gin.Context) {
 	//debug log
 	//debugContext(c)
 
 	//return header and key
-	api := conf.GetConf().Auth.Api
+	api := conf.GetConf().Auth.API
 	//lg.Debugf("api.Header: %#v\n", api.Header)
 	//lg.Debugf("api.Key: %#v\n", api.Key)
 
 	//Get User ids
-	type UserId struct {
-		Id int
+	type UserID struct {
+		ID int
 	}
-	var ids []UserId
+	var ids []UserID
 
 	err := models.GetDB().GetUserIds(&ids)
 	if err != nil {

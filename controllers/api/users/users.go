@@ -12,7 +12,7 @@ import (
 	"github.com/hiromaily/golibs/validator"
 )
 
-//{'firstName':'kentaro','lastName':'asakura','email':'cccc@aa.jp', 'password':'testtest'};
+// UserRequest is expected request form from user
 type UserRequest struct {
 	FirstName string `valid:"nonempty,min=3,max=20" field:"first_name" dispName:"First Name" json:"firstName" form:"firstName"`
 	LastName  string `valid:"nonempty,min=3,max=20" field:"last_name" dispName:"Last Name" json:"lastName" form:"lastName"`
@@ -127,24 +127,24 @@ func updateUser(data *UserRequest, id string) (int64, error) {
 	return models.GetDB().UpdateUser(user, id)
 }
 
-//Users: get list [GET]
-func UsersListGetAction(c *gin.Context) {
+// ListGetAction is get user list [GET]
+func ListGetAction(c *gin.Context) {
 	lg.Debug("[GET] UsersListGetAction")
 
 	var users []models.UsersSL
+
 	_, err := models.GetDB().GetUserList(&users, "")
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
-	} else {
-		//Make json for response and return
-		jslib.RtnUserJson(c, 0, js.CreateUserListJson(users))
-		return
 	}
+
+	//Make json for response and return
+	jslib.RtnUserJson(c, 0, js.CreateUserListJSON(users))
 }
 
-//Users: register for new user [POST]
-func UserPostAction(c *gin.Context) {
+// InsertPostAction is register for new user [POST]
+func InsertPostAction(c *gin.Context) {
 	lg.Debug("[POST] UserPostAction")
 
 	//Param & Check valid
@@ -162,41 +162,40 @@ func UserPostAction(c *gin.Context) {
 		return
 	}
 
-	jslib.RtnUserJson(c, 0, js.CreateUserJson(id))
+	jslib.RtnUserJson(c, 0, js.CreateUserJSON(id))
 	return
 }
 
-//Users: get specific user [GET]
-func UserGetAction(c *gin.Context) {
+// GetAction is get specific user [GET]
+func GetAction(c *gin.Context) {
 	lg.Debug("[GET] UserGetAction")
 
 	//Param
 	//FirstName := c.Query("firstName")
 	//lg.Debug("firstName:", FirstName)
-	userId := c.Param("id")
-	if userId == "" {
+	userID := c.Param("id")
+	if userID == "" {
 		c.AbortWithError(400, errors.New("missing id on request parameter"))
 		return
 	}
 
 	var user models.UsersSL
-	b, err := models.GetDB().GetUserList(&user, userId)
+	b, err := models.GetDB().GetUserList(&user, userID)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
+	}
+
+	//Make json for response and return
+	if b {
+		jslib.RtnUserJson(c, 0, js.CreateUserListJSON([]models.UsersSL{user}))
 	} else {
-		//Make json for response and return
-		if b {
-			jslib.RtnUserJson(c, 0, js.CreateUserListJson([]models.UsersSL{user}))
-		} else {
-			jslib.RtnUserJson(c, 0, js.CreateUserListJson(nil))
-		}
-		return
+		jslib.RtnUserJson(c, 0, js.CreateUserListJSON(nil))
 	}
 }
 
-//Users: update specific user [PUT]
-func UserPutAction(c *gin.Context) {
+// PutAction is update specific user [PUT]
+func PutAction(c *gin.Context) {
 	lg.Debug("[PUT] UserPutAction")
 
 	//Param & Check valid
@@ -217,12 +216,12 @@ func UserPutAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.RtnUserJson(c, 0, js.CreateUserJson(0))
+	jslib.RtnUserJson(c, 0, js.CreateUserJSON(0))
 	return
 }
 
-//Users: delete specific user [DELETE] (work in progress)
-func UserDeleteAction(c *gin.Context) {
+// DeleteAction is delete specific user [DELETE] (work in progress)
+func DeleteAction(c *gin.Context) {
 	lg.Debug("[DELETE] UserDeleteAction")
 	//check token
 
@@ -242,6 +241,6 @@ func UserDeleteAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.RtnUserJson(c, 0, js.CreateUserJson(0))
+	jslib.RtnUserJson(c, 0, js.CreateUserJSON(0))
 	return
 }

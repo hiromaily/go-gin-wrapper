@@ -28,7 +28,7 @@ func init() {
 func initConf() {
 	//config
 	if *tomlPath != "" {
-		conf.SetTomlPath(*tomlPath)
+		conf.SetTOMLPath(*tomlPath)
 	}
 	conf.New("")
 
@@ -47,12 +47,12 @@ func singleReverseProxy() {
 	//Web Server
 	//webserverURL := "http://127.0.0.1:9990"
 	srv := conf.GetConf().Server
-	webserverURL := getURL(srv.Scheme, srv.Host, srv.Port)
-	webserverUrl, _ := url.Parse(webserverURL)
+	tmp := getURL(srv.Scheme, srv.Host, srv.Port)
+	webserverURL, _ := url.Parse(tmp)
 
 	//Proxy Server
 	proxyAddress := fmt.Sprintf(":%d", conf.GetConf().Proxy.Server.Port)
-	proxyHandler := httputil.NewSingleHostReverseProxy(webserverUrl)
+	proxyHandler := httputil.NewSingleHostReverseProxy(webserverURL)
 	server := http.Server{
 		Addr:    proxyAddress,
 		Handler: proxyHandler,

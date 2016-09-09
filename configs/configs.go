@@ -11,10 +11,12 @@ import (
 )
 
 /* singleton */
-var conf *Config
+var (
+	conf         *Config
+	tomlFileName = "./configs/settings.toml"
+)
 
-var tomlFileName string = "./configs/settings.toml"
-
+// Config is of root
 type Config struct {
 	Environment string
 	Server      *ServerConfig
@@ -27,6 +29,7 @@ type Config struct {
 	Develop     DevelopConfig
 }
 
+// ServerConfig is for web server
 type ServerConfig struct {
 	Scheme    string          `toml:"scheme"`
 	Host      string          `toml:"host"`
@@ -37,33 +40,39 @@ type ServerConfig struct {
 	BasicAuth BasicAuthConfig `toml:"basic_auth"`
 }
 
+// DocsConfig is path for document root of webserver
 type DocsConfig struct {
 	Path string `toml:"path"`
 }
 
+// LogConfig is for Log
 type LogConfig struct {
 	Level uint8  `toml:"level"`
 	Path  string `toml:"path"`
 }
 
+// SessionConfig is for Session
 type SessionConfig struct {
 	Name     string `toml:"name"`
 	Key      string `toml:"key"`
 	MaxAge   int    `toml:"max_age"`
 	Secure   bool   `toml:"secure"`
-	HttpOnly bool   `toml:"http_only"`
+	HTTPOnly bool   `toml:"http_only"`
 }
 
+// BasicAuthConfig is for Basic Auth
 type BasicAuthConfig struct {
 	User string `toml:"user"`
 	Pass string `toml:"pass"`
 }
 
+// ProxyConfig is for base of Reverse Proxy Server
 type ProxyConfig struct {
 	Mode   uint8             `toml:"mode"` //0:off, 1:go, 2,nginx
 	Server ProxyServerConfig `toml:"server"`
 }
 
+// ProxyServerConfig is for Reverse Proxy Server
 type ProxyServerConfig struct {
 	Scheme  string    `toml:"scheme"`
 	Host    string    `toml:"host"`
@@ -72,26 +81,30 @@ type ProxyServerConfig struct {
 	Log     LogConfig `toml:"log"`
 }
 
+// AuthConfig is for Auth
 type AuthConfig struct {
-	Api      *ApiConfig      `toml:"api"`
-	Jwt      *JwtConfig      `toml:"jwt"`
+	API      *APIConfig      `toml:"api"`
+	JWT      *JWTConfig      `toml:"jwt"`
 	Google   *GoogleConfig   `toml:"google"`
 	Facebook *FacebookConfig `toml:"facebook"`
 }
 
-type ApiConfig struct {
+// APIConfig is for Rest API
+type APIConfig struct {
 	Header string `toml:"header"`
 	Key    string `toml:"key"`
 	Ajax   bool   `toml:"only_ajax"`
 }
 
-type JwtConfig struct {
+// JWTConfig is for JWT Auth
+type JWTConfig struct {
 	Mode       uint8  `toml:"mode"`
 	Secret     string `toml:"secret_code"`
 	PrivateKey string `toml:"private_key"`
 	PublicKey  string `toml:"public_key"`
 }
 
+// GoogleConfig is for Google OAuth2
 type GoogleConfig struct {
 	Encrypted    bool   `toml:"encrypted"`
 	ClientID     string `toml:"client_id"`
@@ -99,6 +112,7 @@ type GoogleConfig struct {
 	CallbackURL  string `toml:"call_back_url"`
 }
 
+// FacebookConfig is for Facebook OAuth2
 type FacebookConfig struct {
 	Encrypted    bool   `toml:"encrypted"`
 	ClientID     string `toml:"client_id"`
@@ -106,11 +120,13 @@ type FacebookConfig struct {
 	CallbackURL  string `toml:"call_back_url"`
 }
 
+// MySQLConfig is for MySQL Server
 type MySQLConfig struct {
 	*MySQLContentConfig
 	Test *MySQLContentConfig `toml:"test"`
 }
 
+// MySQLContentConfig is for MySQL Server
 type MySQLContentConfig struct {
 	Encrypted bool   `toml:"encrypted"`
 	Host      string `toml:"host"`
@@ -120,6 +136,7 @@ type MySQLContentConfig struct {
 	Pass      string `toml:"pass"`
 }
 
+// RedisConfig is for Redis Server
 type RedisConfig struct {
 	Encrypted bool   `toml:"encrypted"`
 	Host      string `toml:"host"`
@@ -128,6 +145,7 @@ type RedisConfig struct {
 	Session   bool   `toml:"session"`
 }
 
+// MongoConfig is for MongoDB Server
 type MongoConfig struct {
 	Encrypted bool   `toml:"encrypted"`
 	Host      string `toml:"host"`
@@ -137,6 +155,7 @@ type MongoConfig struct {
 	Pass      string `toml:"pass"`
 }
 
+// AwsConfig for Amazon Web Service
 type AwsConfig struct {
 	Encrypted bool   `toml:"encrypted"`
 	AccessKey string `toml:"access_key"`
@@ -144,12 +163,13 @@ type AwsConfig struct {
 	Region    string `toml:"region"`
 }
 
+// DevelopConfig is for development environment
 type DevelopConfig struct {
 	ProfileEnable bool `toml:"profile_enable"`
 	RecoverEnable bool `toml:"recover_enable"`
 }
 
-var checkTomlKeys [][]string = [][]string{
+var checkTOMLKeys = [][]string{
 	{"environment"},
 	{"server", "scheme"},
 	{"server", "host"},
@@ -233,7 +253,7 @@ func validateConfig(conf *Config, md *toml.MetaData) error {
 
 	format := "[%s]"
 	inValid := false
-	for _, keys := range checkTomlKeys {
+	for _, keys := range checkTOMLKeys {
 		if !md.IsDefined(keys...) {
 			switch len(keys) {
 			case 1:
@@ -291,7 +311,7 @@ func loadConfig(fileName string) (*Config, error) {
 	return &config, nil
 }
 
-// singleton architecture
+// New is create instance
 func New(fileName string) {
 	var err error
 	if conf == nil {
@@ -302,7 +322,7 @@ func New(fileName string) {
 	}
 }
 
-// singleton architecture
+// GetConf is to get config instance
 func GetConf() *Config {
 	var err error
 	if conf == nil {
@@ -315,10 +335,12 @@ func GetConf() *Config {
 	return conf
 }
 
-func SetTomlPath(path string) {
+// SetTOMLPath is to set toml file path
+func SetTOMLPath(path string) {
 	tomlFileName = path
 }
 
+// Cipher is to decrypt crypted string on config
 func Cipher() {
 	crypt := enc.GetCryptInstance()
 

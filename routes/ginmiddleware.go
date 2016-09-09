@@ -285,7 +285,7 @@ func CheckHttpHeader() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHttpHeader]")
 
-		apiConf := conf.GetConf().Auth.Api
+		apiConf := conf.GetConf().Auth.API
 
 		lg.Debugf("[Request Header]\n%#v\n", c.Request.Header)
 		lg.Debugf("[Request Form]\n%#v\n", c.Request.Form)

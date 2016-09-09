@@ -11,20 +11,20 @@ import (
 	"time"
 )
 
-// JWT End Point [POST]
-func IndexAction(c *gin.Context) {
+// IndexPostAction is JWT End Point [POST]
+func IndexPostAction(c *gin.Context) {
 	lg.Debug("[POST] IndexAction")
 
 	//login
 	//check login
-	userId, mail, err := login.CheckLoginAPI(c)
+	userID, mail, err := login.CheckLoginAPI(c)
 	if err != nil {
 		c.AbortWithError(400, err)
 		return
 	}
 
 	ti := time.Now().Add(time.Minute * 60).Unix()
-	token, err := jwt.CreateBasicToken(ti, u.Itoa(userId), mail)
+	token, err := jwt.CreateBasicToken(ti, u.Itoa(userID), mail)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
