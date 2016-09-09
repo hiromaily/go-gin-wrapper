@@ -166,7 +166,7 @@ func GlobalRecover() gin.HandlerFunc {
 					case 500:
 						errMsg = http.StatusText(http.StatusInternalServerError)
 					default:
-						errMsg = "something error is happend."
+						errMsg = "something error is happened."
 					}
 				}
 
@@ -304,7 +304,7 @@ func CheckHttpHeader() gin.HandlerFunc {
 		IsContentType := c.Request.Header.Get("Content-Type")
 		lg.Debugf("[Content-Type] %s", IsContentType)
 
-		//TODO:if no Content-Type, how sould be handled.
+		//TODO:if no Content-Type, how should be handled.
 
 		//check
 		//if IsXHR(c) || IsKey != "key" || IsContentType != "application/json" {
