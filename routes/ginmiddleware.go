@@ -9,6 +9,7 @@ import (
 	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
 	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"
+	u "github.com/hiromaily/golibs/utils"
 	"net/http"
 	"strings"
 )
@@ -131,58 +132,11 @@ func GlobalRecover() gin.HandlerFunc {
 			//when crossing request, context data can't be left.
 			//c.Set("skipMiddleWare", "1")
 
-			var errMsg string
-
-			refURL := "/"
-			if c.Request.Header.Get("Referer") != "" {
-				refURL = c.Request.Header.Get("Referer")
-			}
-
 			if c.IsAborted() {
 				lg.Debug("[GlobalRecover] c.IsAborted() is true")
-				if c.Errors != nil {
-					if c.Errors.Last() != nil {
-						errMsg = c.Errors.Last().Err.Error()
-					}
-				}
-				if errMsg == "" {
-					switch c.Writer.Status() {
-					case 400:
-						errMsg = http.StatusText(http.StatusBadRequest)
-					case 401:
-						errMsg = http.StatusText(http.StatusUnauthorized)
-					case 403:
-						errMsg = http.StatusText(http.StatusForbidden)
-					case 404:
-						errMsg = http.StatusText(http.StatusNotFound)
-					case 405:
-						errMsg = http.StatusText(http.StatusMethodNotAllowed)
-					case 406:
-						errMsg = http.StatusText(http.StatusNotAcceptable)
-					case 407:
-						errMsg = http.StatusText(http.StatusProxyAuthRequired)
-					case 408:
-						errMsg = http.StatusText(http.StatusRequestTimeout)
-					case 500:
-						errMsg = http.StatusText(http.StatusInternalServerError)
-					default:
-						errMsg = "something error is happened."
-					}
-				}
 
-				if IsXHR(c) {
-					c.JSON(c.Writer.Status(), gin.H{
-						"code": fmt.Sprintf("%d", c.Writer.Status()),
-						//"error": c.Errors.Last().Err.Error(), //it caused error because of nil of objct
-						"error": errMsg,
-					})
-				} else {
-					c.HTML(c.Writer.Status(), "pages/errors/error.tmpl", gin.H{
-						"code":    fmt.Sprintf("%d", c.Writer.Status()),
-						"message": errMsg,
-						"url":     refURL,
-					})
-				}
+				// response
+				setResponse(c, getErrMsg(c), c.Writer.Status())
 				return
 			}
 
@@ -193,18 +147,7 @@ func GlobalRecover() gin.HandlerFunc {
 					//TODO:Ajax or not doesn't matter to response. HTTP header of Accept may be better.
 					//TODO:How precise should I follow specifications of HTTP header.
 
-					if IsXHR(c) {
-						c.JSON(http.StatusInternalServerError, gin.H{
-							"code":  "500",
-							"error": rec,
-						})
-					} else {
-						c.HTML(http.StatusInternalServerError, "pages/errors/error.tmpl", gin.H{
-							"code":    "500",
-							"message": rec,
-							"url":     refURL,
-						})
-					}
+					setResponse(c, u.Itos(rec), 500)
 					return
 				}
 			}
@@ -213,6 +156,80 @@ func GlobalRecover() gin.HandlerFunc {
 		c.Next()
 		//Next is [Main gin Recovery]
 	}
+}
+
+func getErrMsg(c *gin.Context) string {
+	var errMsg string
+
+	if c.Errors != nil {
+		if c.Errors.Last() != nil {
+			errMsg = c.Errors.Last().Err.Error()
+		}
+	}
+
+	if errMsg == "" {
+		switch c.Writer.Status() {
+		case 400:
+			errMsg = http.StatusText(http.StatusBadRequest)
+		case 401:
+			errMsg = http.StatusText(http.StatusUnauthorized)
+		case 403:
+			errMsg = http.StatusText(http.StatusForbidden)
+		case 404:
+			errMsg = http.StatusText(http.StatusNotFound)
+		case 405:
+			errMsg = http.StatusText(http.StatusMethodNotAllowed)
+		case 406:
+			errMsg = http.StatusText(http.StatusNotAcceptable)
+		case 407:
+			errMsg = http.StatusText(http.StatusProxyAuthRequired)
+		case 408:
+			errMsg = http.StatusText(http.StatusRequestTimeout)
+		case 500:
+			errMsg = http.StatusText(http.StatusInternalServerError)
+		default:
+			errMsg = "something error is happened."
+		}
+	}
+
+	return errMsg
+}
+
+func setResponse(c *gin.Context, errMsg string, code int) {
+
+	refURL := "/"
+	if c.Request.Header.Get("Referer") != "" {
+		refURL = c.Request.Header.Get("Referer")
+	}
+
+	if IsXHR(c) {
+		c.JSON(c.Writer.Status(), gin.H{
+			"code": fmt.Sprintf("%d", code),
+			//"error": c.Errors.Last().Err.Error(), //it caused error because of nil of objct
+			"error": errMsg,
+		})
+	} else {
+		c.HTML(c.Writer.Status(), "pages/errors/error.tmpl", gin.H{
+			"code":    fmt.Sprintf("%d", code),
+			"message": errMsg,
+			"url":     refURL,
+		})
+	}
+	/*
+		if IsXHR(c) {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"code":  "500",
+				"error": rec,
+			})
+		} else {
+			c.HTML(http.StatusInternalServerError, "pages/errors/error.tmpl", gin.H{
+				"code":    "500",
+				"message": rec,
+				"url":     refURL,
+			})
+		}
+	*/
+
 }
 
 //-----------------------------------------------------------------------------
