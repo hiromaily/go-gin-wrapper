@@ -18,7 +18,7 @@ var db Models
 // when making mysql instance, first you should use mysql.New()
 func new() {
 	db = Models{}
-	db.Db = mysql.GetDBInstance()
+	db.Db = mysql.GetDB()
 }
 
 // GetDB is to get mysql instance. it's using singleton design pattern.

@@ -14,7 +14,8 @@ import (
 //**********************************************************
 // Type Interface
 //**********************************************************
-//check type of interface
+
+// CheckInterface is to check type of interface
 func CheckInterface(v interface{}) string {
 	//ValueOfでreflect.Value型のオブジェクトを取得
 	//v := reflect.ValueOf(val).Type()
@@ -38,7 +39,7 @@ func CheckInterface(v interface{}) string {
 	}
 }
 
-//check type of interface
+// CheckInterfaceByIf is to check type of interface
 func CheckInterfaceByIf(val interface{}) string {
 	//ValueOfでreflect.Value型のオブジェクトを取得
 	v := reflect.ValueOf(val).Kind()
@@ -94,7 +95,7 @@ func CheckInterfaceByIf(val interface{}) string {
 	}
 }
 
-//change string to type
+// StoType is to change string to type
 func StoType(typeStr string) reflect.Kind {
 	switch typeStr {
 	case reflect.Invalid.String():
@@ -153,7 +154,8 @@ func StoType(typeStr string) reflect.Kind {
 //**********************************************************
 // Convert type to other type
 //**********************************************************
-// Interface型のString型への変更
+
+// Itos is to convert interface{} to string
 func Itos(val interface{}) string {
 	str, ok := val.(string)
 	if !ok {
@@ -162,6 +164,7 @@ func Itos(val interface{}) string {
 	return str
 }
 
+// Itob is to convert interface{} to bool
 func Itob(val interface{}) bool {
 	b, ok := val.(bool)
 	if !ok {
@@ -170,7 +173,7 @@ func Itob(val interface{}) bool {
 	return b
 }
 
-// Interface型のint型への変更
+// Itoi is to convert interface{} to int
 func Itoi(val interface{}) int {
 
 	num64, ok := val.(int64)
@@ -191,13 +194,13 @@ func Itoi(val interface{}) int {
 	num, ok := val.(int)
 	if ok {
 		return int(num)
-	} else {
-		return 0
 	}
+
+	return 0
 }
 
-// Interface型のuint型への変更
-func ItoUi(val interface{}) uint {
+// ItoUI is to convert interface{} to uint
+func ItoUI(val interface{}) uint {
 
 	num64, ok := val.(uint64)
 	if ok {
@@ -217,12 +220,12 @@ func ItoUi(val interface{}) uint {
 	num, ok := val.(uint)
 	if ok {
 		return uint(num)
-	} else {
-		return 0
 	}
+
+	return 0
 }
 
-// Interface型のbyte型->string型への変更
+// ItoBS is to convert byte[] of interface{} to string
 func ItoBS(val interface{}) string {
 	if b, ok := val.([]byte); ok {
 		return string(b)
@@ -230,7 +233,7 @@ func ItoBS(val interface{}) string {
 	return ""
 }
 
-// Interface型のmap[string]int型への変更
+// ItoMsi is to convert map[string] of interface{} to map[string]int
 func ItoMsi(val interface{}) map[string]int {
 	msi, ok := val.(map[string]int)
 	if !ok {
@@ -239,7 +242,7 @@ func ItoMsi(val interface{}) map[string]int {
 	return msi
 }
 
-// Interface型のtime.Time型への変更
+// ItoT is to convert interface{} to time.Time
 func ItoT(val interface{}) time.Time {
 	if t, ok := val.(time.Time); ok {
 		return t
@@ -247,7 +250,7 @@ func ItoT(val interface{}) time.Time {
 	return time.Time{}
 }
 
-// Interface型のtime.Time型->string型への変更
+// ItoTS is to convert time.Time of interface{} to string
 func ItoTS(val interface{}) string {
 	if t, ok := val.(time.Time); ok {
 		return t.String()
@@ -255,29 +258,31 @@ func ItoTS(val interface{}) string {
 	return ""
 }
 
-// String型のError型への変更
+// Stoe is to convert string to error
 func Stoe(val string) error {
 	return errors.New(val)
 }
 
-// String -> Int
+// Atoi is to convert string to int
 func Atoi(str string) (ret int) {
 	ret, _ = strconv.Atoi(str)
 	return
 }
 
-// Int -> String
+// Itoa is to convert int to string
 func Itoa(num int) (ret string) {
 	return strconv.Itoa(num)
 }
 
 //**********************************************************
 // Operate Slice
+// https://github.com/golang/go/wiki/SliceTricks
 //**********************************************************
-// search string
+
+// SearchString is to search string
 func SearchString(ary []string, str string) int {
 
-	var retIdx int = -1
+	retIdx := -1
 	if len(ary) == 0 {
 		return retIdx
 	}
@@ -291,49 +296,48 @@ func SearchString(ary []string, str string) int {
 	return retIdx
 }
 
-// TODO:slice
-// https://github.com/golang/go/wiki/SliceTricks
-
-//Remove element from end of slice
+// Pop is to remove element from end of slice
 func Pop(val []interface{}) []interface{} {
 	return val[:len(val)-1]
 }
 
-//Add element to end of slice
+// Push is to add element to end of slice
 func Push(base []interface{}, val interface{}) []interface{} {
 	return append(base, val)
 }
 
-//Remove element from first of slice
+// Shift is to remove element from first of slice
 func Shift(val []interface{}) []interface{} {
 	return val[1:]
 }
 
-//Add element to first of slice
+// Unshift is to add element to first of slice
 func Unshift(base []interface{}, val interface{}) []interface{} {
 	return append([]interface{}{val}, base...)
 }
 
-//change slice data to slice interdace
-//https://github.com/golang/go/wiki/InterfaceSlice
+// SliceIntToInterface is to change slice data of int to slice []interface{}
+// https://github.com/golang/go/wiki/InterfaceSlice
 func SliceIntToInterface(dataSlice []int) []interface{} {
-	var interfaceSlice []interface{} = make([]interface{}, len(dataSlice))
+	interfaceSlice := make([]interface{}, len(dataSlice))
 	for i, d := range dataSlice {
 		interfaceSlice[i] = d
 	}
 	return interfaceSlice
 }
 
+// SliceStrToInterface is to change slice data of string to slice []interface{}
 func SliceStrToInterface(dataSlice []string) []interface{} {
-	var interfaceSlice []interface{} = make([]interface{}, len(dataSlice))
+	interfaceSlice := make([]interface{}, len(dataSlice))
 	for i, d := range dataSlice {
 		interfaceSlice[i] = d
 	}
 	return interfaceSlice
 }
 
+// SliceMapToInterface is to change slice data of map[string]int to slice []interface{}
 func SliceMapToInterface(dataSlice []map[string]int) []interface{} {
-	var interfaceSlice []interface{} = make([]interface{}, len(dataSlice))
+	interfaceSlice := make([]interface{}, len(dataSlice))
 	for i, d := range dataSlice {
 		interfaceSlice[i] = d
 	}
@@ -343,6 +347,8 @@ func SliceMapToInterface(dataSlice []map[string]int) []interface{} {
 //**********************************************************
 // Handle Directory
 //**********************************************************
+
+// IsExistDir is to check existence of directory
 func IsExistDir(name string) bool {
 	_, err := os.Stat(name)
 	return !os.IsNotExist(err)
@@ -351,7 +357,8 @@ func IsExistDir(name string) bool {
 //**********************************************************
 // Handle Error
 //**********************************************************
-// check error and if so execute panic
+
+// GoPanicWhenError is to execute panic when error
 func GoPanicWhenError(err error) {
 	if err != nil {
 		fmt.Println(runtime.Caller(1))
@@ -359,7 +366,7 @@ func GoPanicWhenError(err error) {
 	}
 }
 
-// check error and if so print error
+// ShowErrorWhenError is to show error when error
 func ShowErrorWhenError(err error) {
 	if err != nil {
 		fmt.Println(err.Error())

@@ -8,7 +8,7 @@ import (
 	jslib "github.com/hiromaily/go-gin-wrapper/libs/json"
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	lg "github.com/hiromaily/golibs/log"
-	"github.com/hiromaily/golibs/times"
+	tm "github.com/hiromaily/golibs/time"
 	"github.com/hiromaily/golibs/validator"
 )
 
@@ -121,7 +121,7 @@ func updateUser(data *UserRequest, id string) (int64, error) {
 		user.Password = data.Password
 	}
 	//update date
-	user.Updated = times.GetCurrentTimeByStr()
+	user.Updated = tm.GetCurrentDateTimeByStr("")
 
 	//Update
 	return models.GetDB().UpdateUser(user, id)

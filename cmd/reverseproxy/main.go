@@ -33,7 +33,7 @@ func initConf() {
 	conf.New("")
 
 	//log
-	lg.InitializeLog(conf.GetConf().Proxy.Server.Log.Level, lg.LOG_OFF_COUNT, 0,
+	lg.InitializeLog(conf.GetConf().Proxy.Server.Log.Level, lg.LogOff, 99,
 		"[REVERSE_PROXY]", conf.GetConf().Proxy.Server.Log.Path)
 }
 

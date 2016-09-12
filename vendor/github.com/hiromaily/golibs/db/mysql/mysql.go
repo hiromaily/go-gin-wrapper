@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
 	lg "github.com/hiromaily/golibs/log"
-	"github.com/hiromaily/golibs/times"
+	tm "github.com/hiromaily/golibs/time"
 	u "github.com/hiromaily/golibs/utils"
 	"reflect"
 	"time"
@@ -19,6 +20,7 @@ import (
 
 const tFomt = "2006-01-02 15:04:05"
 
+// MS is struct for MySQL
 type MS struct {
 	DB         *sql.DB
 	Rows       *sql.Rows
@@ -26,6 +28,7 @@ type MS struct {
 	ServerInfo //embeded
 }
 
+// ServerInfo is struct of server information
 type ServerInfo struct {
 	host   string
 	port   uint16
@@ -39,6 +42,8 @@ var dbInfo MS
 //-----------------------------------------------------------------------------
 // Basic
 //-----------------------------------------------------------------------------
+
+// New is to create instance
 func New(host, dbname, user, pass string, port uint16) {
 	var err error
 	if dbInfo.DB == nil {
@@ -57,8 +62,8 @@ func New(host, dbname, user, pass string, port uint16) {
 	return
 }
 
-// singleton architecture
-func GetDBInstance() *MS {
+// GetDB is to get instance. singleton architecture
+func GetDB() *MS {
 	var err error
 	if dbInfo.DB == nil {
 		//TODO: it may be better to call New()
@@ -80,7 +85,7 @@ func (ms *MS) getDsn() string {
 		ms.user, ms.pass, ms.host, ms.port, ms.dbname, param)
 }
 
-// Connection
+// Connection is to connect MySQL server
 // Be careful, sql.Open() doesn't return err. Use db.Ping() to check DB condition.
 func (ms *MS) Connection() (*sql.DB, error) {
 	//return sql.Open("mysql", getDsn())
@@ -88,17 +93,17 @@ func (ms *MS) Connection() (*sql.DB, error) {
 	return db, db.Ping()
 }
 
-// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
+// SetMaxIdleConns is to set the maximum number of connections in the idle connection pool.
 func (ms *MS) SetMaxIdleConns(n int) {
 	ms.DB.SetMaxIdleConns(n)
 }
 
-//SetMaxOpenConns sets the maximum number of open connections to the database.
+// SetMaxOpenConns is to set the maximum number of open connections to the database.
 func (ms *MS) SetMaxOpenConns(n int) {
 	ms.DB.SetMaxOpenConns(n)
 }
 
-// Close
+// Close is to close connection
 func (ms *MS) Close() {
 	ms.DB.Close()
 }
@@ -106,14 +111,15 @@ func (ms *MS) Close() {
 //-----------------------------------------------------------------------------
 // Select
 //-----------------------------------------------------------------------------
-// SELECT Count: Get number of rows
-func (ms *MS) SelectCount(countSql string, args ...interface{}) (int, error) {
+
+// SelectCount is to get number of rows
+func (ms *MS) SelectCount(countSQL string, args ...interface{}) (int, error) {
 	//field on table
 	var count int
 
 	//1. create sql and exec
 	//err := self.db.QueryRow("SELECT count(user_id) FROM t_users WHERE delete_flg=?", "0").Scan(&count)
-	err := ms.DB.QueryRow(countSql, args...).Scan(&count)
+	err := ms.DB.QueryRow(countSQL, args...).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -121,9 +127,9 @@ func (ms *MS) SelectCount(countSql string, args ...interface{}) (int, error) {
 	return count, nil
 }
 
-//get Rows and return db instance
+// SelectIns is to get rows and return db instance
 func (ms *MS) SelectIns(selectSQL string, args ...interface{}) *MS {
-	defer times.Track(time.Now(), "SelectIns()")
+	defer tm.Track(time.Now(), "SelectIns()")
 	//SelectSQLAllFieldIns() took 471.577µs
 
 	//If no args, set nil
@@ -138,9 +144,9 @@ func (ms *MS) SelectIns(selectSQL string, args ...interface{}) *MS {
 	return ms
 }
 
-//set extracted data into parameter variable
+// ScanOne is to set a extracted data into parameter variable
 func (ms *MS) ScanOne(x interface{}) bool {
-	//defer times.Track(time.Now(), "ScanOne()")
+	//defer tm.Track(time.Now(), "ScanOne()")
 	//ScanOne() took 5.23µs
 
 	if ms.Err != nil {
@@ -151,45 +157,48 @@ func (ms *MS) ScanOne(x interface{}) bool {
 	//e.g)v = person Person
 	v := reflect.ValueOf(x)
 	if v.Kind() != reflect.Ptr || v.IsNil() {
-		ms.Err = errors.New("parameter is not valid. it sould be pointer and not nil.")
+		ms.Err = errors.New("parameter is not valid. it should be pointer and not nil")
 		return false
-	} else {
-		if v.Elem().Kind() == reflect.Struct {
+	}
 
-			//create container to set scaned record on database
-			values, scanArgs := makeScanArgs(v.Elem().Type())
+	if v.Elem().Kind() == reflect.Struct {
 
-			//check len(value) and column
-			validateStructAndColumns(ms, values)
-			if ms.Err != nil {
-				return false
-			}
+		//create container to set scaned record on database
+		values, scanArgs := makeScanArgs(v.Elem().Type())
 
-			// rows.Next()
-			ret := ms.Rows.Next()
-			if !ret {
-				//ms.Err = errors.New("nodata")
-				return false
-			}
-
-			// rows.Scan()
-			ms.Err = ms.Rows.Scan(scanArgs...)
-			if ms.Err != nil {
-				return false
-			}
-
-			//ms.Err = ms.Rows.Scan(v)
-			scanStruct(values, v.Elem())
-		} else {
-			ms.Err = errors.New("parameter should be pointer of struct slice or struct")
+		//check len(value) and column
+		validateStructAndColumns(ms, values)
+		if ms.Err != nil {
 			return false
 		}
+
+		// rows.Next()
+		ret := ms.Rows.Next()
+		if !ret {
+			//ms.Err = errors.New("nodata")
+			return false
+		}
+
+		// rows.Scan()
+		ms.Err = ms.Rows.Scan(scanArgs...)
+		if ms.Err != nil {
+			return false
+		}
+
+		//ms.Err = ms.Rows.Scan(v)
+		scanStruct(values, v.Elem())
+
+		return true
 	}
-	return true
+
+	ms.Err = errors.New("parameter should be pointer of struct slice or struct")
+	return false
+
 }
 
+// Scan is to set all extracted data into parameter variable
 func (ms *MS) Scan(x interface{}) bool {
-	//defer times.Track(time.Now(), "Scan()")
+	//defer tm.Track(time.Now(), "Scan()")
 	//Scan() took 465.971µs
 
 	if ms.Err != nil {
@@ -201,44 +210,44 @@ func (ms *MS) Scan(x interface{}) bool {
 	v := reflect.ValueOf(x)
 
 	if v.Kind() != reflect.Ptr || v.IsNil() {
-		ms.Err = errors.New("parameter is not valid. it sould be pointer and not nil.")
+		ms.Err = errors.New("parameter is not valid. it should be pointer and not nil")
 		return false
-	} else {
-		if v.Elem().Kind() == reflect.Slice || v.Elem().Kind() == reflect.Array {
-			elemType := v.Elem().Type().Elem() //reflects_test.TeacherInfo
-			newElem := reflect.New(elemType).Elem()
+	}
 
-			//create container to set scaned record on database
-			values, scanArgs := makeScanArgs(newElem.Type())
+	if v.Elem().Kind() == reflect.Slice || v.Elem().Kind() == reflect.Array {
+		elemType := v.Elem().Type().Elem() //reflects_test.TeacherInfo
+		newElem := reflect.New(elemType).Elem()
 
-			//check len(value) and column
-			validateStructAndColumns(ms, values)
+		//create container to set scaned record on database
+		values, scanArgs := makeScanArgs(newElem.Type())
+
+		//check len(value) and column
+		validateStructAndColumns(ms, values)
+		if ms.Err != nil {
+			return false
+		}
+
+		// rows.Next()
+		cnt := 0
+		for ms.Rows.Next() {
+			ms.Err = ms.Rows.Scan(scanArgs...)
 			if ms.Err != nil {
 				return false
 			}
 
-			// rows.Next()
-			cnt := 0
-			for ms.Rows.Next() {
-				ms.Err = ms.Rows.Scan(scanArgs...)
-				if ms.Err != nil {
-					return false
-				}
-
-				scanStruct(values, newElem)
-				v.Elem().Set(reflect.Append(v.Elem(), newElem))
-				cnt++
-			}
-			if cnt == 0 {
-				return false
-			}
-		} else {
-			ms.Err = errors.New("parameter is not valid. it sould be pointer and not nil.")
+			scanStruct(values, newElem)
+			v.Elem().Set(reflect.Append(v.Elem(), newElem))
+			cnt++
+		}
+		if cnt == 0 {
 			return false
 		}
+		return true
 	}
 
-	return true
+	ms.Err = errors.New("parameter is not valid. it should be pointer and not nil")
+	return false
+
 }
 
 func makeScanArgs(structType reflect.Type) ([]interface{}, []interface{}) {
@@ -259,13 +268,13 @@ func validateStructAndColumns(ms *MS, values []interface{}) error {
 		return ms.Err
 	}
 	if len(columns) != len(values) {
-		ms.Err = fmt.Errorf("number of struct field(%d) doesn't match to columns of sql(%d).", len(values), len(columns))
+		ms.Err = fmt.Errorf("number of struct field(%d) doesn't match to columns of sql(%d)", len(values), len(columns))
 		return ms.Err
 	}
 	return nil
 }
 
-//Set data
+// Set data
 func scanStruct(values []interface{}, v reflect.Value) {
 	structType := v.Type()
 	for i := 0; i < structType.NumField(); i++ {
@@ -276,7 +285,7 @@ func scanStruct(values []interface{}, v reflect.Value) {
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			v.Field(i).Set(reflect.ValueOf(u.Itoi(values[i])))
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-			v.Field(i).Set(reflect.ValueOf(u.ItoUi(values[i])))
+			v.Field(i).Set(reflect.ValueOf(u.ItoUI(values[i])))
 		case reflect.Bool:
 			v.Field(i).Set(reflect.ValueOf(u.Itob(values[i])))
 		case reflect.String:
@@ -298,9 +307,9 @@ func scanStruct(values []interface{}, v reflect.Value) {
 	return
 }
 
-// SELECT : Get All field you set(Though you get only record, use it.)
+// Select is to get all field you set
 func (ms *MS) Select(selectSQL string, args ...interface{}) ([]map[string]interface{}, []string, error) {
-	defer times.Track(time.Now(), "SelectSQLAllField()")
+	defer tm.Track(time.Now(), "SelectSQLAllField()")
 	//540.417µs
 
 	//1. create sql and exec
@@ -315,7 +324,7 @@ func (ms *MS) Select(selectSQL string, args ...interface{}) ([]map[string]interf
 
 // Convert result of select into Map[] type. Return multiple array map and interface(plural lines)
 func (ms *MS) convertRowsToMaps(rows *sql.Rows) ([]map[string]interface{}, []string, error) {
-	defer times.Track(time.Now(), "convertRowsToMaps()")
+	defer tm.Track(time.Now(), "convertRowsToMaps()")
 	//convertRowsToMaps() took 85.191µs
 
 	// Get column name
@@ -377,10 +386,12 @@ func (ms *MS) convertRowsToMaps(rows *sql.Rows) ([]map[string]interface{}, []str
 //-----------------------------------------------------------------------------
 // Insert
 //-----------------------------------------------------------------------------
-func (self *MS) Insert(sql string, args ...interface{}) (int64, error) {
+
+// Insert is to insert record
+func (ms *MS) Insert(sql string, args ...interface{}) (int64, error) {
 	//1.creates a prepared statement (placeholder)
 	//insertSQL := "INSERT t_users SET first_name=?, last_name=?"
-	stmt, err := self.DB.Prepare(sql)
+	stmt, err := ms.DB.Prepare(sql)
 	if err != nil {
 		return 0, err
 	}
@@ -402,6 +413,8 @@ func (self *MS) Insert(sql string, args ...interface{}) (int64, error) {
 //-----------------------------------------------------------------------------
 // UPDATE / DELETE
 //-----------------------------------------------------------------------------
+
+// Exec is for update and delete
 func (ms *MS) Exec(sql string, args ...interface{}) (int64, error) {
 
 	//1.creates a prepared statement (placeholder)
@@ -425,7 +438,7 @@ func (ms *MS) Exec(sql string, args ...interface{}) (int64, error) {
 	return res.RowsAffected()
 }
 
-// Execution simply
+// Exec2 is for update and delete more simpler than Exec
 func (ms *MS) Exec2(sql string, args ...interface{}) error {
 	//result, err := self.db.Exec("INSERT t_users SET first_name=?, last_name=?", "Mika", "Haruda")
 	_, err := ms.DB.Exec(sql, args...)
@@ -435,6 +448,8 @@ func (ms *MS) Exec2(sql string, args ...interface{}) error {
 //-----------------------------------------------------------------------------
 // Util
 //-----------------------------------------------------------------------------
+
+// ColumnForSQL is to scan struct data for get column tag
 func ColumnForSQL(s interface{}) string {
 	v := reflect.ValueOf(s)
 	if v.Elem().Kind() == reflect.Slice || v.Elem().Kind() == reflect.Array {

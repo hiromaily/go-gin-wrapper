@@ -1,6 +1,5 @@
 package hash
 
-//https://github.com/tadzik/simpleaes/blob/master/simpleaes.go
 import (
 	//"fmt"
 	"crypto/md5"
@@ -21,7 +20,8 @@ import (
 //-----------------------------------------------------------------------------
 // HASH
 //-----------------------------------------------------------------------------
-//Cipher by MD5
+
+// GetMD5 is to hash by MD5
 func GetMD5(baseString string) string {
 	//md5
 	h := md5.New()
@@ -33,7 +33,7 @@ func GetMD5(baseString string) string {
 	return ret
 }
 
-//Cipher by SHA1
+// GetSHA1 is to hash by SHA1
 func GetSHA1(baseString string) string {
 	//sha1
 	h := sha1.New()
@@ -45,7 +45,7 @@ func GetSHA1(baseString string) string {
 	return ret
 }
 
-//Cipher by SHA256
+// GetSHA256 is to hash by SHA256
 func GetSHA256(baseString string) string {
 	//sha256
 	h := sha256.New()
@@ -57,7 +57,7 @@ func GetSHA256(baseString string) string {
 	return ret
 }
 
-//Cipher by MD5 Plus salt
+// GetMD5Plus is to hash by MD5 Plus salt
 func GetMD5Plus(baseString string, strPlus string) string {
 	//1.ユーザが入力したパスワードに対してMD5で一度暗号化
 	//2.得られたMD5の値の前後に管理者自身だけが知っているランダムな文字列を追加
@@ -84,7 +84,7 @@ func GetMD5Plus(baseString string, strPlus string) string {
 	return ret
 }
 
-//Cipher by Scrypt
+// GetScrypt to hash by Scrypt
 func GetScrypt(baseString string) string {
 	salt := "@#$%7G8r"
 	//func Key(password, salt []byte, N, r, p, keyLen int) ([]byte, error) {
@@ -93,7 +93,7 @@ func GetScrypt(baseString string) string {
 	//result is not readable.
 	//lg.Debugf("Scrypt: %s\n", dk)
 
-	//In order to read, it sould be encoded by base64
+	//In order to read, it should be encoded by base64
 	result := base64.StdEncoding.EncodeToString(dk)
 
 	return result

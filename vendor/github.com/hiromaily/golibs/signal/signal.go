@@ -8,9 +8,10 @@ import (
 	"syscall"
 )
 
-//https://golang.org/pkg/runtime/
 //GOTRACEBACK=single
 //GOTRACEBACK=all
+
+// StartSignal is to wait signal using goroutine
 func StartSignal() {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan,

@@ -43,7 +43,7 @@ func setupMain() {
 	initConf()
 
 	//log
-	lg.InitializeLog(conf.GetConf().Server.Log.Level, lg.LOG_OFF_COUNT, 0,
+	lg.InitializeLog(conf.GetConf().Server.Log.Level, lg.LogOff, 99,
 		"[GOWEB]", conf.GetConf().Server.Log.Path)
 
 	//lg.Debugf("conf %#v\n", conf.GetConfInstance())
@@ -126,7 +126,7 @@ func initDatabase(testFlg uint8) {
 		dbInfo := conf.GetConf().MySQL.Test
 		mysql.New(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
 	}
-	mysql.GetDBInstance().SetMaxIdleConns(50)
+	mysql.GetDB().SetMaxIdleConns(50)
 
 	//MongoDB
 	initMongo()

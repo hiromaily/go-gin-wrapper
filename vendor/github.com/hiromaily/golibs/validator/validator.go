@@ -11,10 +11,14 @@ import (
 	"unicode/utf8"
 )
 
-type Validator func(str string) bool
-type ValidatorCal func(str string, num int) bool
+// BasicValidator is validator function
+type BasicValidator func(str string) bool
 
-var TagMap = map[string]Validator{
+// CalcValidator is validator function
+type CalcValidator func(str string, num int) bool
+
+// TagMap is to map tag name of struct to function
+var TagMap = map[string]BasicValidator{
 	"nonempty": isNonEmpty,
 	"email":    isEmail,
 	"url":      isURL,
@@ -22,12 +26,17 @@ var TagMap = map[string]Validator{
 	"alphabet": isAlphabet,
 }
 
-var TagMapCal = map[string]ValidatorCal{
+// TagMapCal is to map tag name of struct to function
+var TagMapCal = map[string]CalcValidator{
 	"min": isMinOK,
 	"max": isMaxOK,
 }
 
-//github.com/asaskevich/govalidator/validator.go
+//-----------------------------------------------------------------------------
+// functions for validator
+// github.com/asaskevich/govalidator/validator.go
+//-----------------------------------------------------------------------------
+
 func isNonEmpty(str string) bool {
 	return str != ""
 }
@@ -82,10 +91,13 @@ func isMaxOK(str string, num int) bool {
 func getErrorMsgFmt(chkItem string, errFmt map[string]string) (string, error) {
 	if _, ok := errFmt[chkItem]; ok {
 		return errFmt[chkItem], nil
-	} else {
-		return "", errors.New("Not found key")
 	}
+	return "", errors.New("Not found key")
 }
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
 
 func checkValidation(str string, val string, disp string) []string {
 	ret := []string{disp}
@@ -112,7 +124,7 @@ func checkValidation(str string, val string, disp string) []string {
 	return ret
 }
 
-//Check validation after extracted tag from struct type.
+// CheckValidation to check validation after extracted tag from struct type.
 func CheckValidation(s interface{}, brankSkip bool) map[string][]string {
 
 	mRet := make(map[string][]string)
@@ -144,6 +156,7 @@ func CheckValidation(s interface{}, brankSkip bool) map[string][]string {
 	return mRet
 }
 
+// ConvertErrorMsgs is to convert error messages
 func ConvertErrorMsgs(data map[string][]string, errFmt map[string]string) []string {
 
 	msgs := []string{}

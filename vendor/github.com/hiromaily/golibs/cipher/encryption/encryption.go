@@ -11,15 +11,17 @@ import (
 
 //https://github.com/tadzik/simpleaes/blob/master/simpleaes.go
 
+// Crypt is for cipher config data
 type Crypt struct {
 	//enc, dec cipher.BlockMode
 	cipher cipher.Block
 	iv     []byte
 }
 
-var cryptInfo Crypt
-
-var commonIV = []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f}
+var (
+	cryptInfo Crypt
+	commonIV  = []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f}
+)
 
 // Creates a new encryption/decryption object
 // with a given key of a given size
@@ -31,9 +33,8 @@ var commonIV = []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09
 // when there is no iv string passed as 3rd value to function.
 //func NewCryptUtil(size int, key string, more ...string) (*CryptUtil, error) {
 
-//size = 16
-//key = "8#75F%R+&a5ZvM_<"
-//iv = "@~wp-7hPs<WEx@R4"
+// NewCrypt is to create crypt instance
+// e.g. size = 16, key = "8#75F%R+&a5ZvM_<", iv = "@~wp-7hPs<WEx@R4"
 func NewCrypt(size int, key, iv string) (*Crypt, error) {
 
 	//fmt.Printf("cryptConf %#v\n", cryptConf)
@@ -52,7 +53,8 @@ func NewCrypt(size int, key, iv string) (*Crypt, error) {
 	return &cryptInfo, nil
 }
 
-func GetCryptInstance() *Crypt {
+// GetCrypt is to get crypt instance
+func GetCrypt() *Crypt {
 	return &cryptInfo
 }
 
@@ -62,13 +64,12 @@ func (c *Crypt) padSlice(src []byte) []byte {
 	mult := int((len(src) / bs) + 1)
 	leng := bs * mult
 
-	src_padded := make([]byte, leng)
-	copy(src_padded, src)
-	return src_padded
+	srcPadded := make([]byte, leng)
+	copy(srcPadded, src)
+	return srcPadded
 }
 
-// Encrypt a slice of bytes, producing a new, freshly allocated slice
-//
+// Encrypt is encrypt a slice of bytes, producing a new, freshly allocated slice
 // Source will be padded with null bytes if necessary
 func (c *Crypt) Encrypt(src []byte) []byte {
 	if len(src)%16 != 0 {
@@ -79,14 +80,14 @@ func (c *Crypt) Encrypt(src []byte) []byte {
 	return dst
 }
 
-// Encrypt and encode by base64 string
+// EncryptBase64 is encrypt and encode by base64 string
 func (c *Crypt) EncryptBase64(plainText string) string {
 	encryptedBytes := c.Encrypt([]byte(plainText))
 	base64 := base64.StdEncoding.EncodeToString(encryptedBytes)
 	return base64
 }
 
-// Encrypt blocks from reader, write results into writer
+// EncryptStream is to encrypt blocks from reader, write results into writer
 func (c *Crypt) EncryptStream(reader io.Reader, writer io.Writer) error {
 	for {
 		buf := make([]byte, 16)
@@ -108,8 +109,7 @@ func (c *Crypt) EncryptStream(reader io.Reader, writer io.Writer) error {
 	return nil
 }
 
-// Decrypt a slice of bytes, producing a new, freshly allocated slice
-//
+// Decrypt is to decrypt a slice of bytes, producing a new, freshly allocated slice
 // Source will be padded with null bytes if necessary
 func (c *Crypt) Decrypt(src []byte) []byte {
 	if len(src)%16 != 0 {
@@ -121,7 +121,7 @@ func (c *Crypt) Decrypt(src []byte) []byte {
 	return trimmed
 }
 
-// Decypt decoded Base64 string
+// DecryptBase64 is to decrypt decoded Base64 string
 func (c *Crypt) DecryptBase64(base64String string) (string, error) {
 	unbase64, err := base64.StdEncoding.DecodeString(base64String)
 	if err != nil {
@@ -131,7 +131,7 @@ func (c *Crypt) DecryptBase64(base64String string) (string, error) {
 	return string(decryptedBytes[:]), nil
 }
 
-// Decrypt blocks from reader, write results into writer
+// DecryptStream is to decrypt blocks from reader, write results into writer
 func (c *Crypt) DecryptStream(reader io.Reader, writer io.Writer) error {
 	buf := make([]byte, 16)
 	for {
@@ -152,10 +152,10 @@ func (c *Crypt) DecryptStream(reader io.Reader, writer io.Writer) error {
 }
 
 //-----------------------------------------------------------------------------
-// Cipher (It hasn't finished yet)
+// Cipher (TODO:It hasn't finished yet)
 //-----------------------------------------------------------------------------
 
-//Cipher by Aes
+// GetAesEncrypt to cipher by Aes
 func GetAesEncrypt(baseString string) (string, error) {
 	//The key argument should be the AES key, either 16, 24, or 32 bytes to select AES-128, AES-192, or AES-256.
 	key := "djjf63Hdgd#:dj37"
@@ -189,11 +189,13 @@ func GetAesEncrypt(baseString string) (string, error) {
 //-----------------------------------------------------------------------------
 // Base64
 //-----------------------------------------------------------------------------
-//Cipher by Base64
+
+// GetBase64Encode is to encode by Base64
 func GetBase64Encode(src []byte) []byte {
 	return []byte(base64.StdEncoding.EncodeToString(src))
 }
 
+// GetBase64Decode is to decode by base64
 func GetBase64Decode(src []byte) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(string(src))
 }

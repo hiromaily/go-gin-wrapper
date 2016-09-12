@@ -20,10 +20,10 @@
 GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
-TEST_MODE=1        #0:off, 1:after build, run test, 2:quick test for customized
+TEST_MODE=0        #0:off, 1:after build, run test, 2:quick test for customized
 AUTO_EXEC=0        #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
 INSTALL_PKG=1
-GODEP_MODE=0
+GODEP_MODE=1
 
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0      #0:off, 1:deploy server, 2:exec test on heroku
@@ -89,14 +89,18 @@ fi
 ###########################################################
 # go lint
 ###########################################################
-# it's too strict
 #go get -u github.com/golang/lint/golint
 if [ $GO_LINT -eq 1 ]; then
-    #golint ./...
-    #golint `go list ./... | grep -v '/vendor/'`
+    echo '============== golint =============='
     golint ./... | grep -v '^vendor\/' || true
-fi
 
+    echo '============== misspell =============='
+    #misspell .
+    misspell `find . -name "*.go" | grep -v '/vendor/'`
+
+    echo '============== ineffassign =============='
+    ineffassign .
+fi
 
 ###########################################################
 # go list for check import package

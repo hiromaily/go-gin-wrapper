@@ -342,7 +342,7 @@ func SetTOMLPath(path string) {
 
 // Cipher is to decrypt crypted string on config
 func Cipher() {
-	crypt := enc.GetCryptInstance()
+	crypt := enc.GetCrypt()
 
 	if conf.Auth.Google.Encrypted {
 		c := conf.Auth.Google

@@ -9,6 +9,7 @@ import (
 
 var fileNames []string
 
+// checkDirectory is to check directory using goroutine as semaphore
 func checkDirectory(basePath string, extensions []string, ch chan<- string, chSmp chan bool, wg *sync.WaitGroup, closeFlg bool) {
 
 	// read directory
@@ -56,6 +57,7 @@ func checkDirectory(basePath string, extensions []string, ch chan<- string, chSm
 	}
 }
 
+// checkDirectorySingle is check directory using single goroutine
 func checkDirectorySingle(basePath string, extensions []string, ch chan<- string, closeFlg bool) {
 	// read directory
 	fis, err := ioutil.ReadDir(basePath)
@@ -92,6 +94,7 @@ func checkDirectorySingle(basePath string, extensions []string, ch chan<- string
 	}
 }
 
+// checkDirectoryJIC is check directory without goroutine
 func checkDirectoryJIC(basePath string, extensions []string) {
 	// read directory
 	fis, err := ioutil.ReadDir(basePath)
@@ -125,6 +128,7 @@ func checkDirectoryJIC(basePath string, extensions []string) {
 	}
 }
 
+// GetFileList is to get file list using multiple goroutine
 func GetFileList(basePath string, extensions []string) []string {
 	files := []string{}
 	pool := 20
@@ -144,6 +148,7 @@ func GetFileList(basePath string, extensions []string) []string {
 	return files
 }
 
+// GetFileListSingle is to get file list using a goroutine
 func GetFileListSingle(basePath string, extensions []string) []string {
 	files := []string{}
 	ch := make(chan string)
@@ -159,7 +164,8 @@ func GetFileListSingle(basePath string, extensions []string) []string {
 	return files
 }
 
-//Not use channel. But faster.
+// GetFileListJIC is to get file list without goroutine
+// It doesn't use channel. But faster. (JIC means Just In Case)
 func GetFileListJIC(basePath string, extensions []string) []string {
 	fileNames = []string{}
 

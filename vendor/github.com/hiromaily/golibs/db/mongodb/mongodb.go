@@ -17,39 +17,42 @@ import (
 
 //TODO:Mongo session sometimes disconnect and it's not recover automatically.
 
+// MongoInfo is for MongoDB instance
 type MongoInfo struct {
 	Session *mgo.Session
 	Db      *mgo.Database
 	C       *mgo.Collection
 }
 
-var mgInfo MongoInfo
-var mongoUrl string
-var savedDbName string
+var (
+	mgInfo      MongoInfo
+	mongoURL    string
+	savedDbName string
+)
 
 //-----------------------------------------------------------------------------
 // Settings
 //-----------------------------------------------------------------------------
-// create session object
+
+// New is for create instance
 func New(host, db, user, pass string, port uint16) {
 	var err error
 	if mgInfo.Session == nil {
 		//[mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]
 		//mgInfo.session, _ = mgo.Dial("mongodb://user:pass@localhost:port/test")
-		mongoUrl = ""
 		if db == "" {
 			//session, err := mgo.Dial("localhost:40001")
-			mongoUrl = fmt.Sprintf("mongodb://%s:%d", host, port)
+			mongoURL = fmt.Sprintf("mongodb://%s:%d", host, port)
 		} else {
 			savedDbName = db
 			if user != "" && pass != "" {
-				mongoUrl = fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", user, pass, host, port, db)
+				mongoURL = fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", user, pass, host, port, db)
 			} else {
-				mongoUrl = fmt.Sprintf("mongodb://%s:%d/%s", host, port, db)
+				mongoURL = fmt.Sprintf("mongodb://%s:%d/%s", host, port, db)
 			}
 		}
-		fmt.Printf("mongo url: %s\n", mongoUrl)
-		mgInfo.Session, err = mgo.Dial(mongoUrl)
+		fmt.Printf("mongo url: %s\n", mongoURL)
+		mgInfo.Session, err = mgo.Dial(mongoURL)
 		//fmt.Println(mgInfo.Session)
 
 		if err != nil {
@@ -62,7 +65,7 @@ func New(host, db, user, pass string, port uint16) {
 func getMongoSession(rtnSession uint8) *mgo.Session {
 	if mgInfo.Session == nil {
 		var err error
-		mgInfo.Session, err = mgo.Dial(mongoUrl)
+		mgInfo.Session, err = mgo.Dial(mongoURL)
 		if err != nil {
 			panic(err)
 			//log.Fatal("Failed to start the Mongo session")
@@ -70,21 +73,20 @@ func getMongoSession(rtnSession uint8) *mgo.Session {
 	}
 	if rtnSession == 1 {
 		return mgInfo.Session.Clone()
-	} else {
-		return nil
 	}
+	return nil
 }
 
-// singleton architecture
+// GetMongo is to get instance. singleton architecture
 func GetMongo() *MongoInfo {
 	if mgInfo.Session == nil {
-		//panic("Before call this, call New in addtion to arguments")
+		//panic("Before call this, call New in addition to arguments")
 		getMongoSession(0)
 	}
 	return &mgInfo
 }
 
-// close
+// Close is to close connection
 func (mi *MongoInfo) Close() {
 	mi.Session.Close()
 }
@@ -92,7 +94,8 @@ func (mi *MongoInfo) Close() {
 //-----------------------------------------------------------------------------
 // Database
 //-----------------------------------------------------------------------------
-// reset session.DB object to mi.db
+
+// GetDB is reset session.DB object to mi.db
 func (mi *MongoInfo) GetDB(dbName string) *mgo.Database {
 	savedDbName = dbName
 	//mi.db = mi.session.DB("test")
@@ -101,6 +104,7 @@ func (mi *MongoInfo) GetDB(dbName string) *mgo.Database {
 	return mi.Db
 }
 
+// DropDB is to drop database
 func (mi *MongoInfo) DropDB(dbName string) error {
 	//err := mi.Session.DB(dbName).DropDatabase()
 	err := getMongoSession(1).DB(dbName).DropDatabase()
@@ -110,7 +114,8 @@ func (mi *MongoInfo) DropDB(dbName string) error {
 //-----------------------------------------------------------------------------
 // Collection
 //-----------------------------------------------------------------------------
-// Set index
+
+// SetExpireOnCollection is to set expired date to collection
 func (mi *MongoInfo) SetExpireOnCollection(sessionExpire time.Duration) error {
 	sessionTTL := mgo.Index{
 		Key:         []string{"createdAt"},
@@ -138,7 +143,7 @@ func (mi *MongoInfo) CreateCol(colName string) error {
 }
 */
 
-// get and set collection
+// GetCol is to get and set collection
 func (mi *MongoInfo) GetCol(colName string) *mgo.Collection {
 	if mi.Db == nil {
 		if savedDbName == "" {
@@ -151,7 +156,7 @@ func (mi *MongoInfo) GetCol(colName string) *mgo.Collection {
 	return mi.C
 }
 
-// drop collection
+// DropCol is to drop collection
 func (mi *MongoInfo) DropCol(colName string) (err error) {
 	err = mi.Db.C(colName).DropCollection()
 	mi.C = nil
@@ -161,13 +166,14 @@ func (mi *MongoInfo) DropCol(colName string) (err error) {
 //-----------------------------------------------------------------------------
 // Document
 //-----------------------------------------------------------------------------
-//Get Count
+
+// GetCount is to get count
 func (mi *MongoInfo) GetCount() int {
 	cnt, _ := mi.C.Count()
 	return cnt
 }
 
-//Query One
+// FindOne is query to find one
 func (mi *MongoInfo) FindOne(bd bson.M, data interface{}) error {
 
 	//p := new(Person) //return is address of Person??
@@ -179,7 +185,7 @@ func (mi *MongoInfo) FindOne(bd bson.M, data interface{}) error {
 	return mi.C.Find(bd).One(data)
 }
 
-// delete all documents record from collection. Version3.x
+// DelAllDocs is to delete all documents record from collection. Version3.x
 func (mi *MongoInfo) DelAllDocs(colName string) (err error) {
 	if colName != "" {
 		//mi.Db.C(colName).Remove(bson.M{})
@@ -194,16 +200,21 @@ func (mi *MongoInfo) DelAllDocs(colName string) (err error) {
 //-----------------------------------------------------------------------------
 // Util
 //-----------------------------------------------------------------------------
-// convert datetime GMT
+
+// ConvertDateTime is to convert datetime GMT
 // MongoDB stores times in UTC by default
 func ConvertDateTime() {
 	//user.CreatedAt.Local()
 }
 
-//-----------------------------------------------------------------------------
-// Load Json
-//-----------------------------------------------------------------------------
-func LoadJsonFile(filePath string) ([]byte, error) {
+// GetObjectID is to get ObjectId as string
+func GetObjectID(ID bson.ObjectId) string {
+	//bson.ObjectId
+	return ID.Hex()
+}
+
+// LoadJSONFile is to load JSON file
+func LoadJSONFile(filePath string) ([]byte, error) {
 	// Loading jsonfile
 	if filePath == "" {
 		err := errors.New("Nothing Json File")
