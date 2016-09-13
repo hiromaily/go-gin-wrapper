@@ -28,7 +28,7 @@ services:
     ports:
       - "26379:6379"
     volumes:
-      - ./docker_build/redis_data:/data
+      - ./docker_build/redis/data:/data
     restart: always
     command: redis-server --requirepass password --appendonly yes
   # Mongo
