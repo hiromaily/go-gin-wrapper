@@ -1,3 +1,4 @@
+// Package jwt is authentication by JWT
 package jwt
 
 import (
@@ -147,7 +148,7 @@ func judgeParse(token *jwt.Token) (interface{}, error) {
 	}
 
 	if !ok {
-		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 	}
 
 	if encrypted == HMAC {
@@ -191,11 +192,11 @@ func JudgeJWTWithClaim(tokenString, clientID, userName string) error {
 	//check claim
 	claims, ok := token.Claims.(*jwt.StandardClaims)
 	if !ok {
-		return fmt.Errorf("Claims data can't be retrieved")
+		return fmt.Errorf("claims data can't be retrieved")
 	} else if claims.Issuer != clientID {
-		return fmt.Errorf("Issuer is invalid")
+		return fmt.Errorf("issuer is invalid")
 	} else if claims.Subject != userName {
-		return fmt.Errorf("Subject is invalid")
+		return fmt.Errorf("subject is invalid")
 	}
 
 	return nil
@@ -218,13 +219,13 @@ func JudgeJWTWithCustomClaim(tokenString, clientID, userName, option string) err
 	//check claim
 	claims, ok := token.Claims.(*CustomClaims)
 	if !ok {
-		return fmt.Errorf("Claims data can't be retrieved")
+		return fmt.Errorf("claims data can't be retrieved")
 	} else if claims.Issuer != clientID {
-		return fmt.Errorf("Issuer is invalid")
+		return fmt.Errorf("issuer is invalid")
 	} else if claims.Subject != userName {
-		return fmt.Errorf("Subject is invalid")
+		return fmt.Errorf("subject is invalid")
 	} else if claims.Option != option {
-		return fmt.Errorf("Option is invalid")
+		return fmt.Errorf("option is invalid")
 	}
 
 	return nil

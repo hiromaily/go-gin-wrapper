@@ -4,6 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/hiromaily/go-gin-wrapper/badge.svg)](https://coveralls.io/github/hiromaily/go-gin-wrapper)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hiromaily/go-gin-wrapper)](https://goreportcard.com/report/github.com/hiromaily/go-gin-wrapper)
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hiromaily/go-gin-wrapper)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/LICENSE)
 
 Go-gin-wrapper is wrapper of go gin web framework plus reverseproxy.
  [gin-gonic/gin](https://github.com/gin-gonic/gin)

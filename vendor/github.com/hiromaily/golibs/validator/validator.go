@@ -92,7 +92,7 @@ func getErrorMsgFmt(chkItem string, errFmt map[string]string) (string, error) {
 	if _, ok := errFmt[chkItem]; ok {
 		return errFmt[chkItem], nil
 	}
-	return "", errors.New("Not found key")
+	return "", errors.New("not found key")
 }
 
 //-----------------------------------------------------------------------------

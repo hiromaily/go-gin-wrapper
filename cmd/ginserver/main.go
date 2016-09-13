@@ -9,11 +9,11 @@ import (
 	//"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
-	"github.com/hiromaily/go-gin-wrapper/libs/cipher"
 	"github.com/hiromaily/go-gin-wrapper/libs/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/routes"
 	"github.com/hiromaily/golibs/auth/jwt"
+	enc "github.com/hiromaily/golibs/cipher/encryption"
 	mongo "github.com/hiromaily/golibs/db/mongodb"
 	"github.com/hiromaily/golibs/db/mysql"
 	fl "github.com/hiromaily/golibs/files"
@@ -35,7 +35,7 @@ func init() {
 	flag.Parse()
 
 	//cipher
-	cipher.Setup()
+	enc.NewCryptDefault()
 }
 
 func setupMain() {
@@ -68,12 +68,7 @@ func setupMain() {
 
 func initConf() {
 	//config
-	if *tomlPath != "" {
-		conf.SetTOMLPath(*tomlPath)
-	}
-	conf.New("")
-	conf.Cipher()
-	//conf.GetConf()
+	conf.New(*tomlPath, true)
 }
 
 func initAuth() {

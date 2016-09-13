@@ -312,13 +312,17 @@ func loadConfig(fileName string) (*Config, error) {
 }
 
 // New is create instance
-func New(fileName string) {
+func New(fileName string, cipherFlg bool) {
 	var err error
 	if conf == nil {
 		conf, err = loadConfig(fileName)
 	}
 	if err != nil {
 		panic(err)
+	}
+
+	if cipherFlg {
+		Cipher()
 	}
 }
 

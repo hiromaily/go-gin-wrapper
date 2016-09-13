@@ -44,7 +44,7 @@ var dbInfo MS
 //-----------------------------------------------------------------------------
 
 // New is to create instance
-func New(host, dbname, user, pass string, port uint16) {
+func New(host, dbname, user, pass string, port uint16) *MS {
 	var err error
 	if dbInfo.DB == nil {
 		dbInfo.host = host
@@ -55,19 +55,38 @@ func New(host, dbname, user, pass string, port uint16) {
 
 		dbInfo.DB, err = dbInfo.Connection()
 	}
-	//lg.Debugf("dbInfo.db %+v\n", *dbInfo.DB)
 	if err != nil {
 		panic(err.Error())
 	}
-	return
+	return &dbInfo
+}
+
+// NewIns make a new instance
+func NewIns(host, dbname, user, pass string, port uint16) *MS {
+	ms := &MS{}
+	var err error
+	if ms.DB == nil {
+		ms.host = host
+		ms.port = port
+		ms.dbname = dbname
+		ms.user = user
+		ms.pass = pass
+
+		ms.DB, err = dbInfo.Connection()
+	}
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return ms
 }
 
 // GetDB is to get instance. singleton architecture
 func GetDB() *MS {
 	var err error
 	if dbInfo.DB == nil {
-		//TODO: it may be better to call New()
-		dbInfo.DB, err = dbInfo.Connection()
+		//dbInfo.DB, err = dbInfo.Connection()
+		return nil
 	}
 	if err != nil {
 		panic(err.Error())
@@ -88,7 +107,6 @@ func (ms *MS) getDsn() string {
 // Connection is to connect MySQL server
 // Be careful, sql.Open() doesn't return err. Use db.Ping() to check DB condition.
 func (ms *MS) Connection() (*sql.DB, error) {
-	//return sql.Open("mysql", getDsn())
 	db, _ := sql.Open("mysql", ms.getDsn())
 	return db, db.Ping()
 }

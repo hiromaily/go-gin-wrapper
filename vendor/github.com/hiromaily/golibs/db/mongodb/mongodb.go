@@ -34,31 +34,40 @@ var (
 // Settings
 //-----------------------------------------------------------------------------
 
-// New is for create instance
+// New is to create instance for singleton
 func New(host, db, user, pass string, port uint16) {
-	var err error
 	if mgInfo.Session == nil {
 		//[mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]
 		//mgInfo.session, _ = mgo.Dial("mongodb://user:pass@localhost:port/test")
-		if db == "" {
-			//session, err := mgo.Dial("localhost:40001")
-			mongoURL = fmt.Sprintf("mongodb://%s:%d", host, port)
-		} else {
-			savedDbName = db
-			if user != "" && pass != "" {
-				mongoURL = fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", user, pass, host, port, db)
-			} else {
-				mongoURL = fmt.Sprintf("mongodb://%s:%d/%s", host, port, db)
-			}
-		}
-		fmt.Printf("mongo url: %s\n", mongoURL)
-		mgInfo.Session, err = mgo.Dial(mongoURL)
-		//fmt.Println(mgInfo.Session)
+		createMongoURL(host, db, user, pass, port)
 
-		if err != nil {
-			panic(err)
-		}
+		getMongoSession(0)
 		//mgInfo.Session.SetMode(mgo.Monotonic, true)
+	}
+}
+
+// NewIns make a new instance
+func NewIns(host, db, user, pass string, port uint16) {
+	var err error
+	mg := &MongoInfo{}
+	createMongoURL(host, db, user, pass, port)
+
+	mg.Session, err = mgo.Dial(mongoURL)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func createMongoURL(host, db, user, pass string, port uint16) {
+	if db == "" {
+		mongoURL = fmt.Sprintf("mongodb://%s:%d", host, port)
+	} else {
+		savedDbName = db
+		if user != "" && pass != "" {
+			mongoURL = fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", user, pass, host, port, db)
+		} else {
+			mongoURL = fmt.Sprintf("mongodb://%s:%d/%s", host, port, db)
+		}
 	}
 }
 
@@ -78,6 +87,7 @@ func getMongoSession(rtnSession uint8) *mgo.Session {
 }
 
 // GetMongo is to get instance. singleton architecture
+//  This is for singleton design pattern
 func GetMongo() *MongoInfo {
 	if mgInfo.Session == nil {
 		//panic("Before call this, call New in addition to arguments")
@@ -217,7 +227,7 @@ func GetObjectID(ID bson.ObjectId) string {
 func LoadJSONFile(filePath string) ([]byte, error) {
 	// Loading jsonfile
 	if filePath == "" {
-		err := errors.New("Nothing Json File")
+		err := errors.New("nothing JSON file")
 		return nil, err
 	}
 

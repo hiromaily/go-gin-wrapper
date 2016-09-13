@@ -374,11 +374,11 @@ func TestConfigs(t *testing.T) {
 	//configFiles
 	path := "../../configs/"
 	for _, v := range configFiles {
-		conf.New(path + v)
+		conf.New(path+v, false)
 	}
 
 	//
-	conf.New(*tomlPath)
+	conf.New(*tomlPath, false)
 }
 
 //-----------------------------------------------------------------------------
