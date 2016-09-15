@@ -1,0 +1,3 @@
+*.tmpl linguist-language=golang
+statics/*
+templates/samples/* linguist-documentation
