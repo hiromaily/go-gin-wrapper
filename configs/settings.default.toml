@@ -40,9 +40,11 @@ path = "/var/log/goweb/proxy.log"
 [auth]
 
 [auth.api]
+only_ajax = true
+cors = false
+require_header = true
 header = "X-Custom-Header-Gin"
 key = "key12345"
-only_ajax = true
 
 [auth.jwt]
 mode = 2   #0:off, 1:HMAC, 2:RSA

@@ -91,9 +91,11 @@ type AuthConfig struct {
 
 // APIConfig is for Rest API
 type APIConfig struct {
-	Header string `toml:"header"`
-	Key    string `toml:"key"`
-	Ajax   bool   `toml:"only_ajax"`
+	Ajax          bool   `toml:"only_ajax"`
+	CORS          bool   `toml:"cors"`
+	RequireHeader bool   `toml:"require_header"`
+	Header        string `toml:"header"`
+	Key           string `toml:"key"`
 }
 
 // JWTConfig is for JWT Auth
@@ -190,9 +192,11 @@ var checkTOMLKeys = [][]string{
 	{"proxy", "server", "port"},
 	{"proxy", "server", "log", "level"},
 	{"proxy", "server", "log", "path"},
+	{"auth", "api", "only_ajax"},
+	{"auth", "api", "cors"},
+	{"auth", "api", "require_header"},
 	{"auth", "api", "header"},
 	{"auth", "api", "key"},
-	{"auth", "api", "only_ajax"},
 	{"auth", "jwt", "mode"},
 	{"auth", "jwt", "secret_code"},
 	{"auth", "jwt", "private_key"},
