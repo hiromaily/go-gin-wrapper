@@ -12,6 +12,8 @@
 
 #travis web console -> settings
 
+#cp /Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/work_js/react/app/dist/apilist.bundle.js \
+#/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/statics/js/
 
 ###########################################################
 # Variable
@@ -20,8 +22,8 @@
 GOTRACEBACK=all
 CURRENTDIR=`pwd`
 
-TEST_MODE=1        #0:off, 1:after build, run test, 2:quick test for customized
-AUTO_EXEC=0        #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
+TEST_MODE=0        #0:off, 1:after build, run test, 2:quick test for customized
+AUTO_EXEC=1        #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
 INSTALL_PKG=1
 GODEP_MODE=1
 

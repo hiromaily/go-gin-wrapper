@@ -1,4 +1,4 @@
-{{define "pages/apilist/index.tmpl"}}
+{{define "pages/apilist/index2.tmpl"}}
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -17,8 +17,14 @@
           <!-- /. ROW 01 -->
           {{template "components/wrapper/row_01.tmpl" .}}
 
-          <!-- React -->
-          <div id="app"></div>
+          <!-- /. ROW user list -->
+          {{template "components/wrapper/apilist/userlist.tmpl" .}}
+          <!-- /. ROW FORM JWT -->
+          {{template "components/wrapper/apilist/jwt.tmpl" .}}
+          <!-- /. ROW FORM GET DELETE -->
+          {{template "components/wrapper/apilist/get_del.tmpl" .}}
+          <!-- /. ROW FORM PUT POST -->
+          {{template "components/wrapper/apilist/put_post.tmpl" .}}
         </div>
         <!-- /. PAGE INNER  -->
       </div>
@@ -29,7 +35,7 @@
     {{template "components/footer.tmpl" .}}
 
   <!-- /. FOOTER jslist -->
-  {{template "components/footer_react.tmpl" .}}
+  {{template "components/footer_jslist.tmpl" .}}
 
 </body>
 </html>

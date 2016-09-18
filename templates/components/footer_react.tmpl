@@ -1,0 +1,22 @@
+{{define "components/footer_react.tmpl"}}
+<!-- SCRIPTS -AT THE BOTOM TO REDUCE THE LOAD TIME-->
+<!-- JQUERY SCRIPTS -->
+<script src="/assets/js/jquery-1.10.2.js"></script>
+<!-- BOOTSTRAP SCRIPTS -->
+<script src="/assets/js/bootstrap.js"></script>
+<!-- METISMENU SCRIPTS -->
+<script src="/assets/js/jquery.metisMenu.js"></script>
+<!-- CUSTOM SCRIPTS -->
+<script src="/assets/js/custom.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.0/sweetalert.min.js"></script>
+
+<script type="text/javascript">
+var hiromaily_header = {{ .header }};
+var hiromaily_key = {{ .key }};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.js"></script>
+<script src="/statics/js/apilist.bundle.js"></script>
+<!--<script src="/statics/js/hiromaily.js"></script>-->
+{{end}}

@@ -1,0 +1,22 @@
+{
+    "extends": ["eslint:recommended"],
+    "plugins": ["react"],
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "globals": {
+        "$": false
+    },
+    "rules": {
+        "no-console":0,
+        "semi" : [2 , "never"]
+    }
+}

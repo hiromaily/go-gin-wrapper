@@ -1,0 +1,28 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:100);
+
+.block {
+  width: 150px;
+  height: 150px;
+  border-radius: 15px;
+  transition: background-color 0.8s ease-in;
+}
+
+h2 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 100;
+  margin: 10px;
+}
+
+.usercard {
+  height: 170px;
+  width: 300px;
+  border: 1px solid #bdbdbd;
+  border-radius: 15px;
+}
+
+.circle {
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  margin: 10px;
+}

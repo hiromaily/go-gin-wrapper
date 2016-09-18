@@ -1,0 +1,25 @@
+{
+    "news": [
+        {
+            "id": 5,
+            "author": "harry5", 
+            "date": "2016-06-04 19:30:40 +0900", 
+            "text": "zzzzzzzzzzzzzzzz5", 
+            "title": "news5"
+        },
+        {
+            "id": 6,
+            "author": "harry6", 
+            "date": "2016-06-05 19:30:40 +0900", 
+            "text": "zzzzzzzzzzzzzzzz6", 
+            "title": "news6"
+        },
+        {
+            "id": 7,
+            "author": "harry7", 
+            "date": "2016-06-06 19:30:40 +0900", 
+            "text": "zzzzzzzzzzzzzzzz7", 
+            "title": "news7"
+        }
+    ]
+}

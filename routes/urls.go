@@ -68,6 +68,7 @@ func SetURLOnHTTP(r *gin.Engine) {
 	{
 		//Top
 		apiListG.GET("/", apilist.IndexAction)
+		apiListG.GET("/index2", apilist.Index2Action)
 	}
 
 	//-----------------------

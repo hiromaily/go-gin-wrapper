@@ -103,55 +103,55 @@
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/auth/jwt",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/cipher/encryption",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/cipher/hash",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mongodb",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mysql",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/files",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/heroku",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/log",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/regexp",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/signal",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/time",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/utils",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/validator",
-			"Rev": "43dfeaf20491823b573ebf37d374bbf8b9b9714d"
+			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
 		},
 		{
 			"ImportPath": "github.com/manucorporat/sse",

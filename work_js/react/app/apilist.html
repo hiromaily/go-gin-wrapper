@@ -1,0 +1,183 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>incorporate react into page now.</title>
+      <!-- BOOTSTRAP STYLES-->
+      <link href="/assets/css/bootstrap.css" rel="stylesheet" />
+      <!-- FONTAWESOME STYLES-->
+      <link href="/assets/css/font-awesome.css" rel="stylesheet" />
+      <!--CUSTOM BASIC STYLES-->
+      <link href="/assets/css/basic.css" rel="stylesheet" />
+      <!--CUSTOM MAIN STYLES-->
+      <link href="/assets/css/custom.css" rel="stylesheet" />
+      <!-- GOOGLE FONTS-->
+      <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+      <!-- alert -->
+      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.0/sweetalert.min.css">
+      <style>
+        .form-err{color: red; font-size: 8pt;}
+      </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <!-- /. NAV TOP  -->
+      <!-- /. NAV SIDE  -->
+      <nav class="navbar-default navbar-side" role="navigation">
+        <div class="sidebar-collapse">
+          <ul class="nav" id="main-menu">
+            <li>
+              <div class="user-img-div">
+                <img src="/assets/img/users/user.png" class="img-thumbnail" />
+                <div class="inner-text">Hiroki Harry Yasui
+                  <br />
+                  <small>Last Login : 2 Weeks Ago </small>
+                </div>
+              </div>
+            </li>
+            <li>
+              <a class="nav-menu" href="/">
+                <i class="fa fa-dashboard "></i>TOP Page
+              </a>
+            </li>
+            <li>
+              <a class="nav-menu" href="/news/">
+                <i class="fa fa-dashboard "></i>News Page
+              </a>
+            </li>
+            <li>
+              <a class="nav-menu" href="/apilist/">
+                <i class="fa fa-desktop "></i>API List Page
+              </a>
+            </li>
+            <li>
+              <a class="nav-menu" href="/login">
+                <i class="fa fa-dashboard "></i>Login Page
+              </a>
+            </li>
+            <li>
+              <a class="nav-menu" href="/logout" data-post="1" data-method="post">
+                <i class="fa fa-sign-in "></i>Logout
+              </a>
+            </li>
+            <li>
+              <a class="nav-menu" href="/logout" data-ajax="1" data-method="put">
+                <i class="fa fa-sign-in "></i>Logout(ajax)
+              </a>
+            </li>
+            <li>
+              <a class="nav-menu" href="/accounts/">
+                <i class="fa fa-square-o "></i>After Login Page
+              </a>
+            </li>
+            <li>
+              <a class="nav-menu" href="/admin/">
+                <i class="fa fa-square-o "></i>Admin Page
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+<form id="form_active" action="/logout" method="POST"></form>
+<script type="text/javascript">
+(function (){
+  //navi color
+  var key="/apilist/";
+  //class="active-menu-top"
+  //var el = document.querySelector("a.nav-menu");
+  var el = document.querySelectorAll("a.nav-menu");
+  for (var i = 0, len = el.length; i < len; i++) {
+    if (el[i].getAttribute('href') == key){
+      el[i].classList.add('active-menu');
+    }
+  }
+
+  //logout
+  //<a class="nav-menu" href="/logout" data-post="1" data-method="post">
+  function getPostElem(){
+    post_elem = document.querySelectorAll('a[data-post="1"]');
+    for (var i = 0, len = post_elem.length; i < len; i++) {
+      post_elem[i].addEventListener("click", onPost, false);
+    }
+  }
+
+  function getAjaxElem(){
+    ajax_elem = document.querySelectorAll('a[data-ajax="1"]');
+    for (var i = 0, len = ajax_elem.length; i < len; i++) {
+      ajax_elem[i].addEventListener("click", onAjax, false);
+    }
+  }
+
+  function onPost(e){
+    e.preventDefault();
+    sendPost(e.target.href);
+  }
+
+  function onAjax(e){
+    e.preventDefault();
+    //sendAjax(e.target.href, e.target.getAttribute('data-method'), e.target.getAttribute('data-contype'));
+    hy.sendAjax(e.target.href, e.target.getAttribute('data-method'), "form", "")
+  }
+
+  //send Post
+  function sendPost(url){
+    //form action
+    var form = document.getElementById("form_active");
+    form.action = url;
+    form.submit();
+  }
+
+
+document.addEventListener("DOMContentLoaded",getAjaxElem,false);
+document.addEventListener("DOMContentLoaded",getPostElem,false);
+})();
+</script>
+      <!-- -->
+      <div id="page-wrapper">
+        <div id="page-inner">
+          <!-- /. ROW 01 -->
+          <div class="row">
+            <div class="col-md-12">
+              <h1 class="page-head-line">API LIST</h1>
+              <h1 class="page-subhead-line">This is dummy text , you can replace it with your original text. </h1>
+            </div>
+          </div>
+
+          <!-- React -->
+          <div id="app"></div>
+
+        </div>
+        <!-- /. PAGE INNER  -->
+      </div>
+      <!-- /. PAGE WRAPPER  -->
+    </div>
+    <!-- /. WRAPPER  -->
+    <!-- /. Footer -->
+    <div id="footer-sec">&copy; 2014 YourCompany | Design By :
+      <a href="http://www.binarytheme.com/" target="_blank">BinaryTheme.com</a>
+    </div>
+
+  <!-- /. FOOTER jslist -->
+<!-- SCRIPTS -AT THE BOTOM TO REDUCE THE LOAD TIME-->
+<!-- JQUERY SCRIPTS -->
+<script src="/assets/js/jquery-1.10.2.js"></script>
+<!-- BOOTSTRAP SCRIPTS -->
+<script src="/assets/js/bootstrap.js"></script>
+<!-- METISMENU SCRIPTS -->
+<script src="/assets/js/jquery.metisMenu.js"></script>
+<!-- CUSTOM SCRIPTS -->
+<script src="/assets/js/custom.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.0/sweetalert.min.js"></script>
+
+<script type="text/javascript">
+var hiromaily_header = "X-Custom-Header-Gin";
+var hiromaily_key = "key12345";
+</script>
+<!--<script src="/statics/js/hiromaily.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.js"></script>
+    <script src="dist/apilist.bundle.js"></script>
+
+</body>
+</html>
