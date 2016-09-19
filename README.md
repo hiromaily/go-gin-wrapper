@@ -3,11 +3,11 @@
 [![Build Status](https://travis-ci.org/hiromaily/go-gin-wrapper.svg?branch=master)](https://travis-ci.org/hiromaily/go-gin-wrapper)
 [![Coverage Status](https://coveralls.io/repos/github/hiromaily/go-gin-wrapper/badge.svg)](https://coveralls.io/github/hiromaily/go-gin-wrapper)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hiromaily/go-gin-wrapper)](https://goreportcard.com/report/github.com/hiromaily/go-gin-wrapper)
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hiromaily/go-gin-wrapper)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/LICENSE)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hiromaily/go-gin-wrapper)
 
-Go-gin-wrapper is wrapper of go gin web framework plus reverseproxy.
- [gin-gonic/gin](https://github.com/gin-gonic/gin)
+Go-gin-wrapper is wrapper of go gin web framework plus reverseproxy. React by ES6 is used on part of front-end.  
+[gin-gonic/gin](https://github.com/gin-gonic/gin)
 
 
 ## Installation
@@ -99,13 +99,13 @@ $ heroku ps -a ginserver
 
 ## Deploy
 $ git push -f heroku master
-
-## Access (For check hot to work)
-[site on heroku](https://ginserver.herokuapp.com/)
-
 ``` 
 
-Heroku environment set configs/heroku.toml when starting to run.  
+* Access (For check hot to work)  
+[site on heroku](https://ginserver.herokuapp.com/)
+
+
+* Heroku environment set configs/heroku.toml when starting to run.  
 ```
 ginserver -f /app/configs/heroku.toml
 ```
