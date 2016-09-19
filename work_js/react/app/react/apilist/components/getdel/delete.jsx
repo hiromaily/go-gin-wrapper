@@ -21,8 +21,9 @@ export default class Delete extends React.Component {
 
   render() {
     let options = this.props.ids.map(function (id) {
+      let key='del_'+id
       return (
-        <Options key={id} id={id} />
+        <Options key={key} id={id} />
       )
     })
 

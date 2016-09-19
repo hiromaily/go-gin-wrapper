@@ -31,7 +31,13 @@ export default class Post extends React.Component {
       })
 
       //send data
-      let sendData = [this.refs.postFN.value, this.refs.postLN.value, this.refs.postEM.value, this.refs.postPW.value]
+      //let sendData = [this.refs.postFN.value, this.refs.postLN.value, this.refs.postEM.value, this.refs.postPW.value]
+      let sendData = {
+        firstName: this.refs.postFN.value,
+        lastName:  this.refs.postLN.value,
+        email:     this.refs.postEM.value,
+        password:  this.refs.postPW.value
+      }
 
       //call event for post btn click
       this.props.btn.call(this, sendData)

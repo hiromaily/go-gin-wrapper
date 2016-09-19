@@ -15,12 +15,12 @@ export default class JwtInput extends React.Component {
             <form role="form">
               <div className="form-group">
                 <label>E-mail</label>
-                <input id="jwtEM" className="form-control" type="text" onChange={this.props.em} autoComplete="off" />
+                <input id="jwtEM" className="form-control" type="text" onChange={this.props.em} value={this.props.inputEM} autoComplete="off" />
                 <span className="form-err">{this.props.error.email}</span>
               </div>
               <div className="form-group">
                 <label>Password</label>
-                <input id="jwtPW" className="form-control" type="password" onChange={this.props.pw} autoComplete="off" />
+                <input id="jwtPW" className="form-control" type="password" onChange={this.props.pw} value={this.props.inputPW} autoComplete="off" />
                 <span className="form-err">{this.props.error.pass}</span>
               </div>
               <button id="jwtBtn" type="button" onClick={this.props.btn} className="btn btn-info">Get JWT</button>

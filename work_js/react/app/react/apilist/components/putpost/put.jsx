@@ -44,7 +44,14 @@ export default class Put extends React.Component {
     })
 
     //send data
-    let sendData = [this.refs.putFN.value, this.refs.putLN.value, this.refs.putEM.value, this.refs.putPW.value]
+    //let sendData = [this.refs.putID.value, this.refs.putFN.value, this.refs.putLN.value, this.refs.putEM.value, this.refs.putPW.value]
+    let sendData = {
+      id:        this.refs.putID.value,
+      firstName: this.refs.putFN.value,
+      lastName:  this.refs.putLN.value,
+      email:     this.refs.putEM.value,
+      password:  this.refs.putPW.value
+    }
 
     //call event for put btn click
     this.props.btn.call(this, sendData)

@@ -159,11 +159,11 @@ var getUserAPITests2 = []struct {
 	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, //TODO:value is necessary
 	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
 	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
-	{fmt.Sprintf("/api/users/%d", userID), http.StatusBadRequest, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil}, //TODO:no resource is right
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "DELETE", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil}, //TODO:no resource is right
 	//TODO:with post data, put data
 	//TODO:with jwt token
 }
@@ -178,9 +178,9 @@ var getUserAPITests3 = []struct {
 }{
 	//with jwt token
 	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
 	//TODO:with post data, put data
 }
 

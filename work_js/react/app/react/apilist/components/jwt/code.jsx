@@ -14,7 +14,7 @@ export default class JwtCode extends React.Component {
             <div className="panel-body">
                 <div className="form-group">
                   <label htmlFor="disabledInput">jwt code</label>
-                  <input id="jwtCode" className="form-control" id="disabledInput" value={this.props.code} type="text" placeholder="" disabled="" />
+                  <input id="jwtCode" className="form-control" id="disabledInput" value={this.props.code} type="text" placeholder="" disabled />
                 </div>
             </div>
           </div>

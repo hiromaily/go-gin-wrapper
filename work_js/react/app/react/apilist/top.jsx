@@ -19,6 +19,7 @@ export default class App extends React.Component {
     this.delBtnEvt = this.delBtnEvt.bind(this)
     this.putBtnEvt = this.putBtnEvt.bind(this)
     this.postBtnEvt = this.postBtnEvt.bind(this)
+    this.getUserIDs = this.getUserIDs.bind(this)
   }
 
   //Only once before first render()
@@ -27,53 +28,131 @@ export default class App extends React.Component {
     this.getUserIDs()
   }
 
-  //Get all user IDs
-  //TODO:get user ids by Ajax
-  getUserIDs() {
-    console.log("[App]:getUserIDs()")
-    console.log(hiromaily_header)
-    console.log(hiromaily_key)
-    //JWT
-    if(this.refs.jwt != undefined){
-      console.log(this.refs.jwt.state.code)
+  callAjax(mode, passedURL, sendData) {
+    console.log("[App]:callAjax, mode is ", mode)
+
+    let that = this
+    let url = passedURL
+    let method = 'get'
+    let contentType = "application/x-www-form-urlencoded"
+    let token = "Bearer " + this.refs.jwt.state.code
+
+    switch (mode) {
+      case 'getid':
+        break
+      case 'getlist':
+        break
+      case 'delete':
+        method = 'delete'
+        break
+      case 'put':
+        method = 'put'
+        break
+      case 'post':
+        method = 'post'
+        break
+      default:
+        return
+        break
     }
 
-    let url = '/json/userIDs.json'
-
-    //Only this API can Access without jwt
     $.ajax({
-      url: url,
-      dataType: 'json',
-      cache: false,
-      success: (data) => {
-        this.setState({ids: data.ids})
+      url: encodeURI(url),
+      type: method,
+      beforeSend: function beforeSend(xhr) {
+        xhr.setRequestHeader(hiromaily_header, hiromaily_key)
+        xhr.setRequestHeader('Authorization', token)
       },
-      error: (xhr, status, err) => {
-        console.error(url, status, err.toString())
+      //cache    : false,
+      crossDomain: false,
+      //contentType: contentType,
+      dataType:    'json', //data type from server
+      data:        sendData
+    }).done(function (data, textStatus, jqXHR) {
+      switch (mode) {
+        case 'getid':
+          //console.log(data.ids)
+          that.setState({ids: data.ids})
+          //swal("success!", "get ids!", "success")
+          break
+        case 'getlist':
+          if (data.code == 0) {
+            //console.log(data.users)
+            //let newUsers = []
+            //for (let user of data.users) {
+            //  newUsers.push({id:user.id, firstName:user.firstName, lastName:user.lastName, email:user.email, updated:user.updated})
+            //}
+            that.setState({
+              users: data.users
+            })
+            //swal("success!", "get user list!", "success")
+          }else{
+            swal("error!", "validation error was occurred!", "error")
+          }
+          break
+        case 'delete':
+          console.log(data.id)
+          // get user ids again.
+          that.getUserIDs()
+          that.getUsers('All')
+          swal("success!", "delete user!", "success")
+          break
+        case 'put':
+          console.log(data.id)
+          that.getUsers(data.id)
+          swal("success!", "put user!", "success")
+          break
+        case 'post':
+          console.log(data.id)
+          that.getUserIDs()
+          that.getUsers(data.id)
+          swal("success!", "post user!", "success")
+          break
+        default:
+          break
       }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+      console.error(url, textStatus, errorThrown.toString())
+      swal("error!", "validation error was occurred!", "error")
     })
-    //this.setState({
-    //  ids: [1,2,3,4,5,6,7,8,9,10]
-    //})
   }
 
-  //This may be not necessary
-  getUserIDsFromUsers(users){
-    let newIDs = []
-    for (let user of users){
-      newIDs.push(user.id)
+  //Get all user IDs
+  getUserIDs() {
+    console.log("[App]:getUserIDs()")
+    //JWT
+    if(this.refs.jwt == undefined){
+      return
+    }else if (this.refs.jwt.state.code == ""){
+      return
     }
+    //console.log("jwt code:", this.refs.jwt.state.code)
 
-    this.setState({
-      ids: newIDs
-    })
+    //call ajax
+    let url = '/api/users/ids'
+    this.callAjax('getid', url, '')
   }
 
   //Get users data as list
-  getUsers() {
-    //TODO:get users by Ajax
+  getUsers(id) {
     console.log("[App]:getUsers()")
 
+    if (this.refs.jwt.state.code == ""){
+      swal("warning!", "jwt code is required.", "warning")
+      return
+    }
+
+    let url = ''
+    if (id == "All"){
+        url = "/api/users"
+    }else{
+        url = "/api/users/id/" + id
+    }
+
+    //call ajax
+    this.callAjax('getlist', url, '')
+
+    /*
     var newUsers = []
     newUsers.push({id:1, firstName:'harry1', lastName:'yasu1', email:'aa@aa.jp', updated:'2016/5/21'})
     newUsers.push({id:2, firstName:'harry2', lastName:'yasu2', email:'aa@aa.jp', updated:'2016/5/21'})
@@ -84,84 +163,133 @@ export default class App extends React.Component {
 
     this.setState({
       users: newUsers
-    });
+    })
+    */
+  }
+
+  //Delete users data from id
+  deleteUser(id) {
+    console.log("[App]:deleteUser()")
+
+    if (this.refs.jwt.state.code == ""){
+      swal("warning!", "jwt code is required.", "warning")
+      return
+    }
+
+    let url = "/api/users/id/" + id
+
+    //call ajax
+    this.callAjax('delete', url, '')
+  }
+
+  //Put user data
+  putUser(data) {
+    console.log("[App]:putUser()")
+
+    if (this.refs.jwt.state.code == ""){
+      swal("warning!", "jwt code is required.", "warning")
+      return
+    }
+
+    let url = "/api/users/id/"
+    let sendData = new Object()
+
+    if (data.id != "" && !isNaN(data.id)){
+      url = url + data.id
+    }else{
+      swal("warning!", "user id is invalid.", "warning")
+      return
+    }
+
+
+    //create data
+    if (data.firstName != ""){
+      sendData.firstName = data.firstName
+    }
+    if (data.lastName != ""){
+      sendData.lastName = data.lastName
+    }
+    if (data.email != ""){
+      sendData.email = data.email
+    }
+    if (data.password != ""){
+      sendData.password = data.password
+    }
+
+    //call ajax
+    this.callAjax('put', url, sendData)
+  }
+
+  //Post user data
+  postUser(data) {
+    console.log("[App]:postUser()")
+
+    if (this.refs.jwt.state.code == ""){
+      swal("warning!", "jwt code is required.", "warning")
+      return
+    }
+
+    let url = "/api/users"
+    let sendData = new Object()
+
+    //create data
+    sendData.firstName = data.firstName
+    sendData.lastName = data.lastName
+    sendData.email = data.email
+    sendData.password = data.password
+
+    //call ajax
+    this.callAjax('post', url, sendData)
   }
 
   //Click get btn
-  getBtnEvt(data) {
+  getBtnEvt(id) {
     console.log("[App]:getBtnEvt()")
-    console.log(data)
-    //TODO: get userlist by Ajax
-    //TODO: set response user list
-    //たとえ1レコードでも全ユーザーIDを取得しないといけない。
+    //console.log(id)
 
-    //1.指定したIDの情報取得 -> users
-    this.getUsers()
+    //1.get user list by id
+    this.getUsers(id)
 
-    //2.userid全リストの取得 -> ids (不要)
-    //this.getUserIDs()
-
-    //set.Stateはrenderが呼ばれるまで反映されない。
+    //[!!!]set.State is not updated until calling render()
     //console.log("[App]:getBtnEvt(), this.state", this.state)
   }
 
   //Click delete btn
-  delBtnEvt(data) {
+  delBtnEvt(id) {
     console.log("[App]:delBtnEvt()")
-    console.log(data)
-    //TODO: delete user by Ajax
-    //TODO: change user id options and user list
+    //console.log(id)
 
-    //削除後、userlistを取得し直す
-    //2.指定したIDの情報取得 -> users
-    this.getUsers()
-
-    //削除後、useridを取得し直す
-    //3.userid全リストの取得 -> ids
-    this.getUserIDs()
-
+    //1.delete user by id
+    this.deleteUser(id)
   }
 
   //Click put btn
   putBtnEvt(data) {
     console.log("[App]:putBtnEvt()")
-    console.log(data)
-    //TODO: update user by Ajax
-    //TODO: change user id options and user list
+    //console.log(data)
 
-
-
-    //更新後、userlistを取得し直す
-    //2.指定したIDの情報取得 -> users
-    this.getUsers()
-
+    //put user
+    this.putUser(data)
   }
 
   //Click post btn
   postBtnEvt(data) {
     console.log("[App]:postBtnEvt()")
-    console.log(data)
-    //TODO: insert user by Ajax
-    //TODO: change user id options and user list
+    //console.log(data)
 
-    //登録後、userlistを取得し直す
-    //2.指定したIDの情報取得 -> users
-    this.getUsers()
-
-    //後、useridを取得し直す
-    //3.userid全リストの取得 -> ids
-    this.getUserIDs()
+    //post user
+    this.postUser(data)
   }
 
 
   render() {
-    //このタイミングではstateは更新される
+    //state was updated at this time.
     //console.log("[App]:render() this.state.users:", this.state.users)
 
     return (
       <div>
         <List users={this.state.users} />
-        <JwtParent users={this.state.users} ref="jwt" />
+        <JwtParent users={this.state.users} funcGetUserIDs={this.getUserIDs} ref="jwt" />
         <GetDelParent btnGet={this.getBtnEvt} btnDel={this.delBtnEvt} ids={this.state.ids} ref="getdel" />
         <PutPostParent btnPut={this.putBtnEvt} btnPost={this.postBtnEvt} />
       </div>

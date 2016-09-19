@@ -32,7 +32,12 @@ type UsersSL struct {
 	FirstName string `column:"first_name" json:"firstName"`
 	LastName  string `column:"last_name" json:"lastName"`
 	Email     string `column:"email" json:"email"`
-	Updated   string `column:"update_datetime" json:"update"`
+	Updated   string `column:"update_datetime" json:"updated"`
+}
+
+// UsersIDs is for t_user table structure. This is for only user_id.
+type UsersIDs struct {
+	ID int `column:"user_id" json:"id"`
 }
 
 // UserAuth is response when OAuth2 login is used.

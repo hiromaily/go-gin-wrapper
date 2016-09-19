@@ -9,6 +9,7 @@ import (
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	lg "github.com/hiromaily/golibs/log"
 	tm "github.com/hiromaily/golibs/time"
+	u "github.com/hiromaily/golibs/utils"
 	"github.com/hiromaily/golibs/validator"
 )
 
@@ -162,7 +163,7 @@ func InsertPostAction(c *gin.Context) {
 		return
 	}
 
-	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(id))
+	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(int(id)))
 	return
 }
 
@@ -216,7 +217,7 @@ func PutAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(0))
+	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
 	return
 }
 
@@ -241,6 +242,31 @@ func DeleteAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(0))
+	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
 	return
+}
+
+// IdsGetAction is get user ids [GET]
+func IdsGetAction(c *gin.Context) {
+	lg.Debug("[GET] IdsGetAction")
+
+	var ids []models.UsersIDs
+
+	err := models.GetDB().GetUserIds(&ids)
+	if err != nil {
+		c.AbortWithError(500, err)
+		return
+	}
+
+	//convert
+	//newIds := make([]int, len(ids))
+	newIds := []int{}
+	for _, id := range ids {
+		newIds = append(newIds, id.ID)
+	}
+	//lg.Debugf("ids: %v", ids)
+	//lg.Debugf("newIds: %v", newIds)
+
+	//Make json for response and return
+	jslib.RtnUserJSON(c, 0, js.CreateUserIDsJSON(newIds))
 }

@@ -159,13 +159,21 @@ func SetURLOnHTTP(r *gin.Engine) {
 	//users := r.Group("/api/users", CheckHttpHeader(), CheckJWT())
 	users := r.Group("/api/users", handlers...)
 	{
-		users.GET("", us.ListGetAction)       //Get user list
-		users.POST("", us.InsertPostAction)   //Register for new user
-		users.GET("/:id", us.GetAction)       //Get specific user
-		users.PUT("/:id", us.PutAction)       //Update specific user
-		users.DELETE("/:id", us.DeleteAction) //Delete specific user
+		users.GET("", us.ListGetAction)          //Get user list
+		users.POST("", us.InsertPostAction)      //Register for new user
+		users.GET("/id/:id", us.GetAction)       //Get specific user
+		users.PUT("/id/:id", us.PutAction)       //Update specific user
+		users.DELETE("/id/:id", us.DeleteAction) //Delete specific user
 		//for unnecessary parameter, use *XXXX. e.g. /user/:name/*action
+
+		//panic: path segment 'ids' conflicts with existing wildcard ':id' in path '/api/users/ids'
+		users.GET("/ids", us.IdsGetAction) //Get user list
 	}
+	//users2 := r.Group("/api/userids/", handlers...)
+	//{
+	//	users2.GET("", us.IdsGetAction) //Get user list
+	//}
+
 	//TODO:When user can use only method of GET and POST, X-HTTP-Method-Override header may be helpful.
 	//Or use parameter `_method`
 }

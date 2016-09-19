@@ -12,6 +12,12 @@ type UserListResponse struct {
 	Users   []models.UsersSL `json:"users"`
 }
 
+// UserIDsResponse is for user IDs
+type UserIDsResponse struct {
+	Code int   `json:"code"`
+	IDs  []int `json:"ids"`
+}
+
 // UserResponse is for single user response
 type UserResponse struct {
 	Code    int    `json:"code"`
@@ -39,8 +45,17 @@ func CreateUserListJSON(users []models.UsersSL) *UserListResponse {
 	return &userList
 }
 
+// CreateUserIDsJSON is for response for user IDs
+func CreateUserIDsJSON(ids []int) *UserIDsResponse {
+	userIDs := UserIDsResponse{
+		Code: 0,
+		IDs:  ids,
+	}
+	return &userIDs
+}
+
 // CreateUserJSON is response for single user
-func CreateUserJSON(id int64) *UserResponse {
+func CreateUserJSON(id int) *UserResponse {
 	var (
 		code int
 		msg  string
@@ -49,7 +64,7 @@ func CreateUserJSON(id int64) *UserResponse {
 	user := UserResponse{
 		Code:    code,
 		Message: msg,
-		ID:      int(id),
+		ID:      id,
 	}
 	return &user
 }

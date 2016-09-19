@@ -62,7 +62,7 @@
     if (id == "All"){
         url = "/api/users";
     }else{
-        url = "/api/users/" + id;
+        url = "/api/users/id/" + id;
     }
 
     //create data
@@ -74,7 +74,7 @@
   function delUser(evt){
     //
     var id = getSelectText("slctDelIds");
-    var url = "/api/users/" + id;
+    var url = "/api/users/id/" + id;
 
     //send
     hy.sendAjax(url, "delete", "form", "")

@@ -68,7 +68,7 @@
     var sendData = new Object();
     var id = document.getElementById("putID").value;
     if (id != "" && !isNaN(id)){
-        url = "/api/users/" + id;
+        url = "/api/users/id/" + id;
     }else{
         //id error
         console.log("id is invalid.");
@@ -98,7 +98,7 @@
   }
 
   function postUser(evt){
-    var url = "/api/users";
+    var url = "/api/users/";
     var sendData = new Object();
 
     var errFlg = 0;
