@@ -330,7 +330,7 @@ func CheckHTTPHeader() gin.HandlerFunc {
 		//check
 		//if IsXHR(c) || IsKey != "key" || IsContentType != "application/json" {
 		//if IsXHR(c) && IsKey != "key" {
-		if (apiConf.Ajax && !IsXHR(c)) || IsKey != apiConf.Key {
+		if (apiConf.Ajax && !IsXHR(c)) || (apiConf.RequireHeader && IsKey != apiConf.Key) {
 			//error
 			c.AbortWithStatus(400)
 			return
