@@ -244,3 +244,11 @@ ul#filters {
 		overflow:hidden;
 	}
 	
+
+/*==========================================
+   Added by myself
+    =====================================================*/
+.form-err{
+    color:red;
+    font-size: 8pt;
+}
