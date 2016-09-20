@@ -9,7 +9,7 @@ var webserver = require('gulp-webserver');
 
 var inDir = './app/src/'
 var outDir = './app/dist/'
-var inFiles = ['index', 'apilist'];
+var inFiles = ['apilist'];
 //var inFile = './app/src/index.js';
 //var outFile = './app/dist/index.bundle.js';
 
