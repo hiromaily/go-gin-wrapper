@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
+	"github.com/hiromaily/go-gin-wrapper/libs/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
 	"github.com/hiromaily/golibs/auth/jwt"
@@ -373,6 +374,17 @@ func CheckJWT() gin.HandlerFunc {
 			c.AbortWithError(400, err)
 			return
 		}
+
+		c.Next()
+	}
+}
+
+// CheckCORS is to check CORS
+func CheckCORS() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		lg.Info("[CheckCORS]")
+
+		cors.CheckHeader(c)
 
 		c.Next()
 	}

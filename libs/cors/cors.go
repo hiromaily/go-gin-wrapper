@@ -20,6 +20,9 @@ const (
 
 // CheckHeader is for CORS before handling request
 func CheckHeader(c *gin.Context) int {
+	lg.Info("[cors.CheckHeader]")
+	lg.Debug("%v", )
+
 	// check preflight of XMLHttpRequest Level2 XMLHttpRequest
 	// 1.check origin
 	origin := c.Request.Header.Get("Origin")
@@ -53,6 +56,7 @@ func SetHeader(c *gin.Context) bool {
 	lg.Info("[cors.SetHeader]")
 	if conf.GetConf().API.CORS.Enabled {
 		lg.Debugf("c.Request.RemoteAddr: %v", c.Request.RemoteAddr)
+		//[::1]:58434
 
 		//Access-Control-Allow-Origin
 		// allow from remote addr

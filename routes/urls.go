@@ -8,12 +8,11 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/controllers/admins"
 	"github.com/hiromaily/go-gin-wrapper/controllers/api/jwt"
 	us "github.com/hiromaily/go-gin-wrapper/controllers/api/users"
+	"github.com/hiromaily/go-gin-wrapper/controllers/apilist"
 	"github.com/hiromaily/go-gin-wrapper/controllers/bases"
 	"github.com/hiromaily/go-gin-wrapper/controllers/errors"
 	"github.com/hiromaily/go-gin-wrapper/controllers/news"
 	oauth "github.com/hiromaily/go-gin-wrapper/controllers/oauth2"
-	//ba "github.com/hiromaily/go-gin-wrapper/libs/basicauth"
-	"github.com/hiromaily/go-gin-wrapper/controllers/apilist"
 	//"github.com/hiromaily/go-gin-wrapper/controllers/chat"
 	//"github.com/olahol/melody"
 	"net/http"
@@ -152,8 +151,13 @@ func SetURLOnHTTP(r *gin.Engine) {
 	//  r.Use(routes.CheckHttpHeader())
 	//  it let us faster to develop instead of a bit less performance.
 	var handlers = []gin.HandlerFunc{CheckHTTPHeader()}
+	//JWT
 	if conf.GetConf().API.JWT.Mode != 0 {
 		handlers = append(handlers, CheckJWT())
+	}
+	//CORS
+	if conf.GetConf().API.CORS.Enabled {
+		handlers = append(handlers, CheckCORS())
 	}
 
 	//users := r.Group("/api/users", CheckHttpHeader(), CheckJWT())
