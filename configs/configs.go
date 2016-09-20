@@ -21,6 +21,7 @@ type Config struct {
 	Environment string
 	Server      *ServerConfig
 	Proxy       ProxyConfig
+	API         *APIConfig
 	Auth        *AuthConfig
 	MySQL       *MySQLConfig
 	Redis       *RedisConfig
@@ -81,21 +82,28 @@ type ProxyServerConfig struct {
 	Log     LogConfig `toml:"log"`
 }
 
-// AuthConfig is for Auth
-type AuthConfig struct {
-	API      *APIConfig      `toml:"api"`
-	JWT      *JWTConfig      `toml:"jwt"`
-	Google   *GoogleConfig   `toml:"google"`
-	Facebook *FacebookConfig `toml:"facebook"`
-}
-
 // APIConfig is for Rest API
 type APIConfig struct {
-	Ajax          bool   `toml:"only_ajax"`
-	CORS          bool   `toml:"cors"`
-	RequireHeader bool   `toml:"require_header"`
-	Header        string `toml:"header"`
-	Key           string `toml:"key"`
+	Ajax   bool          `toml:"only_ajax"`
+	CORS   *CORSConfig   `toml:"cors"`
+	Header *HeaderConfig `toml:"header"`
+	JWT    *JWTConfig    `toml:"jwt"`
+}
+
+// CORSConfig is for CORS
+type CORSConfig struct {
+	Enabled     bool     `toml:"enabled"`
+	Origins     []string `toml:"origins"`
+	Headers     []string `toml:"headers"`
+	Methods     []string `toml:"methods"`
+	Credentials bool     `toml:"credentials"`
+}
+
+// HeaderConfig is added original header for authentication
+type HeaderConfig struct {
+	Enabled bool   `toml:"enabled"`
+	Header  string `toml:"header"`
+	Key     string `toml:"key"`
 }
 
 // JWTConfig is for JWT Auth
@@ -104,6 +112,12 @@ type JWTConfig struct {
 	Secret     string `toml:"secret_code"`
 	PrivateKey string `toml:"private_key"`
 	PublicKey  string `toml:"public_key"`
+}
+
+// AuthConfig is for Auth
+type AuthConfig struct {
+	Google   *GoogleConfig   `toml:"google"`
+	Facebook *FacebookConfig `toml:"facebook"`
 }
 
 // GoogleConfig is for Google OAuth2
@@ -192,15 +206,19 @@ var checkTOMLKeys = [][]string{
 	{"proxy", "server", "port"},
 	{"proxy", "server", "log", "level"},
 	{"proxy", "server", "log", "path"},
-	{"auth", "api", "only_ajax"},
-	{"auth", "api", "cors"},
-	{"auth", "api", "require_header"},
-	{"auth", "api", "header"},
-	{"auth", "api", "key"},
-	{"auth", "jwt", "mode"},
-	{"auth", "jwt", "secret_code"},
-	{"auth", "jwt", "private_key"},
-	{"auth", "jwt", "public_key"},
+	{"api", "only_ajax"},
+	{"api", "cors", "enabled"},
+	{"api", "cors", "origins"},
+	{"api", "cors", "headers"},
+	{"api", "cors", "methods"},
+	{"api", "cors", "credentials"},
+	{"api", "header", "enabled"},
+	{"api", "header", "header"},
+	{"api", "header", "key"},
+	{"api", "jwt", "mode"},
+	{"api", "jwt", "secret_code"},
+	{"api", "jwt", "private_key"},
+	{"api", "jwt", "public_key"},
 	{"auth", "google", "encrypted"},
 	{"auth", "google", "client_id"},
 	{"auth", "google", "client_secret"},

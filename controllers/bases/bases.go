@@ -2,11 +2,11 @@ package bases
 
 import (
 	"github.com/gin-gonic/gin"
-	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
 	"github.com/hiromaily/go-gin-wrapper/libs/login"
+	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	lg "github.com/hiromaily/golibs/log"
 	"net/http"
 )
@@ -59,19 +59,12 @@ func IndexAction(c *gin.Context) {
 	//debug log
 	//debugContext(c)
 
-	//return header and key
-	api := conf.GetConf().Auth.API
-
-	lg.Debugf("api.Header: %#v\n", api.Header)
-	lg.Debugf("api.Key: %#v\n", api.Key)
-
 	//View
-	c.HTML(http.StatusOK, "pages/bases/index.tmpl", gin.H{
+	res := gin.H{
 		"title":    "Top Page",
 		"navi_key": "/",
-		"header":   api.Header,
-		"key":      api.Key,
-	})
+	}
+	c.HTML(http.StatusOK, "pages/bases/index.tmpl", html.Response(res))
 }
 
 // LoginGetAction is for login page [GET]
@@ -137,16 +130,13 @@ func LogoutPostAction(c *gin.Context) {
 	//Session
 	sess.Logout(c)
 
-	//lg.Debug(sess.IsLogin(c))
-	api := conf.GetConf().Auth.API
-
 	//View
-	c.HTML(http.StatusOK, "pages/bases/logout.tmpl", gin.H{
+	//View
+	res := gin.H{
 		"title":    "Logout Page",
 		"navi_key": "/logout",
-		"header":   api.Header,
-		"key":      api.Key,
-	})
+	}
+	c.HTML(http.StatusOK, "pages/bases/logout.tmpl", html.Response(res))
 }
 
 // LogoutPutAction is for logout by Ajax [PUT]

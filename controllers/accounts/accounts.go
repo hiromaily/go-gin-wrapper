@@ -2,8 +2,8 @@ package accounts
 
 import (
 	"github.com/gin-gonic/gin"
-	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
+	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	lg "github.com/hiromaily/golibs/log"
 	"net/http"
 )
@@ -19,13 +19,10 @@ func IndexAction(c *gin.Context) {
 		return
 	}
 
-	api := conf.GetConf().Auth.API
-
 	//View
-	c.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", gin.H{
+	res := gin.H{
 		"title":    "Accounts Page",
 		"navi_key": "/accounts/",
-		"header":   api.Header,
-		"key":      api.Key,
-	})
+	}
+	c.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", html.Response(res))
 }

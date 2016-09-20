@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
+	"github.com/hiromaily/go-gin-wrapper/libs/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	lg "github.com/hiromaily/golibs/log"
 	reg "github.com/hiromaily/golibs/regexp"
@@ -67,14 +68,16 @@ func GetProto(c *gin.Context) string {
 	return c.Request.Proto
 }
 
+/*
 // SetRquestHeaderForSecurity is to set HTTP request header
-func SetRquestHeaderForSecurity(c *gin.Context) {
+func SetRequestHeaderForSecurity(c *gin.Context) {
 	c.Request.Header.Set("X-Content-Type-Options", "nosniff")
 	c.Request.Header.Set("X-XSS-Protection", "1, mode=block")
 	c.Request.Header.Set("X-Frame-Options", "deny")
 	c.Request.Header.Set("Content-Security-Policy", "default-src 'none'")
 	//c.Request.Header.Set("Strict-Transport-Security", "max-age=15768000")
 }
+*/
 
 // SetResponseHeaderForSecurity is to set HTTP response header
 func SetResponseHeaderForSecurity(c *gin.Context) {
@@ -85,6 +88,9 @@ func SetResponseHeaderForSecurity(c *gin.Context) {
 	c.Writer.Header().Set("X-Frame-Options", "deny")
 	c.Writer.Header().Set("Content-Security-Policy", "default-src 'none'")
 	//c.Writer.Header().Set("Strict-Transport-Security", "max-age=15768000")
+
+	//CORS
+	cors.SetHeader(c)
 
 	//c.Writer.WriteHeader()
 	//c.Writer.WriteString()

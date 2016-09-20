@@ -306,8 +306,6 @@ func CheckHTTPHeader() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHttpHeader]")
 
-		apiConf := conf.GetConf().Auth.API
-
 		lg.Debugf("[Request Header]\n%#v\n", c.Request.Header)
 		lg.Debugf("[Request Form]\n%#v\n", c.Request.Form)
 		lg.Debugf("[Request Body]\n%#v\n", c.Request.Body)
@@ -319,22 +317,26 @@ func CheckHTTPHeader() gin.HandlerFunc {
 		//IsKey := c.Request.Header.Get("X-Custom-Header-Gin")
 		//lg.Debugf("[X-Custom-Header-Gin] %s", IsKey)
 
-		IsKey := c.Request.Header.Get(apiConf.Header)
-		lg.Debugf("[%s] %s", apiConf.Header, IsKey)
-
-		IsContentType := c.Request.Header.Get("Content-Type")
-		lg.Debugf("[Content-Type] %s", IsContentType)
-
-		//TODO:if no Content-Type, how should be handled.
-
-		//check
-		//if IsXHR(c) || IsKey != "key" || IsContentType != "application/json" {
-		//if IsXHR(c) && IsKey != "key" {
-		if (apiConf.Ajax && !IsXHR(c)) || (apiConf.RequireHeader && IsKey != apiConf.Key) {
+		apiConf := conf.GetConf().API
+		if apiConf.Ajax && !IsXHR(c) {
 			//error
 			c.AbortWithStatus(400)
 			return
 		}
+
+		if apiConf.Header.Enabled {
+			valOfaddedHeader := c.Request.Header.Get(apiConf.Header.Header)
+			if valOfaddedHeader != apiConf.Header.Key {
+				//error
+				c.AbortWithStatus(400)
+				return
+			}
+		}
+
+		//TODO:if no Content-Type, how should be handled.
+		//contentType := c.Request.Header.Get("Content-Type")
+		//if contentType == "application/json" {
+		//}
 
 		//Context Meta Data
 		//SetMetaData(c)

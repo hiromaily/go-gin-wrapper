@@ -37,20 +37,28 @@ web_port = [ 9997, 9998, 9999 ]
 level = 1
 path = "/var/log/goweb/proxy.log"
 
-[auth]
-
-[auth.api]
+[api]
 only_ajax = true
-cors = false
-require_header = true
+
+[api.cors]
+enabled = true
+origins = ["localhost:8000"]
+headers = ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"]
+methods = ["GET", "OPTIONS"]
+credentials = false
+
+[api.header]
+enabled = true
 header = "X-Custom-Header-Gin"
 key = "key12345"
 
-[auth.jwt]
+[api.jwt]
 mode = 2   #0:off, 1:HMAC, 2:RSA
 secret_code = ""
 private_key = "/Users/hy/.ssh/jwt_rsa"
 public_key = "/Users/hy/.ssh/jwt_rsa.pub"
+
+[auth]
 
 [auth.google]
 encrypted = true

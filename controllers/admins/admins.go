@@ -2,7 +2,7 @@ package admins
 
 import (
 	"github.com/gin-gonic/gin"
-	conf "github.com/hiromaily/go-gin-wrapper/configs"
+	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	lg "github.com/hiromaily/golibs/log"
 	"net/http"
 )
@@ -14,13 +14,10 @@ func IndexAction(c *gin.Context) {
 	user := c.MustGet(gin.AuthUserKey).(string)
 	lg.Debugf("[---]gin.AuthUserKey: %s", user)
 
-	api := conf.GetConf().Auth.API
-
 	//View
-	c.HTML(http.StatusOK, "pages/admins/gallery.tmpl", gin.H{
+	res := gin.H{
 		"title":    "Admin Page",
 		"navi_key": "/admin/",
-		"header":   api.Header,
-		"key":      api.Key,
-	})
+	}
+	c.HTML(http.StatusOK, "pages/admins/gallery.tmpl", html.Response(res))
 }

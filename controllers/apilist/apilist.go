@@ -2,18 +2,15 @@ package apilist
 
 import (
 	"github.com/gin-gonic/gin"
-	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	//lg "github.com/hiromaily/golibs/log"
+	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	"net/http"
 )
 
 // IndexAction is top page for API List (react version)
 func IndexAction(c *gin.Context) {
 	//return header and key
-	api := conf.GetConf().Auth.API
-	//lg.Debugf("api.Header: %#v\n", api.Header)
-	//lg.Debugf("api.Key: %#v\n", api.Key)
 
 	//Get User ids
 	type UserID struct {
@@ -28,13 +25,12 @@ func IndexAction(c *gin.Context) {
 	}
 
 	//View
-	c.HTML(http.StatusOK, "pages/apilist/index.tmpl", gin.H{
+	res := gin.H{
 		"title":    "API List Page",
 		"navi_key": "/apilist/",
 		"ids":      ids,
-		"header":   api.Header,
-		"key":      api.Key,
-	})
+	}
+	c.HTML(http.StatusOK, "pages/apilist/index.tmpl", html.Response(res))
 }
 
 // Index2Action is top page for API List (this is old version)
@@ -42,11 +38,6 @@ func Index2Action(c *gin.Context) {
 	//debug log
 	//debugContext(c)
 
-	//return header and key
-	api := conf.GetConf().Auth.API
-	//lg.Debugf("api.Header: %#v\n", api.Header)
-	//lg.Debugf("api.Key: %#v\n", api.Key)
-
 	//Get User ids
 	type UserID struct {
 		ID int
@@ -60,11 +51,10 @@ func Index2Action(c *gin.Context) {
 	}
 
 	//View
-	c.HTML(http.StatusOK, "pages/apilist/index2.tmpl", gin.H{
+	res := gin.H{
 		"title":    "API List Page",
 		"navi_key": "/apilist/",
 		"ids":      ids,
-		"header":   api.Header,
-		"key":      api.Key,
-	})
+	}
+	c.HTML(http.StatusOK, "pages/apilist/index2.tmpl", html.Response(res))
 }

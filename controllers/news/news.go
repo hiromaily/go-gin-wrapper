@@ -2,7 +2,7 @@ package news
 
 import (
 	"github.com/gin-gonic/gin"
-	conf "github.com/hiromaily/go-gin-wrapper/configs"
+	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	models "github.com/hiromaily/go-gin-wrapper/models/mongo"
 	"net/http"
 )
@@ -23,24 +23,16 @@ func IndexAction(c *gin.Context) {
 	}
 
 	//Param
-	//params := ParamNews{
-	//	Classes: []string{"alert-success","alert-info","alert-warning","alert-danger"},
-	//	Articles: articles,
-	//}
 	className := []string{"alert-success", "alert-info", "alert-warning", "alert-danger"}
 
-	api := conf.GetConf().Auth.API
-
 	//View
-	c.HTML(http.StatusOK, "pages/news/news.tmpl", gin.H{
+	res := gin.H{
 		"title":    "News Page",
 		"navi_key": "/news/",
-		//"params": params,
 		"articles": articles,
 		"class":    className,
-		"header":   api.Header,
-		"key":      api.Key,
-	})
+	}
+	c.HTML(http.StatusOK, "pages/news/news.tmpl", html.Response(res))
 }
 
 // Index2Action is still working in progress.

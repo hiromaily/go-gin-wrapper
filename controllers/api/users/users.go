@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	js "github.com/hiromaily/go-gin-wrapper/jsons"
-	jslib "github.com/hiromaily/go-gin-wrapper/libs/json"
+	jslib "github.com/hiromaily/go-gin-wrapper/libs/response/json"
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	lg "github.com/hiromaily/golibs/log"
 	tm "github.com/hiromaily/golibs/time"

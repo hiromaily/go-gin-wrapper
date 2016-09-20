@@ -72,7 +72,7 @@ func initConf() {
 }
 
 func initAuth() {
-	auth := conf.GetConf().Auth.JWT
+	auth := conf.GetConf().API.JWT
 	if auth.Mode == jwt.HMAC && auth.Secret != "" {
 		jwt.InitSecretKey(auth.Secret)
 	} else if auth.Mode == jwt.RSA && auth.PrivateKey != "" && auth.PublicKey != "" {
