@@ -103,55 +103,55 @@
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/auth/jwt",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/cipher/encryption",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/cipher/hash",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mongodb",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/db/mysql",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/files",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/heroku",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/log",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/regexp",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/signal",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/time",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/utils",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/hiromaily/golibs/validator",
-			"Rev": "e64941b0b597f9b5be62aead9435f4f4a6a16856"
+			"Rev": "2dca096bfbd899488a27477325f00ae90fdd3a5a"
 		},
 		{
 			"ImportPath": "github.com/manucorporat/sse",
@@ -180,19 +180,19 @@
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
-			"Rev": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf"
+			"Rev": "71a035914f99bb58fe82eac0f1289f10963d876c"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context/ctxhttp",
-			"Rev": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf"
+			"Rev": "71a035914f99bb58fe82eac0f1289f10963d876c"
 		},
 		{
 			"ImportPath": "golang.org/x/net/html",
-			"Rev": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf"
+			"Rev": "71a035914f99bb58fe82eac0f1289f10963d876c"
 		},
 		{
 			"ImportPath": "golang.org/x/net/html/atom",
-			"Rev": "07b51741c1d6423d4a6abab1c49940ec09cb1aaf"
+			"Rev": "71a035914f99bb58fe82eac0f1289f10963d876c"
 		},
 		{
 			"ImportPath": "golang.org/x/oauth2",

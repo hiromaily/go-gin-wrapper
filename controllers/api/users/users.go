@@ -130,7 +130,7 @@ func updateUser(data *UserRequest, id string) (int64, error) {
 
 // ListGetAction is get user list [GET]
 func ListGetAction(c *gin.Context) {
-	lg.Debug("[GET] UsersListGetAction")
+	lg.Info("[GET] UsersListGetAction")
 
 	var users []models.UsersSL
 
@@ -143,6 +143,13 @@ func ListGetAction(c *gin.Context) {
 	//Make json for response and return
 	jslib.RtnUserJSON(c, 0, js.CreateUserListJSON(users))
 }
+
+// ListOptionsAction is preflight request of CORS before get request
+//func ListOptionsAction(c *gin.Context) {
+//	lg.Info("[OPTIONS] ListOptionsAction")
+//	//TODO: return void??
+//	cors.SetHeader(c)
+//}
 
 // InsertPostAction is register for new user [POST]
 func InsertPostAction(c *gin.Context) {
@@ -169,7 +176,7 @@ func InsertPostAction(c *gin.Context) {
 
 // GetAction is get specific user [GET]
 func GetAction(c *gin.Context) {
-	lg.Debug("[GET] UserGetAction")
+	lg.Info("[GET] UserGetAction")
 
 	//Param
 	//FirstName := c.Query("firstName")
@@ -197,7 +204,7 @@ func GetAction(c *gin.Context) {
 
 // PutAction is update specific user [PUT]
 func PutAction(c *gin.Context) {
-	lg.Debug("[PUT] UserPutAction")
+	lg.Info("[PUT] UserPutAction")
 
 	//Param & Check valid
 	var uData UserRequest
@@ -223,7 +230,7 @@ func PutAction(c *gin.Context) {
 
 // DeleteAction is delete specific user [DELETE] (work in progress)
 func DeleteAction(c *gin.Context) {
-	lg.Debug("[DELETE] UserDeleteAction")
+	lg.Info("[DELETE] UserDeleteAction")
 	//check token
 
 	//Param
@@ -248,7 +255,7 @@ func DeleteAction(c *gin.Context) {
 
 // IdsGetAction is get user ids [GET]
 func IdsGetAction(c *gin.Context) {
-	lg.Debug("[GET] IdsGetAction")
+	lg.Info("[GET] IdsGetAction")
 
 	var ids []models.UsersIDs
 

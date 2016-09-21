@@ -216,21 +216,6 @@ func setResponse(c *gin.Context, errMsg string, code int) {
 			"url":     refURL,
 		})
 	}
-	/*
-		if IsXHR(c) {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"code":  "500",
-				"error": rec,
-			})
-		} else {
-			c.HTML(http.StatusInternalServerError, "pages/errors/error.tmpl", gin.H{
-				"code":    "500",
-				"message": rec,
-				"url":     refURL,
-			})
-		}
-	*/
-
 }
 
 //-----------------------------------------------------------------------------
@@ -311,6 +296,7 @@ func CheckHTTPHeader() gin.HandlerFunc {
 		lg.Debugf("[Request Form]\n%#v\n", c.Request.Form)
 		lg.Debugf("[Request Body]\n%#v\n", c.Request.Body)
 		lg.Debugf("c.ClientIP() %s", c.ClientIP())
+		lg.Debugf("Request method is %s", c.Request.Method)
 
 		//IsAjax := c.Request.Header.Get("X-Requested-With")
 		//lg.Debugf("[X-Requested-With] %s", IsAjax)
@@ -319,16 +305,23 @@ func CheckHTTPHeader() gin.HandlerFunc {
 		//lg.Debugf("[X-Custom-Header-Gin] %s", IsKey)
 
 		apiConf := conf.GetConf().API
-		if apiConf.Ajax && !IsXHR(c) {
-			//error
-			c.AbortWithStatus(400)
-			return
+
+		//TODO:when preflight request, X-Requested-With may be not sent
+		//TODO:all cors requests don't include X-Requested-With..
+		if c.Request.Method != "OPTIONS" && c.Request.Header.Get("X-Custom-Header-Cors") == "" {
+			if apiConf.Ajax && !IsXHR(c) {
+				//error
+				lg.Error("request is required by Ajax ")
+				c.AbortWithStatus(400)
+				return
+			}
 		}
 
 		if apiConf.Header.Enabled {
 			valOfaddedHeader := c.Request.Header.Get(apiConf.Header.Header)
 			if valOfaddedHeader != apiConf.Header.Key {
 				//error
+				lg.Error("header and key are invalid")
 				c.AbortWithStatus(400)
 				return
 			}
@@ -384,7 +377,9 @@ func CheckCORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckCORS]")
 
-		cors.CheckHeader(c)
+		if c.Request.Method == "OPTIONS" && c.Request.Header.Get("Origin") != "" {
+			cors.CheckHeader(c)
+		}
 
 		c.Next()
 	}

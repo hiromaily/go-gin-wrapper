@@ -68,19 +68,10 @@ func GetProto(c *gin.Context) string {
 	return c.Request.Proto
 }
 
-/*
-// SetRquestHeaderForSecurity is to set HTTP request header
-func SetRequestHeaderForSecurity(c *gin.Context) {
-	c.Request.Header.Set("X-Content-Type-Options", "nosniff")
-	c.Request.Header.Set("X-XSS-Protection", "1, mode=block")
-	c.Request.Header.Set("X-Frame-Options", "deny")
-	c.Request.Header.Set("Content-Security-Policy", "default-src 'none'")
-	//c.Request.Header.Set("Strict-Transport-Security", "max-age=15768000")
-}
-*/
-
 // SetResponseHeaderForSecurity is to set HTTP response header
+// TODO:it may be better to set config
 func SetResponseHeaderForSecurity(c *gin.Context) {
+	lg.Info("SetResponseHeaderForSecurity")
 	//http://qiita.com/roothybrid7/items/34578037d883c9a99ca8
 
 	c.Writer.Header().Set("X-Content-Type-Options", "nosniff")
@@ -90,13 +81,15 @@ func SetResponseHeaderForSecurity(c *gin.Context) {
 	//c.Writer.Header().Set("Strict-Transport-Security", "max-age=15768000")
 
 	//CORS
-	cors.SetHeader(c)
-
+	if conf.GetConf().API.CORS.Enabled && c.Request.Method == "GET" {
+		cors.SetHeader(c)
+	}
 	//c.Writer.WriteHeader()
 	//c.Writer.WriteString()
 }
 
-// SetResponseHeader is set HTTP response header (TODO: work in progress)
+// SetResponseHeader is set HTTP response header
+// TODO: work in progress
 func SetResponseHeader(c *gin.Context, data []map[string]string) {
 	for _, header := range data {
 		for key, val := range header {

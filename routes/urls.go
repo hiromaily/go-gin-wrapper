@@ -13,6 +13,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/controllers/errors"
 	"github.com/hiromaily/go-gin-wrapper/controllers/news"
 	oauth "github.com/hiromaily/go-gin-wrapper/controllers/oauth2"
+	"github.com/hiromaily/go-gin-wrapper/libs/cors"
 	//"github.com/hiromaily/go-gin-wrapper/controllers/chat"
 	//"github.com/olahol/melody"
 	"net/http"
@@ -172,6 +173,9 @@ func SetURLOnHTTP(r *gin.Engine) {
 
 		//panic: path segment 'ids' conflicts with existing wildcard ':id' in path '/api/users/ids'
 		users.GET("/ids", us.IdsGetAction) //Get user list
+
+		//Accept CORS
+		users.OPTIONS("", cors.SetHeader)
 	}
 	//users2 := r.Group("/api/userids/", handlers...)
 	//{

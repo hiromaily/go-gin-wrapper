@@ -3,11 +3,11 @@ package utils
 import (
 	"errors"
 	"fmt"
-	//lg "github.com/hiromaily/golibs/log"
 	"os"
 	"reflect"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -288,6 +288,23 @@ func SearchString(ary []string, str string) int {
 	}
 	for i, val := range ary {
 		if val == str {
+			retIdx = i
+			break
+		}
+	}
+
+	return retIdx
+}
+
+// SearchStringLower is to search string converted as lower case
+func SearchStringLower(ary []string, str string) int {
+
+	retIdx := -1
+	if len(ary) == 0 {
+		return retIdx
+	}
+	for i, val := range ary {
+		if strings.ToLower(val) == strings.ToLower(str) {
 			retIdx = i
 			break
 		}
