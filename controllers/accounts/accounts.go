@@ -1,10 +1,10 @@
 package accounts
 
 import (
-	"github.com/gin-gonic/gin"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	lg "github.com/hiromaily/golibs/log"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 )
 

@@ -25,7 +25,7 @@ CURRENTDIR=`pwd`
 TEST_MODE=1        #0:off, 1:after build, run test, 2:quick test for customized
 AUTO_EXEC=0        #0.off, 1:after build, execute, 2:only run quickly, 3:reverse proxy mode
 INSTALL_PKG=1
-GODEP_MODE=1
+GODEP_MODE=0
 
 AUTO_GITCOMMIT=0
 HEROKU_MODE=0      #0:off, 1:deploy server, 2:exec test on heroku
@@ -41,7 +41,7 @@ RESET_DB=0
 ###########################################################
 # Local docker databases for me
 ###########################################################
-LOCAL_DB_DOCKER=0  #0:no, 1:Start, 2:Off
+LOCAL_DB_DOCKER=1  #0:no, 1:Start, 2:Off
 if [ $LOCAL_DB_DOCKER -eq 1 ]; then
     docker start redisd
     docker start mysqld

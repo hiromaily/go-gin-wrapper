@@ -3,7 +3,6 @@ package routes
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
@@ -11,6 +10,7 @@ import (
 	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"
 	u "github.com/hiromaily/golibs/utils"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 	"strings"
 )

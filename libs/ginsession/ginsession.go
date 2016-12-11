@@ -2,10 +2,11 @@ package ginsession
 
 import (
 	"errors"
-	"github.com/gin-gonic/contrib/sessions"
-	"github.com/gin-gonic/gin"
+	//"github.com/gin-gonic/contrib/sessions"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
+	"github.com/hiromaily/go-gin-wrapper/libs/sessions"
 	lg "github.com/hiromaily/golibs/log"
+	gin "gopkg.in/gin-gonic/gin.v1"
 )
 
 // SetSession is for session

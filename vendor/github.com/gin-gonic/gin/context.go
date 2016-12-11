@@ -17,7 +17,6 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/gin-gonic/gin/render"
 	"github.com/manucorporat/sse"
-	"golang.org/x/net/context"
 )
 
 // Content-Type MIME of the most common data formats
@@ -49,8 +48,6 @@ type Context struct {
 	Errors   errorMsgs
 	Accepted []string
 }
-
-var _ context.Context = &Context{}
 
 /************************************/
 /********** CONTEXT CREATION ********/
@@ -166,9 +163,7 @@ func (c *Context) Set(key string, value interface{}) {
 // Get returns the value for the given key, ie: (value, true).
 // If the value does not exists it returns (nil, false)
 func (c *Context) Get(key string) (value interface{}, exists bool) {
-	if c.Keys != nil {
-		value, exists = c.Keys[key]
-	}
+	value, exists = c.Keys[key]
 	return
 }
 
@@ -230,11 +225,27 @@ func (c *Context) DefaultQuery(key, defaultValue string) string {
 // 		("", false) == c.GetQuery("id")
 // 		("", true) == c.GetQuery("lastname")
 func (c *Context) GetQuery(key string) (string, bool) {
-	req := c.Request
-	if values, ok := req.URL.Query()[key]; ok && len(values) > 0 {
-		return values[0], true
+	if values, ok := c.GetQueryArray(key); ok {
+		return values[0], ok
 	}
 	return "", false
+}
+
+// QueryArray returns a slice of strings for a given query key.
+// The length of the slice depends on the number of params with the given key.
+func (c *Context) QueryArray(key string) []string {
+	values, _ := c.GetQueryArray(key)
+	return values
+}
+
+// GetQueryArray returns a slice of strings for a given query key, plus
+// a boolean value whether at least one value exists for the given key.
+func (c *Context) GetQueryArray(key string) ([]string, bool) {
+	req := c.Request
+	if values, ok := req.URL.Query()[key]; ok && len(values) > 0 {
+		return values, true
+	}
+	return []string{}, false
 }
 
 // PostForm returns the specified key from a POST urlencoded form or multipart form
@@ -262,17 +273,34 @@ func (c *Context) DefaultPostForm(key, defaultValue string) string {
 // 		email=  			  	-->  ("", true) := GetPostForm("email") // set email to ""
 //							 	-->  ("", false) := GetPostForm("email") // do nothing with email
 func (c *Context) GetPostForm(key string) (string, bool) {
+	if values, ok := c.GetPostFormArray(key); ok {
+		return values[0], ok
+	}
+	return "", false
+}
+
+// PostFormArray returns a slice of strings for a given form key.
+// The length of the slice depends on the number of params with the given key.
+func (c *Context) PostFormArray(key string) []string {
+	values, _ := c.GetPostFormArray(key)
+	return values
+}
+
+// GetPostFormArray returns a slice of strings for a given form key, plus
+// a boolean value whether at least one value exists for the given key.
+func (c *Context) GetPostFormArray(key string) ([]string, bool) {
 	req := c.Request
+	req.ParseForm()
 	req.ParseMultipartForm(32 << 20) // 32 MB
 	if values := req.PostForm[key]; len(values) > 0 {
-		return values[0], true
+		return values, true
 	}
 	if req.MultipartForm != nil && req.MultipartForm.File != nil {
 		if values := req.MultipartForm.Value[key]; len(values) > 0 {
-			return values[0], true
+			return values, true
 		}
 	}
-	return "", false
+	return []string{}, false
 }
 
 // Bind checks the Content-Type to select a binding engine automatically,
@@ -320,9 +348,17 @@ func (c *Context) ClientIP() string {
 			return clientIP
 		}
 	}
+
+	if c.engine.AppEngine {
+		if addr := c.Request.Header.Get("X-Appengine-Remote-Addr"); addr != "" {
+			return addr
+		}
+	}
+
 	if ip, _, err := net.SplitHostPort(strings.TrimSpace(c.Request.RemoteAddr)); err == nil {
 		return ip
 	}
+
 	return ""
 }
 

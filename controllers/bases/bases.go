@@ -1,13 +1,13 @@
 package bases
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/hiromaily/go-gin-wrapper/libs/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
 	"github.com/hiromaily/go-gin-wrapper/libs/login"
 	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	lg "github.com/hiromaily/golibs/log"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 )
 

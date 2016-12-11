@@ -3,7 +3,6 @@ package users
 import (
 	//"encoding/json"
 	"errors"
-	"github.com/gin-gonic/gin"
 	js "github.com/hiromaily/go-gin-wrapper/jsons"
 	jslib "github.com/hiromaily/go-gin-wrapper/libs/response/json"
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
@@ -11,6 +10,7 @@ import (
 	tm "github.com/hiromaily/golibs/time"
 	u "github.com/hiromaily/golibs/utils"
 	"github.com/hiromaily/golibs/validator"
+	gin "gopkg.in/gin-gonic/gin.v1"
 )
 
 // UserRequest is expected request form from user

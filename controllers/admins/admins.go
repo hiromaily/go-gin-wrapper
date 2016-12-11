@@ -1,9 +1,9 @@
 package admins
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	lg "github.com/hiromaily/golibs/log"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 )
 

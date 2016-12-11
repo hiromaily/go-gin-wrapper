@@ -13,8 +13,7 @@ import (
 	"time"
 )
 
-//TODO:トランザクションの機能もあるので、どこかに追加しておく
-//TODO:異なるlibraryを使っているが、各funcのInterfaceを統一すればよいのでは？
+//TODO:Add Transaction
 //http://qiita.com/tenntenn/items/dddb13c15643454a7c3b
 //http://go-database-sql.org/
 
@@ -127,6 +126,98 @@ func (ms *MS) Close() {
 }
 
 //-----------------------------------------------------------------------------
+// functions
+//-----------------------------------------------------------------------------
+func makeScanStructArgs(structType reflect.Type) ([]interface{}, []interface{}) {
+	values := make([]interface{}, structType.NumField())
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	return values, scanArgs
+}
+
+func validateStructAndColumns(ms *MS, values []interface{}) error {
+	columns, err := ms.Rows.Columns()
+	if err != nil {
+		//when Rows are closed, error occur.
+		ms.Err = err
+		return ms.Err
+	}
+	if len(columns) != len(values) {
+		ms.Err = fmt.Errorf("number of struct field(%d) doesn't match to columns of sql(%d)", len(values), len(columns))
+		return ms.Err
+	}
+	return nil
+}
+
+// Set data
+func scanStruct(values []interface{}, v reflect.Value) {
+	structType := v.Type()
+	for i := 0; i < structType.NumField(); i++ {
+		//val := reflect.ValueOf(values[i])
+		val := reflect.TypeOf(values[i])
+		switch val.Kind() {
+		case reflect.Invalid:
+		//nil: for now, it skips.
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			v.Field(i).Set(reflect.ValueOf(u.Itoi(values[i])))
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+			v.Field(i).Set(reflect.ValueOf(u.ItoUI(values[i])))
+		case reflect.Bool:
+			v.Field(i).Set(reflect.ValueOf(u.Itob(values[i])))
+		case reflect.String:
+			v.Field(i).Set(reflect.ValueOf(u.Itos(values[i])))
+		case reflect.Slice:
+			if u.CheckInterface(values[i]) == "[]uint8" {
+				v.Field(i).Set(reflect.ValueOf(u.ItoBS(values[i])))
+			}
+		//case reflect.Chan, reflect.Func, reflect.Ptr, reflect.Map:
+		case reflect.Struct:
+			//time.Time
+			if u.CheckInterface(values[i]) == "time.Time" {
+				v.Field(i).Set(reflect.ValueOf(u.ItoT(values[i]).Format(tFomt)))
+			}
+		default: // reflect.Array, reflect.Struct, reflect.Interface
+			v.Field(i).Set(reflect.ValueOf(values[i]))
+		}
+	}
+	return
+}
+
+// Set data
+func scanValue(value interface{}, v reflect.Value) {
+	val := reflect.ValueOf(value)
+
+	switch val.Kind() {
+	case reflect.Invalid:
+	//nil: for now, it skips.
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		v.Set(reflect.ValueOf(u.Itoi(value)))
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		v.Set(reflect.ValueOf(u.ItoUI(value)))
+	case reflect.Bool:
+		v.Set(reflect.ValueOf(u.Itob(value)))
+	case reflect.String:
+		v.Set(reflect.ValueOf(u.Itos(value)))
+	case reflect.Slice:
+		if u.CheckInterface(value) == "[]uint8" {
+			v.Set(reflect.ValueOf(u.ItoBS(value)))
+		}
+	//case reflect.Chan, reflect.Func, reflect.Ptr, reflect.Map:
+	case reflect.Struct:
+		//time.Time
+		if u.CheckInterface(value) == "time.Time" {
+			v.Set(reflect.ValueOf(u.ItoT(value).Format(tFomt)))
+		}
+	default: // reflect.Array, reflect.Struct, reflect.Interface
+		v.Set(reflect.ValueOf(value))
+	}
+	return
+}
+
+//-----------------------------------------------------------------------------
 // Select
 //-----------------------------------------------------------------------------
 
@@ -172,31 +263,34 @@ func (ms *MS) ScanOne(x interface{}) bool {
 		return false
 	}
 
-	//e.g)v = person Person
+	//e.g. v = person Person
 	v := reflect.ValueOf(x)
 	if v.Kind() != reflect.Ptr || v.IsNil() {
 		ms.Err = errors.New("parameter is not valid. it should be pointer and not nil")
 		return false
 	}
 
+	// initialize variable
+	var values, scanArgs []interface{}
 	if v.Elem().Kind() == reflect.Struct {
-
 		//create container to set scaned record on database
-		values, scanArgs := makeScanArgs(v.Elem().Type())
+		values, scanArgs = makeScanStructArgs(v.Elem().Type())
 
 		//check len(value) and column
 		validateStructAndColumns(ms, values)
 		if ms.Err != nil {
 			return false
 		}
+	}
 
-		// rows.Next()
-		ret := ms.Rows.Next()
-		if !ret {
-			//ms.Err = errors.New("nodata")
-			return false
-		}
+	// rows.Next()
+	ret := ms.Rows.Next()
+	if !ret {
+		//data is nothing
+		return false
+	}
 
+	if v.Elem().Kind() == reflect.Struct {
 		// rows.Scan()
 		ms.Err = ms.Rows.Scan(scanArgs...)
 		if ms.Err != nil {
@@ -205,13 +299,16 @@ func (ms *MS) ScanOne(x interface{}) bool {
 
 		//ms.Err = ms.Rows.Scan(v)
 		scanStruct(values, v.Elem())
-
-		return true
+	} else {
+		// rows.Scan()
+		ms.Err = ms.Rows.Scan(x)
+		if ms.Err != nil {
+			return false
+		}
+		//scanValue(values[0], v.Elem())
 	}
 
-	ms.Err = errors.New("parameter should be pointer of struct slice or struct")
-	return false
-
+	return true
 }
 
 // Scan is to set all extracted data into parameter variable
@@ -224,7 +321,7 @@ func (ms *MS) Scan(x interface{}) bool {
 		return false
 	}
 
-	//e.g)v = persons []Person
+	//e.g. v = persons []Person
 	v := reflect.ValueOf(x)
 
 	if v.Kind() != reflect.Ptr || v.IsNil() {
@@ -236,8 +333,16 @@ func (ms *MS) Scan(x interface{}) bool {
 		elemType := v.Elem().Type().Elem() //reflects_test.TeacherInfo
 		newElem := reflect.New(elemType).Elem()
 
-		//create container to set scaned record on database
-		values, scanArgs := makeScanArgs(newElem.Type())
+		var values, scanArgs []interface{}
+		if newElem.Kind() == reflect.Struct {
+			//create container to set scaned record on database
+			values, scanArgs = makeScanStructArgs(newElem.Type())
+		} else {
+			// Note! Only one filed
+			values = make([]interface{}, 1)
+			scanArgs = make([]interface{}, 1)
+			scanArgs[0] = &values[0]
+		}
 
 		//check len(value) and column
 		validateStructAndColumns(ms, values)
@@ -253,7 +358,11 @@ func (ms *MS) Scan(x interface{}) bool {
 				return false
 			}
 
-			scanStruct(values, newElem)
+			if newElem.Kind() == reflect.Struct {
+				scanStruct(values, newElem)
+			} else {
+				scanValue(values[0], newElem)
+			}
 			v.Elem().Set(reflect.Append(v.Elem(), newElem))
 			cnt++
 		}
@@ -268,70 +377,12 @@ func (ms *MS) Scan(x interface{}) bool {
 
 }
 
-func makeScanArgs(structType reflect.Type) ([]interface{}, []interface{}) {
-	values := make([]interface{}, structType.NumField())
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	return values, scanArgs
-}
-
-func validateStructAndColumns(ms *MS, values []interface{}) error {
-	columns, err := ms.Rows.Columns()
-	if err != nil {
-		//when Rows are closed, error occur.
-		ms.Err = err
-		return ms.Err
-	}
-	if len(columns) != len(values) {
-		ms.Err = fmt.Errorf("number of struct field(%d) doesn't match to columns of sql(%d)", len(values), len(columns))
-		return ms.Err
-	}
-	return nil
-}
-
-// Set data
-func scanStruct(values []interface{}, v reflect.Value) {
-	structType := v.Type()
-	for i := 0; i < structType.NumField(); i++ {
-		val := reflect.ValueOf(values[i])
-		switch val.Kind() {
-		case reflect.Invalid:
-			//nil: for now, it skips.
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			v.Field(i).Set(reflect.ValueOf(u.Itoi(values[i])))
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-			v.Field(i).Set(reflect.ValueOf(u.ItoUI(values[i])))
-		case reflect.Bool:
-			v.Field(i).Set(reflect.ValueOf(u.Itob(values[i])))
-		case reflect.String:
-			v.Field(i).Set(reflect.ValueOf(u.Itos(values[i])))
-		case reflect.Slice:
-			if u.CheckInterface(values[i]) == "[]uint8" {
-				v.Field(i).Set(reflect.ValueOf(u.ItoBS(values[i])))
-			}
-		//case reflect.Chan, reflect.Func, reflect.Ptr, reflect.Map:
-		case reflect.Struct:
-			//time.Time
-			if u.CheckInterface(values[i]) == "time.Time" {
-				v.Field(i).Set(reflect.ValueOf(u.ItoT(values[i]).Format(tFomt)))
-			}
-		default: // reflect.Array, reflect.Struct, reflect.Interface
-			v.Field(i).Set(reflect.ValueOf(values[i]))
-		}
-	}
-	return
-}
-
 // Select is to get all field you set
 func (ms *MS) Select(selectSQL string, args ...interface{}) ([]map[string]interface{}, []string, error) {
 	defer tm.Track(time.Now(), "SelectSQLAllField()")
 	//540.417µs
 
-	//1. create sql and exec
-	//rows, err := self.db.Query("SELECT * FROM t_users WHERE delete_flg=?", "0")
+	//create sql and exec
 	rows, err := ms.DB.Query(selectSQL, args...)
 	if err != nil {
 		return nil, nil, err
@@ -353,7 +404,7 @@ func (ms *MS) convertRowsToMaps(rows *sql.Rows) ([]map[string]interface{}, []str
 
 	values := make([]interface{}, len(columns))
 
-	// rows.Scan は引数に `[]interface{}`が必要.
+	// rows.Scan requires `[]interface{}` as parameter
 	scanArgs := make([]interface{}, len(values))
 
 	for i := range values {
@@ -370,7 +421,7 @@ func (ms *MS) convertRowsToMaps(rows *sql.Rows) ([]map[string]interface{}, []str
 			return nil, columns, err
 		}
 
-		rowdata := map[string]interface{}{}
+		rowData := map[string]interface{}{}
 
 		//var v string
 		for i, value := range values {
@@ -394,9 +445,9 @@ func (ms *MS) convertRowsToMaps(rows *sql.Rows) ([]map[string]interface{}, []str
 			//}
 
 			//rowdata[columns[i]] = v
-			rowdata[columns[i]] = value
+			rowData[columns[i]] = value
 		}
-		retMaps = append(retMaps, rowdata)
+		retMaps = append(retMaps, rowData)
 	}
 	return retMaps, columns, nil
 }

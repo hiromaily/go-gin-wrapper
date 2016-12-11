@@ -3,12 +3,12 @@ package bases
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	lg "github.com/hiromaily/golibs/log"
 	reg "github.com/hiromaily/golibs/regexp"
+	gin "gopkg.in/gin-gonic/gin.v1"
 )
 
 func getURL(scheme, host string, port int) string {

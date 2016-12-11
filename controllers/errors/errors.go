@@ -1,7 +1,7 @@
 package errors
 
 import (
-	"github.com/gin-gonic/gin"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 )
 

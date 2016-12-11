@@ -1,13 +1,13 @@
 package jwt
 
 import (
-	"github.com/gin-gonic/gin"
 	js "github.com/hiromaily/go-gin-wrapper/jsons"
 	"github.com/hiromaily/go-gin-wrapper/libs/login"
 	jslib "github.com/hiromaily/go-gin-wrapper/libs/response/json"
 	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"
 	u "github.com/hiromaily/golibs/utils"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	"time"
 )
 

@@ -2,7 +2,6 @@ package routes
 
 import (
 	//"fmt"
-	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/controllers/accounts"
 	"github.com/hiromaily/go-gin-wrapper/controllers/admins"
@@ -14,6 +13,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/controllers/news"
 	oauth "github.com/hiromaily/go-gin-wrapper/controllers/oauth2"
 	"github.com/hiromaily/go-gin-wrapper/libs/cors"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	//"github.com/hiromaily/go-gin-wrapper/controllers/chat"
 	//"github.com/olahol/melody"
 	"net/http"

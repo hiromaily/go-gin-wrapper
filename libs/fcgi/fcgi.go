@@ -1,7 +1,7 @@
 package fcgi
 
 import (
-	"github.com/gin-gonic/gin"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	"log"
 	"net"
 	"net/http/fcgi"

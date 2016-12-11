@@ -2,7 +2,6 @@ package oauth2
 
 import (
 	"encoding/json"
-	"github.com/gin-gonic/gin"
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
 	"github.com/hiromaily/go-gin-wrapper/libs/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
@@ -11,6 +10,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	"io/ioutil"
 	"net/http"
 )

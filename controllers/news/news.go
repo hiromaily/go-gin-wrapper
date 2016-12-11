@@ -1,9 +1,9 @@
 package news
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	models "github.com/hiromaily/go-gin-wrapper/models/mongo"
+	gin "gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 )
 

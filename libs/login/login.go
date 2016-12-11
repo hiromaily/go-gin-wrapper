@@ -2,10 +2,10 @@ package login
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
 	lg "github.com/hiromaily/golibs/log"
 	valid "github.com/hiromaily/golibs/validator"
+	gin "gopkg.in/gin-gonic/gin.v1"
 )
 
 // Request is request structure for login
