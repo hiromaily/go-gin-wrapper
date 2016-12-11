@@ -26,6 +26,7 @@ CREATE TABLE `t_invoices` (
   `invoice_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Invoice ID',
   `user_id` int(11) NOT NULL COMMENT 'User ID',
   `memo` text COLLATE utf8_unicode_ci COMMENT 'Memo',
+  `memo2` json DEFAULT NULL COMMENT 'Memo2 by json data',
   `delete_flg` char(1) COLLATE utf8_unicode_ci DEFAULT '0' COMMENT 'delete flg',
   `create_datetime` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'created date',
   `update_datetime` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'updated date',
