@@ -93,7 +93,7 @@ encrypted = true
 host = "ag3OSWgL80j4UIxZxjOnsIgErPqeR34I8jO0sjXTqboc2CkMCnA9dJqqQTGnYyLO"
 port = 9769
 pass = "GjxxrquD3+VV7sftoJlDTQZLAALyXfhgapkPeFKc0mg="
-session = true
+session = false
 
 [mongodb]
 encrypted = true
