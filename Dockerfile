@@ -1,6 +1,6 @@
 # Dcokerfile for go-gin-wrapper
 
-FROM golang:1.6
+FROM golang:1.8
 
 #ARG redisHostName=default-redis-server
 #ARG mysqlHostName=default-mysql-server
@@ -14,8 +14,8 @@ RUN mkdir /var/log/goweb/
 
 WORKDIR /go/src/github.com/hiromaily/go-gin-wrapper
 
+#COPY . /go/src/github.com/hiromaily/go-gin-wrapper
 #RUN go get -d -v ./... && go build -v -o /go/bin/ginserver ./cmd/ginserver/
 
 EXPOSE 9999
 
-#ENTRYPOINT ["ginserver", "-f", "./configs/docker.toml"]
