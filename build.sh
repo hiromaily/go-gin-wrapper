@@ -65,8 +65,10 @@ fi
 # Update all package
 ###########################################################
 if [ $GO_GET -eq 1 ]; then
+    rm -rf vendor
     go get -u -v ./...
     #go get -d -v ./...
+    #go get -u -v `go list ./... | grep -v '/go-gin-wrapper/libs/'`
 
     ### tools ###
     go get -u github.com/tools/godep
