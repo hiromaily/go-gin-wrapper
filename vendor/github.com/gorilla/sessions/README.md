@@ -1,6 +1,8 @@
 sessions
 ========
 [![GoDoc](https://godoc.org/github.com/gorilla/sessions?status.svg)](https://godoc.org/github.com/gorilla/sessions) [![Build Status](https://travis-ci.org/gorilla/sessions.png?branch=master)](https://travis-ci.org/gorilla/sessions)
+[![Sourcegraph](https://sourcegraph.com/github.com/gorilla/sessions/-/badge.svg)](https://sourcegraph.com/github.com/gorilla/sessions?badge)
+
 
 gorilla/sessions provides cookie and filesystem sessions and infrastructure for
 custom session backends.
@@ -52,6 +54,12 @@ with
 as or else you will leak memory! An easy way to do this is to wrap the top-level
 mux when calling http.ListenAndServe:
 
+```go
+	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
+```
+
+The ClearHandler function is provided by the gorilla/context package.
+
 More examples are available [on the Gorilla
 website](http://www.gorillatoolkit.org/pkg/sessions).
 
@@ -74,6 +82,7 @@ Other implementations of the `sessions.Store` interface:
 * [github.com/boj/riakstore](https://github.com/boj/riakstore) - Riak
 * [github.com/michaeljs1990/sqlitestore](https://github.com/michaeljs1990/sqlitestore) - SQLite
 * [github.com/wader/gormstore](https://github.com/wader/gormstore) - GORM (MySQL, PostgreSQL, SQLite)
+* [github.com/gernest/qlstore](https://github.com/gernest/qlstore) - ql
 
 ## License
 

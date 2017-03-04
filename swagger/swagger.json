@@ -1,0 +1,359 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "go-gin-wrapper",
+        "description": "default API.",
+        "version": "1.0.0"
+    },
+    "host": "localhost",
+    "schemes": [
+        "http"
+    ],
+    "basePath": "/api",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/jwt": {
+            "post": {
+                "summary": "JWT authentication",
+                "description": "In advance, JWT is required to call all APIs.",
+                "parameters": [
+                    {
+                        "name": "inputEmail",
+                        "in": "formData",
+                        "description": "User E-mail.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "inputPassword",
+                        "in": "formData",
+                        "description": "User password.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "JWT"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Code and JWT.",
+                        "schema": {
+                            "$ref": "#/definitions/Jwt"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "summary": "Get all user data",
+                "description": "Get all user data.",
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of user.",
+                        "schema": {
+                            "$ref": "#/definitions/Users"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create new user data",
+                "description": "Create new user data.",
+                "parameters": [
+                    {
+                        "name": "firstName",
+                        "in": "formData",
+                        "description": "User first name.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "lastName",
+                        "in": "formData",
+                        "description": "User last name.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "User E-mail.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "User password.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of user.",
+                        "schema": {
+                            "$ref": "#/definitions/UserID"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/ids": {
+            "get": {
+                "summary": "Get all user ID",
+                "description": "Get all user ID.",
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of user's ID.",
+                        "schema": {
+                            "$ref": "#/definitions/UserIDs"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "summary": "Get specific user data",
+                "description": "Get specific user data.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An user.",
+                        "schema": {
+                            "$ref": "#/definitions/Users"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update specific user data",
+                "description": "Update specific user data.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of updated user.",
+                        "schema": {
+                            "$ref": "#/definitions/Users"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete specific user data",
+                "description": "Delete specific user data.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of user.",
+                        "schema": {
+                            "$ref": "#/definitions/UserID"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Jwt": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "return code."
+                },
+                "token": {
+                    "type": "string",
+                    "description": "token for API call."
+                }
+            }
+        },
+        "Users": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "return code."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "token for API call."
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User"
+                    }
+                }
+            }
+        },
+        "User": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "User ID."
+                },
+                "firstName": {
+                    "type": "string",
+                    "description": "User first name."
+                },
+                "lastName": {
+                    "type": "string",
+                    "description": "User last name."
+                },
+                "email": {
+                    "type": "string",
+                    "description": "User E-mail address."
+                },
+                "updated": {
+                    "type": "string",
+                    "description": "Updated date."
+                }
+            }
+        },
+        "UserID": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "return code."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "This is not used anymore."
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "New user ID."
+                }
+            }
+        },
+        "UserIDs": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "return code."
+                },
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "description": "User IDs."
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Error code."
+                },
+                "error": {
+                    "type": "string",
+                    "description": "Error message."
+                }
+            }
+        }
+    }
+}
