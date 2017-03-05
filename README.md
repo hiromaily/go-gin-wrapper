@@ -145,6 +145,10 @@ Docker environment set configs/docker.toml when starting to run.
 Heroku server use ```PORT``` automatically as environment variable.
 
 
+## APIs
+Documentation is prepared using Swagger
+[swagger](http://localhost:9999/swagger/?url=https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/swagger/swagger.yaml)
+
 
 ## Usage
 ```
