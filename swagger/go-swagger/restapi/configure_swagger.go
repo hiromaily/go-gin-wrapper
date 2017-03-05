@@ -9,9 +9,9 @@ import (
 	middleware "github.com/go-openapi/runtime/middleware"
 	graceful "github.com/tylerb/graceful"
 
-	"github.com/hiromaily/go-gin-wrapper/swagger/restapi/operations"
-	"github.com/hiromaily/go-gin-wrapper/swagger/restapi/operations/j_w_t"
-	"github.com/hiromaily/go-gin-wrapper/swagger/restapi/operations/users"
+	"github.com/hiromaily/go-gin-wrapper/swagger/go-swagger/restapi/operations"
+	"github.com/hiromaily/go-gin-wrapper/swagger/go-swagger/restapi/operations/j_w_t"
+	"github.com/hiromaily/go-gin-wrapper/swagger/go-swagger/restapi/operations/users"
 )
 
 // This file is safe to edit. Once it exists it will not be overwritten

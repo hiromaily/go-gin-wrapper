@@ -53,10 +53,13 @@ bld:
 	go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
 
 bldswg:
-	go build -i -v -o ${GOPATH}/bin/swgserver ./swagger/cmd/swagger-server/
+	go build -i -v -o ${GOPATH}/bin/swgserver ./swagger/go-swagger/cmd/swagger-server/
 
 exec:
 	ginserver -f ./configs/settings.toml
+
+execswg:
+	swgserver
 
 godep:
 	echo go-gin was modified by me because of bug. So it could not be worked.

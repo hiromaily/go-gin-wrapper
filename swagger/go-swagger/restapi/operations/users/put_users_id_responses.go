@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/hiromaily/go-gin-wrapper/swagger/models"
+	"github.com/hiromaily/go-gin-wrapper/swagger/go-swagger/models"
 )
 
 /*PutUsersIDOK An array of updated user.

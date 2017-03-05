@@ -15,8 +15,8 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/hiromaily/go-gin-wrapper/swagger/restapi/operations/j_w_t"
-	"github.com/hiromaily/go-gin-wrapper/swagger/restapi/operations/users"
+	"github.com/hiromaily/go-gin-wrapper/swagger/go-swagger/restapi/operations/j_w_t"
+	"github.com/hiromaily/go-gin-wrapper/swagger/go-swagger/restapi/operations/users"
 )
 
 // NewSwaggerAPI creates a new Swagger instance
