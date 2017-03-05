@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime/middleware"
 )
 
 // NewGetUsersParams creates a new GetUsersParams object

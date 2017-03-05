@@ -13,6 +13,7 @@ import (
 	middleware "github.com/go-openapi/runtime/middleware"
 	spec "github.com/go-openapi/spec"
 	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/hiromaily/go-gin-wrapper/swagger/restapi/operations/j_w_t"
 	"github.com/hiromaily/go-gin-wrapper/swagger/restapi/operations/users"

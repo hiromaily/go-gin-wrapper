@@ -49,12 +49,21 @@ chk:
 run:
 	go run ./cmd/ginserver/main.go
 
-build:
+bld:
 	go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
+
+bldswg:
+	go build -i -v -o ${GOPATH}/bin/swgserver ./swagger/cmd/swagger-server/
 
 exec:
 	ginserver -f ./configs/settings.toml
 
+godep:
+	echo go-gin was modified by me because of bug. So it could not be worked.
+	#go get -u github.com/tools/godep
+	#rm -rf Godeps
+	#rm -rf ./vendor
+	#godep save ./...
 
 #develop: pull
 #	docker-compose build

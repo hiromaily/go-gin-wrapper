@@ -15,7 +15,15 @@ Go-gin-wrapper is wrapper of go gin web framework plus reverseproxy. React by ES
 $ go get github.com/hiromaily/go-gin-wrapper ./...
 ```
 
-#### For docker environment
+#### Setup for local environment with Docker
+```
+$ make update
+$ make dcinit
+$ make setupmongo
+$ make run
+```
+
+#### Setup for docker environment
 ```
 $ ./docker-create.sh
 ```
