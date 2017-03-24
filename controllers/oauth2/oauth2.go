@@ -10,7 +10,8 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
-	gin "gopkg.in/gin-gonic/gin.v1"
+	//gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
 )

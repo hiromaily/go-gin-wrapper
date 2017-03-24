@@ -4,10 +4,12 @@ import (
 	"net/http/pprof"
 	"strings"
 
-	gin "gopkg.in/gin-gonic/gin.v1"
+	//gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 )
 
 // Note::This source code is from https://github.com/DeanThompson/ginpprof/blob/master/pprof.go
+// This source is not used anymore.
 
 // Wrap adds several routes from package `net/http/pprof` to *gin.Engine object
 func Wrap(router *gin.Engine) {

@@ -10,7 +10,8 @@ import (
 	tm "github.com/hiromaily/golibs/time"
 	u "github.com/hiromaily/golibs/utils"
 	"github.com/hiromaily/golibs/validator"
-	gin "gopkg.in/gin-gonic/gin.v1"
+	//gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 )
 
 // UserRequest is expected request form from user

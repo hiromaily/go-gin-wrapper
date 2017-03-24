@@ -2,7 +2,8 @@ package html
 
 import (
 	conf "github.com/hiromaily/go-gin-wrapper/configs"
-	gin "gopkg.in/gin-gonic/gin.v1"
+	//gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 )
 
 // Response is to add common parameter for html response

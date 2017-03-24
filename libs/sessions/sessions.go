@@ -6,8 +6,12 @@ import (
 
 	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
-	gin "gopkg.in/gin-gonic/gin.v1"
+	//gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 )
+
+// Note. it's from https://github.com/gin-gonic/contrib/tree/master/sessions
+// This source is not used anymore.
 
 const (
 	DefaultKey  = "github.com/gin-gonic/contrib/sessions"

@@ -8,7 +8,8 @@ import (
 	sess "github.com/hiromaily/go-gin-wrapper/libs/ginsession"
 	lg "github.com/hiromaily/golibs/log"
 	reg "github.com/hiromaily/golibs/regexp"
-	gin "gopkg.in/gin-gonic/gin.v1"
+	//gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 )
 
 func getURL(scheme, host string, port int) string {

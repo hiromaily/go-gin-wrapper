@@ -28,6 +28,11 @@ update:
 	go get -u github.com/tools/godep
 	godep save ./...
 
+godep:
+	rm -rf Godeps
+	rm -rf ./vendor
+	godep save ./...
+
 fmt:
 	go fmt `go list ./... | grep -v '/vendor/'`
 

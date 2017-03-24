@@ -3,7 +3,8 @@ package json
 import (
 	//"encoding/json"
 	hh "github.com/hiromaily/go-gin-wrapper/libs/httpheader"
-	gin "gopkg.in/gin-gonic/gin.v1"
+	//gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 	"net/http"
 )
 

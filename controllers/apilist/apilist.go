@@ -2,7 +2,8 @@ package apilist
 
 import (
 	models "github.com/hiromaily/go-gin-wrapper/models/mysql"
-	gin "gopkg.in/gin-gonic/gin.v1"
+	//gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 	//lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/go-gin-wrapper/libs/response/html"
 	"net/http"
