@@ -4,6 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/hiromaily/go-gin-wrapper/badge.svg)](https://coveralls.io/github/hiromaily/go-gin-wrapper)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hiromaily/go-gin-wrapper)](https://goreportcard.com/report/github.com/hiromaily/go-gin-wrapper)
 [![codebeat badge](https://codebeat.co/badges/30d3509a-36be-408b-bfed-ddd6f601c075)](https://codebeat.co/projects/github-com-hiromaily-go-gin-wrapper-master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/83df70f4373d47f8b889be10ad28d4a3)](https://www.codacy.com/app/hiromaily2/go-gin-wrapper?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hiromaily/go-gin-wrapper&amp;utm_campaign=Badge_Grade)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/LICENSE)
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hiromaily/go-gin-wrapper)
 
