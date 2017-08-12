@@ -1,9 +1,24 @@
 # Note: tabs by space can't not used for Makefile!
 MONGO_PORT=27017
+CURRENTDIR=`pwd`
 
 ###############################################################################
 # Initial Settings
 ###############################################################################
+init_environment:
+	export ENC_KEY='xxxxxxxxxkeykey'
+	export ENC_IV='xxxxxxxxxxxxiviv'
+
+	#heroku
+	#heroku config:add ENC_KEY='xxxxxxxxxkeykey'
+	#heroku config:add ENC_IV='xxxxxxxxxxxxiviv'
+
+	#travis web console -> settings
+
+deployjs:
+	#cp /Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/frontend_workspace/react/app/dist/apilist.bundle.js \
+	#/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/statics/js/
+
 mongoinit:
 	#After running mongodb
 	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
@@ -83,11 +98,38 @@ dcfirst:
 dcbld:
 	docker-compose build
 
-dcbld:
+dcup:
 	docker-compose up
 
 dcfull:
 	docker-compose up --build
+
+
+dctest:
+	export RUN_TEST=1
+	sh ./docker-create.sh
+
+dcshell:
+	echo '============== docker =============='
+	# create docker container
+	export RUN_TEST=0
+	sh ./docker-create.sh
+
+	#wait to be ready or not.
+	echo 'building now. it may be take over 40s.'
+	sleep 30s
+	while :
+	do
+		#000 or 200 or 404
+		HTTP_STATUS=`curl -LI localhost:8888/ -w '%{http_code}\n' -s -o /dev/null`
+		echo $HTTP_STATUS
+		if [ $HTTP_STATUS -eq 000 ]; then
+			sleep 1s
+		else
+			docker logs web
+			break
+		fi
+	done
 
 
 ###############################################################################
@@ -168,6 +210,20 @@ test:
 
 ###############################################################################
 # Heroku
+#
+#heroku ps -a ginserver
+#heroku run bash
+#heroku logs -t
+#heroku ps
+#heroku config
+#
+#heroku open
+# https://ginserver.herokuapp.com/
+#
 ###############################################################################
 herokudeploy:
 	git push -f heroku master
+
+###### e.g. command for heroku #####
+#heroku config:add HEROKU_FLG=1
+

@@ -1,6 +1,11 @@
 *.tmpl linguist-language=golang
+data/* linguist-documentation
+docker/* linguist-documentation
+Godeps/* linguist-documentation
 statics/* linguist-documentation
+swagger/* linguist-documentation
 templates/samples/* linguist-documentation
+vendor/* linguist-documentation
 frontend_workspace/hiromaily/node_modules/* linguist-documentation
 frontend_workspace/react/node_modules/* linguist-documentation
 frontend_workspace/react/app/assets/* linguist-documentation

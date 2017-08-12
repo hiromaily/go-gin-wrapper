@@ -6,6 +6,7 @@ version: '3.0'
 volumes:
   db: {}
   rdb: {}
+  mdb: {}
 
 services:
   # MySQL
@@ -49,6 +50,8 @@ services:
     container_name: web-mongo
     ports:
       - "27017"
+    volumes:
+      - mdb:/data/db
     #command: bash ./init.sh
 
   # golang:go-gin-wrapper

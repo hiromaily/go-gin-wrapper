@@ -282,7 +282,7 @@ func loadStaticFiles(r *gin.Engine) {
 	r.Static("/statics", rootPath+"/statics")
 	r.Static("/assets", rootPath+"/statics/assets")
 	r.Static("/favicon.ico", rootPath+"/statics/favicon.ico")
-	r.Static("/swagger", rootPath+"/swagger/swagger-ui/dist")
+	r.Static("/swagger", rootPath+"/swagger/swagger-ui")
 
 	// /when location of html as layer level is not top, be careful.
 	//r.Static("/admin/assets", "statics/assets")

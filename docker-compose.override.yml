@@ -25,7 +25,15 @@ services:
     ports:
       - "${WEB_PORT:-8080}:8080"
     volumes:
-      - ./:/go/src/github.com/hiromaily/go-gin-wrapper
+      #- ./:/go/src/github.com/hiromaily/go-gin-wrapper
+      - ./cmd:/go/src/github.com/hiromaily/go-gin-wrapper/cmd
+      - ./core:/go/src/github.com/hiromaily/go-gin-wrapper/core
+      - ./data:/go/src/github.com/hiromaily/go-gin-wrapper/data
+      - ./Godeps:/go/src/github.com/hiromaily/go-gin-wrapper/Godeps
+      - ./statics:/go/src/github.com/hiromaily/go-gin-wrapper/statics
+      - ./swagger:/go/src/github.com/hiromaily/go-gin-wrapper/swagger
+      - ./templates:/go/src/github.com/hiromaily/go-gin-wrapper/templates
+      - ./vendor:/go/src/github.com/hiromaily/go-gin-wrapper/vendor
     environment:
       ENC_KEY: ${ENC_KEY}
       ENC_IV: ${ENC_IV}

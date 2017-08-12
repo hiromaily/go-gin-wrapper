@@ -1,9 +1,10 @@
 #common
 .DS_Store
 .idea/
+tmp/*
 
 #main
-configs/settings.toml
+data/toml/settings.toml
 
 #vendor
 vendor/gopkg.in/mgo.v2/internal/sasl/
@@ -20,32 +21,5 @@ frontend_workspace/hiromaily/dist/
 frontend_workspace/hiromaily/src/sample.es6.js
 
 #docker
-docker/logs
-docker/mysql/db_data/*
-docker/redis/data/*
-docker/go-gin-wrapper
 
 #swagger-ui
-swagger/swagger-ui/.dockerignore
-swagger/swagger-ui/.gitattributes
-swagger/swagger-ui/.gitignore
-swagger/swagger-ui/.jshintignore
-swagger/swagger-ui/.jshintrc
-swagger/swagger-ui/.npmignore
-swagger/swagger-ui/.travis.yml
-swagger/swagger-ui/CONTRIBUTING.md
-swagger/swagger-ui/Dockerfile
-swagger/swagger-ui/ISSUE_TEMPLATE.md
-swagger/swagger-ui/LICENSE
-swagger/swagger-ui/README.md
-swagger/swagger-ui/bower.json
-swagger/swagger-ui/composer.json
-swagger/swagger-ui/gulpfile.js
-swagger/swagger-ui/index.js
-swagger/swagger-ui/karma.conf.js
-swagger/swagger-ui/lang/
-swagger/swagger-ui/lib/
-swagger/swagger-ui/nginx.conf
-swagger/swagger-ui/package.json
-swagger/swagger-ui/src/
-swagger/swagger-ui/test/
