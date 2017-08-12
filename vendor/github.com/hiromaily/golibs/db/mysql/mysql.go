@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	// mysql driver
+	// TODO:it may cause error on golang 1.8.3 or some version
+	// panic: sql: Register called twice for driver mysql
 	_ "github.com/go-sql-driver/mysql"
 	lg "github.com/hiromaily/golibs/log"
 	tm "github.com/hiromaily/golibs/time"
@@ -43,7 +45,7 @@ var dbInfo MS
 //-----------------------------------------------------------------------------
 
 // New is to create instance
-func New(host, dbname, user, pass string, port uint16) *MS {
+func New(host, dbname, user, pass string, port uint16) error {
 	var err error
 	if dbInfo.DB == nil {
 		dbInfo.host = host
@@ -55,9 +57,11 @@ func New(host, dbname, user, pass string, port uint16) *MS {
 		dbInfo.DB, err = dbInfo.Connection()
 	}
 	if err != nil {
-		panic(err.Error())
+		//panic(err.Error())
+		return err
 	}
-	return &dbInfo
+	//return &dbInfo
+	return nil
 }
 
 // NewIns make a new instance

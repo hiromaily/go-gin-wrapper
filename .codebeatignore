@@ -1,5 +1,5 @@
 data/**
-docker_build/**
+docker/**
 statics/**
 swagger/**
-work_js/**
+frontend_workspace/**

@@ -4,34 +4,14 @@ MONGO_PORT=27017
 ###############################################################################
 # Initial Settings
 ###############################################################################
-dcinit:
-	docker-compose up mysql redis mongo
-
 mongoinit:
-	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker_build/mongo/init.js
-	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker_build/mongo/dump/hiromaily
-
+	#After running mongodb
+	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
+	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
 
 dbinit:
 	export DB_NAME=hiromaily
 	sh ./data/sql/setup.sh
-
-
-###############################################################################
-# Docker
-###############################################################################
-dcstart:
-	docker start web-redisd
-	docker start web-mysqld
-	docker start web-mongod
-
-dcstop:
-	docker stop web-redisd
-	docker stop web-mysqld
-	docker stop web-mongod
-
-dcmongo:
-	docker exec -it web-mongo bash
 
 
 ###############################################################################
@@ -42,8 +22,8 @@ changegit:
 	git checkout v0.9.17
 
 update:
-	go get -u -v ./...
 	go get -u github.com/tools/godep
+	go get -u -d -v ./...
 
 godep:
 	rm -rf Godeps
@@ -74,8 +54,48 @@ chk:
 
 
 ###############################################################################
-# Build
+# Docker TODO:delete it
 ###############################################################################
+dcstart:
+	docker start web-redisd
+	docker start web-mysqld
+	docker start web-mongod
+
+dcstop:
+	docker stop web-redisd
+	docker stop web-mysqld
+	docker stop web-mongod
+
+dcmongo:
+	docker exec -it web-mongo bash
+
+
+###############################################################################
+# Docker-Compose
+###############################################################################
+dcfirst:
+	docker-compose build
+	docker-compose up mongo
+	#
+	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
+	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
+
+dcbld:
+	docker-compose build
+
+dcbld:
+	docker-compose up
+
+dcfull:
+	docker-compose up --build
+
+
+###############################################################################
+# Local Build
+###############################################################################
+#dcdb:
+#	docker-compose up mysql redis mongo
+
 bld:
 	go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
 
@@ -93,10 +113,10 @@ run:
 	go run ./cmd/ginserver/main.go
 
 exec:
-	ginserver -f ./configs/settings.toml
+	ginserver -f ./data/toml/settings.toml
 
 execproxy:
-	PORTS=(9997 9998 9999)
+	PORTS=(8080 8081 8082)
 	for port in ${PORTS[@]}
 	do
 		echo 'port is ${port}'
@@ -115,7 +135,7 @@ execswg:
 # Test
 ###############################################################################
 quicktest:
-	go test -run TestLogin -v cmd/ginserver/*.go -f ../../configs/settings.toml
+	go test -run TestLogin -v cmd/ginserver/*.go -f ../../data/toml/settings.toml
 
 test:
 	# Create Test Data
@@ -127,23 +147,23 @@ test:
 
 	# Execute
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
-	-f ../../configs/settings.toml -om 0
+	-f ../../data/toml/settings.toml -om 0
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetUserAPIRequestOnTable" \
-	-f ../../configs/settings.toml -om 1
+	-f ../../data/toml/settings.toml -om 1
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetUserAPIRequestOnTable" \
-	-f ../../configs/settings.toml -om 2
+	-f ../../data/toml/settings.toml -om 2
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
-	-f ../../configs/settings.toml -om 1
+	-f ../../data/toml/settings.toml -om 1
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
-	-f ../../configs/settings.toml -om 2
+	-f ../../data/toml/settings.toml -om 2
 
 
 ###############################################################################

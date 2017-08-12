@@ -1,8 +1,12 @@
-#docker-compose.yml
 #- mysql:5.7
 #- redis:3.2
 #- web from Dockerfile of web (build is required)
-version: '2.1'
+version: '3.0'
+
+volumes:
+  db: {}
+  rdb: {}
+
 services:
   # MySQL
   mysql:
@@ -10,31 +14,33 @@ services:
     image: mysql:5.7
     container_name: web-mysql
     ports:
-      - "13306:3306"
+      - "3306"
     volumes:
-      - ./docker_build/mysql/conf:/etc/mysql/conf.d
-      - ./docker_build/mysql/db_data:/var/lib/mysql
-      - ./docker_build/mysql/init.d:/docker-entrypoint-initdb.d
+      - db:/var/lib/mysql
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d
+      - ./docker/mysql/init.d:/docker-entrypoint-initdb.d
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hiromaily
       MYSQL_USER: hiromaily
       MYSQL_PASSWORD: 12345678
+
   # Redis
   redis:
     image: redis:3.2
     container_name: web-redis
     ports:
-      - "16379:6379"
+      - "6379"
     volumes:
-      - ./docker_build/redis/data:/data
+      - rdb:/data
     restart: always
     command: redis-server --requirepass password --appendonly yes
+
   # Mongo
   mongo:
     build:
-      context: ./docker_build/mongo/
+      context: ./docker/mongo/
       dockerfile: Dockerfile
       args:
         mongo_port: 27017
@@ -42,8 +48,9 @@ services:
     image: go-gin-wrapper-mongo:1.0
     container_name: web-mongo
     ports:
-      - "27017:27017"
+      - "27017"
     #command: bash ./init.sh
+
   # golang:go-gin-wrapper
   web:
     build:
@@ -55,10 +62,7 @@ services:
     image: go-gin-wrapper:1.0
     container_name: web
     ports:
-      - "9999:9999"
-    volumes:
-      - ./docker_build/logs:/var/log/goweb
-      - ./:/go/src/github.com/hiromaily/go-gin-wrapper
+      - "8080"
     environment:
       ENC_KEY: ${ENC_KEY}
       ENC_IV: ${ENC_IV}
@@ -70,8 +74,5 @@ services:
       - mysql
       - redis
       - mongo
-    stdin_open: true
-    tty: true
     restart: always
-    #command: bash
-    command: bash ./docker-entrypoint.sh
+    command: /go/bin/ginserver -f ./data/toml/docker.toml

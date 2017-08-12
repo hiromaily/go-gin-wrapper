@@ -1,0 +1,114 @@
+#local, heroku, docker, staging, production
+environment = "travis"
+
+[server]
+scheme = "http"
+host = "127.0.0.1"
+port = 8080
+
+[server.docs]
+path = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper"
+
+[server.log]
+level = 1
+path = "/var/log/goweb/ginserver.log"
+
+[server.session]
+name = "go-web-ginserver"
+key = "secretskey123456"
+max_age =  300     #(s)
+secure = false    #set false in development environment, production environment requires true
+http_only = true
+
+[server.basic_auth]
+user = "web"
+pass = "test"
+
+[proxy]
+mode = 0   #0:off, 1:go, 2:nginx
+
+[proxy.server]
+scheme = "http"
+host = "127.0.0.1"
+port = 9990
+web_port = [ 8080, 8081, 8082 ]
+
+[proxy.server.log]
+level = 1
+path = "/var/log/goweb/proxy.log"
+
+[api]
+only_ajax = true
+
+[api.cors]
+enabled = true
+origins = ["localhost:8000"]
+headers = ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"]
+methods = ["GET", "OPTIONS"]
+credentials = false
+
+[api.header]
+enabled = true
+header = "X-Custom-Header-Gin"
+key = "key12345"
+
+[api.jwt]
+mode = 0   #0:off, 1:HMAC, 2:RSA
+secret_code = "secret1234567890"
+private_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/data/rsakey/jwttest_rsa"
+public_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/data/rsakey/jwttest_rsa.pub"
+
+[auth]
+
+[auth.google]
+encrypted = true
+client_id = "kPmVQs1VcRWa7lm9afOcZzd2wxfLE4Ws441Y5H+MeAs735CVMgSLbUDsqR5vMJSkVLeWP1ScpLmS1hiEvfkTNcOYic3iMojstNDNSQLrUaU="
+client_secret = "vWl5RU38iFcid5JI/j610qcp0aoHOEvWI6+Q/QrKRbY="
+call_back_url = "http://localhost:8080/oauth2/google/callback"
+
+[auth.facebook]
+encrypted = true
+client_id = "VZSYxmfcqQFZNUP7Tzchtg=="                         #app_id
+client_secret = "aVd1AHW1PVsChVWcI0uhim0etWgg+9Mj2x+puSBTHHM=" #app secret
+call_back_url = "http://localhost:8080/oauth2/facebook/callback"
+
+[mysql]
+encrypted = true
+host = "V3thdTLItfVkuSYOSED0iU1wT3WspcFYPzK4Wawg0pg="
+port = 3306
+dbname = "fw1LcS2+7H0aUf3WsIKLCZgpBioCzwGNRQuah3nGgZ8="
+user = "AaDHChFkMG1SFFIGtxqKhA=="
+pass = "t/gil33PoC+8ejUxV7bmGg=="
+
+[mysql.test]
+encrypted = true
+host = "V3thdTLItfVkuSYOSED0iU1wT3WspcFYPzK4Wawg0pg="
+port = 3306
+dbname = "fw1LcS2+7H0aUf3WsIKLCZgpBioCzwGNRQuah3nGgZ8="
+user = "AaDHChFkMG1SFFIGtxqKhA=="
+pass = "t/gil33PoC+8ejUxV7bmGg=="
+
+[redis]
+encrypted = true
+host = "ag3OSWgL80j4UIxZxjOnsIgErPqeR34I8jO0sjXTqboc2CkMCnA9dJqqQTGnYyLO"
+port = 9769
+pass = "GjxxrquD3+VV7sftoJlDTQZLAALyXfhgapkPeFKc0mg="
+session = false
+
+[mongodb]
+encrypted = true
+host = "k2Cq14y2yjvdlPdtAyIHnAh/Vmx0Zw7ZH+2v9OIDMRk="
+port = 61495
+dbname = "I2pC5pwBCO11SFbvE2tcyw=="
+user = "I2pC5pwBCO11SFbvE2tcyw=="
+pass = "pcK4iAT4ARALfbF6SU/2CYOwZVYOnBGuFd4v2WgntLg="
+
+[aws]
+encrypted = true
+access_key = "XXXXXXXXXXXX"
+secret_key = "XXXXXXXXXXXX"
+region = "ap-northeast-1"
+
+[develop]
+profile_enable = false
+recover_enable = true

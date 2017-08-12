@@ -12,18 +12,18 @@ vendor/gopkg.in/mgo.v2/internal/sasl/
 ginserver
 profile.cov
 
-#work_js
+#frontend_workspace
 node_modules
-work_js/hiromaily/test.sh
-work_js/hiromaily/reset.sh
-work_js/hiromaily/dist/
-work_js/hiromaily/src/sample.es6.js
+frontend_workspace/hiromaily/test.sh
+frontend_workspace/hiromaily/reset.sh
+frontend_workspace/hiromaily/dist/
+frontend_workspace/hiromaily/src/sample.es6.js
 
 #docker
-docker_build/logs
-docker_build/mysql/db_data/*
-docker_build/redis/data/*
-docker_build/go-gin-wrapper
+docker/logs
+docker/mysql/db_data/*
+docker/redis/data/*
+docker/go-gin-wrapper
 
 #swagger-ui
 swagger/swagger-ui/.dockerignore

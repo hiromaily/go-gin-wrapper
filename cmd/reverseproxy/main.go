@@ -4,7 +4,7 @@ import (
 	"container/ring"
 	"flag"
 	"fmt"
-	conf "github.com/hiromaily/go-gin-wrapper/configs"
+	conf "github.com/hiromaily/go-gin-wrapper/core/configs"
 	lg "github.com/hiromaily/golibs/log"
 	"net/http"
 	"net/http/httputil"

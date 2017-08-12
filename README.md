@@ -128,7 +128,7 @@ Docker environment set configs/docker.toml when starting to run.
 * docker-compose.yml
 * docker-entrypoint.sh
 * Dockerfile
-* ./docker_build/*
+* ./docker/*
 
 
 ## Environment variable e.g.

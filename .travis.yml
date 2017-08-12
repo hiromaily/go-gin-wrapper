@@ -19,8 +19,8 @@ before_install:
 script:
   - go fmt ./...
   - go vet $(go list ./... | grep -v /vendor/)
-  # - go test -v cmd/ginserver/*.go -f ../../configs/travis.toml -om 0
-  - cd ${GO_GIN_PATH};go test -v -covermode=count -coverprofile=profile.cov -f ../../configs/travis.toml -om 0
+  # - go test -v cmd/ginserver/*.go -f ../../data/toml/travis.toml -om 0
+  - cd ${GO_GIN_PATH};go test -v -covermode=count -coverprofile=profile.cov -f ../../data/toml/travis.toml -om 0
   - cd ${GO_GIN_PATH};goveralls -coverprofile=profile.cov -service=travis-ci
 
 branches:

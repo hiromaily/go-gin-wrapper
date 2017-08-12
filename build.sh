@@ -12,7 +12,7 @@
 
 #travis web console -> settings
 
-#cp /Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/work_js/react/app/dist/apilist.bundle.js \
+#cp /Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/frontend_workspace/react/app/dist/apilist.bundle.js \
 #/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/statics/js/
 
 ###########################################################

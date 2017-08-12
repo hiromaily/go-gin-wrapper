@@ -9,7 +9,7 @@ import (
 	"errors"
 	"flag"
 	"github.com/PuerkitoBio/goquery"
-	conf "github.com/hiromaily/go-gin-wrapper/configs"
+	conf "github.com/hiromaily/go-gin-wrapper/core/configs"
 	//gin "gopkg.in/gin-gonic/gin.v1"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
@@ -43,7 +43,7 @@ var (
 	keyHeaderWrong   = map[string]string{"X-Custom-Header-Gin": "mistake"}
 	basicAuthHeaders = map[string]string{"Authorization": "Basic d2ViOnRlc3Q="}
 	contentType      = map[string]string{"Content-Type": "application/x-www-form-urlencoded"}
-	refererLogin     = map[string]string{"Referer": "http://hiromaily.com:9999/login"}
+	refererLogin     = map[string]string{"Referer": "http://hiromaily.com:8080/login"}
 	jwtAuth          = map[string]string{"Authorization": "Bearer %s"}
 	loginHeaders     = []map[string]string{contentType, refererLogin}
 	rightHeaders     = []map[string]string{ajaxHeader, keyHeader}
@@ -329,7 +329,7 @@ func checkHTTPHeader(req *http.Request) {
 	//Content-Length: 0
 	//Content-Type: application/x-www-form-urlencoded
 	//Cookie: go-web-ginserver=MTQ3MTA1MDQ3MnxOd3dBTkVOQlJGZE1WRTlRVmxoWldGbEVSVTFYVGxKSk5VZFhXalJYVkRWRlNWazJWRnBQVUVWWlJGSklOMUZSUTB0TE0waGFRVkU9fC_7LJ1pOXIOZo8ZXg-R4oO1LFXaSqJtvA3l0f6Qk9DA
-	//Referer: http://hiromaily.com:9999/login
+	//Referer: http://hiromaily.com:8080/login
 	//Accept-Encoding: gzip
 }
 

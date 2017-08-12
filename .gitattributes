@@ -1,10 +1,10 @@
 *.tmpl linguist-language=golang
 statics/* linguist-documentation
 templates/samples/* linguist-documentation
-work_js/hiromaily/node_modules/* linguist-documentation
-work_js/react/node_modules/* linguist-documentation
-work_js/react/app/assets/* linguist-documentation
-work_js/react/app/css/* linguist-documentation
-work_js/react/app/json/* linguist-documentation
-work_js/react/app/lib/* linguist-documentation
-work_js/react/app/dist/* linguist-documentation
+frontend_workspace/hiromaily/node_modules/* linguist-documentation
+frontend_workspace/react/node_modules/* linguist-documentation
+frontend_workspace/react/app/assets/* linguist-documentation
+frontend_workspace/react/app/css/* linguist-documentation
+frontend_workspace/react/app/json/* linguist-documentation
+frontend_workspace/react/app/lib/* linguist-documentation
+frontend_workspace/react/app/dist/* linguist-documentation

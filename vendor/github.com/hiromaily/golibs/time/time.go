@@ -118,3 +118,11 @@ func GetFormatTime(strTime string, format string) string {
 
 	return t.Format(format)
 }
+
+// GetFormatTime2 is to format time
+func GetFormatTime2(hour, min, sec, nsec int) time.Time {
+	//t := time.Date(2013, 9, 2, 1, 55, 20, 120e6, time.Local)
+	t := time.Date(2017, 6, 3, hour, min, sec, nsec, time.Local)
+	//fmt.Println(t.Format("2006-01-02T15:04:05.000Z07:00"))
+	return t
+}

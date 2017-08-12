@@ -1,0 +1,35 @@
+#- mysql:5.7
+#- redis:3.2
+#- web from Dockerfile of web (build is required)
+version: '3.0'
+
+services:
+  # MySQL
+  mysql:
+    ports:
+      - "${MYSQL_PORT:-13306}:3306"
+
+  # Redis
+  redis:
+    ports:
+      - "${MYSQL_PORT:-16379}:6379"
+
+  # Mongo
+  mongo:
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    #command: bash ./init.sh
+
+  # Golang:go-gin-wrapper
+  web:
+    ports:
+      - "${WEB_PORT:-8080}:8080"
+    volumes:
+      - ./:/go/src/github.com/hiromaily/go-gin-wrapper
+    environment:
+      ENC_KEY: ${ENC_KEY}
+      ENC_IV: ${ENC_IV}
+    stdin_open: true
+    tty: true
+    command: fresh -c /go/src/github.com/hiromaily/go-gin-wrapper/runner.conf
+    #command: bash ./docker-entrypoint.sh
