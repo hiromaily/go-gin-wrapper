@@ -19,13 +19,16 @@ $ go get github.com/hiromaily/go-gin-wrapper ./...
 
 #### Setup for local environment with Docker
 ```
-$ make update
-$ make dcinit
-$ make setupmongo
-$ make run
+$ docker-compose build
+$ docker-compose up mongo
+# Initialize mongodb
+$ mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
+$ mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
+ or
+$ make dcfirst
 ```
 
-#### Setup for docker environment
+#### Setup for test on docker environment
 ```
 $ ./docker-create.sh
 ```
@@ -51,14 +54,14 @@ It's used for news information. Another worker program make data regularly.
 #### TOML file
 This is for configuration.
 ```
-$ cp configs/settings.default.toml configs/settings.toml
+$ cp data/toml/settings.default.toml data/toml/settings.toml
 
 ```
 When running web server, go-gin-wrapper requires toml file as configuration information.  
 Without command line arguments for toml file path, this try to read ```configs/settings.toml```.   
 If you want to use original toml file, use command line arguments ```-f filepath```.  
 ```
-ginserver -f /app/configs/yourfile.toml
+ginserver -f /app/data/toml/yourfile.toml
 ```
 
 * server
@@ -117,16 +120,16 @@ $ git push -f heroku master
 
 * Heroku environment set configs/heroku.toml when starting to run.  
 ```
-ginserver -f /app/configs/heroku.toml
+ginserver -f /app/data/toml/heroku.toml
 ```
 
 ### 3. On Docker
-Docker environment set configs/docker.toml when starting to run.  
+Docker environment set data/toml/docker.toml when starting to run.  
 
 #### Docker related files
 * docker-create.sh
 * docker-compose.yml
-* docker-entrypoint.sh
+* docker-compose.override.yml
 * Dockerfile
 * ./docker/*
 
@@ -142,14 +145,14 @@ Docker environment set configs/docker.toml when starting to run.
 | NAME              | Value            |
 |:------------------|:-----------------|
 | HEROKU_FLG        | 1                |
-| PORT              | 9999             |
+| PORT              | 8080             |
 
 Heroku server use ```PORT``` automatically as environment variable.
 
 
 ## APIs
 Documentation is prepared using Swagger
-[swagger](http://localhost:9999/swagger/?url=https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/swagger/swagger.yaml)
+[swagger](http://localhost:8080/swagger/?url=https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/swagger/swagger.yaml)
 
 
 ## Usage
@@ -160,7 +163,7 @@ Options:
   -f     Toml file path
 
 e.g.
- $ ginserver -f /app/configs/yourfile.toml
+ $ ginserver -f /app/data/toml/yourfile.toml
 ```
 
 
