@@ -11,6 +11,9 @@
 Go-gin-wrapper is wrapper of go gin web framework plus reverseproxy. React by ES6 is used on part of front-end.  
 [gin-gonic/gin](https://github.com/gin-gonic/gin)
 
+## Example
+This is built on Heroku. You can see [here](https://ginserver.herokuapp.com/).
+
 
 ## Installation
 ```
