@@ -12,7 +12,7 @@ services:
   # Redis
   redis:
     ports:
-      - "${MYSQL_PORT:-16379}:6379"
+      - "${REDIS_PORT:-16379}:6379"
 
   # Mongo
   mongo:
