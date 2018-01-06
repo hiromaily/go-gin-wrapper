@@ -139,20 +139,20 @@ dcshell:
 #	docker-compose up mysql redis mongo
 
 bld:
-	go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
+	go build -i -race -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
 
 bldproxy:
-	go build -i -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
+	go build -i -race -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
 
 bldswg:
-	go build -i -v -o ${GOPATH}/bin/swgserver ./swagger/go-swagger/cmd/swagger-server/
+	go build -i -race -v -o ${GOPATH}/bin/swgserver ./swagger/go-swagger/cmd/swagger-server/
 
 
 ###############################################################################
 # Execution
 ###############################################################################
 run:
-	go run ./cmd/ginserver/main.go
+	go run -race ./cmd/ginserver/main.go
 
 exec:
 	ginserver -f ./data/toml/settings.toml
