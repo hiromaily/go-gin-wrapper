@@ -10,7 +10,7 @@ data/toml/settings.toml
 vendor/gopkg.in/mgo.v2/internal/sasl/
 
 #compiled
-ginserver
+#ginserver
 profile.cov
 
 #frontend_workspace
