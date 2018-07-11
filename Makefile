@@ -90,10 +90,13 @@ dcmongo:
 ###############################################################################
 dcfirst:
 	docker-compose build
-	docker-compose up mongo
-	#
+	docker-compose up mongo &
+	# should sleep
+	sleep 5
+
 	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
 	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
+
 
 dcbld:
 	docker-compose build
