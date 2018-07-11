@@ -2,8 +2,8 @@ package log
 
 import (
 	"fmt"
+	c "github.com/hiromaily/golibs/color"
 	u "github.com/hiromaily/golibs/utils"
-	"github.com/shiena/ansicolor"
 	"log"
 	"os"
 	"runtime"
@@ -127,9 +127,21 @@ func openFile(logger *log.Logger, fileName string) {
 }
 
 // setColor is to set color
-// TODO: work in progress
-func setColor() {
-	logStdOut.SetOutput(ansicolor.NewAnsiColorWriter(os.Stdout))
+func setColor(key, val string) string {
+	switch key {
+	case "Debug", "Debugf":
+		return c.Add(c.SkyBlue, val)
+	case "Info", "Infof":
+		return c.Add(c.Green, val)
+	case "Warn", "Warnf":
+		return c.Add(c.Yellow, val)
+	case "Error", "Errorf":
+		return c.Add(c.DeepPink, val)
+	case "Fatal", "Fatalf":
+		return c.Add(c.Red, val)
+	default:
+		return val
+	}
 }
 
 // New is to create new log object
@@ -169,9 +181,9 @@ func (lo *Object) Out(key string, v ...interface{}) {
 
 	if lo.logLevel <= getStatus(key) {
 		if lo.logFileLevel <= getStatus(key) {
-			lo.loggerFile.Output(2, fmt.Sprint(nv...))
+			lo.loggerFile.Output(3, fmt.Sprint(nv...))
 		} else {
-			lo.loggerStd.Output(2, fmt.Sprint(nv...))
+			lo.loggerStd.Output(3, setColor(key, fmt.Sprint(nv...)))
 		}
 	}
 }
@@ -180,9 +192,9 @@ func (lo *Object) Out(key string, v ...interface{}) {
 func (lo *Object) Outf(key, format string, v ...interface{}) {
 	if lo.logLevel <= getStatus(key) {
 		if lo.logFileLevel <= getStatus(key) {
-			lo.loggerFile.Output(2, fmt.Sprintf(getPrefix(key)+format, v...))
+			lo.loggerFile.Output(3, fmt.Sprintf(getPrefix(key)+format, v...))
 		} else {
-			lo.loggerStd.Output(2, fmt.Sprintf(getPrefix(key)+format, v...))
+			lo.loggerStd.Output(3, setColor(key, fmt.Sprintf(getPrefix(key)+format, v...)))
 		}
 	}
 }
@@ -274,7 +286,7 @@ func InitializeLog(level, fileLevel uint8, logFmt int, prefix, fileName string) 
 	//Log Object
 	logStdOut = log.New(os.Stderr, prefix, logFmt)
 	// color mode
-	setColor()
+	//setColor()
 
 	logFileOut = log.New(os.Stderr, prefix, logFmt)
 	if fileLevel != LogOff {
@@ -291,7 +303,7 @@ func out(key string, v ...interface{}) {
 			//file
 			logFileOut.Output(3, fmt.Sprint(nv...))
 		} else {
-			logStdOut.Output(3, fmt.Sprint(nv...))
+			logStdOut.Output(3, setColor(key, fmt.Sprint(nv...)))
 		}
 	}
 }
@@ -303,7 +315,7 @@ func outf(key, format string, v ...interface{}) {
 			//file
 			logFileOut.Output(3, fmt.Sprintf(getPrefix(key)+format, v...))
 		} else {
-			logStdOut.Output(3, fmt.Sprintf(getPrefix(key)+format, v...))
+			logStdOut.Output(3, setColor(key, fmt.Sprintf(getPrefix(key)+format, v...)))
 		}
 	}
 }

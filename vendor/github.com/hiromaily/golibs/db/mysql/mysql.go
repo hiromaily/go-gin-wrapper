@@ -9,10 +9,10 @@ import (
 	// panic: sql: Register called twice for driver mysql
 	_ "github.com/go-sql-driver/mysql"
 	lg "github.com/hiromaily/golibs/log"
-	tm "github.com/hiromaily/golibs/time"
+	//tm "github.com/hiromaily/golibs/time"
 	u "github.com/hiromaily/golibs/utils"
 	"reflect"
-	"time"
+	//"time"
 )
 
 //TODO:Add Transaction
@@ -242,7 +242,9 @@ func (ms *MS) SelectCount(countSQL string, args ...interface{}) (int, error) {
 
 // SelectIns is to get rows and return db instance
 func (ms *MS) SelectIns(selectSQL string, args ...interface{}) *MS {
-	defer tm.Track(time.Now(), "SelectIns()")
+	//TODO: it should be switched by initial settings.
+	//defer tm.Track(time.Now(), "SelectIns()")
+
 	//SelectSQLAllFieldIns() took 471.577µs
 
 	//If no args, set nil
@@ -383,7 +385,7 @@ func (ms *MS) Scan(x interface{}) bool {
 
 // Select is to get all field you set
 func (ms *MS) Select(selectSQL string, args ...interface{}) ([]map[string]interface{}, []string, error) {
-	defer tm.Track(time.Now(), "SelectSQLAllField()")
+	//defer tm.Track(time.Now(), "SelectSQLAllField()")
 	//540.417µs
 
 	//create sql and exec
@@ -397,7 +399,7 @@ func (ms *MS) Select(selectSQL string, args ...interface{}) ([]map[string]interf
 
 // Convert result of select into Map[] type. Return multiple array map and interface(plural lines)
 func (ms *MS) convertRowsToMaps(rows *sql.Rows) ([]map[string]interface{}, []string, error) {
-	defer tm.Track(time.Now(), "convertRowsToMaps()")
+	//defer tm.Track(time.Now(), "convertRowsToMaps()")
 	//convertRowsToMaps() took 85.191µs
 
 	// Get column name

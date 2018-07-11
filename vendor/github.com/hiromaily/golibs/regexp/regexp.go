@@ -1,12 +1,12 @@
 package regexp
 
 import (
-	"regexp"
+	re "regexp"
 )
 
 // CheckRegexp is check str using pattern reg
 func CheckRegexp(reg, str string) bool {
-	return regexp.MustCompile(reg).Match([]byte(str))
+	return re.MustCompile(reg).Match([]byte(str))
 }
 
 // IsInvisiblefile is whether target is invisible file or not
@@ -44,4 +44,19 @@ func IsHeaderURL(target string) bool {
 // IsBenchTest is check parameter for bench test
 func IsBenchTest(target string) bool {
 	return CheckRegexp(`^-test.bench`, target)
+}
+
+func Replace(path, from, to string) string {
+	//reg := re.MustCompile(from)
+	//return reg.ReplaceAllString(path, to)
+	reg, _ := re.Compile(from)
+	if reg.MatchString(path) {
+		return reg.ReplaceAllString(path, to)
+	}
+	return "error"
+}
+
+func Replace2(path, from, to string) string {
+	reg := re.MustCompile(from)
+	return reg.ReplaceAllString(path, to)
 }

@@ -494,6 +494,22 @@ func CopySlice32(arr []int32) []int32 {
 }
 
 //**********************************************************
+// Slice: Remove overlapped element
+//**********************************************************
+// UniqueStringSlice is to remove overlapped element
+func UniqueStringSlice(arr []string) (uniq []string) {
+	m := make(map[string]bool)
+
+	for _, ele := range arr {
+		if !m[ele] {
+			m[ele] = true
+			uniq = append(uniq, ele)
+		}
+	}
+	return
+}
+
+//**********************************************************
 // Slice Generate random data
 //**********************************************************
 func CheckRandam() {
