@@ -2,21 +2,26 @@ package log
 
 import (
 	"fmt"
-	c "github.com/hiromaily/golibs/color"
-	u "github.com/hiromaily/golibs/utils"
 	"log"
 	"os"
 	"runtime"
 	"strings"
+
+	c "github.com/hiromaily/golibs/color"
+	r "github.com/hiromaily/golibs/runtimes"
+	u "github.com/hiromaily/golibs/utils"
 )
 
 //Output e.g.
 //[GOWEB]20:33:18 [DEBUG]conf environment : local
 //[GOWEB]2016/05/17 20:09:32 log.go:132: [DEBUG]conf environment : local
 
+// LogStatus is logStatus
+type LogStatus uint8
+
 const (
 	// DebugStatus is at debug level
-	DebugStatus uint8 = iota + 1
+	DebugStatus LogStatus = iota + 1
 	// InfoStatus is at info level
 	InfoStatus
 	// WarningStatus is at warning level
@@ -25,6 +30,8 @@ const (
 	ErrorStatus
 	// FatalStatus is at fatal level
 	FatalStatus
+	// StackStatus is at stack level
+	StackStatus
 	// LogOff is at no log
 	LogOff
 )
@@ -40,7 +47,24 @@ const (
 	ErrorPrefix string = "[ERROR]"
 	// FatalPrefix is of fatal prefix
 	FatalPrefix string = "[FATAL]"
+	// StackPrefix is of fatal prefix
+	StackPrefix string = "[STACK]"
 )
+
+// LogFmt is log format
+type LogFmt int
+
+const (
+	NoDateNoFile      LogFmt = 0
+	OnlyTime          LogFmt = log.Ltime
+	TimeShortFile     LogFmt = log.Ltime | log.Lshortfile //should be default
+	DateTimeShortFile LogFmt = log.LstdFlags | log.Lshortfile
+)
+
+// Int is to convert to type int
+func (lf LogFmt) Int() int {
+	return int(lf)
+}
 
 /*
 	Ldate         = 1 << iota     // the date in the local time zone: 2009/01/23
@@ -53,33 +77,34 @@ const (
 
 */
 
-// Object is for log object
-type Object struct {
-	loggerStd    *log.Logger
-	loggerFile   *log.Logger
-	logLevel     uint8
-	logFileLevel uint8
+// LogType is console or file to output
+type LogType uint8
+
+const (
+	File LogType = iota + 1
+	Console
+)
+
+// Logger is for log object
+type Logger struct {
+	logger    *log.Logger
+	logLevel  LogStatus
+	logType   LogType
+	separator string
 }
 
 var (
-	logLevel     uint8 = 1
-	logFileLevel uint8 = 4
-	filePathName       = "/var/log/go/xxxx.log"
-	logStdOut    *log.Logger
-	logFileOut   *log.Logger
+	logger    *log.Logger
+	logLevel  LogStatus = 1
+	logType   LogType
+	separator string
 )
 
-// currentFunc is to get current func name
-func currentFunc(skip int) string {
-	programCounter, _, _, ok := runtime.Caller(skip)
-	if !ok {
-		return ""
-	}
-	sl := strings.Split(runtime.FuncForPC(programCounter).Name(), ".")
-	return sl[len(sl)-1]
-}
+//-----------------------------------------------------------------------------
+// functions
+//-----------------------------------------------------------------------------
 
-func getStatus(key string) uint8 {
+func getStatus(key string) LogStatus {
 	switch key {
 	case "Debug", "Debugf":
 		return DebugStatus
@@ -91,6 +116,8 @@ func getStatus(key string) uint8 {
 		return ErrorStatus
 	case "Fatal", "Fatalf":
 		return FatalStatus
+	case "Stack":
+		return StackStatus
 	default:
 		return 0
 	}
@@ -108,22 +135,11 @@ func getPrefix(key string) string {
 		return ErrorPrefix
 	case "Fatal", "Fatalf":
 		return FatalPrefix
+	case "Stack":
+		return StackPrefix
 	default:
 		return ""
 	}
-}
-
-// openFile is for output log file
-func openFile(logger *log.Logger, fileName string) {
-	if fileName == "" {
-		return
-	}
-
-	f, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatal("Error opening file :", err.Error())
-	}
-	logger.SetOutput(f)
 }
 
 // setColor is to set color
@@ -144,119 +160,148 @@ func setColor(key, val string) string {
 	}
 }
 
+// openFile is for output log file
+func openFile(logger *log.Logger, fileName string) {
+	if fileName == "" {
+		return
+	}
+	//ファイルがなければ作成する
+	f, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal("Error opening file :", err.Error())
+	}
+	logger.SetOutput(f)
+}
+
+// currentFunc is to get current func name
+func currentFunc(skip int) string {
+	programCounter, _, _, ok := runtime.Caller(skip)
+	if !ok {
+		return ""
+	}
+	sl := strings.Split(runtime.FuncForPC(programCounter).Name(), ".")
+	return sl[len(sl)-1]
+}
+
+//-----------------------------------------------------------------------------
+// logger instance
+//-----------------------------------------------------------------------------
+
 // New is to create new log object
-func New(level, fileLevel uint8, logFmt int, prefix, fileName string) *Object {
-	logObj := &Object{}
-	logObj.logLevel = level
-	logObj.logFileLevel = fileLevel
+func New(level LogStatus, logFmt LogFmt, prefix, fileName, delimiter string) *Logger {
+	logConf := &Logger{}
+	logConf.logLevel = level
+	logConf.separator = delimiter
+
+	logConf.logger = log.New(os.Stderr, prefix, logFmt.Int())
 
 	//Log File Path
 	if fileName == "" {
-		fileName = filePathName
+		logConf.logType = Console
+	} else {
+		logConf.logType = File
+
+		openFile(logConf.logger, fileName)
 	}
 
-	//Log Format
-	if logFmt == 0 {
-		//date and file is not shown.
-	} else if logFmt == 99 {
-		//logFmt = log.Ltime                               //2
-		logFmt = log.Ltime | log.Lshortfile //18
-		//logFmt = log.LstdFlags | log.Lshortfile          //19
-		//logFmt = log.Ldate | log.Ltime | log.Lshortfile  //19
-	}
-
-	logObj.loggerStd = log.New(os.Stderr, prefix, logFmt)
-	logObj.loggerFile = log.New(os.Stderr, prefix, logFmt)
-
-	if fileLevel != LogOff {
-		openFile(logObj.loggerFile, fileName)
-	}
-
-	return logObj
+	return logConf
 }
 
 // Out is to output log
-func (lo *Object) Out(key string, v ...interface{}) {
+func (lo *Logger) Out(key string, v ...interface{}) {
 	nv := u.Unshift(v, getPrefix(key))
 
 	if lo.logLevel <= getStatus(key) {
-		if lo.logFileLevel <= getStatus(key) {
-			lo.loggerFile.Output(3, fmt.Sprint(nv...))
+		if lo.logType == File {
+			lo.logger.Output(3, fmt.Sprint(nv...))
 		} else {
-			lo.loggerStd.Output(3, setColor(key, fmt.Sprint(nv...)))
+			lo.logger.Output(3, setColor(key, fmt.Sprint(nv...)))
 		}
 	}
 }
 
 // Outf is to output log with format
-func (lo *Object) Outf(key, format string, v ...interface{}) {
+func (lo *Logger) Outf(key, format string, v ...interface{}) {
 	if lo.logLevel <= getStatus(key) {
-		if lo.logFileLevel <= getStatus(key) {
-			lo.loggerFile.Output(3, fmt.Sprintf(getPrefix(key)+format, v...))
+		if lo.logType == File {
+			lo.logger.Output(3, fmt.Sprintf(getPrefix(key)+format, v...))
 		} else {
-			lo.loggerStd.Output(3, setColor(key, fmt.Sprintf(getPrefix(key)+format, v...)))
+			lo.logger.Output(3, setColor(key, fmt.Sprintf(getPrefix(key)+format, v...)))
 		}
 	}
 }
 
 // Debug is to call output func for debug log
-func (lo *Object) Debug(v ...interface{}) {
+func (lo *Logger) Debug(v ...interface{}) {
 	key := currentFunc(1)
 	lo.Out(key, v...)
 }
 
 // Debugf is to call output func for debug log with format
-func (lo *Object) Debugf(format string, v ...interface{}) {
+func (lo *Logger) Debugf(format string, v ...interface{}) {
 	key := currentFunc(1)
 	lo.Outf(key, format, v...)
 }
 
 // Info is to call output func for info log
-func (lo *Object) Info(v ...interface{}) {
+func (lo *Logger) Info(v ...interface{}) {
 	key := currentFunc(1)
 	lo.Out(key, v...)
 }
 
 // Infof is to call output func for info log with format
-func (lo *Object) Infof(format string, v ...interface{}) {
+func (lo *Logger) Infof(format string, v ...interface{}) {
 	key := currentFunc(1)
 	lo.Outf(key, format, v...)
 }
 
 // Warn is to call output func for warn log
-func (lo *Object) Warn(v ...interface{}) {
+func (lo *Logger) Warn(v ...interface{}) {
 	key := currentFunc(1)
 	lo.Out(key, v...)
 }
 
 // Warnf is to call output func for warn log with format
-func (lo *Object) Warnf(format string, v ...interface{}) {
+func (lo *Logger) Warnf(format string, v ...interface{}) {
 	key := currentFunc(1)
 	lo.Outf(key, format, v...)
 }
 
 // Error is to call output func for error log
-func (lo *Object) Error(v ...interface{}) {
+func (lo *Logger) Error(v ...interface{}) {
 	key := currentFunc(1)
 	lo.Out(key, v...)
 }
 
 // Errorf is to call output func for error log with format
-func (lo *Object) Errorf(format string, v ...interface{}) {
+func (lo *Logger) Errorf(format string, v ...interface{}) {
 	key := currentFunc(1)
 	lo.Outf(key, format, v...)
 }
 
 // Fatal is to call output func for fatal log
-func (lo *Object) Fatal(v ...interface{}) {
+func (lo *Logger) Fatal(v ...interface{}) {
 	key := currentFunc(1)
 	lo.Out(key, v...)
 }
 
 // Fatalf is to call output func for fatal log with format
-func (lo *Object) Fatalf(format string, v ...interface{}) {
+func (lo *Logger) Fatalf(format string, v ...interface{}) {
 	key := currentFunc(1)
 	lo.Outf(key, format, v...)
+}
+
+// Stack is to call output func for stack trace
+func (lo *Logger) Stack() {
+	info := r.GetStackTrace(lo.separator)
+	msg := "\n"
+	for i := len(info) - 2; i > 0; i-- {
+		v := info[i]
+		msg += fmt.Sprintf("%02d: [Function]%s [File]%s:%d\n", i, v.FunctionName, v.FileName, v.FileLine)
+	}
+
+	key := currentFunc(1)
+	lo.Out(key, msg)
 }
 
 //-----------------------------------------------------------------------------
@@ -264,33 +309,19 @@ func (lo *Object) Fatalf(format string, v ...interface{}) {
 //-----------------------------------------------------------------------------
 
 // InitializeLog is to initialize base log object using default setting
-func InitializeLog(level, fileLevel uint8, logFmt int, prefix, fileName string) {
+func InitializeLog(level LogStatus, logFmt LogFmt, prefix, fileName, delimiter string) {
 	logLevel = level
-	logFileLevel = fileLevel
+	separator = delimiter
+
+	//Log Object
+	logger = log.New(os.Stderr, prefix, logFmt.Int())
 
 	//Log File Path
 	if fileName == "" {
-		fileName = filePathName
-	}
-
-	//Log Format
-	if logFmt == 0 {
-		//date and file is not shown.
-	} else if logFmt == 99 {
-		//logFmt = log.Ltime                               //2
-		logFmt = log.Ltime | log.Lshortfile //18 (best for me)
-		//logFmt = log.LstdFlags | log.Lshortfile          //19
-		//logFmt = log.Ldate | log.Ltime | log.Lshortfile  //19
-	}
-
-	//Log Object
-	logStdOut = log.New(os.Stderr, prefix, logFmt)
-	// color mode
-	//setColor()
-
-	logFileOut = log.New(os.Stderr, prefix, logFmt)
-	if fileLevel != LogOff {
-		openFile(logFileOut, fileName)
+		logType = Console
+	} else {
+		logType = File
+		openFile(logger, fileName)
 	}
 }
 
@@ -299,11 +330,11 @@ func out(key string, v ...interface{}) {
 	nv := u.Unshift(v, getPrefix(key))
 
 	if logLevel <= getStatus(key) {
-		if logFileLevel <= getStatus(key) {
+		if logType == File {
 			//file
-			logFileOut.Output(3, fmt.Sprint(nv...))
+			logger.Output(3, fmt.Sprint(nv...))
 		} else {
-			logStdOut.Output(3, setColor(key, fmt.Sprint(nv...)))
+			logger.Output(3, setColor(key, fmt.Sprint(nv...)))
 		}
 	}
 }
@@ -311,11 +342,11 @@ func out(key string, v ...interface{}) {
 // outf is to output log with format
 func outf(key, format string, v ...interface{}) {
 	if logLevel <= getStatus(key) {
-		if logFileLevel <= getStatus(key) {
+		if logType == File {
 			//file
-			logFileOut.Output(3, fmt.Sprintf(getPrefix(key)+format, v...))
+			logger.Output(3, fmt.Sprintf(getPrefix(key)+format, v...))
 		} else {
-			logStdOut.Output(3, setColor(key, fmt.Sprintf(getPrefix(key)+format, v...)))
+			logger.Output(3, setColor(key, fmt.Sprintf(getPrefix(key)+format, v...)))
 		}
 	}
 }
@@ -378,4 +409,17 @@ func Fatal(v ...interface{}) {
 func Fatalf(format string, v ...interface{}) {
 	key := currentFunc(1)
 	outf(key, format, v...)
+}
+
+// Stack is to call output func for stack trace
+func Stack() {
+	info := r.GetStackTrace(separator)
+	msg := "\n"
+	for i := len(info) - 2; i > 0; i-- {
+		v := info[i]
+		msg += fmt.Sprintf("%02d: [Function]%s [File]%s:%d\n", i, v.FunctionName, v.FileName, v.FileLine)
+	}
+
+	key := currentFunc(1)
+	out(key, msg)
 }

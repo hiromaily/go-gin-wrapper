@@ -45,8 +45,8 @@ func setupMain() {
 	initConf()
 
 	//log
-	lg.InitializeLog(conf.GetConf().Server.Log.Level, lg.LogOff, 99,
-		"[GOWEB]", conf.GetConf().Server.Log.Path)
+	lg.InitializeLog(lg.LogStatus(conf.GetConf().Server.Log.Level), lg.TimeShortFile,
+		"[GOWEB]", conf.GetConf().Server.Log.Path, "hiromaily")
 
 	//lg.Debugf("conf %#v\n", conf.GetConfInstance())
 	lg.Debugf("[Environment] : %s\n", conf.GetConf().Environment)

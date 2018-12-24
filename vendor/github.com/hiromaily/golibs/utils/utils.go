@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -430,6 +431,30 @@ func SearchStringLower(ary []string, str string) int {
 	}
 
 	return retIdx
+}
+
+//**********************************************************
+// Slice Struct Sort
+//**********************************************************
+func SortStructSlice() {
+	type ExamResult struct {
+		Name  string
+		Score int
+	}
+	exams := make([]ExamResult, 5)
+	exams[0] = ExamResult{Name: "Jon", Score: 37}
+	exams[1] = ExamResult{Name: "Mike", Score: 14}
+	exams[2] = ExamResult{Name: "Rob", Score: 74}
+	exams[3] = ExamResult{Name: "Oscar", Score: 94}
+	exams[4] = ExamResult{Name: "Jan", Score: 92}
+
+	sort.Slice(exams, func(i, j int) bool {
+		//small to big
+		return exams[i].Score < exams[j].Score
+	})
+
+	fmt.Printf("%+v\n", exams)
+	//[{Name:Mike Score:14} {Name:Jon Score:37} {Name:Rob Score:74} {Name:Jan Score:92} {Name:Oscar Score:94}]
 }
 
 //**********************************************************

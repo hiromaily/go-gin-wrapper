@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build !go1.9
-
 // Package google provides support for making OAuth2 authorized and authenticated
 // HTTP requests to Google APIs. It supports the Web server flow, client-side
 // credentials, service accounts, Google Compute Engine service accounts, and Google
@@ -24,8 +22,8 @@
 //
 // Credentials
 //
-// The DefaultCredentials type represents Google Application Default Credentials, as
-// well as other forms of credential.
+// The Credentials type represents Google credentials, including Application Default
+// Credentials.
 //
 // Use FindDefaultCredentials to obtain Application Default Credentials.
 // FindDefaultCredentials looks in some well-known places for a credentials file, and
@@ -34,10 +32,9 @@
 // DefaultClient and DefaultTokenSource are convenience methods. They first call FindDefaultCredentials,
 // then use the credentials to construct an http.Client or an oauth2.TokenSource.
 //
-// Use CredentialsFromJSON to obtain credentials from either of the two JSON
-// formats described in OAuth2 Configs, above. (The DefaultCredentials returned may
-// not be "Application Default Credentials".) The TokenSource in the returned value
-// is the same as the one obtained from the oauth2.Config returned from
-// ConfigFromJSON or JWTConfigFromJSON, but the DefaultCredentials may contain
-// additional information that is useful is some circumstances.
+// Use CredentialsFromJSON to obtain credentials from either of the two JSON formats
+// described in OAuth2 Configs, above. The TokenSource in the returned value is the
+// same as the one obtained from the oauth2.Config returned from ConfigFromJSON or
+// JWTConfigFromJSON, but the Credentials may contain additional information
+// that is useful is some circumstances.
 package google
