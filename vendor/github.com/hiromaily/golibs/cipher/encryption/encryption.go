@@ -15,14 +15,12 @@ import (
 
 // Crypt is for cipher config data
 type Crypt struct {
-	//enc, dec cipher.BlockMode
 	cipher cipher.Block
 	iv     []byte
 }
 
 var (
 	cryptInfo Crypt
-	commonIV  = []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f}
 )
 
 // Creates a new encryption/decryption object
@@ -36,28 +34,26 @@ var (
 //func NewCryptUtil(size int, key string, more ...string) (*CryptUtil, error) {
 
 // NewCrypt is to create crypt instance
-// e.g. size = 16, key = "8#75F%R+&a5ZvM_<", iv = "@~wp-7hPs<WEx@R4"
-func NewCrypt(size int, key, iv string) (*Crypt, error) {
+// key size should be 16,24,32
+// iv size should be 16
+func NewCrypt(key, iv string) (*Crypt, error) {
 
-	//fmt.Printf("cryptConf %#v\n", cryptConf)
-
-	padded := make([]byte, size)
+	padded := make([]byte, len(key))
 	copy(padded, []byte(key))
 
 	bIv := []byte(iv)
-	aes, err := aes.NewCipher(padded)
+	block, err := aes.NewCipher(padded)
 	if err != nil {
 		return nil, err
 	}
 
-	cryptInfo = Crypt{aes, bIv}
+	cryptInfo = Crypt{block, bIv}
 
 	return &cryptInfo, nil
 }
 
 // NewCryptDefault is setup with default settings.
-func NewCryptDefault() (*Crypt, error) {
-	size := 16
+func NewCryptWithEnv() (*Crypt, error) {
 	key := os.Getenv("ENC_KEY")
 	iv := os.Getenv("ENC_IV")
 
@@ -65,7 +61,7 @@ func NewCryptDefault() (*Crypt, error) {
 		return nil, fmt.Errorf("%s", "set Environment Variable: ENC_KEY, ENC_IV")
 	}
 
-	return NewCrypt(size, key, iv)
+	return NewCrypt(key, iv)
 }
 
 // GetCrypt is to get crypt instance
@@ -75,9 +71,8 @@ func GetCrypt() *Crypt {
 
 func (c *Crypt) padSlice(src []byte) []byte {
 	// src must be a multiple of block size
-	bs := 16
-	mult := int((len(src) / bs) + 1)
-	leng := bs * mult
+	mult := int((len(src) / aes.BlockSize) + 1)
+	leng := aes.BlockSize * mult
 
 	srcPadded := make([]byte, leng)
 	copy(srcPadded, src)
@@ -87,7 +82,7 @@ func (c *Crypt) padSlice(src []byte) []byte {
 // Encrypt is encrypt a slice of bytes, producing a new, freshly allocated slice
 // Source will be padded with null bytes if necessary
 func (c *Crypt) Encrypt(src []byte) []byte {
-	if len(src)%16 != 0 {
+	if len(src)%aes.BlockSize != 0 {
 		src = c.padSlice(src)
 	}
 	dst := make([]byte, len(src))
@@ -105,7 +100,7 @@ func (c *Crypt) EncryptBase64(plainText string) string {
 // EncryptStream is to encrypt blocks from reader, write results into writer
 func (c *Crypt) EncryptStream(reader io.Reader, writer io.Writer) error {
 	for {
-		buf := make([]byte, 16)
+		buf := make([]byte, aes.BlockSize)
 		_, err := io.ReadFull(reader, buf)
 		if err != nil {
 			if err == io.EOF {
@@ -127,7 +122,7 @@ func (c *Crypt) EncryptStream(reader io.Reader, writer io.Writer) error {
 // Decrypt is to decrypt a slice of bytes, producing a new, freshly allocated slice
 // Source will be padded with null bytes if necessary
 func (c *Crypt) Decrypt(src []byte) []byte {
-	if len(src)%16 != 0 {
+	if len(src)%aes.BlockSize != 0 {
 		src = c.padSlice(src)
 	}
 	dst := make([]byte, len(src))
@@ -148,7 +143,7 @@ func (c *Crypt) DecryptBase64(base64String string) (string, error) {
 
 // DecryptStream is to decrypt blocks from reader, write results into writer
 func (c *Crypt) DecryptStream(reader io.Reader, writer io.Writer) error {
-	buf := make([]byte, 16)
+	buf := make([]byte, aes.BlockSize)
 	for {
 		_, err := io.ReadFull(reader, buf)
 		if err != nil {

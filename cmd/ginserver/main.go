@@ -37,7 +37,7 @@ func init() {
 	flag.Parse()
 
 	//cipher
-	enc.NewCryptDefault()
+	enc.NewCryptWithEnv()
 }
 
 func setupMain() {

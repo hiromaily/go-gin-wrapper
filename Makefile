@@ -37,13 +37,14 @@ changegit:
 	git checkout v0.9.17
 
 update:
-	go get -u github.com/tools/godep
+	go get -u github.com/golang/dep/cmd/dep
 	go get -u -d -v ./...
 
-godep:
-	rm -rf Godeps
-	rm -rf ./vendor
-	godep save ./...
+dep-init:
+	dep init
+
+dep-ensure:
+	dep ensure
 
 
 ###############################################################################

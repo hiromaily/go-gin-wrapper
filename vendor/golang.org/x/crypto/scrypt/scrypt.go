@@ -5,7 +5,7 @@
 // Package scrypt implements the scrypt key derivation function as defined in
 // Colin Percival's paper "Stronger Key Derivation via Sequential Memory-Hard
 // Functions" (https://www.tarsnap.com/scrypt/scrypt.pdf).
-package scrypt
+package scrypt // import "golang.org/x/crypto/scrypt"
 
 import (
 	"crypto/sha256"
@@ -29,7 +29,7 @@ func blockXOR(dst, src []uint32, n int) {
 }
 
 // salsaXOR applies Salsa20/8 to the XOR of 16 numbers from tmp and in,
-// and puts the result into both both tmp and out.
+// and puts the result into both tmp and out.
 func salsaXOR(tmp *[16]uint32, in, out []uint32) {
 	w0 := tmp[0] ^ in[0]
 	w1 := tmp[1] ^ in[1]

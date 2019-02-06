@@ -55,6 +55,10 @@ func dumpStackTrace(separator string) (callerInfo []*CallerInfo) {
 	return callerInfo[1:]
 }
 
+func GetOS() string {
+	return runtime.GOOS
+}
+
 func GetStackTrace(separator string) []*CallerInfo {
 	info := dumpStackTrace(separator)
 	return info
