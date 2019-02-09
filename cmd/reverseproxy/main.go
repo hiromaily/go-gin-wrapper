@@ -30,8 +30,9 @@ func initConf() {
 	conf.New(*tomlPath, false)
 
 	//log
-	lg.InitializeLog(conf.GetConf().Proxy.Server.Log.Level, lg.LogOff, 99,
-		"[REVERSE_PROXY]", conf.GetConf().Proxy.Server.Log.Path)
+	logLevel := lg.LogStatus(conf.GetConf().Proxy.Server.Log.Level)
+	lg.InitializeLog(logLevel, lg.TimeShortFile,
+		"[REVERSE_PROXY]", conf.GetConf().Proxy.Server.Log.Path, "hiromaily")
 }
 
 func getURL(scheme, host string, port int) string {

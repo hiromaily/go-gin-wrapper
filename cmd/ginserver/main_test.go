@@ -1,17 +1,11 @@
 package main
 
 import (
-	"fmt"
-	lg "github.com/hiromaily/golibs/log"
-	//u "github.com/hiromaily/golibs/utils"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"flag"
-	"github.com/PuerkitoBio/goquery"
-	conf "github.com/hiromaily/go-gin-wrapper/core/configs"
-	//gin "gopkg.in/gin-gonic/gin.v1"
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -22,6 +16,13 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	lg "github.com/hiromaily/golibs/log"
+	//u "github.com/hiromaily/golibs/utils"
+	"github.com/PuerkitoBio/goquery"
+	conf "github.com/hiromaily/go-gin-wrapper/core/configs"
+	//gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 )
 
 //TODO:change toml settings automatically as program code.
@@ -210,9 +211,7 @@ func init() {
 	//flag.Parse()
 
 	//when changing loglevel
-	lg.InitializeLog(lg.DebugStatus, lg.LogOff, 99, "[GOWEB]", "/var/log/go/test.log")
-	//lg.InitializeLog(lg.INFO_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
-	//lg.InitializeLog(lg.WARNING_STATUS, lg.LOG_OFF_COUNT, 0, "[GOWEB]", "/var/log/go/test.log")
+	lg.InitializeLog(lg.DebugStatus, lg.TimeShortFile, "[GOWEB]", "", "hiromaily")
 }
 
 func setup() {

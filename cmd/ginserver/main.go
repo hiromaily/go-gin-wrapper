@@ -4,6 +4,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"html/template"
+	"time"
+
 	"github.com/DeanThompson/ginpprof"
 	//"github.com/hiromaily/go-gin-wrapper/libs/ginpprof"
 	"github.com/fatih/color"
@@ -23,8 +26,6 @@ import (
 	//gin "gopkg.in/gin-gonic/gin.v1"
 	"github.com/gin-gonic/gin"
 	//u "github.com/hiromaily/golibs/utils"
-	"html/template"
-	"time"
 )
 
 var (
