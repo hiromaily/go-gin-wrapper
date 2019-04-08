@@ -37,7 +37,7 @@ $ ./docker-create.sh
 ```
 
 
-## Configration
+## Configuration
 
 ### 1. Common settings
 #### MySQL
