@@ -5,84 +5,97 @@ CURRENTDIR=`pwd`
 ###############################################################################
 # Initial Settings
 ###############################################################################
-init_environment:
+init-env:
 	export ENC_KEY='xxxxxxxxxkeykey'
 	export ENC_IV='xxxxxxxxxxxxiviv'
 
-	#heroku
-	#heroku config:add ENC_KEY='xxxxxxxxxkeykey'
-	#heroku config:add ENC_IV='xxxxxxxxxxxxiviv'
-
 	#travis web console -> settings
 
-deployjs:
+deploy-js:
 	#cp /Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/frontend_workspace/react/app/dist/apilist.bundle.js \
 	#/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/statics/js/
 
-mongoinit:
+init-mongo:
 	#After running mongodb
 	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
 	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
 
-dbinit:
+init-db:
 	export DB_NAME=hiromaily
 	sh ./data/sql/setup.sh
-
 
 ###############################################################################
 # Managing Dependencies
 ###############################################################################
-changegit:
-	cd ${GOPATH}/src/github.com/aws/aws-sdk-go
-	git checkout v0.9.17
-
+.PHONY: update
 update:
-	go get -u github.com/golang/dep/cmd/dep
+	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	go get -u -d -v ./...
 
-dep-init:
-	dep init
-
-dep-ensure:
-	dep ensure
-
 
 ###############################################################################
-# Golang detection and formatter
+# Golang formatter and detection
 ###############################################################################
-fmt:
-	go fmt `go list ./... | grep -v '/vendor/'`
-
-vet:
-	go vet `go list ./... | grep -v '/vendor/'`
-
+.PHONY: lint
 lint:
-	golint ./... | grep -v '^vendor\/' || true
-	misspell `find . -name "*.go" | grep -v '/vendor/'`
-	ineffassign .
+	golangci-lint run --fix
 
-chk:
-	go fmt `go list ./... | grep -v '/vendor/'`
-	go vet `go list ./... | grep -v '/vendor/'`
-	golint ./... | grep -v '^vendor\/' || true
-	misspell `find . -name "*.go" | grep -v '/vendor/'`
-	ineffassign .
+.PHONY: imports
+imports:
+	./scripts/imports.sh
 
+
+###############################################################################
+# Local Build
+###############################################################################
+bld:
+	go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
+
+bld-proxy:
+	go build -i -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
+
+bld-swg:
+	go build -i -v -o ${GOPATH}/bin/swgserver ./swagger/go-swagger/cmd/swagger-server/
+
+
+###############################################################################
+# Execution
+###############################################################################
+run:
+	go run -race ./cmd/ginserver/main.go
+
+exec:
+	ginserver -f ./data/toml/settings.toml
+
+exec-proxy:
+	PORTS=(8080 8081 8082)
+	for port in ${PORTS[@]}
+	do
+		echo 'port is ${port}'
+		ginserver -f ./configs/settings.toml -P ${port} &
+	done
+	sleep 5s
+
+	reverseproxy -f ./configs/settings.toml
+	#proxy.hiromaily.com:9990
+
+exec-swg:
+	swgserver
 
 ###############################################################################
 # Docker TODO:delete it
 ###############################################################################
-dcstart:
+dc-start:
 	docker start web-redisd
 	docker start web-mysqld
 	docker start web-mongod
 
-dcstop:
+dc-stop:
 	docker stop web-redisd
 	docker stop web-mysqld
 	docker stop web-mongod
 
-dcmongo:
+dc-mongo:
 	docker exec -it web-mongo bash
 
 
@@ -134,47 +147,6 @@ dcshell:
 			break
 		fi
 	done
-
-
-###############################################################################
-# Local Build
-###############################################################################
-#dcdb:
-#	docker-compose up mysql redis mongo
-
-bld:
-	go build -i -race -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
-
-bldproxy:
-	go build -i -race -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
-
-bldswg:
-	go build -i -race -v -o ${GOPATH}/bin/swgserver ./swagger/go-swagger/cmd/swagger-server/
-
-
-###############################################################################
-# Execution
-###############################################################################
-run:
-	go run -race ./cmd/ginserver/main.go
-
-exec:
-	ginserver -f ./data/toml/settings.toml
-
-execproxy:
-	PORTS=(8080 8081 8082)
-	for port in ${PORTS[@]}
-	do
-		echo 'port is ${port}'
-		ginserver -f ./configs/settings.toml -P ${port} &
-	done
-	sleep 5s
-
-	reverseproxy -f ./configs/settings.toml
-	#proxy.hiromaily.com:9990
-
-execswg:
-	swgserver
 
 
 ###############################################################################

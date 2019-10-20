@@ -9,22 +9,21 @@ services:
 
 env:
   global:
+    - GO111MODULE=on
     - GO_GIN_PATH='/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/cmd/ginserver/'
 
 before_install:
-  - go get -u github.com/golang/dep/cmd/dep
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
+  - go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 install:
-  - $GOPATH/bin/dep ensure
+  - go mod download
 
 script:
-  - go fmt ./...
-  - go vet $(go list ./... | grep -v /vendor/)
-  # - go test -v cmd/ginserver/*.go -f ../../data/toml/travis.toml -om 0
-  - cd ${GO_GIN_PATH};go test -v -covermode=count -coverprofile=profile.cov -f ../../data/toml/travis.toml -om 0
-  - cd ${GO_GIN_PATH};goveralls -coverprofile=profile.cov -service=travis-ci
+  #- golangci-lint run
+  - go test -v -race -covermode=atomic -coverprofile=profile.cov ./cmd/ginserver/... ./data/toml/travis.toml -om 0
+  - goveralls -coverprofile=profile.cov -service=travis-ci
 
 branches:
   only:
