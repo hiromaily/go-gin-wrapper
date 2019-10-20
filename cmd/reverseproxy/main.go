@@ -4,12 +4,13 @@ import (
 	"container/ring"
 	"flag"
 	"fmt"
-	conf "github.com/hiromaily/go-gin-wrapper/core/configs"
-	lg "github.com/hiromaily/golibs/log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"sync"
+
+	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	lg "github.com/hiromaily/golibs/log"
 )
 
 var (

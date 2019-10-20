@@ -1,0 +1,1 @@
+{"version":3,"sources":["module_import.es6.js"],"names":["hy","abc"],"mappings":";;AACA;;IAAYA,E;;;;AAEZA,GAAGC,GAAH,G,CAHA","file":"module_import.js","sourcesContent":["//https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/import\nimport * as hy from \"./module_export.es6.js\"\n\nhy.abc()\n"],"sourceRoot":"/source/"}

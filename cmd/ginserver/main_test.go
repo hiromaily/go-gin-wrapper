@@ -18,9 +18,12 @@ import (
 	"time"
 
 	lg "github.com/hiromaily/golibs/log"
+
 	//u "github.com/hiromaily/golibs/utils"
 	"github.com/PuerkitoBio/goquery"
-	conf "github.com/hiromaily/go-gin-wrapper/core/configs"
+
+	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+
 	//gin "gopkg.in/gin-gonic/gin.v1"
 	"github.com/gin-gonic/gin"
 )

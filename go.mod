@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go v0.47.0 // indirect
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DeanThompson/ginpprof v0.0.0-20190408063150-3be636683586
+	github.com/PuerkitoBio/goquery v1.5.0
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff
 	github.com/fatih/color v1.7.0
 	github.com/gin-contrib/sse v0.1.0 // indirect

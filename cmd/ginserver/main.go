@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/DeanThompson/ginpprof"
-	//"github.com/hiromaily/go-gin-wrapper/libs/ginpprof"
 	"github.com/fatih/color"
-	//"github.com/fvbock/endless"
-	conf "github.com/hiromaily/go-gin-wrapper/core/configs"
-	"github.com/hiromaily/go-gin-wrapper/core/libs/fcgi"
-	sess "github.com/hiromaily/go-gin-wrapper/core/libs/ginsession"
-	"github.com/hiromaily/go-gin-wrapper/core/routes"
+	"github.com/gin-gonic/gin"
+
+	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/libs/fcgi"
+	sess "github.com/hiromaily/go-gin-wrapper/pkg/libs/ginsession"
+	"github.com/hiromaily/go-gin-wrapper/pkg/routes"
 	"github.com/hiromaily/golibs/auth/jwt"
 	enc "github.com/hiromaily/golibs/cipher/encryption"
 	mongo "github.com/hiromaily/golibs/db/mongodb"
@@ -23,9 +23,6 @@ import (
 	hrk "github.com/hiromaily/golibs/heroku"
 	lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/golibs/signal"
-	//gin "gopkg.in/gin-gonic/gin.v1"
-	"github.com/gin-gonic/gin"
-	//u "github.com/hiromaily/golibs/utils"
 )
 
 var (
@@ -227,9 +224,9 @@ func loadTemplates(r *gin.Engine) {
 
 	ext := []string{"tmpl"}
 
-	files1 := fl.GetFileList(rootPath+"/templates/pages", ext)
-	files2 := fl.GetFileList(rootPath+"/templates/components", ext)
-	files3 := fl.GetFileList(rootPath+"/templates/inner_js", ext)
+	files1 := fl.GetFileList(rootPath+"/web/templates/pages", ext)
+	files2 := fl.GetFileList(rootPath+"/web/templates/components", ext)
+	files3 := fl.GetFileList(rootPath+"/web/templates/inner_js", ext)
 
 	joined1 := append(files1, files2...)
 	files := append(joined1, files3...)
@@ -354,12 +351,12 @@ func setHTTPSServer() {
 	setMiddleWare(r)
 
 	//templates
-	r.LoadHTMLGlob("templates/**/*")
+	r.LoadHTMLGlob("web/templates/**/*")
 
 	//static
 	//router.Static("/static", "/var/www")
-	r.Static("/statics", "statics")
-	r.Static("/assets", "statics/assets")
+	r.Static("/statics", "web/statics")
+	r.Static("/assets", "web/statics/assets")
 
 	//set router
 	routes.SetURLOnHTTPS(r)

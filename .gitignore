@@ -4,7 +4,7 @@
 tmp/*
 
 #main
-data/toml/settings.toml
+testdata/toml/settings.toml
 
 #vendor
 vendor/gopkg.in/mgo.v2/internal/sasl/
