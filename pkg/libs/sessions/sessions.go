@@ -15,10 +15,12 @@ import (
 // This source is not used anymore.
 
 const (
+	// DefaultKey is default key
 	DefaultKey  = "github.com/gin-gonic/contrib/sessions"
 	errorFormat = "[sessions] ERROR! %s\n"
 )
 
+// Store is session store interface with options object
 type Store interface {
 	sessions.Store
 	Options(Options)
@@ -27,18 +29,22 @@ type Store interface {
 // Options stores configuration for a session or session store.
 // Fields are a subset of http.Cookie fields.
 type Options struct {
-	Path   string
+	// Path is path of url
+	Path string
+	// Domain is domain of url
 	Domain string
 	// MaxAge=0 means no 'Max-Age' attribute specified.
 	// MaxAge<0 means delete cookie now, equivalently 'Max-Age: 0'.
 	// MaxAge>0 means Max-Age attribute present and given in seconds.
-	MaxAge   int
-	Secure   bool
-	HttpOnly bool
+	MaxAge int
+	// Secure is secured cookie or not
+	Secure bool
+	// HttpOnly is http only or not
+	HTTPOnly bool
 }
 
-// Wraps thinly gorilla-session methods.
 // Session stores the values and optional configuration for a session.
+// Wraps thinly gorilla-session methods.
 type Session interface {
 	// Get returns the session value associated to the given key.
 	Get(key interface{}) interface{}
@@ -62,6 +68,7 @@ type Session interface {
 	Save() error
 }
 
+// Sessions returns session handler
 func Sessions(name string, store Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		s := &session{name, c.Request, store, nil, false, c.Writer}
@@ -80,46 +87,54 @@ type session struct {
 	writer  http.ResponseWriter
 }
 
+// Get gets value by key
 func (s *session) Get(key interface{}) interface{} {
 	return s.Session().Values[key]
 }
 
+// Set sets key and value
 func (s *session) Set(key interface{}, val interface{}) {
 	s.Session().Values[key] = val
 	s.written = true
 }
 
+// Delete deletes session value by key
 func (s *session) Delete(key interface{}) {
 	delete(s.Session().Values, key)
 	s.written = true
 }
 
+// Clear deletes session
 func (s *session) Clear() {
 	for key := range s.Session().Values {
 		s.Delete(key)
 	}
 }
 
+// AddFlash adds a flash message to the session
 func (s *session) AddFlash(value interface{}, vars ...string) {
 	s.Session().AddFlash(value, vars...)
 	s.written = true
 }
 
+// Flashes returns a slice of flash messages from the session
 func (s *session) Flashes(vars ...string) []interface{} {
 	s.written = true
 	return s.Session().Flashes(vars...)
 }
 
+// Options is to set session options
 func (s *session) Options(options Options) {
 	s.Session().Options = &sessions.Options{
 		Path:     options.Path,
 		Domain:   options.Domain,
 		MaxAge:   options.MaxAge,
 		Secure:   options.Secure,
-		HttpOnly: options.HttpOnly,
+		HttpOnly: options.HTTPOnly,
 	}
 }
 
+// Save is to save session
 func (s *session) Save() error {
 	if s.Written() {
 		e := s.Session().Save(s.request, s.writer)
@@ -131,6 +146,7 @@ func (s *session) Save() error {
 	return nil
 }
 
+// Session is to get session
 func (s *session) Session() *sessions.Session {
 	if s.session == nil {
 		var err error
@@ -146,7 +162,7 @@ func (s *session) Written() bool {
 	return s.written
 }
 
-// shortcut to get session
+// Default is shortcut to get session
 func Default(c *gin.Context) Session {
 	return c.MustGet(DefaultKey).(Session)
 }

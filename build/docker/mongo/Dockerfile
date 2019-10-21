@@ -1,10 +1,13 @@
 # Dcokerfile for Mongo
 
-FROM mongo:3.4
+FROM mongo:4.2-bionic
 
 ARG mongo_port=27017
 ENV MONGO_PORT=$mongo_port
 
-RUN mkdir settings
-WORKDIR /settings
-COPY . .
+COPY init.js /docker-entrypoint-initdb.d/
+#COPY mongod.conf /etc/
+
+EXPOSE 27017
+
+CMD ["mongod", "--auth"]

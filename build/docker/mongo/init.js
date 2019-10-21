@@ -3,7 +3,9 @@
 //-----------------------------------------------------------------------------
 //
 var conn;
-var host = "127.0.0.1"
+var host = "127.0.0.1";
+var port = 27017;
+
 //init
 function init(){
     print("[function] init();");
@@ -31,7 +33,7 @@ function createUserOnAdmin(){
     db = conn.getDB("admin");
 
     // create user who can anything.
-    db.createUser({user: "root", pwd: "password", roles: [ "root" ] });
+    //db.createUser({user: "root", pwd: "password", roles: [ "root" ] });
 
     // create user who has admin authority on all databases.
     db.createUser({user:"admin", pwd:"admin", roles: [{role: "userAdminAnyDatabase", db: "admin"}] });

@@ -2,33 +2,13 @@
 MONGO_PORT=27017
 CURRENTDIR=`pwd`
 
-###############################################################################
-# Initial Settings
-###############################################################################
-init-env:
-	export ENC_KEY='xxxxxxxxxkeykey'
-	export ENC_IV='xxxxxxxxxxxxiviv'
-
-	#travis web console -> settings
-
-deploy-js:
-	#cp /Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/frontend_workspace/react/app/dist/apilist.bundle.js \
-	#/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/statics/js/
-
-init-mongo:
-	#After running mongodb
-	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
-	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
-
-init-db:
-	export DB_NAME=hiromaily
-	sh ./data/sql/setup.sh
 
 ###############################################################################
 # Managing Dependencies
 ###############################################################################
 .PHONY: update
 update:
+	GO111MODULE=off go get -u github.com/oxequa/realize
 	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	go get -u -d -v ./...
 
@@ -48,25 +28,31 @@ imports:
 ###############################################################################
 # Local Build
 ###############################################################################
-bld:
+.PHONY: init-env
+build:
 	go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
 
-bld-proxy:
+.PHONY: build-proxy
+build-proxy:
 	go build -i -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
 
-bld-swg:
+.PHONY: build-swg
+build-swg:
 	go build -i -v -o ${GOPATH}/bin/swgserver ./swagger/go-swagger/cmd/swagger-server/
 
 
 ###############################################################################
 # Execution
 ###############################################################################
+.PHONY: run
 run:
-	go run -race ./cmd/ginserver/main.go
+	go run ./cmd/ginserver/main.go -f ./configs/settings.toml
 
+.PHONY: exec
 exec:
-	ginserver -f ./data/toml/settings.toml
+	ginserver -f ./configs/settings.toml
 
+.PHONY: exec-proxy
 exec-proxy:
 	PORTS=(8080 8081 8082)
 	for port in ${PORTS[@]}
@@ -79,58 +65,49 @@ exec-proxy:
 	reverseproxy -f ./configs/settings.toml
 	#proxy.hiromaily.com:9990
 
+.PHONY: exec-swg
 exec-swg:
 	swgserver
-
-###############################################################################
-# Docker TODO:delete it
-###############################################################################
-dc-start:
-	docker start web-redisd
-	docker start web-mysqld
-	docker start web-mongod
-
-dc-stop:
-	docker stop web-redisd
-	docker stop web-mysqld
-	docker stop web-mongod
-
-dc-mongo:
-	docker exec -it web-mongo bash
 
 
 ###############################################################################
 # Docker-Compose
 ###############################################################################
-dcfirst:
+# .PHONY: dc-setup
+# dc-setup:
+# 	docker-compose build
+# 	docker-compose up mongo &
+# 	# should sleep
+# 	sleep 5
+#
+# 	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
+# 	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
+
+
+.PHONY: dc-bld
+dc-bld:
 	docker-compose build
-	docker-compose up mongo &
-	# should sleep
-	sleep 5
 
-	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
-	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
-
-
-dcbld:
-	docker-compose build
-
-dcup:
+.PHONY: dc-up
+dc-up:
 	docker-compose up
 
-dcfull:
+.PHONY: dc-bld-up
+dc-bld-up:
 	docker-compose up --build
 
 
-dctest:
+.PHONY: dc-test
+dc-test:
 	export RUN_TEST=1
-	sh ./docker-create.sh
+	sh ./scripts/docker-create.sh
 
-dcshell:
+.PHONY: dc-shell
+dc-shell:
 	echo '============== docker =============='
 	# create docker container
 	export RUN_TEST=0
-	sh ./docker-create.sh
+	sh ./scripts/docker-create.sh
 
 	#wait to be ready or not.
 	echo 'building now. it may be take over 40s.'
@@ -150,38 +127,111 @@ dcshell:
 
 
 ###############################################################################
+# Docker TODO:delete it
+###############################################################################
+.PHONY: dc-start
+dc-start:
+	docker start web-redisd
+	docker start web-mysqld
+	docker start web-mongod
+
+.PHONY: dc-stop
+dc-stop:
+	docker stop web-redisd
+	docker stop web-mysqld
+	docker stop web-mongod
+
+.PHONY: dc-mongo
+dc-mongo:
+	docker exec -it web-mongo bash
+
+###############################################################################
+# mongo cli on mac
+###############################################################################
+# https://docs.mongodb.com/manual/tutorial/enable-authentication/
+# https://medium.com/mongoaudit/how-to-enable-authentication-on-mongodb-b9e8a924efac
+
+# $ mongo
+# >db
+# >use hiromaily
+# >mongo hiromaily -u hiromaily -p 12345678
+# >mongo 127.0.0.1:27017/admin
+# >mongo --port 27017  --authenticationDatabase "admin" -u "root" -p "root-secret"
+# >mongo --host mongodb://root:root-secret@127.0.0.1:27017/ --authenticationDatabase admin
+
+
+###############################################################################
+# Create Data
+###############################################################################
+.PHONY: init-db
+init-db:
+	export DB_NAME=hiromaily
+	sh ./data/sql/setup.sh
+
+# .PHONY: init-mongo
+# init-mongo:
+# 	#After running mongodb
+# 	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
+# 	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
+
+
+###############################################################################
+# Front End
+###############################################################################
+# .PHONY: deploy-js
+# deploy-js:
+# 	cp /Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/frontend_workspace/react/app/dist/apilist.bundle.js \
+# 	/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/statics/js/
+
+
+###############################################################################
+# Tools
+# Note: environment variable `ENC_KEY`, `ENC_IV` should be set in advance
+###############################################################################
+.PHONY: tool-encode
+tool-encode:
+	go run ./tools/encryption/ -m e important-password
+
+.PHONY: tool-decode
+tool-decode:
+	go run ./tools/encryption/ -m d o5PDC2aLqoYxhY9+mL0W/IdG+rTTH0FWPUT4u1XBzko=
+
+
+###############################################################################
 # Test
 ###############################################################################
-quicktest:
-	go test -run TestLogin -v cmd/ginserver/*.go -f ../../data/toml/settings.toml
+.PHONY: test-quick
+test-quick:
+	go test -run TestLogin -v cmd/ginserver/*.go -f ../../configs/settings.toml
 
+.PHONY: test
 test:
 	# Create Test Data
 	export DB_NAME=hiromaily2
 	export DB_PORT=13306
 	export DB_USER=root
 	export DB_PASS=root
-	sh ./data/sql/setup.sh
+	sh ./testdata/sql/setup.sh
 
 	# Execute
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
-	-f ../../data/toml/settings.toml -om 0
+	-f ../../configs/settings.toml -om 0
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetUserAPIRequestOnTable" \
-	-f ../../data/toml/settings.toml -om 1
+	-f ../../configs/settings.toml -om 1
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetUserAPIRequestOnTable" \
-	-f ../../data/toml/settings.toml -om 2
+	-f ../../configs/settings.toml -om 2
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
-	-f ../../data/toml/settings.toml -om 1
+	-f ../../configs/settings.toml -om 1
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
-	-f ../../data/toml/settings.toml -om 2
+	-f ../../configs/settings.toml -om 2
 
 
 ###############################################################################
@@ -197,9 +247,9 @@ test:
 # https://ginserver.herokuapp.com/
 #
 ###############################################################################
-herokudeploy:
+.PHONY: heroku-deploy
+heroku-deploy:
 	git push -f heroku master
 
 ###### e.g. command for heroku #####
 #heroku config:add HEROKU_FLG=1
-

@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"errors"
 	"fmt"
+
+	"github.com/pkg/errors"
 
 	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	"github.com/hiromaily/go-gin-wrapper/pkg/libs/cors"
@@ -364,7 +365,7 @@ func CheckJWT() gin.HandlerFunc {
 				}
 			}
 		} else {
-			err = errors.New("Authorization header was missed.")
+			err = errors.New("authorization header was missed")
 		}
 
 		if err != nil {
@@ -401,13 +402,13 @@ func IsXHR(c *gin.Context) bool {
 // IsAcceptHeaderJSON is whether request require JSON or not
 func IsAcceptHeaderJSON(c *gin.Context) bool {
 	accept := strings.ToLower(c.Request.Header.Get("Accept"))
-	return strings.Index(accept, "application/json") != -1
+	return strings.Contains(accept, "application/json")
 }
 
 // IsContentTypeJSON is whether data format of request is JSON or not
 func IsContentTypeJSON(c *gin.Context) bool {
 	accept := strings.ToLower(c.Request.Header.Get("Content-Type"))
-	return strings.Index(accept, "application/json") != -1
+	return strings.Contains(accept, "application/json")
 }
 
 // GetUserAgent is get user agent

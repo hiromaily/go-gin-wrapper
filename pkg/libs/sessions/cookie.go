@@ -4,10 +4,12 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+// CookieStore is CookieStore interface
 type CookieStore interface {
 	Store
 }
 
+// NewCookieStore returns cookieStore object
 // Keys are defined in pairs to allow key rotation, but the common case is to set a single
 // authentication key and optionally an encryption key.
 //
@@ -25,12 +27,13 @@ type cookieStore struct {
 	*sessions.CookieStore
 }
 
+// Options return session options
 func (c *cookieStore) Options(options Options) {
 	c.CookieStore.Options = &sessions.Options{
 		Path:     options.Path,
 		Domain:   options.Domain,
 		MaxAge:   options.MaxAge,
 		Secure:   options.Secure,
-		HttpOnly: options.HttpOnly,
+		HttpOnly: options.HTTPOnly,
 	}
 }

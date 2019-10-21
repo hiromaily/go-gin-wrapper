@@ -5,10 +5,12 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+// RedisStore is interface
 type RedisStore interface {
 	Store
 }
 
+// NewRedisStore returns redisStore object
 // size: maximum number of idle connections.
 // network: tcp or udp
 // address: host:port
@@ -34,12 +36,13 @@ type redisStore struct {
 	*redistore.RediStore
 }
 
+// Options returns session options
 func (c *redisStore) Options(options Options) {
 	c.RediStore.Options = &sessions.Options{
 		Path:     options.Path,
 		Domain:   options.Domain,
 		MaxAge:   options.MaxAge,
 		Secure:   options.Secure,
-		HttpOnly: options.HttpOnly,
+		HttpOnly: options.HTTPOnly,
 	}
 }

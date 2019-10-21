@@ -1,12 +1,12 @@
 package configs
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 
 	"github.com/BurntSushi/toml"
+	"github.com/pkg/errors"
 
 	enc "github.com/hiromaily/golibs/cipher/encryption"
 	u "github.com/hiromaily/golibs/utils"
@@ -265,7 +265,7 @@ func init() {
 }
 
 //check validation of config
-func validateConfig(conf *Config, md *toml.MetaData) error {
+func validateConfig(md *toml.MetaData) error {
 	//for protection when debugging on non production environment
 	var errStrings []string
 
@@ -275,8 +275,7 @@ func validateConfig(conf *Config, md *toml.MetaData) error {
 	//	errStrings = append(errStrings, "environment")
 	//}
 
-	format := "[%s]"
-	inValid := false
+	var format string
 	for _, keys := range checkTOMLKeys {
 		if !md.IsDefined(keys...) {
 			switch len(keys) {
@@ -288,8 +287,7 @@ func validateConfig(conf *Config, md *toml.MetaData) error {
 				format = "[%s.%s] %s"
 			default:
 				//invalid check string
-				inValid = true
-				break
+				return errors.New("toml format is not expected, validateConfig() itself should be fixed")
 			}
 			keysIfc := u.SliceStrToInterface(keys)
 			errStrings = append(errStrings, fmt.Sprintf(format, keysIfc...))
@@ -297,11 +295,8 @@ func validateConfig(conf *Config, md *toml.MetaData) error {
 	}
 
 	// Error
-	if inValid {
-		return errors.New("Error: Check Text has wrong number of parameter")
-	}
 	if len(errStrings) != 0 {
-		return fmt.Errorf("Error: There are lacks of keys : %#v \n", errStrings)
+		return errors.Errorf("there are lacks of keys : %#v \n", errStrings)
 	}
 
 	return nil
@@ -327,7 +322,7 @@ func loadConfig(fileName string) (*Config, error) {
 	}
 
 	//check validation of config
-	err = validateConfig(&config, &md)
+	err = validateConfig(&md)
 	if err != nil {
 		return nil, err
 	}

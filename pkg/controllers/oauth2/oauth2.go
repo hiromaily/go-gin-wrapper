@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 
 	"golang.org/x/oauth2"
@@ -178,9 +179,9 @@ func getToken(c *gin.Context, mode string) (token *oauth2.Token) {
 
 	switch mode {
 	case GoogleAuth:
-		token, err = googleOauthConfig.Exchange(oauth2.NoContext, code)
+		token, err = googleOauthConfig.Exchange(context.Background(), code)
 	case FacebookAuth:
-		token, err = facebookOauthConfig.Exchange(oauth2.NoContext, code)
+		token, err = facebookOauthConfig.Exchange(context.Background(), code)
 	default:
 		return nil
 	}
@@ -270,8 +271,6 @@ func registerOrLogin(c *gin.Context, mode string, uA *models.UserAuth, user *mod
 
 	//Redirect[GET]
 	c.Redirect(http.StatusTemporaryRedirect, "/accounts") //307
-
-	return
 }
 
 // CallbackGoogleAction is callback from Google[GET]
@@ -323,8 +322,6 @@ func CallbackGoogleAction(c *gin.Context) {
 		OAuth2Flg: mode,
 	}
 	registerOrLogin(c, mode, userAuth, user)
-
-	return
 }
 
 // CallbackFacebookAction is callback from Facebook [GET]
@@ -377,6 +374,4 @@ func CallbackFacebookAction(c *gin.Context) {
 		OAuth2Flg: mode,
 	}
 	registerOrLogin(c, mode, userAuth, user)
-
-	return
 }

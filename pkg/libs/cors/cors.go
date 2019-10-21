@@ -68,10 +68,7 @@ func CheckHeader(c *gin.Context) {
 		c.AbortWithStatus(400)
 		return
 	}
-
 	//if strings.Contains(s, "authorization") == true || strings.Contains(s, "Authorization") == true {
-
-	return
 }
 
 // SetHeader is for CORS
@@ -101,5 +98,4 @@ func SetHeader(c *gin.Context) {
 
 		return
 	}
-	return
 }

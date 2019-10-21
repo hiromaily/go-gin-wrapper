@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"html/template"
@@ -10,6 +9,7 @@ import (
 	"github.com/DeanThompson/ginpprof"
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 
 	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	"github.com/hiromaily/go-gin-wrapper/pkg/libs/fcgi"
@@ -342,6 +342,7 @@ func setHTTPServer(testFlg uint8, path string) *gin.Engine {
 }
 
 // For TLS (work in progress)
+// nolint: unused, deadcode
 func setHTTPSServer() {
 	//gin.SetMode(gin.ReleaseMode)
 

@@ -1,9 +1,8 @@
 package ginsession
 
 import (
-	"errors"
-
 	"github.com/gin-gonic/contrib/sessions"
+	"github.com/pkg/errors"
 
 	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
 

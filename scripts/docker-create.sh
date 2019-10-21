@@ -55,8 +55,8 @@ docker-compose  up -d
 #mongo settings
 sleep 3s
 MONGO_PORT=30017
-mongo 127.0.0.1:${MONGO_PORT}/admin --eval "var port = ${MONGO_PORT};" ./docker/mongo/init.js
-mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
+mongo 127.0.0.1:${MONGO_PORT}/admin --eval "var port = ${MONGO_PORT};" ./build/docker/mongo/init.js
+mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily build/docker/mongo/dump/hiromaily
 
 if [ $RUN_TEST -eq 1 ]; then
     # test mode

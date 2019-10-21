@@ -1,7 +1,7 @@
 package login
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 
 	models "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
 	lg "github.com/hiromaily/golibs/log"

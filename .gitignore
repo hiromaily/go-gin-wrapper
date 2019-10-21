@@ -4,7 +4,7 @@
 tmp/*
 
 #main
-testdata/toml/settings.toml
+configs/settings.toml
 
 #vendor
 vendor/gopkg.in/mgo.v2/internal/sasl/
@@ -15,10 +15,10 @@ profile.cov
 
 #frontend_workspace
 node_modules
-frontend_workspace/hiromaily/test.sh
-frontend_workspace/hiromaily/reset.sh
-frontend_workspace/hiromaily/dist/
-frontend_workspace/hiromaily/src/sample.es6.js
+web/frontend_workspace/hiromaily/test.sh
+web/frontend_workspace/hiromaily/reset.sh
+web/frontend_workspace/hiromaily/dist/
+web/frontend_workspace/hiromaily/src/sample.es6.js
 
 #docker
 

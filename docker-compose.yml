@@ -1,7 +1,4 @@
-#- mysql:5.7
-#- redis:3.2
-#- web from Dockerfile of web (build is required)
-version: '3.0'
+version: '3.7'
 
 volumes:
   db: {}
@@ -18,8 +15,8 @@ services:
       - "3306"
     volumes:
       - db:/var/lib/mysql
-      - ./docker/mysql/conf.d:/etc/mysql/conf.d
-      - ./docker/mysql/init.d:/docker-entrypoint-initdb.d
+      - ./build/docker/mysql/conf.d:/etc/mysql/conf.d
+      - ./build/docker/mysql/init.d:/docker-entrypoint-initdb.d
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -29,7 +26,7 @@ services:
 
   # Redis
   redis:
-    image: redis:3.2
+    image: redis:5.0
     container_name: web-redis
     ports:
       - "6379"
@@ -41,18 +38,21 @@ services:
   # Mongo
   mongo:
     build:
-      context: ./docker/mongo/
+      context: ./build/docker/mongo/
       dockerfile: Dockerfile
       args:
         mongo_port: 27017
-    #image: mongo:3.4
+    #image: mongo:4.2
     image: go-gin-wrapper-mongo:1.0
     container_name: web-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root-secret
     ports:
       - "27017"
-    volumes:
-      - mdb:/data/db
-    #command: bash ./init.sh
+    #volumes:
+    #  - mdb:/data/db
+    command: mongod --auth
 
   # golang:go-gin-wrapper
   web:
@@ -78,4 +78,4 @@ services:
       - redis
       - mongo
     restart: always
-    command: /go/bin/ginserver -f ./data/toml/docker.toml
+    command: /go/bin/ginserver -f ./configs/docker.toml

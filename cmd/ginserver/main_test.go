@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -16,6 +15,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/pkg/errors"
 
 	lg "github.com/hiromaily/golibs/log"
 
@@ -289,6 +290,7 @@ func setHTTPHeaders(req *http.Request, headers []map[string]string) {
 }
 
 // Get Cookie
+// nolint: unused, deadcode
 func getCookies(cookies []string, key string) (val string) {
 	for _, cookie := range cookies {
 		tmp := strings.Split(cookie, ";")
@@ -302,6 +304,7 @@ func getCookies(cookies []string, key string) (val string) {
 }
 
 // Get Cookie
+// nolint: unused, deadcode
 func getCookies2(strURL, key string, jar *cookiejar.Jar) (val string) {
 	setCookieURL, _ := url.Parse(strURL)
 	cookies := jar.Cookies(setCookieURL) //cookies []*http.Cookie
@@ -317,6 +320,7 @@ func getCookies2(strURL, key string, jar *cookiejar.Jar) (val string) {
 }
 
 // check sent http headers
+// nolint: unused, deadcode
 func checkHTTPHeader(req *http.Request) {
 	b, err := httputil.DumpRequestOut(req, true)
 	if err != nil {
@@ -338,7 +342,7 @@ func checkHTTPHeader(req *http.Request) {
 //
 func getToken(res *http.Response) (ret string) {
 	//<input type="hidden" name="gintoken" value="{{ .gintoken }}">
-	doc, err := goquery.NewDocumentFromResponse(res)
+	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		fmt.Println("[getToken]", err)
 		return
@@ -373,6 +377,8 @@ func getJWT(res *http.Response) (string, error) {
 //-----------------------------------------------------------------------------
 // Config
 //-----------------------------------------------------------------------------
+
+// nolint: unparam
 func TestConfigs(t *testing.T) {
 	//configFiles
 	path := "../../configs/"

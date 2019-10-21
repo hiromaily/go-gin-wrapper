@@ -15,6 +15,7 @@ import (
 )
 
 //TODO:define as common use.
+// nolint: unused, deadcode
 func debugContext(c *gin.Context) {
 	lg.Debugf("[c *gin.Context]: %#v \n", c)
 	lg.Debugf("[c.Keys]: %#v \n", c.Keys)
@@ -48,12 +49,12 @@ func resLogin(c *gin.Context, input *login.Request, msg string, errors []string)
 
 	//View
 	c.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
-		"message":  msg,
-		"input":    input,
-		"errors":   errors,
-		"gintoken": token,
-		"gURL":     gURL,
-		"fURL":     fURL,
+		"message":               msg,
+		"input":                 input,
+		"github.com/pkg/errors": errors,
+		"gintoken":              token,
+		"gURL":                  gURL,
+		"fURL":                  fURL,
 	})
 }
 
@@ -121,8 +122,6 @@ func LoginPostAction(c *gin.Context) {
 	//Redirect[GET]
 	//Status code 307 can't change post to get, 302 is suitable
 	c.Redirect(http.StatusFound, "/accounts/")
-
-	return
 }
 
 // LogoutPostAction is for logout [POST]

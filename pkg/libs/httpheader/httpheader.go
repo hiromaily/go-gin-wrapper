@@ -1,8 +1,9 @@
 package bases
 
 import (
-	"errors"
 	"fmt"
+
+	"github.com/pkg/errors"
 
 	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	"github.com/hiromaily/go-gin-wrapper/pkg/libs/cors"
@@ -41,7 +42,7 @@ func IsRefererHostValid(c *gin.Context, pageFrom string) bool {
 		sess.DelTokenSession(c)
 
 		//set error
-		c.AbortWithError(400, errors.New("Referer is invalid."))
+		c.AbortWithError(400, errors.New("referer is invalid"))
 		return false
 	}
 	return true

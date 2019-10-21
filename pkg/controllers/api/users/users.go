@@ -2,7 +2,7 @@ package users
 
 import (
 	//"encoding/json"
-	"errors"
+	"github.com/pkg/errors"
 
 	js "github.com/hiromaily/go-gin-wrapper/pkg/jsons"
 	jslib "github.com/hiromaily/go-gin-wrapper/pkg/libs/response/json"
@@ -95,7 +95,7 @@ func getUserParamAndValidForPut(c *gin.Context, data *UserRequest) (err error) {
 }
 
 // insert user
-func insertUser(c *gin.Context, data *UserRequest) (int64, error) {
+func insertUser(data *UserRequest) (int64, error) {
 
 	user := &models.Users{
 		FirstName: data.FirstName,
@@ -167,14 +167,13 @@ func InsertPostAction(c *gin.Context) {
 	}
 
 	// Insert
-	id, err := insertUser(c, &uData)
+	id, err := insertUser(&uData)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	}
 
 	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(int(id)))
-	return
 }
 
 // GetAction is get specific user [GET]
@@ -228,7 +227,6 @@ func PutAction(c *gin.Context) {
 	}
 
 	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
-	return
 }
 
 // DeleteAction is delete specific user [DELETE] (work in progress)
@@ -253,7 +251,6 @@ func DeleteAction(c *gin.Context) {
 	}
 
 	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
-	return
 }
 
 // IdsGetAction is get user ids [GET]

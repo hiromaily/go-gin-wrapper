@@ -1,7 +1,4 @@
-#- mysql:5.7
-#- redis:3.2
-#- web from Dockerfile of web (build is required)
-version: '3.0'
+version: '3.7'
 
 services:
   # MySQL
@@ -18,7 +15,7 @@ services:
   mongo:
     ports:
       - "${MONGODB_PORT:-27017}:27017"
-    #command: bash ./init.sh
+    command: mongod --auth
 
   # Golang:go-gin-wrapper
   web:
@@ -27,17 +24,16 @@ services:
     volumes:
       #- ./:/go/src/github.com/hiromaily/go-gin-wrapper
       - ./cmd:/go/src/github.com/hiromaily/go-gin-wrapper/cmd
-      - ./core:/go/src/github.com/hiromaily/go-gin-wrapper/core
-      - ./data:/go/src/github.com/hiromaily/go-gin-wrapper/data
-      - ./Godeps:/go/src/github.com/hiromaily/go-gin-wrapper/Godeps
-      - ./statics:/go/src/github.com/hiromaily/go-gin-wrapper/statics
-      - ./swagger:/go/src/github.com/hiromaily/go-gin-wrapper/swagger
-      - ./templates:/go/src/github.com/hiromaily/go-gin-wrapper/templates
-      - ./vendor:/go/src/github.com/hiromaily/go-gin-wrapper/vendor
+      - ./pkg:/go/src/github.com/hiromaily/go-gin-wrapper/core
+      - ./configs:/go/src/github.com/hiromaily/go-gin-wrapper/configs
+      - ./testdata:/go/src/github.com/hiromaily/go-gin-wrapper/testdata
+      - ./go.mod:/go/src/github.com/hiromaily/go-gin-wrapper/go.mod
+      - ./web:/go/src/github.com/hiromaily/go-gin-wrapper/web
     environment:
       ENC_KEY: ${ENC_KEY}
       ENC_IV: ${ENC_IV}
     stdin_open: true
     tty: true
-    command: fresh -c /go/src/github.com/hiromaily/go-gin-wrapper/runner.conf
+    command: realize start
+    #command: fresh -c /go/src/github.com/hiromaily/go-gin-wrapper/runner.conf
     #command: bash ./docker-entrypoint.sh

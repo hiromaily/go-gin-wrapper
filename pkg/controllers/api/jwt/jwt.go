@@ -36,5 +36,4 @@ func IndexPostAction(c *gin.Context) {
 
 	//Make json for response and return
 	jslib.RtnUserJSON(c, 0, js.CreateJWTJson(token))
-	return
 }

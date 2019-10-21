@@ -1,0 +1,30 @@
+settings:
+  legacy:
+    force: false
+    interval: 100ms
+schema:
+  - name: gin
+    path: cmd/ginserver
+    commands:
+      install:
+        status: true
+        method: go build -i -v -o /bin/ginserver
+      run:
+        status: true
+        method: /bin/ginserver
+    args:
+      - -f=./configs/docker.toml
+    watcher:
+      extensions:
+        - go
+      paths:
+        - /
+      ignored_paths:
+        - .git
+        - .realize
+        - vendor
+        - build
+        - scripts
+        - web/frontend_workspace
+        - web/statics
+        - web/swagger
