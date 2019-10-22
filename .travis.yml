@@ -21,7 +21,7 @@ install:
 
 script:
   #- golangci-lint run
-  - go test -v -race -covermode=atomic -coverprofile=profile.cov ./cmd/ginserver/... ./configs/travis.toml -om 0
+  - go test -v -race -covermode=atomic -coverprofile=profile.cov ./cmd/ginserver/... ./configs/travis.toml -crypto -om 0
   - goveralls -coverprofile=profile.cov -service=travis-ci
 
 branches:

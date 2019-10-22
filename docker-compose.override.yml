@@ -35,5 +35,4 @@ services:
     stdin_open: true
     tty: true
     command: realize start
-    #command: fresh -c /go/src/github.com/hiromaily/go-gin-wrapper/runner.conf
     #command: bash ./docker-entrypoint.sh

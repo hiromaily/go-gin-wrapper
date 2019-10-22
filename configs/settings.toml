@@ -11,7 +11,7 @@ path = "/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper"
 
 [server.log]
 level = 1
-path = "/var/log/goweb/ginserver.log"
+path = "./ginserver.log"
 
 [server.session]
 name = "go-web-ginserver"

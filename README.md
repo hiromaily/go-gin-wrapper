@@ -123,7 +123,7 @@ $ git push -f heroku master
 
 * Heroku environment set configs/heroku.toml when starting to run.  
 ```
-ginserver -f /app/data/toml/heroku.toml
+ginserver -f /app/data/toml/heroku.toml -crypto
 ```
 
 ### 3. On Docker

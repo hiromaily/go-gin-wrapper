@@ -28,7 +28,7 @@ imports:
 ###############################################################################
 # Local Build
 ###############################################################################
-.PHONY: init-env
+.PHONY: build
 build:
 	go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
 
@@ -46,11 +46,11 @@ build-swg:
 ###############################################################################
 .PHONY: run
 run:
-	go run ./cmd/ginserver/main.go -f ./configs/settings.toml
+	go run ./cmd/ginserver/main.go -f ./configs/settings.toml -crypto
 
 .PHONY: exec
 exec:
-	ginserver -f ./configs/settings.toml
+	ginserver -f ./configs/settings.toml -crypto
 
 .PHONY: exec-proxy
 exec-proxy:
@@ -58,7 +58,7 @@ exec-proxy:
 	for port in ${PORTS[@]}
 	do
 		echo 'port is ${port}'
-		ginserver -f ./configs/settings.toml -P ${port} &
+		ginserver -f ./configs/settings.toml -P ${port} -crypto &
 	done
 	sleep 5s
 
@@ -202,7 +202,7 @@ tool-decode:
 ###############################################################################
 .PHONY: test-quick
 test-quick:
-	go test -run TestLogin -v cmd/ginserver/*.go -f ../../configs/settings.toml
+	go test -run TestLogin -v cmd/ginserver/*.go -f ../../configs/settings.toml -crypto
 
 .PHONY: test
 test:
@@ -215,23 +215,23 @@ test:
 
 	# Execute
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
-	-f ../../configs/settings.toml -om 0
+	-f ../../configs/settings.toml -crypto -om 0
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetUserAPIRequestOnTable" \
-	-f ../../configs/settings.toml -om 1
+	-f ../../configs/settings.toml -crypto -om 1
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetUserAPIRequestOnTable" \
-	-f ../../configs/settings.toml -om 2
+	-f ../../configs/settings.toml -crypto -om 2
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
-	-f ../../configs/settings.toml -om 1
+	-f ../../configs/settings.toml -crypto -om 1
 
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
-	-f ../../configs/settings.toml -om 2
+	-f ../../configs/settings.toml -crypto -om 2
 
 
 ###############################################################################

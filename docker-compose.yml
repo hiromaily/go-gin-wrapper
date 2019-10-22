@@ -78,4 +78,4 @@ services:
       - redis
       - mongo
     restart: always
-    command: /go/bin/ginserver -f ./configs/docker.toml
+    command: /go/bin/ginserver -f ./configs/docker.toml -crypto

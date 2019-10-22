@@ -73,7 +73,7 @@ if [ $RUN_TEST -eq 1 ]; then
     docker exec -it ${CONTAINER_NAME} /bin/bash -c "
         export RUN_TEST=1;
         go get -d -v ./...;
-        go test -v cmd/ginserver/*.go -f ../../data/toml/docker.toml;
+        go test -v cmd/ginserver/*.go -f ../../data/toml/docker.toml -crypto;
     "
     #docker exec -it web bash ./docker-entrypoint.sh
 else

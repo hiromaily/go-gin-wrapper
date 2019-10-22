@@ -1,12 +1,11 @@
 package json
 
 import (
-	//"encoding/json"
-	hh "github.com/hiromaily/go-gin-wrapper/pkg/libs/httpheader"
-	//gin "gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	hh "github.com/hiromaily/go-gin-wrapper/pkg/libs/httpheader"
 )
 
 // RtnUserJSON is Return user json

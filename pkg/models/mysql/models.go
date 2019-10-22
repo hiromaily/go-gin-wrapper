@@ -1,30 +1,27 @@
 package mysql
 
 import (
-	"github.com/hiromaily/golibs/db/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
 )
 
-//
-//extension of db/mysql package.
-//
-
-// Models is extension of mysql.DBInfo
-type Models struct {
-	Db *mysql.MS
+// DBModeler is DBModeler interface
+type DBModeler interface {
+	IsUserEmail(email string, password string) (int, error)
+	OAuth2Login(email string) (*UserAuth, error)
+	GetUserIds(users interface{}) error
+	GetUserList(users interface{}, id string) (bool, error)
+	InsertUser(users *Users) (int64, error)
+	UpdateUser(users *Users, id string) (int64, error)
+	DeleteUser(id string) (int64, error)
 }
 
-var db Models
+// NewDBModeler is to return DBModeler interface
+func NewDBModeler(conf *configs.Config) (DBModeler, error) {
+	//logic is here, if switching is required
 
-// when making mysql instance, first you should use mysql.New()
-func new() {
-	db = Models{}
-	db.Db = mysql.GetDB()
-}
+	//MongoDB
+	return newDBModel(conf)
 
-// GetDB is to get mysql instance. it's using singleton design pattern.
-func GetDB() *Models {
-	if db.Db == nil {
-		new()
-	}
-	return &db
+	//or dummy
+	//return &DummyMySQL{}, nil
 }

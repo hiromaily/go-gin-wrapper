@@ -1,30 +1,19 @@
 package mongo
 
-import (
-	mongo "github.com/hiromaily/golibs/db/mongodb"
-)
+import "github.com/hiromaily/go-gin-wrapper/pkg/configs"
 
-//
-//extension of db/mysql package.
-//
-
-// Models is extension of mongo.MongoInfo
-type Models struct {
-	Db *mongo.MongoInfo
+// MongoModeler is DBModeler interface
+type MongoModeler interface {
+	GetNewsData() ([]News, error)
+	GetArticlesData(newsID int) ([]Articles, error)
+	GetArticlesData2(newsID int) ([]Item2, error)
 }
 
-var db Models
-
-// when making mongo instance, first you should use mongo.New()
-func new() {
-	db = Models{}
-	db.Db = mongo.GetMongo()
-}
-
-// GetDB is to get mongo instance. it's using singleton design pattern.
-func GetDB() *Models {
-	if db.Db == nil {
-		new()
-	}
-	return &db
+// NewMongoModeler is to return KVSStorager interface
+func NewMongoModeler(conf *configs.Config) (MongoModeler, error) {
+	//logic is here, if switching is required
+	//MongoDB
+	return newMongoModel(conf)
+	//or dummy
+	//return &DummyMongo{}, nil
 }

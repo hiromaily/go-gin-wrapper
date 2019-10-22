@@ -1,15 +1,13 @@
 package cors
 
 import (
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
-	lg "github.com/hiromaily/golibs/log"
-
-	//gin "gopkg.in/gin-gonic/gin.v1"
-	"github.com/gin-gonic/gin"
-	//"strings"
 	"fmt"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
+	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	lg "github.com/hiromaily/golibs/log"
 	u "github.com/hiromaily/golibs/utils"
 )
 

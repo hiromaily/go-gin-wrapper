@@ -12,6 +12,7 @@ vendor/gopkg.in/mgo.v2/internal/sasl/
 #compiled
 #ginserver
 profile.cov
+ginserver.log
 
 #frontend_workspace
 node_modules

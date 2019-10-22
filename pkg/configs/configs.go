@@ -330,19 +330,33 @@ func loadConfig(fileName string) (*Config, error) {
 	return &config, nil
 }
 
-// New is create instance
-func New(fileName string, cipherFlg bool) {
+// New is create instance as singleton
+func New(fileName string, cipherFlg bool) error {
 	var err error
 	if conf == nil {
 		conf, err = loadConfig(fileName)
 	}
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if cipherFlg {
-		Cipher()
+		conf.Cipher()
 	}
+	return nil
+}
+
+// NewInstance is create instance
+func NewInstance(fileName string, cipherFlg bool) (*Config, error) {
+	conf, err := loadConfig(fileName)
+	if err != nil {
+		return nil, err
+	}
+
+	if cipherFlg {
+		conf.Cipher()
+	}
+	return conf, err
 }
 
 // GetConf is to get config instance
@@ -364,54 +378,54 @@ func SetTOMLPath(path string) {
 }
 
 // Cipher is to decrypt crypted string on config
-func Cipher() {
+func (c *Config) Cipher() {
 	crypt := enc.GetCrypt()
 
-	if conf.Auth.Google.Encrypted {
-		c := conf.Auth.Google
-		c.ClientID, _ = crypt.DecryptBase64(c.ClientID)
-		c.ClientSecret, _ = crypt.DecryptBase64(c.ClientSecret)
+	if c.Auth.Google.Encrypted {
+		ag := c.Auth.Google
+		ag.ClientID, _ = crypt.DecryptBase64(ag.ClientID)
+		ag.ClientSecret, _ = crypt.DecryptBase64(ag.ClientSecret)
 	}
 
-	if conf.Auth.Facebook.Encrypted {
-		c := conf.Auth.Facebook
-		c.ClientID, _ = crypt.DecryptBase64(c.ClientID)
-		c.ClientSecret, _ = crypt.DecryptBase64(c.ClientSecret)
+	if c.Auth.Facebook.Encrypted {
+		ag := c.Auth.Facebook
+		ag.ClientID, _ = crypt.DecryptBase64(ag.ClientID)
+		ag.ClientSecret, _ = crypt.DecryptBase64(ag.ClientSecret)
 	}
 
-	if conf.MySQL.Encrypted {
-		c := conf.MySQL
-		c.Host, _ = crypt.DecryptBase64(c.Host)
-		c.DbName, _ = crypt.DecryptBase64(c.DbName)
-		c.User, _ = crypt.DecryptBase64(c.User)
-		c.Pass, _ = crypt.DecryptBase64(c.Pass)
+	if c.MySQL.Encrypted {
+		m := c.MySQL
+		m.Host, _ = crypt.DecryptBase64(m.Host)
+		m.DbName, _ = crypt.DecryptBase64(m.DbName)
+		m.User, _ = crypt.DecryptBase64(m.User)
+		m.Pass, _ = crypt.DecryptBase64(m.Pass)
 	}
 
-	if conf.MySQL.Test.Encrypted {
-		c := conf.MySQL.Test
-		c.Host, _ = crypt.DecryptBase64(c.Host)
-		c.DbName, _ = crypt.DecryptBase64(c.DbName)
-		c.User, _ = crypt.DecryptBase64(c.User)
-		c.Pass, _ = crypt.DecryptBase64(c.Pass)
+	if c.MySQL.Test.Encrypted {
+		mt := c.MySQL.Test
+		mt.Host, _ = crypt.DecryptBase64(mt.Host)
+		mt.DbName, _ = crypt.DecryptBase64(mt.DbName)
+		mt.User, _ = crypt.DecryptBase64(mt.User)
+		mt.Pass, _ = crypt.DecryptBase64(mt.Pass)
 	}
 
-	if conf.Redis.Encrypted {
-		c := conf.Redis
-		c.Host, _ = crypt.DecryptBase64(c.Host)
-		c.Pass, _ = crypt.DecryptBase64(c.Pass)
+	if c.Redis.Encrypted {
+		r := c.Redis
+		r.Host, _ = crypt.DecryptBase64(r.Host)
+		r.Pass, _ = crypt.DecryptBase64(r.Pass)
 	}
 
-	if conf.Mongo.Encrypted {
-		c := conf.Mongo
-		c.Host, _ = crypt.DecryptBase64(c.Host)
-		c.DbName, _ = crypt.DecryptBase64(c.DbName)
-		c.User, _ = crypt.DecryptBase64(c.User)
-		c.Pass, _ = crypt.DecryptBase64(c.Pass)
+	if c.Mongo.Encrypted {
+		m := c.Mongo
+		m.Host, _ = crypt.DecryptBase64(m.Host)
+		m.DbName, _ = crypt.DecryptBase64(m.DbName)
+		m.User, _ = crypt.DecryptBase64(m.User)
+		m.Pass, _ = crypt.DecryptBase64(m.Pass)
 	}
 
-	if conf.Aws.Encrypted {
-		c := conf.Aws
-		c.AccessKey, _ = crypt.DecryptBase64(c.AccessKey)
-		c.SecretKey, _ = crypt.DecryptBase64(c.SecretKey)
+	if c.Aws.Encrypted {
+		a := c.Aws
+		a.AccessKey, _ = crypt.DecryptBase64(a.AccessKey)
+		a.SecretKey, _ = crypt.DecryptBase64(a.SecretKey)
 	}
 }

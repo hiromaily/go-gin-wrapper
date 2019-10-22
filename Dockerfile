@@ -18,4 +18,4 @@ RUN GO111MODULE=off go get -u github.com/oxequa/realize
 RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/ginserver ./cmd/ginserver/
 
 EXPOSE 8080
-CMD ["/go/bin/ginserver", "-f", "./configs/docker.toml"]
+CMD ["/go/bin/ginserver", "-f", "./configs/docker.toml", "-crypto"]

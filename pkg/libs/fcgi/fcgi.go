@@ -1,7 +1,6 @@
 package fcgi
 
 import (
-	//gin "gopkg.in/gin-gonic/gin.v1"
 	"log"
 	"net"
 	"net/http/fcgi"
