@@ -1,16 +1,11 @@
 #common
 .DS_Store
 .idea/
-tmp/*
 
 #main
 configs/settings.toml
 
-#vendor
-vendor/gopkg.in/mgo.v2/internal/sasl/
-
 #compiled
-#ginserver
 profile.cov
 ginserver.log
 
