@@ -9,9 +9,9 @@ import (
 	"github.com/pkg/errors"
 
 	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/cors"
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/libs/ginsession"
-	hh "github.com/hiromaily/go-gin-wrapper/pkg/libs/httpheader"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
+	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
+	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"
 	u "github.com/hiromaily/golibs/utils"

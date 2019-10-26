@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/csrf"
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/libs/ginsession"
-	hh "github.com/hiromaily/go-gin-wrapper/pkg/libs/httpheader"
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/response/html"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
+	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
+	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 	lg "github.com/hiromaily/golibs/log"
 )
 

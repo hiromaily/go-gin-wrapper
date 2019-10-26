@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/response/html"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 	lg "github.com/hiromaily/golibs/log"
 )
 

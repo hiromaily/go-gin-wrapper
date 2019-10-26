@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 
 	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/cors"
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/libs/ginsession"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
+	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	lg "github.com/hiromaily/golibs/log"
 	reg "github.com/hiromaily/golibs/regexp"
 )

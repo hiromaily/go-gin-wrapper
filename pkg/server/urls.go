@@ -3,8 +3,8 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/cors"
 	ctls "github.com/hiromaily/go-gin-wrapper/pkg/server/controllers"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/middlewares"
 
 	//"github.com/hiromaily/go-gin-wrapper/controllers/chat"

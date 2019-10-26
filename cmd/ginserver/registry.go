@@ -1,11 +1,17 @@
 package main
 
 import (
+	"log"
+
+	"github.com/garyburd/redigo/redis"
+
 	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mongo"
 	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
-	"github.com/hiromaily/go-gin-wrapper/pkg/storager/session"
+	rd "github.com/hiromaily/go-gin-wrapper/pkg/storages/redis"
+
+	//"github.com/hiromaily/go-gin-wrapper/pkg/storages/redis"
 	"github.com/hiromaily/golibs/auth/jwt"
 )
 
@@ -15,12 +21,26 @@ type Registry interface {
 }
 
 type registry struct {
-	conf *configs.Config
+	conf      *configs.Config
+	redisConn *redis.Conn
 }
 
 // NewRegistry is to register regstry interface
 func NewRegistry(conf *configs.Config) Registry {
-	return &registry{conf: conf}
+	return &registry{
+		conf:      conf,
+		redisConn: newRedisConn(conf),
+	}
+}
+
+// newRedisConn is to create redis connection
+func newRedisConn(conf *configs.Config) *redis.Conn {
+	conn, err := rd.NewRedis(conf)
+	if err != nil {
+		log.Println("failed to create redis connection")
+		return nil
+	}
+	return conn
 }
 
 // NewBooker is to register for booker interface
@@ -32,7 +52,6 @@ func (r *registry) NewServerer(port int) server.Serverer {
 		port,
 		r.newDBModeler(),
 		r.newMongoModeler(),
-		r.newSessionStorager(),
 	)
 }
 
@@ -46,14 +65,6 @@ func (r *registry) newDBModeler() dbmodel.DBModeler {
 
 func (r *registry) newMongoModeler() mongomodel.MongoModeler {
 	storager, err := mongomodel.NewMongoModeler(r.conf)
-	if err != nil {
-		panic(err)
-	}
-	return storager
-}
-
-func (r *registry) newSessionStorager() session.SessionStorager {
-	storager, err := session.NewSessionStorager(r.conf)
 	if err != nil {
 		panic(err)
 	}

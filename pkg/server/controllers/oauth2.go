@@ -12,9 +12,9 @@ import (
 	"golang.org/x/oauth2/google"
 
 	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/csrf"
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/libs/ginsession"
 	models "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
+	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	lg "github.com/hiromaily/golibs/log"
 )
 

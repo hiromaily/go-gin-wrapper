@@ -11,12 +11,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/fcgi"
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/libs/ginsession"
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mongo"
 	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
+	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/middlewares"
-	"github.com/hiromaily/go-gin-wrapper/pkg/storager/session"
 	fl "github.com/hiromaily/golibs/files"
 	hrk "github.com/hiromaily/golibs/heroku"
 	lg "github.com/hiromaily/golibs/log"
@@ -37,10 +36,9 @@ func NewServerer(
 	conf *configs.Config,
 	port int,
 	dbModeler dbmodel.DBModeler,
-	mongoModeler mongomodel.MongoModeler,
-	sessionStorage session.SessionStorager) Serverer {
+	mongoModeler mongomodel.MongoModeler) Serverer {
 
-	return NewServer(conf, port, dbModeler, mongoModeler, sessionStorage)
+	return NewServer(conf, port, dbModeler, mongoModeler)
 }
 
 // ----------------------------------------------------------------------------
@@ -49,12 +47,11 @@ func NewServerer(
 
 // Server is Server object
 type Server struct {
-	conf            *configs.Config
-	port            int
-	dbModeler       dbmodel.DBModeler
-	mongoModeler    mongomodel.MongoModeler
-	sessionStorager session.SessionStorager
-	gin             *gin.Engine
+	conf         *configs.Config
+	port         int
+	dbModeler    dbmodel.DBModeler
+	mongoModeler mongomodel.MongoModeler
+	gin          *gin.Engine
 }
 
 // NewServer is to return server object
@@ -62,20 +59,18 @@ func NewServer(
 	conf *configs.Config,
 	port int,
 	dbModeler dbmodel.DBModeler,
-	mongoModeler mongomodel.MongoModeler,
-	sessionStorager session.SessionStorager) *Server {
+	mongoModeler mongomodel.MongoModeler) *Server {
 
 	if port == 0 {
 		port = conf.Server.Port
 	}
 
 	srv := Server{
-		conf:            conf,
-		port:            port,
-		dbModeler:       dbModeler,
-		mongoModeler:    mongoModeler,
-		sessionStorager: sessionStorager,
-		gin:             gin.New(),
+		conf:         conf,
+		port:         port,
+		dbModeler:    dbModeler,
+		mongoModeler: mongoModeler,
+		gin:          gin.New(),
 	}
 	return &srv
 }
@@ -141,10 +136,8 @@ func (s *Server) setMiddleWare() {
 	s.gin.Use(middlewares.UpdateUserSession())
 }
 
-// TODO: it should be used as local object
 func (s *Server) initSession() {
 	red := s.conf.Redis
-	//if os.Getenv("HEROKU_FLG") == "1" {
 	if s.conf.Environment == "heroku" {
 		host, pass, port, err := hrk.GetRedisInfo("")
 		if err == nil && host != "" && port != 0 {
@@ -162,6 +155,7 @@ func (s *Server) initSession() {
 		sess.SetSession(s.gin, "", "")
 	}
 }
+
 func (s *Server) loadTemplates() {
 	//http://stackoverflow.com/questions/25745701/parseglob-what-is-the-pattern-to-parse-all-templates-recursively-within-a-direc
 
@@ -241,7 +235,5 @@ func (s *Server) run() {
 		fcgi.Run(s.gin, fmt.Sprintf(":%d", s.port))
 	} else {
 		s.gin.Run(fmt.Sprintf(":%d", s.port))
-		//change to endless for Zero downtime restarts
-		//endless.ListenAndServe(fmt.Sprintf(":%d", port), r)
 	}
 }

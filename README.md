@@ -18,21 +18,20 @@ This is built on Heroku. You can see [here](https://ginserver.herokuapp.com/).
 ## Installation
 ```
 $ go get github.com/hiromaily/go-gin-wrapper ./...
+ or
+$ go get github.com/hiromaily/go-gin-wrapper ./cmd/ginserver/...
 ```
 
 #### Setup for local environment with Docker
 ```
+# it would be better to execute build, up separately for first the build
 $ docker-compose build
-$ docker-compose up mongo
-# Initialize mongodb
-$ mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
-$ mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
- or
-$ make dcfirst
+$ docker-compose up
 ```
 
 #### Setup for test on docker environment
 ```
+# TODO: this pattern is outdated, should be fixed
 $ ./docker-create.sh
 ```
 
@@ -57,14 +56,14 @@ It's used for news information. Another worker program make data regularly.
 #### TOML file
 This is for configuration.
 ```
-$ cp data/toml/settings.default.toml data/toml/settings.toml
+$ cp ./configs/settings.default.toml ./configs/settings.toml
 
 ```
 When running web server, go-gin-wrapper requires toml file as configuration information.  
 Without command line arguments for toml file path, this try to read ```configs/settings.toml```.   
 If you want to use original toml file, use command line arguments ```-f filepath```.  
 ```
-ginserver -f /app/data/toml/yourfile.toml
+ginserver -f /app/config/yourfile.toml
 ```
 
 * server

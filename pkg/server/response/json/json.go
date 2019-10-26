@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	hh "github.com/hiromaily/go-gin-wrapper/pkg/libs/httpheader"
+	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 )
 
 // RtnUserJSON is Return user json

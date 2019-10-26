@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/libs/ginsession"
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/response/html"
+	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 	lg "github.com/hiromaily/golibs/log"
 )
 

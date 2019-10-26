@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/libs/response/html"
 	models "github.com/hiromaily/go-gin-wrapper/pkg/models/mongo"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
 
 // ParamNews is for news data from MongoDB

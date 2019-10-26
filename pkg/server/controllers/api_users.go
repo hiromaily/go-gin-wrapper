@@ -6,8 +6,8 @@ import (
 	"github.com/pkg/errors"
 
 	js "github.com/hiromaily/go-gin-wrapper/pkg/jsons"
-	jslib "github.com/hiromaily/go-gin-wrapper/pkg/libs/response/json"
 	models "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
+	jslib "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 	lg "github.com/hiromaily/golibs/log"
 	tm "github.com/hiromaily/golibs/time"
 	u "github.com/hiromaily/golibs/utils"

@@ -16,16 +16,17 @@ func SetSession(r *gin.Engine, host, pass string) {
 	var err error
 	ses := conf.GetConf().Server.Session
 
-	if host == "" {
+	if host != "" {
+		//session on Redis
+		store, err = sessions.NewRedisStore(80, "tcp", host, pass, []byte(ses.Key))
+		if err != nil {
+			lg.Errorf("failed to create RedisStore. ", err)
+		}
 		//on memory
 		store = sessions.NewCookieStore([]byte(ses.Key))
 	} else {
-		//session on Redis
-		//store, err = sessions.NewRedisStore(80, "tcp", "localhost:6379", "", []byte("secret1234512345"))
-		store, err = sessions.NewRedisStore(80, "tcp", host, pass, []byte(ses.Key))
-		if err != nil {
-			panic(err)
-		}
+		//on memory
+		store = sessions.NewCookieStore([]byte(ses.Key))
 	}
 
 	strOptions := &sessions.Options{
