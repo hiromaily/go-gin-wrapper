@@ -6,12 +6,23 @@ schema:
   - name: gin
     path: cmd/ginserver
     commands:
-      install:
+      #install:
+      #  status: true
+      build:
         status: true
-        method: go build -i -v -o /bin/ginserver
+        method: go build
+        args:
+          - -i
+          - -v
+          - -o
+          - /bin/ginserver
       run:
         status: true
         method: /bin/ginserver
+        #args: #this code doesn't work
+        #  - -f
+        #  - ./configs/docker.toml
+        #  - -crypto
     args:
       - -f=./configs/docker.toml
       - -crypto
@@ -19,7 +30,7 @@ schema:
       extensions:
         - go
       paths:
-        - /
+        - ./
       ignored_paths:
         - .git
         - .realize
@@ -29,3 +40,8 @@ schema:
         - web/frontend_workspace
         - web/statics
         - web/swagger
+      scripts:
+        - type: before
+          command: echo before global, this is run before build
+          global: true
+          output: true

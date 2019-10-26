@@ -224,17 +224,13 @@ func getTempFunc() template.FuncMap {
 }
 
 func (s *Server) loadStaticFiles() {
-	//rootPath := os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper"
 	rootPath := s.conf.Server.Docs.Path
 
 	//r.Static("/static", "/var/www")
-	s.gin.Static("/statics", rootPath+"/statics")
-	s.gin.Static("/assets", rootPath+"/statics/assets")
-	s.gin.Static("/favicon.ico", rootPath+"/statics/favicon.ico")
-	s.gin.Static("/swagger", rootPath+"/swagger/swagger-ui")
-
-	// /when location of html as layer level is not top, be careful.
-	//r.Static("/admin/assets", "statics/assets")
+	s.gin.Static("/statics", rootPath+"/web/statics")
+	s.gin.Static("/assets", rootPath+"/web/statics/assets")
+	s.gin.Static("/favicon.ico", rootPath+"/web/statics/favicon.ico")
+	s.gin.Static("/swagger", rootPath+"/web/swagger/swagger-ui")
 }
 
 func (s *Server) run() {

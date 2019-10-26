@@ -50,7 +50,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: root-secret
     ports:
       - "27017"
-    #volumes:
+    #volumes: # it causes error for initialization
     #  - mdb:/data/db
     command: mongod --auth
 

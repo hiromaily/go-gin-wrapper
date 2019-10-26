@@ -1,9 +1,10 @@
 # Dcokerfile for go-gin-wrapper
-FROM golang:1.13
+FROM golang:1.13.3-alpine3.10
+
+RUN apk add --no-cache git mysql-client
 
 #ARG redisHostName=default-redis-server
 #ARG mysqlHostName=default-mysql-server
-
 RUN mkdir -p /go/src/github.com/hiromaily/go-gin-wrapper/tmp/ /var/log/goweb/
 
 #ENV REDIS_URL=redis://h:password@${redisHostName}:6379

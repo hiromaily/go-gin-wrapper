@@ -22,17 +22,17 @@ services:
     ports:
       - "${WEB_PORT:-8080}:8080"
     volumes:
-      #- ./:/go/src/github.com/hiromaily/go-gin-wrapper
-      - ./cmd:/go/src/github.com/hiromaily/go-gin-wrapper/cmd
-      - ./pkg:/go/src/github.com/hiromaily/go-gin-wrapper/core
-      - ./configs:/go/src/github.com/hiromaily/go-gin-wrapper/configs
-      - ./testdata:/go/src/github.com/hiromaily/go-gin-wrapper/testdata
-      - ./go.mod:/go/src/github.com/hiromaily/go-gin-wrapper/go.mod
-      - ./web:/go/src/github.com/hiromaily/go-gin-wrapper/web
+      - ./:/go/src/github.com/hiromaily/go-gin-wrapper
+      #- ./cmd:/go/src/github.com/hiromaily/go-gin-wrapper/cmd
+      #- ./pkg:/go/src/github.com/hiromaily/go-gin-wrapper/core
+      #- ./configs:/go/src/github.com/hiromaily/go-gin-wrapper/configs
+      #- ./testdata:/go/src/github.com/hiromaily/go-gin-wrapper/testdata
+      #- ./web:/go/src/github.com/hiromaily/go-gin-wrapper/web
+      #- ./go.mod:/go/src/github.com/hiromaily/go-gin-wrapper/go.mod
     environment:
       ENC_KEY: ${ENC_KEY}
       ENC_IV: ${ENC_IV}
     stdin_open: true
     tty: true
-    command: realize start
-    #command: bash ./docker-entrypoint.sh
+    #command: realize start
+    command: ./scripts/wait-mysql.sh mysql realize start

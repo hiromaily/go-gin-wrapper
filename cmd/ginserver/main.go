@@ -4,14 +4,14 @@ import (
 	"flag"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/golibs/cipher/encryption"
 	lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/golibs/signal"
-	"github.com/hiromaily/golibs/cipher/encryption"
 )
 
 var (
-	tomlPath = flag.String("f", "", "toml file path")
-	portNum  = flag.Int("p", 0, "port of server")
+	tomlPath        = flag.String("f", "", "toml file path")
+	portNum         = flag.Int("p", 0, "port of server")
 	isEncryptedConf = flag.Bool("crypto", false, "if true, config file is handled as encrypted value")
 )
 
