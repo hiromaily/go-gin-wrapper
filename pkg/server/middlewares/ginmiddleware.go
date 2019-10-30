@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
@@ -32,7 +32,7 @@ var RefererURLs = map[string]string{
 // RejectSpecificIP is to check registered IP address to reject
 // TODO: working in progress yet.
 // TODO: it reject all without reverse　proxy ip address.
-func RejectSpecificIP() gin.HandlerFunc {
+func RejectSpecificIP(proxyConf *configs.ProxyConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if hh.IsStaticFile(c) {
 			c.Next()
@@ -42,8 +42,8 @@ func RejectSpecificIP() gin.HandlerFunc {
 
 		ip := c.ClientIP()
 		//proxy
-		if conf.GetConf().Proxy.Mode != 0 {
-			if conf.GetConf().Proxy.Server.Host != ip {
+		if proxyConf.Mode != 0 {
+			if proxyConf.Server.Host != ip {
 				c.AbortWithStatus(403)
 				return
 			}
@@ -129,7 +129,7 @@ func UpdateUserSession() gin.HandlerFunc {
 
 // GlobalRecover is after request, handle aborted code or 500 error.
 // When 404 or 405 error occurred, response already been set in controllers/errors/errors.go
-func GlobalRecover() gin.HandlerFunc {
+func GlobalRecover(devConf *configs.DevelopConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func(c *gin.Context) {
 			if hh.IsStaticFile(c) {
@@ -149,7 +149,7 @@ func GlobalRecover() gin.HandlerFunc {
 				return
 			}
 
-			if conf.GetConf().Develop.RecoverEnable {
+			if devConf.RecoverEnable {
 				if rec := recover(); rec != nil {
 					lg.Debugf("[GlobalRecover] recover() is not nil:\n %v", rec)
 					//TODO:How should response data be decided whether html or json?
@@ -232,7 +232,7 @@ func setResponse(c *gin.Context, errMsg string, code int) {
 
 // CheckHTTPRefererAndCSRF is to check referer and CSRF token
 // TODO: it's not finished yet.
-func CheckHTTPRefererAndCSRF() gin.HandlerFunc {
+func CheckHTTPRefererAndCSRF(srvConf *configs.ServerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHTTPRefererAndCSRF]")
 		//Referer
@@ -240,7 +240,7 @@ func CheckHTTPRefererAndCSRF() gin.HandlerFunc {
 		//get referer data mapping table using url (map[string])
 		if refURL, ok := RefererURLs[url]; ok {
 			//Check Referer
-			if !hh.IsRefererHostValid(c, refURL) {
+			if !hh.IsRefererHostValid(c, srvConf, refURL) {
 				c.Next()
 				return
 			}
@@ -254,14 +254,14 @@ func CheckHTTPRefererAndCSRF() gin.HandlerFunc {
 
 // CheckHTTPReferer is to check HTTP Referer.
 // TODO: it's not checked yet if it work well or not.
-func CheckHTTPReferer() gin.HandlerFunc {
+func CheckHTTPReferer(srvConf *configs.ServerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[heckHttpReferer]")
 		url := hh.GetURL(c)
 		//get referer data mapping table using url (map[string])
 		if refURL, ok := RefererURLs[url]; ok {
 			//Check Referer
-			hh.IsRefererHostValid(c, refURL)
+			hh.IsRefererHostValid(c, srvConf, refURL)
 		}
 		c.Next()
 	}
@@ -296,7 +296,7 @@ func RejectNonHTTPS() gin.HandlerFunc {
 //-----------------------------------------------------------------------------
 
 // CheckHTTPHeader is to check HTTP Header for Ajax request. (For REST)
-func CheckHTTPHeader() gin.HandlerFunc {
+func CheckHTTPHeader(apiConf *configs.APIConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHttpHeader]")
 
@@ -311,8 +311,6 @@ func CheckHTTPHeader() gin.HandlerFunc {
 
 		//IsKey := c.Request.Header.Get("X-Custom-Header-Gin")
 		//lg.Debugf("[X-Custom-Header-Gin] %s", IsKey)
-
-		apiConf := conf.GetConf().API
 
 		//TODO:when preflight request, X-Requested-With may be not sent
 		//TODO:all cors requests don't include X-Requested-With..
@@ -381,12 +379,12 @@ func CheckJWT() gin.HandlerFunc {
 }
 
 // CheckCORS is to check CORS
-func CheckCORS() gin.HandlerFunc {
+func CheckCORS(co *configs.CORSConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckCORS]")
 
 		if c.Request.Method == "OPTIONS" && c.Request.Header.Get("Origin") != "" {
-			cors.CheckHeader(c)
+			cors.CheckHeader(c, co)
 		}
 
 		c.Next()

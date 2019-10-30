@@ -1,6 +1,9 @@
 #local, heroku, docker, staging, production
 environment = "local"
 
+#------------------------------------------------------------------------------
+# Server
+#------------------------------------------------------------------------------
 [server]
 scheme = "http"
 host = "localhost"
@@ -24,6 +27,9 @@ http_only = true
 user = "web"
 pass = "test"
 
+#------------------------------------------------------------------------------
+# Proxy
+#------------------------------------------------------------------------------
 [proxy]
 mode = 0   #0:off, 1:go, 2:nginx
 
@@ -37,6 +43,9 @@ web_port = [ 8080, 8081, 8082 ]
 level = 1
 path = "/var/log/goweb/proxy.log"
 
+#------------------------------------------------------------------------------
+# API
+#------------------------------------------------------------------------------
 [api]
 only_ajax = true
 
@@ -58,20 +67,27 @@ secret_code = ""
 private_key = "/Users/hy/.ssh/jwt_rsa"
 public_key = "/Users/hy/.ssh/jwt_rsa.pub"
 
+#------------------------------------------------------------------------------
+# Auth
+#------------------------------------------------------------------------------
 [auth]
+enabled = false
 
 [auth.google]
-encrypted = true
-client_id = "kPmVQs1VcRWa7lm9afOcZzd2wxfLE4Ws441Y5H+MeAs735CVMgSLbUDsqR5vMJSkVLeWP1ScpLmS1hiEvfkTNcOYic3iMojstNDNSQLrUaU="
-client_secret = "vWl5RU38iFcid5JI/j610qcp0aoHOEvWI6+Q/QrKRbY="
+encrypted = false
+client_id = ""
+client_secret = ""
 call_back_url = "http://localhost:8080/oauth2/google/callback"
 
 [auth.facebook]
-encrypted = true
-client_id = "VZSYxmfcqQFZNUP7Tzchtg=="                         #app_id
-client_secret = "aVd1AHW1PVsChVWcI0uhim0etWgg+9Mj2x+puSBTHHM=" #app secret
+encrypted = false
+client_id = ""     #app_id
+client_secret = "" #app secret
 call_back_url = "http://localhost:8080/oauth2/facebook/callback"
 
+#------------------------------------------------------------------------------
+# MySQL
+#------------------------------------------------------------------------------
 [mysql]
 encrypted = false
 host = "localhost"
@@ -88,6 +104,9 @@ dbname = "testdb"
 user = "testuser"
 pass = "12345678"
 
+#------------------------------------------------------------------------------
+# Redis for cache
+#------------------------------------------------------------------------------
 [redis]
 encrypted = false
 host = "localhost"
@@ -95,6 +114,9 @@ port = 6379
 pass = ""
 session = false
 
+#------------------------------------------------------------------------------
+# MongoDB
+#------------------------------------------------------------------------------
 [mongodb]
 encrypted = false
 host = "localhost"
@@ -103,12 +125,18 @@ dbname = "hiromaily"
 user = "hiromaily"
 pass = "12345678"
 
+#------------------------------------------------------------------------------
+# AWS
+#------------------------------------------------------------------------------
 [aws]
 encrypted = false
 access_key = "XXXXXXXXXXXX"
 secret_key = "XXXXXXXXXXXX"
 region = "ap-northeast-1"
 
+#------------------------------------------------------------------------------
+# Development
+#------------------------------------------------------------------------------
 [develop]
 profile_enable = false
 recover_enable = true

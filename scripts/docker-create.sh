@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# This code is outdated, not used anymore
+
 ###############################################################################
 # Using docker-composer for go-gin-wrapper
 ###############################################################################
@@ -67,13 +69,13 @@ if [ $RUN_TEST -eq 1 ]; then
     export DB_PORT=23306
     export DB_USER=root
     export DB_PASS=root
-    sh ./data/sql/setup.sh
+    sh ./scripts/create-test-db.sh
     #mysql -uroot -proot -h127.0.0.1 -P13306 < ./tests/createdb.sql
 
     docker exec -it ${CONTAINER_NAME} /bin/bash -c "
         export RUN_TEST=1;
         go get -d -v ./...;
-        go test -v cmd/ginserver/*.go -f ../../data/toml/docker.toml -crypto;
+        go test -v cmd/ginserver/*.go -f ../../configs/docker.toml -crypto;
     "
     #docker exec -it web bash ./docker-entrypoint.sh
 else

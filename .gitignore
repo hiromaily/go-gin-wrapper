@@ -4,6 +4,7 @@
 
 #main
 configs/settings.toml
+configs/heroku.toml
 
 #compiled
 profile.cov

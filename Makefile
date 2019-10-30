@@ -70,52 +70,12 @@ exec-swg:
 	swgserver
 
 
-###############################################################################
-# Docker-Compose
-###############################################################################
-# .PHONY: dc-setup
-# dc-setup:
-# 	docker-compose build
-# 	docker-compose up mongo &
-# 	# should sleep
-# 	sleep 5
-#
-# 	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
-# 	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
-
-
-.PHONY: dc-bld
-dc-bld:
-	docker-compose build
-
-.PHONY: dc-up
-dc-up:
-	docker-compose up
-
-.PHONY: dc-bld-up
-dc-bld-up:
-	docker-compose up --build
-
-
-.PHONY: dc-test
-dc-test:
-	export RUN_TEST=1
-	sh ./scripts/docker-create.sh
-
-.PHONY: dc-shell
-dc-shell:
-	echo '============== docker =============='
-	# create docker container
-	export RUN_TEST=0
-	sh ./scripts/docker-create.sh
-
-	#wait to be ready or not.
-	echo 'building now. it may be take over 40s.'
-	sleep 30s
+.PHONY: health-check
+health-check:
 	while :
 	do
 		#000 or 200 or 404
-		HTTP_STATUS=`curl -LI localhost:8888/ -w '%{http_code}\n' -s -o /dev/null`
+		HTTP_STATUS=`curl -LI localhost:8080/ -w '%{http_code}\n' -s -o /dev/null`
 		echo $HTTP_STATUS
 		if [ $HTTP_STATUS -eq 000 ]; then
 			sleep 1s
@@ -127,92 +87,20 @@ dc-shell:
 
 
 ###############################################################################
-# Docker TODO:delete it
-###############################################################################
-.PHONY: dc-start
-dc-start:
-	docker start web-redisd
-	docker start web-mysqld
-	docker start web-mongod
-
-.PHONY: dc-stop
-dc-stop:
-	docker stop web-redisd
-	docker stop web-mysqld
-	docker stop web-mongod
-
-.PHONY: dc-mongo
-dc-mongo:
-	docker exec -it web-mongo bash
-
-###############################################################################
-# mongo cli on mac
-###############################################################################
-# https://docs.mongodb.com/manual/tutorial/enable-authentication/
-# https://medium.com/mongoaudit/how-to-enable-authentication-on-mongodb-b9e8a924efac
-
-# $ mongo
-# >db
-# >use hiromaily
-# >mongo hiromaily -u hiromaily -p 12345678
-# >mongo 127.0.0.1:27017/admin
-# >mongo --port 27017  --authenticationDatabase "admin" -u "root" -p "root-secret"
-# >mongo --host mongodb://root:root-secret@127.0.0.1:27017/ --authenticationDatabase admin
-
-
-###############################################################################
-# Create Data
-###############################################################################
-.PHONY: init-db
-init-db:
-	export DB_NAME=hiromaily
-	sh ./data/sql/setup.sh
-
-# .PHONY: init-mongo
-# init-mongo:
-# 	#After running mongodb
-# 	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
-# 	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
-
-
-###############################################################################
-# Front End
-###############################################################################
-# .PHONY: deploy-js
-# deploy-js:
-# 	cp /Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/frontend_workspace/react/app/dist/apilist.bundle.js \
-# 	/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/statics/js/
-
-
-###############################################################################
-# Tools
-# Note: environment variable `ENC_KEY`, `ENC_IV` should be set in advance
-###############################################################################
-.PHONY: tool-encode
-tool-encode:
-	go run ./tools/encryption/ -m e important-password
-
-.PHONY: tool-decode
-tool-decode:
-	go run ./tools/encryption/ -m d o5PDC2aLqoYxhY9+mL0W/IdG+rTTH0FWPUT4u1XBzko=
-
-
-###############################################################################
 # Test
 ###############################################################################
-.PHONY: test-quick
-test-quick:
-	go test -run TestLogin -v cmd/ginserver/*.go -f ../../configs/settings.toml -crypto
+
+.PHONY: test-setup
+test-setup:
+	# Create Test Data
+	export DB_NAME=hiromaily2 &&\
+	export DB_PORT=13306 &&\
+	export DB_USER=root &&\
+	export DB_PASS=root &&\
+	sh ./scripts/create-test-db.sh
 
 .PHONY: test
 test:
-	# Create Test Data
-	export DB_NAME=hiromaily2
-	export DB_PORT=13306
-	export DB_USER=root
-	export DB_PASS=root
-	sh ./testdata/sql/setup.sh
-
 	# Execute
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-f ../../configs/settings.toml -crypto -om 0
@@ -232,6 +120,93 @@ test:
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
 	-f ../../configs/settings.toml -crypto -om 2
+
+.PHONY: test-quick
+test-quick:
+	go test -run TestLogin -v cmd/ginserver/*.go -f ../../configs/settings.toml -crypto
+
+
+###############################################################################
+# Docker-Compose
+###############################################################################
+
+.PHONY: dc-bld
+dc-bld:
+	docker-compose build
+
+.PHONY: dc-up
+dc-up:
+	docker-compose up
+
+.PHONY: dc-bld-up
+dc-bld-up:
+	docker-compose up --build
+
+
+# .PHONY: dc-test
+# dc-test:
+# 	export RUN_TEST=1
+# 	sh ./scripts/docker-create.sh
+
+# .PHONY: dc-shell
+# dc-shell:
+# 	echo '============== docker =============='
+# 	# create docker container
+# 	export RUN_TEST=0
+# 	sh ./scripts/docker-create.sh
+#
+# 	#wait to be ready or not.
+# 	echo 'building now. it may be take over 40s.'
+# 	sleep 30s
+# 	while :
+# 	do
+# 		#000 or 200 or 404
+# 		HTTP_STATUS=`curl -LI localhost:8888/ -w '%{http_code}\n' -s -o /dev/null`
+# 		echo $HTTP_STATUS
+# 		if [ $HTTP_STATUS -eq 000 ]; then
+# 			sleep 1s
+# 		else
+# 			docker logs web
+# 			break
+# 		fi
+# 	done
+
+
+###############################################################################
+# Create Data
+###############################################################################
+.PHONY: init-db
+init-db:
+	export DB_NAME=hiromaily
+	sh ./scripts/create-test-db.sh
+
+# .PHONY: init-mongo
+# init-mongo:
+# 	#After running mongodb
+# 	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
+# 	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
+
+
+###############################################################################
+# Tools
+# Note: environment variable `ENC_KEY`, `ENC_IV` should be set in advance
+###############################################################################
+.PHONY: tool-encode
+tool-encode:
+	go run ./tools/encryption/ -m e important-password
+
+.PHONY: tool-decode
+tool-decode:
+	go run ./tools/encryption/ -m d o5PDC2aLqoYxhY9+mL0W/IdG+rTTH0FWPUT4u1XBzko=
+
+
+###############################################################################
+# Front End
+###############################################################################
+# .PHONY: deploy-js
+# deploy-js:
+# 	cp /Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/frontend_workspace/react/app/dist/apilist.bundle.js \
+# 	/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper/statics/js/
 
 
 ###############################################################################

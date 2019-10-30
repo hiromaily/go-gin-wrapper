@@ -3,14 +3,12 @@ package html
 import (
 	"github.com/gin-gonic/gin"
 
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
 )
 
 // Response is to add common parameter for html response
-func Response(obj gin.H) gin.H {
+func Response(obj gin.H, api *configs.HeaderConfig) gin.H {
 	//type H map[string]interface{}
-
-	api := conf.GetConf().API.Header
 
 	obj["header"] = api.Header
 	obj["key"] = api.Key

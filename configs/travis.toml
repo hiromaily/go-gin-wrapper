@@ -1,6 +1,9 @@
 #local, heroku, docker, staging, production
 environment = "travis"
 
+#------------------------------------------------------------------------------
+# Server
+#------------------------------------------------------------------------------
 [server]
 scheme = "http"
 host = "127.0.0.1"
@@ -24,6 +27,9 @@ http_only = true
 user = "web"
 pass = "test"
 
+#------------------------------------------------------------------------------
+# Proxy
+#------------------------------------------------------------------------------
 [proxy]
 mode = 0   #0:off, 1:go, 2:nginx
 
@@ -37,6 +43,9 @@ web_port = [ 8080, 8081, 8082 ]
 level = 1
 path = "/var/log/goweb/proxy.log"
 
+#------------------------------------------------------------------------------
+# API
+#------------------------------------------------------------------------------
 [api]
 only_ajax = true
 
@@ -55,10 +64,14 @@ key = "key12345"
 [api.jwt]
 mode = 0   #0:off, 1:HMAC, 2:RSA
 secret_code = "secret1234567890"
-private_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/data/rsakey/jwttest_rsa"
-public_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/data/rsakey/jwttest_rsa.pub"
+private_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/testdata/rsakey/jwttest_rsa"
+public_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/testdata/rsakey/jwttest_rsa.pub"
 
+#------------------------------------------------------------------------------
+# Auth
+#------------------------------------------------------------------------------
 [auth]
+enabled = true
 
 [auth.google]
 encrypted = true
@@ -72,43 +85,58 @@ client_id = "VZSYxmfcqQFZNUP7Tzchtg=="                         #app_id
 client_secret = "aVd1AHW1PVsChVWcI0uhim0etWgg+9Mj2x+puSBTHHM=" #app secret
 call_back_url = "http://localhost:8080/oauth2/facebook/callback"
 
+#------------------------------------------------------------------------------
+# MySQL
+#------------------------------------------------------------------------------
 [mysql]
-encrypted = true
-host = "V3thdTLItfVkuSYOSED0iU1wT3WspcFYPzK4Wawg0pg="
+encrypted = false
+host = "localhost"
 port = 3306
-dbname = "fw1LcS2+7H0aUf3WsIKLCZgpBioCzwGNRQuah3nGgZ8="
-user = "AaDHChFkMG1SFFIGtxqKhA=="
-pass = "t/gil33PoC+8ejUxV7bmGg=="
+dbname = "hiromaily"
+user = ""
+pass = ""
 
 [mysql.test]
-encrypted = true
-host = "V3thdTLItfVkuSYOSED0iU1wT3WspcFYPzK4Wawg0pg="
+encrypted = false
+host = "localhost"
 port = 3306
-dbname = "fw1LcS2+7H0aUf3WsIKLCZgpBioCzwGNRQuah3nGgZ8="
-user = "AaDHChFkMG1SFFIGtxqKhA=="
-pass = "t/gil33PoC+8ejUxV7bmGg=="
+dbname = "hiromaily"
+user = "hiromaily"
+pass = "12345678"
 
+#------------------------------------------------------------------------------
+# Redis for cache
+#------------------------------------------------------------------------------
 [redis]
-encrypted = true
-host = "ag3OSWgL80j4UIxZxjOnsIgErPqeR34I8jO0sjXTqboc2CkMCnA9dJqqQTGnYyLO"
-port = 9769
-pass = "GjxxrquD3+VV7sftoJlDTQZLAALyXfhgapkPeFKc0mg="
-session = false
+encrypted = false
+host = "localhost"
+port = 6379
+pass = "password"
+session = true
 
+#------------------------------------------------------------------------------
+# MongoDB
+#------------------------------------------------------------------------------
 [mongodb]
-encrypted = true
-host = "k2Cq14y2yjvdlPdtAyIHnAh/Vmx0Zw7ZH+2v9OIDMRk="
-port = 61495
-dbname = "I2pC5pwBCO11SFbvE2tcyw=="
-user = "I2pC5pwBCO11SFbvE2tcyw=="
-pass = "pcK4iAT4ARALfbF6SU/2CYOwZVYOnBGuFd4v2WgntLg="
+encrypted = false
+host = "localhost"
+port = 27017
+dbname = "hiromaily"
+user = "hiromaily"
+pass = "12345678"
 
+#------------------------------------------------------------------------------
+# AWS
+#------------------------------------------------------------------------------
 [aws]
 encrypted = true
 access_key = "XXXXXXXXXXXX"
 secret_key = "XXXXXXXXXXXX"
 region = "ap-northeast-1"
 
+#------------------------------------------------------------------------------
+# Development
+#------------------------------------------------------------------------------
 [develop]
 profile_enable = false
 recover_enable = true

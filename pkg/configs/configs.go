@@ -3,7 +3,6 @@ package configs
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/pkg/errors"
@@ -14,22 +13,21 @@ import (
 
 /* singleton */
 var (
-	conf         *Config
-	tomlFileName = "./data/toml/settings.toml"
+	conf *Config
 )
 
 // Config is of root
 type Config struct {
 	Environment string
 	Server      *ServerConfig
-	Proxy       ProxyConfig
+	Proxy       *ProxyConfig
 	API         *APIConfig
 	Auth        *AuthConfig
 	MySQL       *MySQLConfig
 	Redis       *RedisConfig
 	Mongo       *MongoConfig `toml:"mongodb"`
 	Aws         *AwsConfig
-	Develop     DevelopConfig
+	Develop     *DevelopConfig
 }
 
 // ServerConfig is for web server
@@ -110,7 +108,7 @@ type HeaderConfig struct {
 
 // JWTConfig is for JWT Auth
 type JWTConfig struct {
-	Mode       uint8  `toml:"mode"`
+	Mode       uint8  `toml:"mode"` // 0:off, 1:HMAC, 2:RSA
 	Secret     string `toml:"secret_code"`
 	PrivateKey string `toml:"private_key"`
 	PublicKey  string `toml:"public_key"`
@@ -260,10 +258,6 @@ var checkTOMLKeys = [][]string{
 	{"develop", "recover_enable"},
 }
 
-func init() {
-	tomlFileName = os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-gin-wrapper/data/toml/settings.toml"
-}
-
 //check validation of config
 func validateConfig(md *toml.MetaData) error {
 	//for protection when debugging on non production environment
@@ -304,21 +298,18 @@ func validateConfig(md *toml.MetaData) error {
 
 // load configfile
 func loadConfig(fileName string) (*Config, error) {
-	if fileName != "" {
-		tomlFileName = fileName
-	}
 
-	d, err := ioutil.ReadFile(tomlFileName)
+	d, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Error reading %s: %s", tomlFileName, err)
+			"Error reading %s: %s", fileName, err)
 	}
 
 	var config Config
 	md, err := toml.Decode(string(d), &config)
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Error parsing %s: %s(%v)", tomlFileName, err, md)
+			"Error parsing %s: %s(%v)", fileName, err, md)
 	}
 
 	//check validation of config
@@ -370,11 +361,6 @@ func GetConf() *Config {
 	}
 
 	return conf
-}
-
-// SetTOMLPath is to set toml file path
-func SetTOMLPath(path string) {
-	tomlFileName = path
 }
 
 // Cipher is to decrypt crypted string on config

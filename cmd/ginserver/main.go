@@ -17,15 +17,10 @@ var (
 
 func init() {}
 
-func parseFlag() {
-	//command-line
-	flag.Parse()
-}
-
 // Creates a gin router with default middleware:
 // logger and recovery (crash-free) middleware
 func main() {
-	parseFlag()
+	flag.Parse()
 
 	//cipher
 	if *isEncryptedConf {
@@ -41,7 +36,7 @@ func main() {
 		panic(err)
 	}
 	//FIXME: there are a lot of places singleton is used
-	configs.New(*tomlPath, true)
+	//configs.New(*tomlPath, true)
 
 	//log
 	lg.InitializeLog(lg.LogStatus(conf.Server.Log.Level), lg.TimeShortFile,
@@ -53,9 +48,10 @@ func main() {
 		go signal.StartSignal()
 	}
 
-	regi := NewRegistry(conf)
+	var isTestMode = false
+	regi := NewRegistry(conf, isTestMode)
 	server := regi.NewServerer(*portNum)
-	if err := server.Start(); err != nil {
+	if _, err := server.Start(); err != nil {
 		lg.Error(err)
 	}
 }

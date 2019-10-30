@@ -142,7 +142,7 @@ func (ctl *Controller) APIUserListGetAction(c *gin.Context) {
 	}
 
 	//Make json for response and return
-	jslib.RtnUserJSON(c, 0, js.CreateUserListJSON(users))
+	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(users))
 }
 
 // ListOptionsAction is preflight request of CORS before get request
@@ -171,7 +171,7 @@ func (ctl *Controller) APIUserInsertPostAction(c *gin.Context) {
 		return
 	}
 
-	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(int(id)))
+	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(int(id)))
 }
 
 // APIUserGetAction is get specific user [GET]
@@ -196,9 +196,9 @@ func (ctl *Controller) APIUserGetAction(c *gin.Context) {
 
 	//Make json for response and return
 	if b {
-		jslib.RtnUserJSON(c, 0, js.CreateUserListJSON([]models.UsersSL{user}))
+		jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON([]models.UsersSL{user}))
 	} else {
-		jslib.RtnUserJSON(c, 0, js.CreateUserListJSON(nil))
+		jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(nil))
 	}
 }
 
@@ -224,7 +224,7 @@ func (ctl *Controller) APIUserPutAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
+	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
 }
 
 // APIUserDeleteAction is delete specific user [DELETE] (work in progress)
@@ -248,7 +248,7 @@ func (ctl *Controller) APIUserDeleteAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.RtnUserJSON(c, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
+	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
 }
 
 // APIUserIDsGetAction is get user ids [GET]
@@ -272,5 +272,5 @@ func (ctl *Controller) APIUserIDsGetAction(c *gin.Context) {
 	//lg.Debugf("newIds: %v", newIds)
 
 	//Make json for response and return
-	jslib.RtnUserJSON(c, 0, js.CreateUserIDsJSON(newIds))
+	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserIDsJSON(newIds))
 }

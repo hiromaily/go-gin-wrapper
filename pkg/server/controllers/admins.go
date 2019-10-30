@@ -21,5 +21,5 @@ func (ctl *Controller) AdminIndexAction(c *gin.Context) {
 		"title":    "Admin Page",
 		"navi_key": "/admin/",
 	}
-	c.HTML(http.StatusOK, "pages/admins/gallery.tmpl", html.Response(res))
+	c.HTML(http.StatusOK, "pages/admins/gallery.tmpl", html.Response(res, ctl.apiHeader))
 }

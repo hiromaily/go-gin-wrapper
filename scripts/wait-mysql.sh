@@ -8,8 +8,14 @@ host="$1"
 shift
 cmd="$@"
 
+count=0
 while ! mysqladmin ping -h"$host" --silent; do
     >&2 echo "Database is unavailable - sleeping"
+    count=$((++count))
+    if [ "$count" -gt 30 ]; then
+        >&2 echo "timeout"
+        exit 1
+    fi
     sleep 1
 done
 

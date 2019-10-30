@@ -21,15 +21,17 @@ type Registry interface {
 }
 
 type registry struct {
-	conf      *configs.Config
-	redisConn *redis.Conn
+	isTestMode bool
+	conf       *configs.Config
+	redisConn  *redis.Conn
 }
 
 // NewRegistry is to register regstry interface
-func NewRegistry(conf *configs.Config) Registry {
+func NewRegistry(conf *configs.Config, isTestMode bool) Registry {
 	return &registry{
-		conf:      conf,
-		redisConn: newRedisConn(conf),
+		isTestMode: isTestMode,
+		conf:       conf,
+		redisConn:  newRedisConn(conf),
 	}
 }
 
@@ -43,11 +45,12 @@ func newRedisConn(conf *configs.Config) *redis.Conn {
 	return conn
 }
 
-// NewBooker is to register for booker interface
+// NewServerer is to register for serverer interface
 func (r *registry) NewServerer(port int) server.Serverer {
 	r.initAuth()
 
 	return server.NewServerer(
+		r.isTestMode,
 		r.conf,
 		port,
 		r.newDBModeler(),
@@ -56,7 +59,14 @@ func (r *registry) NewServerer(port int) server.Serverer {
 }
 
 func (r *registry) newDBModeler() dbmodel.DBModeler {
-	storager, err := dbmodel.NewDBModeler(r.conf)
+	var dbConf *configs.MySQLContentConfig
+	if r.isTestMode {
+		dbConf = r.conf.MySQL.Test
+	} else {
+		dbConf = r.conf.MySQL.MySQLContentConfig
+	}
+
+	storager, err := dbmodel.NewDBModeler(r.conf.Environment, dbConf)
 	if err != nil {
 		panic(err)
 	}

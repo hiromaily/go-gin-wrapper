@@ -33,5 +33,5 @@ func (ctl *Controller) APIJWTIndexPostAction(c *gin.Context) {
 	lg.Debugf("token: %s", token)
 
 	//Make json for response and return
-	jslib.RtnUserJSON(c, 0, js.CreateJWTJson(token))
+	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateJWTJson(token))
 }

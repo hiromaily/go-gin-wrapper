@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	lg "github.com/hiromaily/golibs/log"
@@ -18,10 +18,9 @@ func getURL(scheme, host string, port int) string {
 }
 
 // IsRefererHostValid is check referer for posted page
-func IsRefererHostValid(c *gin.Context, pageFrom string) bool {
+func IsRefererHostValid(c *gin.Context, srvConf *configs.ServerConfig, pageFrom string) bool {
 
-	srv := conf.GetConf().Server
-	webserverURL := getURL(srv.Scheme, srv.Host, srv.Port)
+	webserverURL := getURL(srvConf.Scheme, srvConf.Host, srvConf.Port)
 
 	//TODO:Add feature that switch https to http easily.
 	url := fmt.Sprintf("%s/%s", webserverURL, pageFrom)
@@ -72,7 +71,7 @@ func GetProto(c *gin.Context) string {
 
 // SetResponseHeaderForSecurity is to set HTTP response header
 // TODO:it may be better to set config
-func SetResponseHeaderForSecurity(c *gin.Context) {
+func SetResponseHeaderForSecurity(c *gin.Context, co *configs.CORSConfig) {
 	lg.Info("SetResponseHeaderForSecurity")
 	//http://qiita.com/roothybrid7/items/34578037d883c9a99ca8
 
@@ -83,8 +82,8 @@ func SetResponseHeaderForSecurity(c *gin.Context) {
 	//c.Writer.Header().Set("Strict-Transport-Security", "max-age=15768000")
 
 	//CORS
-	if conf.GetConf().API.CORS.Enabled && c.Request.Method == "GET" {
-		cors.SetHeader(c)
+	if co.Enabled && c.Request.Method == "GET" {
+		cors.SetHeader(co)(c)
 	}
 	//c.Writer.WriteHeader()
 	//c.Writer.WriteString()

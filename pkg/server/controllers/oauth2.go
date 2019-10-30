@@ -11,7 +11,6 @@ import (
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
 
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	models "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
@@ -87,7 +86,7 @@ var (
 func (ctl *Controller) OAuth2SignInGoogleAction(c *gin.Context) {
 	lg.Info("SignInGoogleAction()")
 
-	auth := conf.GetConf().Auth.Google
+	auth := ctl.auth.Google
 
 	googleOauthConfig.RedirectURL = auth.CallbackURL
 	googleOauthConfig.ClientID = auth.ClientID
@@ -105,7 +104,7 @@ func (ctl *Controller) OAuth2SignInGoogleAction(c *gin.Context) {
 func (ctl *Controller) OAuth2SignInFacebookAction(c *gin.Context) {
 	lg.Info("SignInFacebookAction()")
 
-	auth := conf.GetConf().Auth.Facebook
+	auth := ctl.auth.Facebook
 
 	facebookOauthConfig.RedirectURL = auth.CallbackURL
 	facebookOauthConfig.ClientID = auth.ClientID

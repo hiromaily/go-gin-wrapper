@@ -29,13 +29,6 @@ $ docker-compose build
 $ docker-compose up
 ```
 
-#### Setup for test on docker environment
-```
-# TODO: this pattern is outdated, should be fixed
-$ ./docker-create.sh
-```
-
-
 ## Configuration
 
 ### 1. Common settings
@@ -122,18 +115,17 @@ $ git push -f heroku master
 
 * Heroku environment set configs/heroku.toml when starting to run.  
 ```
-ginserver -f /app/data/toml/heroku.toml -crypto
+ginserver -f /app/configs/heroku.toml -crypto
 ```
 
 ### 3. On Docker
 Docker environment set data/toml/docker.toml when starting to run.  
 
 #### Docker related files
-* docker-create.sh
 * docker-compose.yml
 * docker-compose.override.yml
 * Dockerfile
-* ./docker/*
+* ./build/docker/*
 
 
 ## Environment variable e.g.
@@ -165,7 +157,7 @@ Options:
   -f     Toml file path
 
 e.g.
- $ ginserver -f /app/data/toml/yourfile.toml
+ $ ginserver -f /app/configs/yourfile.toml
 ```
 
 

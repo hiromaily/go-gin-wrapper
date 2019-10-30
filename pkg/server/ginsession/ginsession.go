@@ -5,25 +5,24 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	lg "github.com/hiromaily/golibs/log"
 )
 
 // SetSession is for session
-func SetSession(r *gin.Engine, host, pass string) {
+func SetSession(r *gin.Engine, host, pass string, ses configs.SessionConfig) {
 
 	var store sessions.RedisStore
 	var err error
-	ses := conf.GetConf().Server.Session
 
 	if host != "" {
 		//session on Redis
 		store, err = sessions.NewRedisStore(80, "tcp", host, pass, []byte(ses.Key))
 		if err != nil {
 			lg.Errorf("failed to create RedisStore. ", err)
+			//on memory
+			store = sessions.NewCookieStore([]byte(ses.Key))
 		}
-		//on memory
-		store = sessions.NewCookieStore([]byte(ses.Key))
 	} else {
 		//on memory
 		store = sessions.NewCookieStore([]byte(ses.Key))

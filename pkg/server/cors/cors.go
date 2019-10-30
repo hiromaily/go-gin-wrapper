@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	lg "github.com/hiromaily/golibs/log"
 	u "github.com/hiromaily/golibs/utils"
 )
@@ -24,10 +24,8 @@ const (
 
 // CheckHeader is for CORS before handling request
 //  check preflight of XMLHttpRequest Level2 XMLHttpRequest
-func CheckHeader(c *gin.Context) {
+func CheckHeader(c *gin.Context, co *configs.CORSConfig) {
 	lg.Info("[cors.CheckHeader]")
-
-	co := conf.GetConf().API.CORS
 
 	//TODO:Optionsメソッド時にのみチェック？？
 	// 1.check origin
@@ -70,30 +68,29 @@ func CheckHeader(c *gin.Context) {
 }
 
 // SetHeader is for CORS
-func SetHeader(c *gin.Context) {
-	lg.Info("[cors.SetHeader]")
-	if conf.GetConf().API.CORS.Enabled {
+func SetHeader(co *configs.CORSConfig) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		lg.Info("[cors.SetHeader]")
+		if co.Enabled {
+			//Access-Control-Allow-Origin
+			// allow from remote addr
+			lg.Debugf("c.Request.RemoteAddr: %v", c.Request.RemoteAddr)
+			//c.Writer.Header().Set(HeaderOrigin, c.Request.RemoteAddr)
+			c.Writer.Header().Set(HeaderOrigin, strings.Join(co.Origins, ", "))
 
-		co := conf.GetConf().API.CORS
+			//Access-Control-Allow-Headers
+			//c.Writer.Header().Set(HeaderHeaders, "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+			c.Writer.Header().Set(HeaderHeaders, strings.Join(co.Headers, ", "))
 
-		//Access-Control-Allow-Origin
-		// allow from remote addr
-		lg.Debugf("c.Request.RemoteAddr: %v", c.Request.RemoteAddr)
-		//c.Writer.Header().Set(HeaderOrigin, c.Request.RemoteAddr)
-		c.Writer.Header().Set(HeaderOrigin, strings.Join(co.Origins, ", "))
+			//Access-Control-Allow-Methods
+			//c.Writer.Header().Set(HeaderMethods, "GET, POST, PUT, DELETE, OPTIONS")
+			c.Writer.Header().Set(HeaderMethods, strings.Join(co.Methods, ", "))
 
-		//Access-Control-Allow-Headers
-		//c.Writer.Header().Set(HeaderHeaders, "Origin, X-Requested-With, Content-Type, Accept, Authorization")
-		c.Writer.Header().Set(HeaderHeaders, strings.Join(co.Headers, ", "))
+			//Access-Control-Allow-Credentials
+			//c.Writer.Header().Set(HeaderCredentials, "false")
+			c.Writer.Header().Set(HeaderCredentials, fmt.Sprintf("%t", co.Credentials))
 
-		//Access-Control-Allow-Methods
-		//c.Writer.Header().Set(HeaderMethods, "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set(HeaderMethods, strings.Join(co.Methods, ", "))
-
-		//Access-Control-Allow-Credentials
-		//c.Writer.Header().Set(HeaderCredentials, "false")
-		c.Writer.Header().Set(HeaderCredentials, fmt.Sprintf("%t", co.Credentials))
-
-		return
+			return
+		}
 	}
 }

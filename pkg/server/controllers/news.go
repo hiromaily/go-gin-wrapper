@@ -34,7 +34,7 @@ func (ctl *Controller) NewsIndexAction(c *gin.Context) {
 		"articles": articles,
 		"class":    className,
 	}
-	c.HTML(http.StatusOK, "pages/news/news.tmpl", html.Response(res))
+	c.HTML(http.StatusOK, "pages/news/news.tmpl", html.Response(res, ctl.apiHeader))
 }
 
 // NewsIndex2Action is still working in progress.

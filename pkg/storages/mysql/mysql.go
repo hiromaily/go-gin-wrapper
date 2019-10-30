@@ -9,10 +9,11 @@ import (
 	lg "github.com/hiromaily/golibs/log"
 )
 
-func NewMySQL(conf *configs.Config) (*mysql.MS, error) {
-	ms := &mysql.MS{}
+// NewMySQL is to return mysql connection
+func NewMySQL(env string, conf *configs.MySQLContentConfig) (*mysql.MS, error) {
+	var ms *mysql.MS
 
-	if conf.Environment == "heroku" {
+	if env == "heroku" {
 		//Heroku
 		lg.Debug("HEROKU mode")
 
@@ -28,11 +29,7 @@ func NewMySQL(conf *configs.Config) (*mysql.MS, error) {
 	} else {
 		var err error
 
-		//TODO:For test
-		//dbInfo := conf.MySQL.Test
-
-		dbInfo := conf.MySQL
-		ms, err = mysql.NewInstance(dbInfo.Host, dbInfo.DbName, dbInfo.User, dbInfo.Pass, dbInfo.Port)
+		ms, err = mysql.NewInstance(conf.Host, conf.DbName, conf.User, conf.Pass, conf.Port)
 		if err != nil {
 			return nil, errors.Wrap(err, "fail to call mysql.NewInstance()")
 		}

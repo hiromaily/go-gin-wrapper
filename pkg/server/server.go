@@ -27,18 +27,19 @@ import (
 
 // Serverer is Serverer interface
 type Serverer interface {
-	Start() error
+	Start() (*gin.Engine, error)
 	Close()
 }
 
 // NewServerer is to return Serverer interface
 func NewServerer(
+	isTestMode bool,
 	conf *configs.Config,
 	port int,
 	dbModeler dbmodel.DBModeler,
 	mongoModeler mongomodel.MongoModeler) Serverer {
 
-	return NewServer(conf, port, dbModeler, mongoModeler)
+	return NewServer(isTestMode, conf, port, dbModeler, mongoModeler)
 }
 
 // ----------------------------------------------------------------------------
@@ -47,6 +48,7 @@ func NewServerer(
 
 // Server is Server object
 type Server struct {
+	isTestMode   bool
 	conf         *configs.Config
 	port         int
 	dbModeler    dbmodel.DBModeler
@@ -56,6 +58,7 @@ type Server struct {
 
 // NewServer is to return server object
 func NewServer(
+	isTestMode bool,
 	conf *configs.Config,
 	port int,
 	dbModeler dbmodel.DBModeler,
@@ -66,6 +69,7 @@ func NewServer(
 	}
 
 	srv := Server{
+		isTestMode:   isTestMode,
 		conf:         conf,
 		port:         port,
 		dbModeler:    dbModeler,
@@ -76,7 +80,7 @@ func NewServer(
 }
 
 // Start is to start server execution
-func (s *Server) Start() error {
+func (s *Server) Start() (*gin.Engine, error) {
 	if s.conf.Environment == "production" {
 		//For release
 		gin.SetMode(gin.ReleaseMode)
@@ -99,11 +103,13 @@ func (s *Server) Start() error {
 		ginpprof.Wrapper(s.gin)
 	}
 
-	// Run
-	s.run()
+	if s.isTestMode {
+		return s.gin, nil
+	}
 
-	//return r
-	return nil
+	// Run
+	err := s.run()
+	return nil, err
 }
 
 // Close is to clean up middleware object
@@ -119,7 +125,7 @@ func (s *Server) setMiddleWare() {
 	s.gin.Use(gin.Logger())
 
 	//r.Use(gin.Recovery())           //After GlobalRecover()
-	s.gin.Use(middlewares.GlobalRecover()) //It's called faster than [gin.Recovery()]
+	s.gin.Use(middlewares.GlobalRecover(s.conf.Develop)) //It's called faster than [gin.Recovery()]
 
 	//session
 	s.initSession()
@@ -127,7 +133,7 @@ func (s *Server) setMiddleWare() {
 	//TODO:set ip to toml or redis server
 	//check ip address to refuse specific IP Address
 	//when using load balancer or reverse proxy, set specific IP
-	s.gin.Use(middlewares.RejectSpecificIP())
+	s.gin.Use(middlewares.RejectSpecificIP(s.conf.Proxy))
 
 	//meta data for each rogic
 	s.gin.Use(middlewares.SetMetaData())
@@ -150,9 +156,9 @@ func (s *Server) initSession() {
 
 	if red.Session && red.Host != "" && red.Port != 0 {
 		lg.Debug("redis session start")
-		sess.SetSession(s.gin, fmt.Sprintf("%s:%d", red.Host, red.Port), red.Pass)
+		sess.SetSession(s.gin, fmt.Sprintf("%s:%d", red.Host, red.Port), red.Pass, s.conf.Server.Session)
 	} else {
-		sess.SetSession(s.gin, "", "")
+		sess.SetSession(s.gin, "", "", s.conf.Server.Session)
 	}
 }
 
@@ -227,13 +233,12 @@ func (s *Server) loadStaticFiles() {
 	s.gin.Static("/swagger", rootPath+"/web/swagger/swagger-ui")
 }
 
-func (s *Server) run() {
+func (s *Server) run() error {
 	if s.conf.Proxy.Mode == 2 {
 		//Proxy(Nginx) settings
 		color.Red("[WARNING] running on fcgi mode.")
 		lg.Info("running on fcgi mode.")
-		fcgi.Run(s.gin, fmt.Sprintf(":%d", s.port))
-	} else {
-		s.gin.Run(fmt.Sprintf(":%d", s.port))
+		return fcgi.Run(s.gin, fmt.Sprintf(":%d", s.port))
 	}
+	return s.gin.Run(fmt.Sprintf(":%d", s.port))
 }

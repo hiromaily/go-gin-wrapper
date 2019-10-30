@@ -5,13 +5,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
 	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 )
 
-// RtnUserJSON is Return user json
-func RtnUserJSON(c *gin.Context, code int, obj interface{}) {
+// ResponseUserJSON is Return user json
+func ResponseUserJSON(c *gin.Context, co *configs.CORSConfig, code int, obj interface{}) {
 	//Set Header
-	hh.SetResponseHeaderForSecurity(c)
+	hh.SetResponseHeaderForSecurity(c, co)
 
 	if code == 0 {
 		code = http.StatusOK

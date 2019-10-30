@@ -6,6 +6,7 @@ import (
 	hrk "github.com/hiromaily/golibs/heroku"
 )
 
+// NewMongo is to return mongodb connection
 func NewMongo(conf *configs.Config) (*mdb.MongoInfo, error) {
 	c := conf.Mongo
 
