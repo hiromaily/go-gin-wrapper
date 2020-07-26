@@ -1,14 +1,13 @@
 package configs
 
 import (
-	"fmt"
 	"io/ioutil"
 
 	"github.com/BurntSushi/toml"
+	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 
 	enc "github.com/hiromaily/golibs/cipher/encryption"
-	u "github.com/hiromaily/golibs/utils"
 )
 
 /* singleton */
@@ -18,13 +17,13 @@ var (
 
 // Config is of root
 type Config struct {
-	Environment string
+	Environment string `toml:"environment" validate:"required"`
 	Server      *ServerConfig
 	Proxy       *ProxyConfig
 	API         *APIConfig
 	Auth        *AuthConfig
-	MySQL       *MySQLConfig
-	Redis       *RedisConfig
+	MySQL       *MySQLConfig `toml:"mysql" validate:"required"`
+	Redis       *RedisConfig `toml:"redis" validate:"required"`
 	Mongo       *MongoConfig `toml:"mongodb"`
 	Aws         *AwsConfig
 	Develop     *DevelopConfig
@@ -32,13 +31,13 @@ type Config struct {
 
 // ServerConfig is for web server
 type ServerConfig struct {
-	Scheme    string          `toml:"scheme"`
-	Host      string          `toml:"host"`
-	Port      int             `toml:"port"`
+	Scheme    string          `toml:"scheme" validate:"required"`
+	Host      string          `toml:"host" validate:"required"`
+	Port      int             `toml:"port" validate:"required"`
 	Docs      DocsConfig      `toml:"docs"`
-	Log       LogConfig       `toml:"log"`
-	Session   SessionConfig   `toml:"session"`
-	BasicAuth BasicAuthConfig `toml:"basic_auth"`
+	Log       LogConfig       `toml:"log" validate:"required"`
+	Session   SessionConfig   `toml:"session" validate:"required"`
+	BasicAuth BasicAuthConfig `toml:"basic_auth" validate:"required"`
 }
 
 // DocsConfig is path for document root of webserver
@@ -185,142 +184,6 @@ type DevelopConfig struct {
 	RecoverEnable bool `toml:"recover_enable"`
 }
 
-var checkTOMLKeys = [][]string{
-	{"environment"},
-	{"server", "scheme"},
-	{"server", "host"},
-	{"server", "port"},
-	{"server", "docs", "path"},
-	{"server", "log", "level"},
-	{"server", "log", "path"},
-	{"server", "session", "name"},
-	{"server", "session", "key"},
-	{"server", "session", "max_age"},
-	{"server", "session", "secure"},
-	{"server", "session", "http_only"},
-	{"server", "basic_auth", "user"},
-	{"server", "basic_auth", "pass"},
-	{"proxy", "mode"},
-	{"proxy", "server", "scheme"},
-	{"proxy", "server", "host"},
-	{"proxy", "server", "port"},
-	{"proxy", "server", "log", "level"},
-	{"proxy", "server", "log", "path"},
-	{"api", "only_ajax"},
-	{"api", "cors", "enabled"},
-	{"api", "cors", "origins"},
-	{"api", "cors", "headers"},
-	{"api", "cors", "methods"},
-	{"api", "cors", "credentials"},
-	{"api", "header", "enabled"},
-	{"api", "header", "header"},
-	{"api", "header", "key"},
-	{"api", "jwt", "mode"},
-	{"api", "jwt", "secret_code"},
-	{"api", "jwt", "private_key"},
-	{"api", "jwt", "public_key"},
-	{"auth", "google", "encrypted"},
-	{"auth", "google", "client_id"},
-	{"auth", "google", "client_secret"},
-	{"auth", "google", "call_back_url"},
-	{"auth", "facebook", "encrypted"},
-	{"auth", "facebook", "client_id"},
-	{"auth", "facebook", "client_secret"},
-	{"auth", "facebook", "call_back_url"},
-	{"mysql", "encrypted"},
-	{"mysql", "host"},
-	{"mysql", "port"},
-	{"mysql", "dbname"},
-	{"mysql", "user"},
-	{"mysql", "pass"},
-	{"mysql", "test", "encrypted"},
-	{"mysql", "test", "host"},
-	{"mysql", "test", "port"},
-	{"mysql", "test", "dbname"},
-	{"mysql", "test", "user"},
-	{"mysql", "test", "pass"},
-	{"redis", "encrypted"},
-	{"redis", "host"},
-	{"redis", "port"},
-	{"redis", "pass"},
-	{"redis", "session"},
-	{"mongodb", "encrypted"},
-	{"mongodb", "host"},
-	{"mongodb", "port"},
-	{"mongodb", "dbname"},
-	{"mongodb", "user"},
-	{"mongodb", "pass"},
-	{"aws", "encrypted"},
-	{"aws", "access_key"},
-	{"aws", "secret_key"},
-	{"aws", "region"},
-	{"develop", "profile_enable"},
-	{"develop", "recover_enable"},
-}
-
-//check validation of config
-func validateConfig(md *toml.MetaData) error {
-	//for protection when debugging on non production environment
-	var errStrings []string
-
-	//Check added new items on toml
-	// environment
-	//if !md.IsDefined("environment") {
-	//	errStrings = append(errStrings, "environment")
-	//}
-
-	var format string
-	for _, keys := range checkTOMLKeys {
-		if !md.IsDefined(keys...) {
-			switch len(keys) {
-			case 1:
-				format = "[%s]"
-			case 2:
-				format = "[%s] %s"
-			case 3:
-				format = "[%s.%s] %s"
-			default:
-				//invalid check string
-				return errors.New("toml format is not expected, validateConfig() itself should be fixed")
-			}
-			keysIfc := u.SliceStrToInterface(keys)
-			errStrings = append(errStrings, fmt.Sprintf(format, keysIfc...))
-		}
-	}
-
-	// Error
-	if len(errStrings) != 0 {
-		return errors.Errorf("there are lacks of keys : %#v \n", errStrings)
-	}
-
-	return nil
-}
-
-// load configfile
-func loadConfig(fileName string) (*Config, error) {
-
-	d, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Error reading %s: %s", fileName, err)
-	}
-
-	var config Config
-	md, err := toml.Decode(string(d), &config)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Error parsing %s: %s(%v)", fileName, err, md)
-	}
-
-	//check validation of config
-	err = validateConfig(&md)
-	if err != nil {
-		return nil, err
-	}
-
-	return &config, nil
-}
-
 // New is create instance as singleton
 func New(fileName string, cipherFlg bool) error {
 	var err error
@@ -361,6 +224,33 @@ func GetConf() *Config {
 	}
 
 	return conf
+}
+
+// load configfile
+func loadConfig(fileName string) (*Config, error) {
+
+	d, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return nil, errors.Wrapf(err, "fail to read file: %s", fileName)
+	}
+
+	var config Config
+	_, err = toml.Decode(string(d), &config)
+	if err != nil {
+		return nil, errors.Wrapf(err, "fail to parse: %s", fileName)
+	}
+
+	//check validation of config
+	if err = config.validate(); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+func (c *Config) validate() error {
+	validate := validator.New()
+	return validate.Struct(c)
 }
 
 // Cipher is to decrypt crypted string on config

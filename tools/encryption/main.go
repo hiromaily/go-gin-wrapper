@@ -24,7 +24,7 @@ e.g.:
 
 func init() {
 	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(usage, os.Args[0]))
+		fmt.Fprintf(os.Stderr, usage, os.Args[0])
 	}
 	flag.Parse()
 
