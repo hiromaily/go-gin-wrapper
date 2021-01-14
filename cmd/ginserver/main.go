@@ -5,8 +5,8 @@ import (
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
+	"github.com/hiromaily/go-gin-wrapper/pkg/signal"
 	lg "github.com/hiromaily/golibs/log"
-	"github.com/hiromaily/golibs/signal"
 )
 
 var (
