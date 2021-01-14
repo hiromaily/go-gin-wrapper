@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	lg "github.com/hiromaily/golibs/log"
 )
 
@@ -14,7 +14,7 @@ func init() {}
 func main() {
 	flag.Parse()
 
-	conf, err := configs.NewInstance(*tomlPath, false)
+	conf, err := config.NewInstance(*tomlPath, false)
 	if err != nil {
 		panic(err)
 	}

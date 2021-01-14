@@ -5,13 +5,13 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
-	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mongo"
-	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
+	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
-	rd "github.com/hiromaily/go-gin-wrapper/pkg/storages/redis"
+	rd "github.com/hiromaily/go-gin-wrapper/pkg/storage/redis"
 
-	//"github.com/hiromaily/go-gin-wrapper/pkg/storages/redis"
+	//"github.com/hiromaily/go-gin-wrapper/pkg/storage/redis"
 	"github.com/hiromaily/golibs/auth/jwt"
 )
 
@@ -22,12 +22,12 @@ type Registry interface {
 
 type registry struct {
 	isTestMode bool
-	conf       *configs.Config
+	conf       *config.Config
 	redisConn  *redis.Conn
 }
 
 // NewRegistry is to register regstry interface
-func NewRegistry(conf *configs.Config, isTestMode bool) Registry {
+func NewRegistry(conf *config.Config, isTestMode bool) Registry {
 	return &registry{
 		isTestMode: isTestMode,
 		conf:       conf,
@@ -36,7 +36,7 @@ func NewRegistry(conf *configs.Config, isTestMode bool) Registry {
 }
 
 // newRedisConn is to create redis connection
-func newRedisConn(conf *configs.Config) *redis.Conn {
+func newRedisConn(conf *config.Config) *redis.Conn {
 	conn, err := rd.NewRedis(conf)
 	if err != nil {
 		log.Println("failed to create redis connection")
@@ -59,7 +59,7 @@ func (r *registry) NewServerer(port int) server.Serverer {
 }
 
 func (r *registry) newDBModeler() dbmodel.DBModeler {
-	var dbConf *configs.MySQLContentConfig
+	var dbConf *config.MySQLContentConfig
 	if r.isTestMode {
 		dbConf = r.conf.MySQL.Test
 	} else {

@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	js "github.com/hiromaily/go-gin-wrapper/pkg/jsons"
-	models "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
+	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
+	models "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
 	jslib "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 	lg "github.com/hiromaily/golibs/log"
 	tm "github.com/hiromaily/golibs/time"

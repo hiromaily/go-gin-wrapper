@@ -10,9 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
-	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mongo"
-	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
+	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/middlewares"
@@ -34,7 +34,7 @@ type Serverer interface {
 // NewServerer is to return Serverer interface
 func NewServerer(
 	isTestMode bool,
-	conf *configs.Config,
+	conf *config.Config,
 	port int,
 	dbModeler dbmodel.DBModeler,
 	mongoModeler mongomodel.MongoModeler) Serverer {
@@ -48,7 +48,7 @@ func NewServerer(
 // Server is Server object
 type Server struct {
 	isTestMode   bool
-	conf         *configs.Config
+	conf         *config.Config
 	port         int
 	dbModeler    dbmodel.DBModeler
 	mongoModeler mongomodel.MongoModeler
@@ -58,7 +58,7 @@ type Server struct {
 // NewServer is to return server object
 func NewServer(
 	isTestMode bool,
-	conf *configs.Config,
+	conf *config.Config,
 	port int,
 	dbModeler dbmodel.DBModeler,
 	mongoModeler mongomodel.MongoModeler) *Server {

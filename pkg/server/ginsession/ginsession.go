@@ -5,12 +5,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	lg "github.com/hiromaily/golibs/log"
 )
 
 // SetSession is for session
-func SetSession(r *gin.Engine, host, pass string, ses configs.SessionConfig) {
+func SetSession(r *gin.Engine, host, pass string, ses config.SessionConfig) {
 	var store sessions.RedisStore
 	var err error
 

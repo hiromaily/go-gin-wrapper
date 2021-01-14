@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	lg "github.com/hiromaily/golibs/log"
@@ -18,7 +18,7 @@ func getURL(scheme, host string, port int) string {
 }
 
 // IsRefererHostValid is check referer for posted page
-func IsRefererHostValid(c *gin.Context, srvConf *configs.ServerConfig, pageFrom string) bool {
+func IsRefererHostValid(c *gin.Context, srvConf *config.ServerConfig, pageFrom string) bool {
 	webserverURL := getURL(srvConf.Scheme, srvConf.Host, srvConf.Port)
 
 	// TODO:Add feature that switch https to http easily.
@@ -70,7 +70,7 @@ func GetProto(c *gin.Context) string {
 
 // SetResponseHeaderForSecurity is to set HTTP response header
 // TODO:it may be better to set config
-func SetResponseHeaderForSecurity(c *gin.Context, co *configs.CORSConfig) {
+func SetResponseHeaderForSecurity(c *gin.Context, co *config.CORSConfig) {
 	lg.Info("SetResponseHeaderForSecurity")
 	// http://qiita.com/roothybrid7/items/34578037d883c9a99ca8
 

@@ -3,14 +3,14 @@ package mysql
 import (
 	"github.com/pkg/errors"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/golibs/db/mysql"
 	hrk "github.com/hiromaily/golibs/heroku"
 	lg "github.com/hiromaily/golibs/log"
 )
 
 // NewMySQL is to return mysql connection
-func NewMySQL(env string, conf *configs.MySQLContentConfig) (*mysql.MS, error) {
+func NewMySQL(env string, conf *config.MySQLContentConfig) (*mysql.MS, error) {
 	var ms *mysql.MS
 
 	if env == "heroku" {

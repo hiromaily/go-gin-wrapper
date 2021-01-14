@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	lg "github.com/hiromaily/golibs/log"
 )
 
@@ -18,7 +18,7 @@ type Serverer interface {
 }
 
 // NewServerer is to return Serverer interface
-func NewServerer(conf *configs.Config) Serverer {
+func NewServerer(conf *config.Config) Serverer {
 	return NewServer(conf)
 }
 
@@ -28,12 +28,12 @@ func NewServerer(conf *configs.Config) Serverer {
 
 // Server is Server object
 type Server struct {
-	conf *configs.Config
+	conf *config.Config
 }
 
 // NewServer is to return server object
 func NewServer(
-	conf *configs.Config) *Server {
+	conf *config.Config) *Server {
 	srv := Server{
 		conf: conf,
 	}

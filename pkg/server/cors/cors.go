@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	lg "github.com/hiromaily/golibs/log"
 	u "github.com/hiromaily/golibs/utils"
 )
@@ -24,7 +24,7 @@ const (
 
 // CheckHeader is for CORS before handling request
 //  check preflight of XMLHttpRequest Level2 XMLHttpRequest
-func CheckHeader(c *gin.Context, co *configs.CORSConfig) {
+func CheckHeader(c *gin.Context, co *config.CORSConfig) {
 	lg.Info("[cors.CheckHeader]")
 
 	// TODO:Optionsメソッド時にのみチェック？？
@@ -68,7 +68,7 @@ func CheckHeader(c *gin.Context, co *configs.CORSConfig) {
 }
 
 // SetHeader is for CORS
-func SetHeader(co *configs.CORSConfig) gin.HandlerFunc {
+func SetHeader(co *config.CORSConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[cors.SetHeader]")
 		if co.Enabled {

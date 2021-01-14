@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	models "github.com/hiromaily/go-gin-wrapper/pkg/models/mongo"
+	models "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
 

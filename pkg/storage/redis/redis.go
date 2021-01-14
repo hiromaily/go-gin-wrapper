@@ -6,11 +6,11 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 )
 
 // NewRedis is to return redis connection
-func NewRedis(conf *configs.Config) (*redis.Conn, error) {
+func NewRedis(conf *config.Config) (*redis.Conn, error) {
 	red := conf.Redis
 
 	var conn redis.Conn

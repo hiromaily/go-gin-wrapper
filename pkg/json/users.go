@@ -1,8 +1,8 @@
-package jsons
+package json
 
 import (
 	// u "github.com/hiromaily/golibs/utils"
-	models "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
+	models "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
 )
 
 // UserListResponse is for user list

@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
@@ -32,7 +32,7 @@ var RefererURLs = map[string]string{
 // RejectSpecificIP is to check registered IP address to reject
 // TODO: working in progress yet.
 // TODO: it reject all without reverse　proxy ip address.
-func RejectSpecificIP(proxyConf *configs.ProxyConfig) gin.HandlerFunc {
+func RejectSpecificIP(proxyConf *config.ProxyConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if hh.IsStaticFile(c) {
 			c.Next()
@@ -129,7 +129,7 @@ func UpdateUserSession() gin.HandlerFunc {
 
 // GlobalRecover is after request, handle aborted code or 500 error.
 // When 404 or 405 error occurred, response already been set in controllers/errors/errors.go
-func GlobalRecover(devConf *configs.DevelopConfig) gin.HandlerFunc {
+func GlobalRecover(devConf *config.DevelopConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func(c *gin.Context) {
 			if hh.IsStaticFile(c) {
@@ -231,7 +231,7 @@ func setResponse(c *gin.Context, errMsg string, code int) {
 
 // CheckHTTPRefererAndCSRF is to check referer and CSRF token
 // TODO: it's not finished yet.
-func CheckHTTPRefererAndCSRF(srvConf *configs.ServerConfig) gin.HandlerFunc {
+func CheckHTTPRefererAndCSRF(srvConf *config.ServerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHTTPRefererAndCSRF]")
 		// Referer
@@ -253,7 +253,7 @@ func CheckHTTPRefererAndCSRF(srvConf *configs.ServerConfig) gin.HandlerFunc {
 
 // CheckHTTPReferer is to check HTTP Referer.
 // TODO: it's not checked yet if it work well or not.
-func CheckHTTPReferer(srvConf *configs.ServerConfig) gin.HandlerFunc {
+func CheckHTTPReferer(srvConf *config.ServerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[heckHttpReferer]")
 		url := hh.GetURL(c)
@@ -295,7 +295,7 @@ func RejectNonHTTPS() gin.HandlerFunc {
 //-----------------------------------------------------------------------------
 
 // CheckHTTPHeader is to check HTTP Header for Ajax request. (For REST)
-func CheckHTTPHeader(apiConf *configs.APIConfig) gin.HandlerFunc {
+func CheckHTTPHeader(apiConf *config.APIConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHttpHeader]")
 
@@ -378,7 +378,7 @@ func CheckJWT() gin.HandlerFunc {
 }
 
 // CheckCORS is to check CORS
-func CheckCORS(co *configs.CORSConfig) gin.HandlerFunc {
+func CheckCORS(co *config.CORSConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckCORS]")
 

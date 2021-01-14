@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
-	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mongo"
-	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
+	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
 )
 
 // TODO: define interface
@@ -12,9 +12,9 @@ import (
 type Controller struct {
 	db        dbmodel.DBModeler
 	mongo     mongomodel.MongoModeler
-	apiHeader *configs.HeaderConfig
-	auth      *configs.AuthConfig
-	cors      *configs.CORSConfig
+	apiHeader *config.HeaderConfig
+	auth      *config.AuthConfig
+	cors      *config.CORSConfig
 	// TODO: session should be added here
 }
 
@@ -22,9 +22,9 @@ type Controller struct {
 func NewController(
 	db dbmodel.DBModeler,
 	mongo mongomodel.MongoModeler,
-	apiHeader *configs.HeaderConfig,
-	auth *configs.AuthConfig,
-	cors *configs.CORSConfig) *Controller {
+	apiHeader *config.HeaderConfig,
+	auth *config.AuthConfig,
+	cors *config.CORSConfig) *Controller {
 	return &Controller{
 		db:        db,
 		mongo:     mongo,

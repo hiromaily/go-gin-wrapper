@@ -11,7 +11,7 @@ import (
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
 
-	models "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
+	models "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	lg "github.com/hiromaily/golibs/log"

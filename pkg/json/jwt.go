@@ -1,4 +1,4 @@
-package jsons
+package json
 
 // JWTResponse is response of JWT request
 type JWTResponse struct {

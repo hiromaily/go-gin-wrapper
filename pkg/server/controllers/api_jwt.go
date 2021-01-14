@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	js "github.com/hiromaily/go-gin-wrapper/pkg/jsons"
+	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
 	jslib "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/reverseproxy"
 )
 
@@ -11,11 +11,11 @@ type Registry interface {
 }
 
 type registry struct {
-	conf *configs.Config
+	conf *config.Config
 }
 
 // NewRegistry is to register regstry interface
-func NewRegistry(conf *configs.Config) Registry {
+func NewRegistry(conf *config.Config) Registry {
 	return &registry{
 		conf: conf,
 	}

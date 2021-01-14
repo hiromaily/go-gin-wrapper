@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/golibs/cipher/encryption"
 	lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/golibs/signal"
@@ -31,12 +31,12 @@ func main() {
 	}
 
 	// config
-	conf, err := configs.NewInstance(*tomlPath, *isEncryptedConf)
+	conf, err := config.NewInstance(*tomlPath, *isEncryptedConf)
 	if err != nil {
 		panic(err)
 	}
 	// FIXME: there are a lot of places singleton is used
-	// configs.New(*tomlPath, true)
+	// config.New(*tomlPath, true)
 
 	// log
 	lg.InitializeLog(lg.LogStatus(conf.Server.Log.Level), lg.TimeShortFile,

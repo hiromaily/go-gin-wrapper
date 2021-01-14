@@ -1,13 +1,13 @@
 package mongodb
 
 import (
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	mdb "github.com/hiromaily/golibs/db/mongodb"
 	hrk "github.com/hiromaily/golibs/heroku"
 )
 
 // NewMongo is to return mongodb connection
-func NewMongo(conf *configs.Config) (*mdb.MongoInfo, error) {
+func NewMongo(conf *config.Config) (*mdb.MongoInfo, error) {
 	c := conf.Mongo
 
 	if conf.Environment == "heroku" {

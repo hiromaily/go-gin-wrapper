@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 )
 
 // DBModeler is DBModeler interface
@@ -16,7 +16,7 @@ type DBModeler interface {
 }
 
 // NewDBModeler is to return DBModeler interface
-func NewDBModeler(env string, conf *configs.MySQLContentConfig) (DBModeler, error) {
+func NewDBModeler(env string, conf *config.MySQLContentConfig) (DBModeler, error) {
 	// logic is here, if switching is required
 
 	// MongoDB

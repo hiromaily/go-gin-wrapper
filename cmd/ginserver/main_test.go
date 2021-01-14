@@ -18,7 +18,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/golibs/cipher/encryption"
 	lg "github.com/hiromaily/golibs/log"
 
@@ -26,7 +26,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gin-gonic/gin"
 
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
+	conf "github.com/hiromaily/go-gin-wrapper/pkg/config"
 )
 
 // TODO:change toml settings automatically as program code.
@@ -37,7 +37,7 @@ var (
 
 	// Test Data
 	errRedirect = errors.New("redirect")
-	// configs
+	// config
 	configFiles = []string{"settings.default.toml", "settings.toml", "docker.toml", "heroku.toml", "travis.toml"}
 	jwtCode     string
 )
@@ -228,7 +228,7 @@ func setup() {
 	}
 
 	// config
-	conf, err := configs.NewInstance(*tomlPath, *isEncryptedConf)
+	conf, err := config.NewInstance(*tomlPath, *isEncryptedConf)
 	if err != nil {
 		panic(err)
 	}
@@ -396,7 +396,7 @@ func getJWT(res *http.Response) (string, error) {
 // nolint: unparam
 func TestConfigs(t *testing.T) {
 	// configFiles
-	path := "../../configs/"
+	path := "../../config/"
 	for _, v := range configFiles {
 		conf.New(path+v, false)
 	}
