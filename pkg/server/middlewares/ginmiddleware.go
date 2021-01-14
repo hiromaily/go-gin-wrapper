@@ -8,12 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
+	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwt"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
-	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"
 )
 

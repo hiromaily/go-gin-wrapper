@@ -5,14 +5,12 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 
+	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwt"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
 	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
 	rd "github.com/hiromaily/go-gin-wrapper/pkg/storage/redis"
-
-	//"github.com/hiromaily/go-gin-wrapper/pkg/storage/redis"
-	"github.com/hiromaily/golibs/auth/jwt"
 )
 
 // Registry is for registry interface
