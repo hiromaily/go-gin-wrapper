@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
 	lg "github.com/hiromaily/golibs/log"
-	u "github.com/hiromaily/golibs/utils"
 )
 
 const (
@@ -27,12 +27,12 @@ const (
 func CheckHeader(c *gin.Context, co *config.CORSConfig) {
 	lg.Info("[cors.CheckHeader]")
 
-	// TODO:Optionsメソッド時にのみチェック？？
+	// TODO: should it be checked when `Options` method??
 	// 1.check origin
 	origin := c.Request.Header.Get("Origin")
 	lg.Debugf("Origin header: %v", origin)
 	// Origin header: http://127.0.0.1:8000
-	if u.SearchString(co.Origins, origin) == -1 {
+	if str.SearchIndex(origin, co.Origins) == -1 {
 		lg.Error("Origin header is invalid")
 		c.AbortWithStatus(400)
 		return
@@ -45,9 +45,9 @@ func CheckHeader(c *gin.Context, co *config.CORSConfig) {
 	lg.Debugf("Access-Control-Request-Headers header: %v", header)
 	// Access-Control-Request-Headers header: x-custom-header-cors, x-custom-header-gin
 
-	// TODO:Is it OK to check
+	// TODO: is it OK to check
 	for _, h := range strings.Split(header, ",") {
-		if u.SearchStringLower(co.Headers, strings.TrimSpace(h)) == -1 {
+		if str.SearchIndexLower(strings.TrimSpace(h), co.Headers) == -1 {
 			lg.Error("Access-Control-Request-Headers header is invalid")
 			c.AbortWithStatus(400)
 			return
@@ -59,7 +59,7 @@ func CheckHeader(c *gin.Context, co *config.CORSConfig) {
 	method := c.Request.Header.Get("Access-Control-Request-Method")
 	lg.Debugf("Access-Control-Request-Method header: %v", method)
 	// Access-Control-Request-Method header: GET
-	if u.SearchString(co.Methods, method) == -1 {
+	if str.SearchIndex(method, co.Methods) == -1 {
 		lg.Error("Access-Control-Request-Method header is invalid")
 		c.AbortWithStatus(400)
 		return

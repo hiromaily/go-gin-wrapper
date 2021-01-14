@@ -12,9 +12,9 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
+	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
 	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"
-	u "github.com/hiromaily/golibs/utils"
 )
 
 // TODO:skip static files like (jpg, gif, png, js, css, woff)
@@ -156,7 +156,7 @@ func GlobalRecover(devConf *config.DevelopConfig) gin.HandlerFunc {
 					// TODO:Ajax or not doesn't matter to response. HTTP header of Accept may be better.
 					// TODO:How precise should I follow specifications of HTTP header.
 
-					setResponse(c, u.Itos(rec), 500)
+					setResponse(c, str.Itos(rec), 500)
 					return
 				}
 			}

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,6 @@ import (
 	jslib "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 	"github.com/hiromaily/golibs/auth/jwt"
 	lg "github.com/hiromaily/golibs/log"
-	u "github.com/hiromaily/golibs/utils"
 )
 
 // APIJWTIndexPostAction is JWT End Point [POST]
@@ -25,7 +25,7 @@ func (ctl *Controller) APIJWTIndexPostAction(c *gin.Context) {
 	}
 
 	ti := time.Now().Add(time.Minute * 60).Unix()
-	token, err := jwt.CreateBasicToken(ti, u.Itoa(userID), mail)
+	token, err := jwt.CreateBasicToken(ti, strconv.Itoa(userID), mail)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return

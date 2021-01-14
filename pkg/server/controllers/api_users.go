@@ -7,10 +7,10 @@ import (
 
 	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
 	models "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
-	jslib "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
+	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
+	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
 	"github.com/hiromaily/go-gin-wrapper/pkg/time"
 	lg "github.com/hiromaily/golibs/log"
-	u "github.com/hiromaily/golibs/utils"
 	"github.com/hiromaily/golibs/validator"
 )
 
@@ -140,7 +140,7 @@ func (ctl *Controller) APIUserListGetAction(c *gin.Context) {
 	}
 
 	// Make json for response and return
-	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(users))
+	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(users))
 }
 
 // ListOptionsAction is preflight request of CORS before get request
@@ -169,7 +169,7 @@ func (ctl *Controller) APIUserInsertPostAction(c *gin.Context) {
 		return
 	}
 
-	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(int(id)))
+	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(int(id)))
 }
 
 // APIUserGetAction is get specific user [GET]
@@ -194,9 +194,9 @@ func (ctl *Controller) APIUserGetAction(c *gin.Context) {
 
 	// Make json for response and return
 	if b {
-		jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON([]models.UsersSL{user}))
+		jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON([]models.UsersSL{user}))
 	} else {
-		jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(nil))
+		jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(nil))
 	}
 }
 
@@ -222,7 +222,7 @@ func (ctl *Controller) APIUserPutAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
+	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(str.Atoi(c.Param("id"))))
 }
 
 // APIUserDeleteAction is delete specific user [DELETE] (work in progress)
@@ -246,7 +246,7 @@ func (ctl *Controller) APIUserDeleteAction(c *gin.Context) {
 		lg.Debug("there was no updated data.")
 	}
 
-	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(u.Atoi(c.Param("id"))))
+	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(str.Atoi(c.Param("id"))))
 }
 
 // APIUserIDsGetAction is get user ids [GET]
@@ -270,5 +270,5 @@ func (ctl *Controller) APIUserIDsGetAction(c *gin.Context) {
 	// lg.Debugf("newIds: %v", newIds)
 
 	// Make json for response and return
-	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserIDsJSON(newIds))
+	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserIDsJSON(newIds))
 }

@@ -3,10 +3,10 @@ package mysql
 import (
 	"fmt"
 
+	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
 	hs "github.com/hiromaily/golibs/cipher/hash"
 	"github.com/hiromaily/golibs/db/mysql"
 	lg "github.com/hiromaily/golibs/log"
-	u "github.com/hiromaily/golibs/utils"
 )
 
 // DBModel is extension of mysql.DBInfo
@@ -96,7 +96,7 @@ func (us *DBModel) GetUserList(users interface{}, id string) (bool, error) {
 	var b bool
 	if id != "" {
 		sql += " AND user_id=?"
-		b = us.DB.SelectIns(sql, delFlg, u.Atoi(id)).ScanOne(users)
+		b = us.DB.SelectIns(sql, delFlg, str.Atoi(id)).ScanOne(users)
 	} else {
 		b = us.DB.SelectIns(sql, delFlg).Scan(users)
 	}
@@ -156,7 +156,7 @@ func (us *DBModel) UpdateUser(users *Users, id string) (int64, error) {
 
 	// user id
 	sql += " WHERE user_id=?"
-	vals = append(vals, u.Atoi(id))
+	vals = append(vals, str.Atoi(id))
 
 	// sql debug
 	// lg.Debugf("update sql: %s", sql)
@@ -168,5 +168,5 @@ func (us *DBModel) UpdateUser(users *Users, id string) (int64, error) {
 // DeleteUser is to delete user
 func (us *DBModel) DeleteUser(id string) (int64, error) {
 	sql := "DELETE FROM t_users WHERE user_id=?"
-	return us.DB.Exec(sql, u.Atoi(id))
+	return us.DB.Exec(sql, str.Atoi(id))
 }

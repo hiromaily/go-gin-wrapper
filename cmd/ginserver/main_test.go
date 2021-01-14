@@ -16,17 +16,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
+	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	conf "github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 	lg "github.com/hiromaily/golibs/log"
-
-	// u "github.com/hiromaily/golibs/utils"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/gin-gonic/gin"
-
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/config"
 )
 
 // TODO:change toml settings automatically as program code.
