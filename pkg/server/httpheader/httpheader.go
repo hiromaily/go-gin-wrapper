@@ -1,4 +1,4 @@
-package bases
+package httpheader
 
 import (
 	"fmt"

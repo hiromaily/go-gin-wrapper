@@ -12,7 +12,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
-	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
 	lg "github.com/hiromaily/golibs/log"
 )
@@ -34,7 +34,7 @@ var RefererURLs = map[string]string{
 // TODO: it reject all without reverse　proxy ip address.
 func RejectSpecificIP(proxyConf *config.ProxyConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if hh.IsStaticFile(c) {
+		if httpheader.IsStaticFile(c) {
 			c.Next()
 			return
 		}
@@ -58,7 +58,7 @@ func RejectSpecificIP(proxyConf *config.ProxyConfig) gin.HandlerFunc {
 // SetMetaData is to set meta data
 func SetMetaData() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if hh.IsStaticFile(c) {
+		if httpheader.IsStaticFile(c) {
 			c.Next()
 			return
 		}
@@ -115,7 +115,7 @@ func SetMetaData() gin.HandlerFunc {
 // TODO:When session has already started, update session expired
 func UpdateUserSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if hh.IsStaticFile(c) {
+		if httpheader.IsStaticFile(c) {
 			c.Next()
 			return
 		}
@@ -132,7 +132,7 @@ func UpdateUserSession() gin.HandlerFunc {
 func GlobalRecover(devConf *config.DevelopConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func(c *gin.Context) {
-			if hh.IsStaticFile(c) {
+			if httpheader.IsStaticFile(c) {
 				c.Next()
 				return
 			}
@@ -235,11 +235,11 @@ func CheckHTTPRefererAndCSRF(srvConf *config.ServerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHTTPRefererAndCSRF]")
 		// Referer
-		url := hh.GetURL(c)
+		url := httpheader.GetURL(c)
 		// get referer data mapping table using url (map[string])
 		if refURL, ok := RefererURLs[url]; ok {
 			// Check Referer
-			if !hh.IsRefererHostValid(c, srvConf, refURL) {
+			if !httpheader.IsRefererHostValid(c, srvConf, refURL) {
 				c.Next()
 				return
 			}
@@ -256,11 +256,11 @@ func CheckHTTPRefererAndCSRF(srvConf *config.ServerConfig) gin.HandlerFunc {
 func CheckHTTPReferer(srvConf *config.ServerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[heckHttpReferer]")
-		url := hh.GetURL(c)
+		url := httpheader.GetURL(c)
 		// get referer data mapping table using url (map[string])
 		if refURL, ok := RefererURLs[url]; ok {
 			// Check Referer
-			hh.IsRefererHostValid(c, srvConf, refURL)
+			httpheader.IsRefererHostValid(c, srvConf, refURL)
 		}
 		c.Next()
 	}
