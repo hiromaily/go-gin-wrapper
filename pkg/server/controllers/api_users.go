@@ -8,8 +8,8 @@ import (
 	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
 	models "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
 	jslib "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
+	"github.com/hiromaily/go-gin-wrapper/pkg/time"
 	lg "github.com/hiromaily/golibs/log"
-	tm "github.com/hiromaily/golibs/time"
 	u "github.com/hiromaily/golibs/utils"
 	"github.com/hiromaily/golibs/validator"
 )
@@ -121,7 +121,7 @@ func (ctl *Controller) updateUser(data *UserRequest, id string) (int64, error) {
 		user.Password = data.Password
 	}
 	// update date
-	user.Updated = tm.GetCurrentDateTimeByStr("")
+	user.Updated = time.GetCurrentDateTimeByStr("")
 
 	// Update
 	return ctl.db.UpdateUser(user, id)
