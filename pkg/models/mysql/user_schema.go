@@ -8,8 +8,8 @@ type Users struct {
 	Email     string `column:"email" json:"email"`
 	Password  string `column:"password" json:"password"`
 	OAuth2Flg string `column:"oauth2_flg" json:"oauth2_flg"`
-	//DeleteFlg string    `column:"delete_flg"       db:"delete_flg"`
-	//Created   time.Time `column:"create_datetime"  db:"create_datetime"`
+	// DeleteFlg string    `column:"delete_flg"       db:"delete_flg"`
+	// Created   time.Time `column:"create_datetime"  db:"create_datetime"`
 	Updated string `column:"update_datetime" json:"update"`
 }
 

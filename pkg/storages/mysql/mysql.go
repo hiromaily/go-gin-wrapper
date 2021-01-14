@@ -14,10 +14,10 @@ func NewMySQL(env string, conf *configs.MySQLContentConfig) (*mysql.MS, error) {
 	var ms *mysql.MS
 
 	if env == "heroku" {
-		//Heroku
+		// Heroku
 		lg.Debug("HEROKU mode")
 
-		//database
+		// database
 		host, dbname, user, pass, err := hrk.GetMySQLInfo("")
 		if err != nil {
 			return nil, errors.Wrap(err, "fail to call heroku.GetMySQLInfo()")

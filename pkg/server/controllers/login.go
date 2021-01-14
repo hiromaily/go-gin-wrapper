@@ -26,31 +26,31 @@ var ErrFmt = map[string]string{
 
 // CheckLoginOnHTML is check login on html page.
 func (ctl *Controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []string) {
-	//Get Post Parameters
+	// Get Post Parameters
 	posted := &LoginRequest{
 		Email: c.PostForm("inputEmail"),
 		Pass:  c.PostForm("inputPassword"),
 	}
 
-	//Validation
+	// Validation
 	mRet := valid.CheckValidation(posted, false)
 	if len(mRet) != 0 {
 		errs := valid.ConvertErrorMsgs(mRet, ErrFmt)
 		lg.Debugf("validation error: %#v", errs)
 
-		//return
-		//resLogin(c, posted, "", errs)
+		// return
+		// resLogin(c, posted, "", errs)
 		return 0, posted, errs
 	}
 
-	//Check inputed mail and password
+	// Check inputed mail and password
 	userID, err := ctl.db.IsUserEmail(posted.Email, posted.Pass)
 	if err != nil {
 		errs := []string{"E-mail or Password is made a mistake."}
 		lg.Debugf("login error: %#v", errs)
 
-		//return
-		//resLogin(c, posted, "", errs)
+		// return
+		// resLogin(c, posted, "", errs)
 		return 0, posted, errs
 	}
 	return userID, nil, nil
@@ -63,13 +63,13 @@ func (ctl *Controller) CheckLoginOnAPI(c *gin.Context) (int, string, error) {
 		Pass:  c.PostForm("inputPassword"),
 	}
 
-	//Validation
+	// Validation
 	mRet := valid.CheckValidation(posted, false)
 	if len(mRet) != 0 {
 		return 0, "", errors.New("validation error")
 	}
 
-	//Check inputed mail and password
+	// Check inputed mail and password
 	userID, err := ctl.db.IsUserEmail(posted.Email, posted.Pass)
 	if err != nil {
 		return 0, "", errors.New("login error")

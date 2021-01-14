@@ -11,7 +11,7 @@ import (
 
 // ResponseUserJSON is Return user json
 func ResponseUserJSON(c *gin.Context, co *configs.CORSConfig, code int, obj interface{}) {
-	//Set Header
+	// Set Header
 	hh.SetResponseHeaderForSecurity(c, co)
 
 	if code == 0 {

@@ -10,9 +10,9 @@ import (
 
 // APIListIndexAction is top page for API List (react version)
 func (ctl *Controller) APIListIndexAction(c *gin.Context) {
-	//return header and key
+	// return header and key
 
-	//Get User ids
+	// Get User ids
 	type UserID struct {
 		ID int
 	}
@@ -24,7 +24,7 @@ func (ctl *Controller) APIListIndexAction(c *gin.Context) {
 		return
 	}
 
-	//View
+	// View
 	res := gin.H{
 		"title":    "API List Page",
 		"navi_key": "/apilist/",
@@ -35,10 +35,10 @@ func (ctl *Controller) APIListIndexAction(c *gin.Context) {
 
 // APIListIndex2Action is top page for API List (this is old version)
 func (ctl *Controller) APIListIndex2Action(c *gin.Context) {
-	//debug log
-	//debugContext(c)
+	// debug log
+	// debugContext(c)
 
-	//Get User ids
+	// Get User ids
 	type UserID struct {
 		ID int
 	}
@@ -50,7 +50,7 @@ func (ctl *Controller) APIListIndex2Action(c *gin.Context) {
 		return
 	}
 
-	//View
+	// View
 	res := gin.H{
 		"title":    "API List Page",
 		"navi_key": "/apilist/",

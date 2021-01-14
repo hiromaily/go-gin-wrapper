@@ -68,7 +68,7 @@ type BasicAuthConfig struct {
 
 // ProxyConfig is for base of Reverse Proxy Server
 type ProxyConfig struct {
-	Mode   uint8             `toml:"mode"` //0:off, 1:go, 2,nginx
+	Mode   uint8             `toml:"mode"` // 0:off, 1:go, 2,nginx
 	Server ProxyServerConfig `toml:"server"`
 }
 
@@ -228,7 +228,6 @@ func GetConf() *Config {
 
 // load configfile
 func loadConfig(fileName string) (*Config, error) {
-
 	d, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "fail to read file: %s", fileName)
@@ -240,7 +239,7 @@ func loadConfig(fileName string) (*Config, error) {
 		return nil, errors.Wrapf(err, "fail to parse: %s", fileName)
 	}
 
-	//check validation of config
+	// check validation of config
 	if err = config.validate(); err != nil {
 		return nil, err
 	}

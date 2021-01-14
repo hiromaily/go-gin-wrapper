@@ -10,18 +10,18 @@ import (
 	lg "github.com/hiromaily/golibs/log"
 )
 
-//AccountIndexAction [GET]
+// AccountIndexAction [GET]
 func (ctl *Controller) AccountIndexAction(c *gin.Context) {
 	lg.Info("AccountsGetAction()")
 
-	//judge login
+	// judge login
 	if bRet, _ := sess.IsLogin(c); !bRet {
-		//Redirect[GET]
+		// Redirect[GET]
 		c.Redirect(http.StatusTemporaryRedirect, "/login")
 		return
 	}
 
-	//View
+	// View
 	res := gin.H{
 		"title":    "Accounts Page",
 		"navi_key": "/accounts/",

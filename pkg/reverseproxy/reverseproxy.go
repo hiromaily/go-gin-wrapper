@@ -19,7 +19,6 @@ type Serverer interface {
 
 // NewServerer is to return Serverer interface
 func NewServerer(conf *configs.Config) Serverer {
-
 	return NewServer(conf)
 }
 
@@ -35,7 +34,6 @@ type Server struct {
 // NewServer is to return server object
 func NewServer(
 	conf *configs.Config) *Server {
-
 	srv := Server{
 		conf: conf,
 	}
@@ -55,18 +53,18 @@ func (s *Server) Start() error {
 	return nil
 }
 
-//Single Reverse Proxy
+// Single Reverse Proxy
 func (s *Server) singleReverseProxy() {
 	lg.Info("singleReverseProxy()")
-	//Web Server
-	//webserverURL := "http://127.0.0.1:9990"
+	// Web Server
+	// webserverURL := "http://127.0.0.1:9990"
 	srv := s.conf.Server
 	tmp := getURL(srv.Scheme, srv.Host, srv.Port)
 	webserverURL, _ := url.Parse(tmp)
 
 	fmt.Printf("proxy is runnig ... using Port: %d\n", s.conf.Proxy.Server.Port)
 
-	//Proxy Server
+	// Proxy Server
 	proxyAddress := fmt.Sprintf(":%d", s.conf.Proxy.Server.Port)
 	proxyHandler := httputil.NewSingleHostReverseProxy(webserverURL)
 	server := http.Server{
@@ -80,20 +78,20 @@ func (s *Server) singleReverseProxy() {
 func (s *Server) multipleReverseProxy() {
 	ports := s.conf.Proxy.Server.WebPort
 	lg.Infof("multipleReverseProxy(): number of servers is %d", len(ports))
-	//As precondition, increment port number by one.
+	// As precondition, increment port number by one.
 
-	//web servers
+	// web servers
 	srv := s.conf.Server
 	hostRing := ring.New(len(ports))
 	for _, port := range ports {
-		//url, _ := url.Parse(getURL(srv.Scheme, srv.Host, srv.Port+i))
+		// url, _ := url.Parse(getURL(srv.Scheme, srv.Host, srv.Port+i))
 		url, _ := url.Parse(getURL(srv.Scheme, srv.Host, port))
 		hostRing.Value = url
 		hostRing = hostRing.Next()
 	}
 
 	mutex := sync.Mutex{}
-	//access server alternately
+	// access server alternately
 	director := func(request *http.Request) {
 		mutex.Lock()
 		defer mutex.Unlock()
@@ -102,7 +100,7 @@ func (s *Server) multipleReverseProxy() {
 		hostRing = hostRing.Next()
 	}
 
-	//proxy
+	// proxy
 	proxy := &httputil.ReverseProxy{Director: director}
 	proxyAddress := fmt.Sprintf(":%d", s.conf.Proxy.Server.Port)
 

@@ -22,9 +22,9 @@ type ResGoogle struct {
 	ID            string `json:"id"`
 	Email         string `json:"email"`
 	VerifiedEmail bool   `json:"verified_email"`
-	Name          string `json:"name"`        //full name
-	FirstName     string `json:"given_name"`  //first name
-	LastName      string `json:"family_name"` //last name
+	Name          string `json:"name"`        // full name
+	FirstName     string `json:"given_name"`  // first name
+	LastName      string `json:"family_name"` // last name
 	Link          string `json:"link"`
 	Picture       string `json:"picture"`
 	Gender        string `json:"gender"`
@@ -36,9 +36,9 @@ type ResFacebook struct {
 	ID            string `json:"id"`
 	Email         string `json:"email"`
 	VerifiedEmail bool   `json:"verified"`
-	Name          string `json:"name"`       //full name
-	FirstName     string `json:"first_name"` //first name
-	LastName      string `json:"last_name"`  //last name
+	Name          string `json:"name"`       // full name
+	FirstName     string `json:"first_name"` // first name
+	LastName      string `json:"last_name"`  // last name
 	Link          string `json:"link"`
 	Picture       FBPic  `json:"picture"`
 	Gender        string `json:"gender"`
@@ -77,7 +77,7 @@ var (
 		ClientID:     "",
 		ClientSecret: "",
 		Scopes:       []string{"public_profile", "email"},
-		//Scopes:   []string{"first_name", "last_name", "link", "picture", "email"},
+		// Scopes:   []string{"first_name", "last_name", "link", "picture", "email"},
 		Endpoint: facebook.Endpoint,
 	}
 )
@@ -92,12 +92,12 @@ func (ctl *Controller) OAuth2SignInGoogleAction(c *gin.Context) {
 	googleOauthConfig.ClientID = auth.ClientID
 	googleOauthConfig.ClientSecret = auth.ClientSecret
 
-	//token
+	// token
 	token := csrf.CreateToken()
 	sess.SetTokenSession(c, token)
 
 	url := googleOauthConfig.AuthCodeURL(token)
-	c.Redirect(http.StatusTemporaryRedirect, url) //307
+	c.Redirect(http.StatusTemporaryRedirect, url) // 307
 }
 
 // OAuth2SignInFacebookAction is sign in by Facebook [GET]
@@ -110,17 +110,17 @@ func (ctl *Controller) OAuth2SignInFacebookAction(c *gin.Context) {
 	facebookOauthConfig.ClientID = auth.ClientID
 	facebookOauthConfig.ClientSecret = auth.ClientSecret
 
-	//token
+	// token
 	token := csrf.CreateToken()
 	sess.SetTokenSession(c, token)
 
 	url := facebookOauthConfig.AuthCodeURL(token)
 
-	//add display and auth_type
-	//url = url + "&display=popup&auth_type=reauthenticate"
+	// add display and auth_type
+	// url = url + "&display=popup&auth_type=reauthenticate"
 	url = url + "&display=popup"
 
-	c.Redirect(http.StatusTemporaryRedirect, url) //307
+	c.Redirect(http.StatusTemporaryRedirect, url) // 307
 }
 
 // OAuth2LoginAction is login by Google. (work in progress) [GET]
@@ -140,12 +140,12 @@ func (ctl *Controller) OAuth2LoginAction(c *gin.Context) {
 func checkError(c *gin.Context) bool {
 	lg.Info("checkError()")
 
-	//When user choose access deny
-	//http://localhost:9999/oauth2/callback?error=access_denied&state=66bc8679a5629423463943f679383b57
+	// When user choose access deny
+	// http://localhost:9999/oauth2/callback?error=access_denied&state=66bc8679a5629423463943f679383b57
 	qeyErr, _ := c.GetQuery("error")
 	if qeyErr != "" {
 		lg.Debugf("error is %s", qeyErr)
-		c.Redirect(http.StatusTemporaryRedirect, "/login") //307
+		c.Redirect(http.StatusTemporaryRedirect, "/login") // 307
 		return false
 	}
 	return true
@@ -155,12 +155,12 @@ func checkState(c *gin.Context) bool {
 	lg.Info("checkState()")
 
 	state, _ := c.GetQuery("state")
-	//lg.Debugf("state is %s", state)
-	//lg.Debugf("saved state is %s", sess.GetTokenSession(c))
+	// lg.Debugf("state is %s", state)
+	// lg.Debugf("saved state is %s", sess.GetTokenSession(c))
 	if state == "" || sess.GetTokenSession(c) != state {
-		//error
+		// error
 		lg.Error("state is invalid.")
-		c.Redirect(http.StatusTemporaryRedirect, "/") //307
+		c.Redirect(http.StatusTemporaryRedirect, "/") // 307
 		return false
 	}
 	return true
@@ -183,9 +183,9 @@ func getToken(c *gin.Context, mode string) (token *oauth2.Token) {
 	}
 
 	if err != nil {
-		//error
+		// error
 		lg.Errorf("Code exchange failed with '%s'", err)
-		c.Redirect(http.StatusTemporaryRedirect, "/") //307
+		c.Redirect(http.StatusTemporaryRedirect, "/") // 307
 		return nil
 	}
 	return token
@@ -202,17 +202,17 @@ func getUserInfo(c *gin.Context, token *oauth2.Token, res interface{}, mode stri
 	case FacebookAuth:
 		url = "https://graph.facebook.com/me?access_token=" + token.AccessToken
 		url += "&fields=id,email,verified,name,first_name,last_name,link,picture,gender,locale"
-		//client := facebookOauthConfig.Client(oauth2.NoContext, token)
-		//response, err := client.Get("https://graph.facebook.com/me")
+		// client := facebookOauthConfig.Client(oauth2.NoContext, token)
+		// response, err := client.Get("https://graph.facebook.com/me")
 	default:
 		return false
 	}
 
 	response, err := http.Get(url)
 	if err != nil {
-		//error
+		// error
 		lg.Errorf("Get user info failed with '%s'", err)
-		c.Redirect(http.StatusTemporaryRedirect, "/") //307
+		c.Redirect(http.StatusTemporaryRedirect, "/") // 307
 		return false
 	}
 
@@ -222,7 +222,7 @@ func getUserInfo(c *gin.Context, token *oauth2.Token, res interface{}, mode stri
 	err = json.Unmarshal(contents, res)
 	if err != nil {
 		lg.Errorf("Parse of response as json failed with '%s'", err)
-		c.Redirect(http.StatusTemporaryRedirect, "/") //307
+		c.Redirect(http.StatusTemporaryRedirect, "/") // 307
 		return false
 	}
 
@@ -234,7 +234,7 @@ func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, uA *models.U
 
 	if uA == nil {
 		lg.Debug("no user on t_users")
-		//0:no user -> register and login
+		// 0:no user -> register and login
 
 		lg.Debug("InsertUser()")
 		id, err := ctl.db.InsertUser(user)
@@ -242,31 +242,31 @@ func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, uA *models.U
 			c.AbortWithError(500, err)
 			return
 		}
-		//Session
+		// Session
 		sess.SetUserSession(c, int(id))
 
 	} else {
 		lg.Debug("There is user: %v", uA)
-		//oauth_flg //0, 1:google, 2:facebook
+		// oauth_flg //0, 1:google, 2:facebook
 		if uA.ID != 0 && uA.Auth == mode {
 			lg.Debug("login proceduer")
-			//1:existing user (google) -> login procedure
-			//Session
+			// 1:existing user (google) -> login procedure
+			// Session
 			sess.SetUserSession(c, uA.ID)
 		} else {
 			lg.Debug("redirect login page. user is already exsisting.")
-			//2:existing user (no auth or another auth) -> err
-			c.Redirect(http.StatusTemporaryRedirect, "/login") //307
+			// 2:existing user (no auth or another auth) -> err
+			c.Redirect(http.StatusTemporaryRedirect, "/login") // 307
 			return
 		}
 	}
 
-	//Login
-	//token delete
+	// Login
+	// token delete
 	sess.DelTokenSession(c)
 
-	//Redirect[GET]
-	c.Redirect(http.StatusTemporaryRedirect, "/accounts") //307
+	// Redirect[GET]
+	c.Redirect(http.StatusTemporaryRedirect, "/accounts") // 307
 }
 
 // OAuth2CallbackGoogleAction is callback from Google[GET]
@@ -274,25 +274,25 @@ func (ctl *Controller) OAuth2CallbackGoogleAction(c *gin.Context) {
 	lg.Info("CallbackGoogleAction()")
 	mode := GoogleAuth
 
-	//0.check deny
+	// 0.check deny
 	bRet := checkError(c)
 	if !bRet {
 		return
 	}
 
-	//1.Confirm State(token)
+	// 1.Confirm State(token)
 	bRet = checkState(c)
 	if !bRet {
 		return
 	}
 
-	//2.connection server to server
+	// 2.connection server to server
 	token := getToken(c, mode)
 	if token == nil {
 		return
 	}
 
-	//3.get user info
+	// 3.get user info
 	resGoogle := ResGoogle{}
 	bRet = getUserInfo(c, token, &resGoogle, mode)
 	if !bRet {
@@ -301,7 +301,7 @@ func (ctl *Controller) OAuth2CallbackGoogleAction(c *gin.Context) {
 
 	lg.Debugf("response body is %+s", resGoogle)
 
-	//4.check Email
+	// 4.check Email
 	lg.Debugf("email is %s", resGoogle.Email)
 	userAuth, err := ctl.db.OAuth2Login(resGoogle.Email)
 	if err != nil {
@@ -309,7 +309,7 @@ func (ctl *Controller) OAuth2CallbackGoogleAction(c *gin.Context) {
 		return
 	}
 
-	//5. register or login
+	// 5. register or login
 	user := &models.Users{
 		FirstName: resGoogle.FirstName,
 		LastName:  resGoogle.LastName,
@@ -325,25 +325,25 @@ func (ctl *Controller) OAuth2CallbackFacebookAction(c *gin.Context) {
 	lg.Info("CallbackFacebookAction()")
 	mode := FacebookAuth
 
-	//0.check deny
+	// 0.check deny
 	bRet := checkError(c)
 	if !bRet {
 		return
 	}
 
-	//1.Confirm State(token)
+	// 1.Confirm State(token)
 	bRet = checkState(c)
 	if !bRet {
 		return
 	}
 
-	//2.connection server to server
+	// 2.connection server to server
 	token := getToken(c, mode)
 	if token == nil {
 		return
 	}
 
-	//3.get user info
+	// 3.get user info
 	resFacebook := ResFacebook{}
 	bRet = getUserInfo(c, token, &resFacebook, mode)
 	if !bRet {
@@ -351,9 +351,9 @@ func (ctl *Controller) OAuth2CallbackFacebookAction(c *gin.Context) {
 	}
 
 	lg.Debugf("response body is %+s", resFacebook)
-	//img := "https://graph.facebook.com/" + id + "/picture?width=180&height=180"
+	// img := "https://graph.facebook.com/" + id + "/picture?width=180&height=180"
 
-	//4.check Email
+	// 4.check Email
 	lg.Debugf("email is %s", resFacebook.Email)
 	userAuth, err := ctl.db.OAuth2Login(resFacebook.Email)
 	if err != nil {
@@ -361,7 +361,7 @@ func (ctl *Controller) OAuth2CallbackFacebookAction(c *gin.Context) {
 		return
 	}
 
-	//5. register or login
+	// 5. register or login
 	user := &models.Users{
 		FirstName: resFacebook.FirstName,
 		LastName:  resFacebook.LastName,

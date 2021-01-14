@@ -17,7 +17,7 @@ import (
 	u "github.com/hiromaily/golibs/utils"
 )
 
-//TODO:skip static files like (jpg, gif, png, js, css, woff)
+// TODO:skip static files like (jpg, gif, png, js, css, woff)
 
 // RefererURLs key->request url, value->refer url
 var RefererURLs = map[string]string{
@@ -41,7 +41,7 @@ func RejectSpecificIP(proxyConf *configs.ProxyConfig) gin.HandlerFunc {
 		lg.Info("[RejectSpecificIp]")
 
 		ip := c.ClientIP()
-		//proxy
+		// proxy
 		if proxyConf.Mode != 0 {
 			if proxyConf.Server.Host != ip {
 				c.AbortWithStatus(403)
@@ -64,8 +64,8 @@ func SetMetaData() gin.HandlerFunc {
 		}
 		lg.Info("[SetMetaData]")
 
-		//Context Meta Data
-		//http.Header{
+		// Context Meta Data
+		// http.Header{
 		// "Referer":[]string{"http://localhost:9999/"},
 		// "Accept-Language":[]string{"ja,en-US;q=0.8,en;q=0.6,de;q=0.4,nl;q=0.2"},
 		// "X-Frame-Options":[]string{"deny"},
@@ -80,31 +80,31 @@ func SetMetaData() gin.HandlerFunc {
 		// "Content-Type":[]string{"application/x-www-form-urlencoded"},
 		// "Accept-Encoding":[]string{"gzip, deflate, sdch"}}
 
-		//Ajax
+		// Ajax
 		if IsXHR(c) {
 			c.Set("ajax", "1")
 		} else {
 			c.Set("ajax", "0")
 		}
 
-		//Response Data
+		// Response Data
 		if IsAcceptHeaderJSON(c) {
 			c.Set("responseData", "json")
 		} else {
 			c.Set("responseData", "html")
 		}
 
-		//Requested Data
+		// Requested Data
 		if IsContentTypeJSON(c) {
 			c.Set("requestData", "json")
 		} else {
 			c.Set("requestData", "data")
 		}
 
-		//User Agent
+		// User Agent
 		c.Set("userAgent", GetUserAgent(c))
 
-		//Language
+		// Language
 		c.Set("language", GetLanguage(c))
 
 		c.Next()
@@ -112,7 +112,7 @@ func SetMetaData() gin.HandlerFunc {
 }
 
 // UpdateUserSession is update user session expire
-//TODO:When session has already started, update session expired
+// TODO:When session has already started, update session expired
 func UpdateUserSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if hh.IsStaticFile(c) {
@@ -138,8 +138,8 @@ func GlobalRecover(devConf *configs.DevelopConfig) gin.HandlerFunc {
 			}
 			lg.Info("[GlobalRecover] defer func()")
 
-			//when crossing request, context data can't be left.
-			//c.Set("skipMiddleWare", "1")
+			// when crossing request, context data can't be left.
+			// c.Set("skipMiddleWare", "1")
 
 			if c.IsAborted() {
 				lg.Debug("[GlobalRecover] c.IsAborted() is true")
@@ -152,9 +152,9 @@ func GlobalRecover(devConf *configs.DevelopConfig) gin.HandlerFunc {
 			if devConf.RecoverEnable {
 				if rec := recover(); rec != nil {
 					lg.Debugf("[GlobalRecover] recover() is not nil:\n %v", rec)
-					//TODO:How should response data be decided whether html or json?
-					//TODO:Ajax or not doesn't matter to response. HTTP header of Accept may be better.
-					//TODO:How precise should I follow specifications of HTTP header.
+					// TODO:How should response data be decided whether html or json?
+					// TODO:Ajax or not doesn't matter to response. HTTP header of Accept may be better.
+					// TODO:How precise should I follow specifications of HTTP header.
 
 					setResponse(c, u.Itos(rec), 500)
 					return
@@ -163,7 +163,7 @@ func GlobalRecover(devConf *configs.DevelopConfig) gin.HandlerFunc {
 		}(c)
 
 		c.Next()
-		//Next is [Main gin Recovery]
+		// Next is [Main gin Recovery]
 	}
 }
 
@@ -205,7 +205,6 @@ func getErrMsg(c *gin.Context) string {
 }
 
 func setResponse(c *gin.Context, errMsg string, code int) {
-
 	refURL := "/"
 	if c.Request.Header.Get("Referer") != "" {
 		refURL = c.Request.Header.Get("Referer")
@@ -235,18 +234,18 @@ func setResponse(c *gin.Context, errMsg string, code int) {
 func CheckHTTPRefererAndCSRF(srvConf *configs.ServerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[CheckHTTPRefererAndCSRF]")
-		//Referer
+		// Referer
 		url := hh.GetURL(c)
-		//get referer data mapping table using url (map[string])
+		// get referer data mapping table using url (map[string])
 		if refURL, ok := RefererURLs[url]; ok {
-			//Check Referer
+			// Check Referer
 			if !hh.IsRefererHostValid(c, srvConf, refURL) {
 				c.Next()
 				return
 			}
 		}
 
-		//CSRF
+		// CSRF
 		sess.IsTokenSessionValid(c, c.PostForm("gintoken"))
 		c.Next()
 	}
@@ -258,9 +257,9 @@ func CheckHTTPReferer(srvConf *configs.ServerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lg.Info("[heckHttpReferer]")
 		url := hh.GetURL(c)
-		//get referer data mapping table using url (map[string])
+		// get referer data mapping table using url (map[string])
 		if refURL, ok := RefererURLs[url]; ok {
-			//Check Referer
+			// Check Referer
 			hh.IsRefererHostValid(c, srvConf, refURL)
 		}
 		c.Next()
@@ -306,17 +305,17 @@ func CheckHTTPHeader(apiConf *configs.APIConfig) gin.HandlerFunc {
 		lg.Debugf("c.ClientIP() %s", c.ClientIP())
 		lg.Debugf("Request method is %s", c.Request.Method)
 
-		//IsAjax := c.Request.Header.Get("X-Requested-With")
-		//lg.Debugf("[X-Requested-With] %s", IsAjax)
+		// IsAjax := c.Request.Header.Get("X-Requested-With")
+		// lg.Debugf("[X-Requested-With] %s", IsAjax)
 
-		//IsKey := c.Request.Header.Get("X-Custom-Header-Gin")
-		//lg.Debugf("[X-Custom-Header-Gin] %s", IsKey)
+		// IsKey := c.Request.Header.Get("X-Custom-Header-Gin")
+		// lg.Debugf("[X-Custom-Header-Gin] %s", IsKey)
 
-		//TODO:when preflight request, X-Requested-With may be not sent
-		//TODO:all cors requests don't include X-Requested-With..
+		// TODO:when preflight request, X-Requested-With may be not sent
+		// TODO:all cors requests don't include X-Requested-With..
 		if c.Request.Method != "OPTIONS" && c.Request.Header.Get("X-Custom-Header-Cors") == "" {
 			if apiConf.Ajax && !IsXHR(c) {
-				//error
+				// error
 				lg.Error("request is required by Ajax ")
 				c.AbortWithStatus(400)
 				return
@@ -326,7 +325,7 @@ func CheckHTTPHeader(apiConf *configs.APIConfig) gin.HandlerFunc {
 		if apiConf.Header.Enabled {
 			valOfaddedHeader := c.Request.Header.Get(apiConf.Header.Header)
 			if valOfaddedHeader != apiConf.Header.Key {
-				//error
+				// error
 				lg.Error("header and key are invalid")
 				c.AbortWithStatus(400)
 				return
@@ -338,8 +337,8 @@ func CheckHTTPHeader(apiConf *configs.APIConfig) gin.HandlerFunc {
 		//if contentType == "application/json" {
 		//}
 
-		//Context Meta Data
-		//SetMetaData(c)
+		// Context Meta Data
+		// SetMetaData(c)
 
 		c.Next()
 	}

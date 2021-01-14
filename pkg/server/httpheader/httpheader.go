@@ -19,26 +19,25 @@ func getURL(scheme, host string, port int) string {
 
 // IsRefererHostValid is check referer for posted page
 func IsRefererHostValid(c *gin.Context, srvConf *configs.ServerConfig, pageFrom string) bool {
-
 	webserverURL := getURL(srvConf.Scheme, srvConf.Host, srvConf.Port)
 
-	//TODO:Add feature that switch https to http easily.
+	// TODO:Add feature that switch https to http easily.
 	url := fmt.Sprintf("%s/%s", webserverURL, pageFrom)
 	lg.Debugf("expected url: %s", url)
 
-	//http://localhost:9999/login
+	// http://localhost:9999/login
 	lg.Debugf("Referer: %s", c.Request.Header.Get("Referer"))
-	//lg.Debugf("Referer: %s", c.Request.Referer())
+	// lg.Debugf("Referer: %s", c.Request.Referer())
 
-	//default action
+	// default action
 	if url != c.Request.Referer() {
-		//Invalid access
+		// Invalid access
 		lg.Error("Referer is invalid.")
 
-		//token delete
+		// token delete
 		sess.DelTokenSession(c)
 
-		//set error
+		// set error
 		c.AbortWithError(400, errors.New("referer is invalid"))
 		return false
 	}
@@ -65,7 +64,7 @@ func IsStaticFile(c *gin.Context) bool {
 
 // GetProto is to get protocol
 func GetProto(c *gin.Context) string {
-	//HTTP/1.1
+	// HTTP/1.1
 	return c.Request.Proto
 }
 
@@ -73,20 +72,20 @@ func GetProto(c *gin.Context) string {
 // TODO:it may be better to set config
 func SetResponseHeaderForSecurity(c *gin.Context, co *configs.CORSConfig) {
 	lg.Info("SetResponseHeaderForSecurity")
-	//http://qiita.com/roothybrid7/items/34578037d883c9a99ca8
+	// http://qiita.com/roothybrid7/items/34578037d883c9a99ca8
 
 	c.Writer.Header().Set("X-Content-Type-Options", "nosniff")
 	c.Writer.Header().Set("X-XSS-Protection", "1, mode=block")
 	c.Writer.Header().Set("X-Frame-Options", "deny")
 	c.Writer.Header().Set("Content-Security-Policy", "default-src 'none'")
-	//c.Writer.Header().Set("Strict-Transport-Security", "max-age=15768000")
+	// c.Writer.Header().Set("Strict-Transport-Security", "max-age=15768000")
 
-	//CORS
+	// CORS
 	if co.Enabled && c.Request.Method == "GET" {
 		cors.SetHeader(co)(c)
 	}
-	//c.Writer.WriteHeader()
-	//c.Writer.WriteString()
+	// c.Writer.WriteHeader()
+	// c.Writer.WriteString()
 }
 
 // SetResponseHeader is set HTTP response header

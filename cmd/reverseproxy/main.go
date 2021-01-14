@@ -7,9 +7,7 @@ import (
 	lg "github.com/hiromaily/golibs/log"
 )
 
-var (
-	tomlPath = flag.String("f", "", "Toml file path")
-)
+var tomlPath = flag.String("f", "", "Toml file path")
 
 func init() {}
 
@@ -21,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	//log
+	// log
 	logLevel := lg.LogStatus(conf.Proxy.Server.Log.Level)
 	lg.InitializeLog(logLevel, lg.TimeShortFile,
 		"[REVERSE_PROXY]", conf.Proxy.Server.Log.Path, "hiromaily")

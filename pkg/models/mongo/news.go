@@ -6,9 +6,11 @@ import (
 	"github.com/hiromaily/golibs/db/mongodb"
 )
 
-const newsCollection string = "news"
-const articlesCollection string = "articles"
-const articles2Collection string = "articles2"
+const (
+	newsCollection      string = "news"
+	articlesCollection  string = "articles"
+	articles2Collection string = "articles2"
+)
 
 // MongoModel is extension of mongo.MongoInfo
 type MongoModel struct {
@@ -17,12 +19,12 @@ type MongoModel struct {
 
 // GetNewsData is to get all news data from news collection
 func (mg *MongoModel) GetNewsData() ([]News, error) {
-	//mg.Db.Session
+	// mg.Db.Session
 	mg.DB.GetCol(newsCollection)
 
 	var news []News
 
-	//get
+	// get
 	colQuerier := bson.M{}
 	err := mg.DB.C.Find(colQuerier).All(&news)
 	if err != nil {
@@ -38,7 +40,7 @@ func (mg *MongoModel) GetArticlesData(newsID int) ([]Articles, error) {
 
 	var articles []Articles
 
-	//get
+	// get
 	colQuerier := bson.M{}
 	if newsID != 0 {
 		colQuerier = bson.M{"news_id": newsID}
@@ -58,7 +60,7 @@ func (mg *MongoModel) GetArticlesData2(newsID int) ([]Item2, error) {
 
 	var items []Item2
 
-	//get
+	// get
 	colQuerier := bson.M{}
 	if newsID != 0 {
 		colQuerier = bson.M{"news_id": newsID}

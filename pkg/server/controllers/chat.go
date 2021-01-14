@@ -12,7 +12,7 @@ import (
 func (ctl *Controller) ChatIndexAction(c *gin.Context) {
 	lg.Info("SignInGoogleAction()")
 
-	//View
+	// View
 	c.HTML(http.StatusOK, "pages/chat/index.tmpl", gin.H{
 		"title": "Chat Page",
 	})

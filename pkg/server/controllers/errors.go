@@ -8,7 +8,6 @@ import (
 
 // Error404Action is for 404 error [GET]
 func (ctl *Controller) Error404Action(c *gin.Context) {
-
 	refURL := "/"
 	if c.Request.Header.Get("Referer") != "" {
 		refURL = c.Request.Header.Get("Referer")
@@ -20,7 +19,7 @@ func (ctl *Controller) Error404Action(c *gin.Context) {
 		"url":     refURL,
 	})
 
-	//View
+	// View
 	c.HTML(http.StatusNotFound, "pages/errors/error.tmpl", gin.H{
 		"message": "404 errors",
 	})
@@ -28,10 +27,9 @@ func (ctl *Controller) Error404Action(c *gin.Context) {
 
 // Error405Action is for 405 error
 func (ctl *Controller) Error405Action(c *gin.Context) {
-
 	refURL := c.Request.Header.Get("Referer")
 
-	//View
+	// View
 	c.HTML(http.StatusMethodNotAllowed, "pages/errors/error.tmpl", gin.H{
 		"code":    http.StatusNotFound,
 		"message": "405 errors",

@@ -24,7 +24,7 @@ type UserRequest struct {
 
 // get user parameter and check validation
 func (ctl *Controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (err error) {
-	//Check token(before send message, pass token)
+	// Check token(before send message, pass token)
 
 	contentType := c.Request.Header.Get("Content-Type")
 	lg.Debug("Content-Type is ", contentType)
@@ -32,7 +32,7 @@ func (ctl *Controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (
 	if contentType == "application/json" {
 		err = c.BindJSON(data)
 	} else {
-		//application/x-www-form-urlencoded
+		// application/x-www-form-urlencoded
 		err = c.Bind(data)
 	}
 	if err != nil {
@@ -41,7 +41,7 @@ func (ctl *Controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (
 
 	lg.Debug("Request Body: %#v", data)
 
-	//Validation
+	// Validation
 	mRet := validator.CheckValidation(data, false)
 	lg.Debug(mRet)
 	if len(mRet) != 0 {
@@ -52,7 +52,7 @@ func (ctl *Controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (
 }
 
 func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequest) (err error) {
-	//Param id
+	// Param id
 	if c.Param("id") == "" {
 		return errors.New("missing id on request parameter")
 	}
@@ -69,7 +69,7 @@ func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequ
 	if contentType == "application/json" {
 		err = c.BindJSON(data)
 	} else {
-		//application/x-www-form-urlencoded
+		// application/x-www-form-urlencoded
 		err = c.Bind(data)
 	}
 	if err != nil {
@@ -78,7 +78,7 @@ func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequ
 
 	lg.Debug("Request Body: %#v", data)
 
-	//Validation
+	// Validation
 	if data.FirstName == "" && data.LastName == "" && data.Email == "" && data.Password == "" {
 		return errors.New("validation no data error")
 	}
@@ -94,7 +94,6 @@ func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequ
 
 // insert user
 func (ctl *Controller) insertUser(data *UserRequest) (int64, error) {
-
 	user := &models.Users{
 		FirstName: data.FirstName,
 		LastName:  data.LastName,
@@ -102,13 +101,12 @@ func (ctl *Controller) insertUser(data *UserRequest) (int64, error) {
 		Password:  data.Password,
 	}
 
-	//Insert
+	// Insert
 	return ctl.db.InsertUser(user)
 }
 
 // update user
 func (ctl *Controller) updateUser(data *UserRequest, id string) (int64, error) {
-
 	user := &models.Users{}
 	if data.FirstName != "" {
 		user.FirstName = data.FirstName
@@ -122,10 +120,10 @@ func (ctl *Controller) updateUser(data *UserRequest, id string) (int64, error) {
 	if data.Password != "" {
 		user.Password = data.Password
 	}
-	//update date
+	// update date
 	user.Updated = tm.GetCurrentDateTimeByStr("")
 
-	//Update
+	// Update
 	return ctl.db.UpdateUser(user, id)
 }
 
@@ -141,7 +139,7 @@ func (ctl *Controller) APIUserListGetAction(c *gin.Context) {
 		return
 	}
 
-	//Make json for response and return
+	// Make json for response and return
 	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(users))
 }
 
@@ -156,7 +154,7 @@ func (ctl *Controller) APIUserListGetAction(c *gin.Context) {
 func (ctl *Controller) APIUserInsertPostAction(c *gin.Context) {
 	lg.Debug("[POST] UserPostAction")
 
-	//Param & Check valid
+	// Param & Check valid
 	var uData UserRequest
 	err := ctl.getUserParamAndValid(c, &uData)
 	if err != nil {
@@ -178,9 +176,9 @@ func (ctl *Controller) APIUserInsertPostAction(c *gin.Context) {
 func (ctl *Controller) APIUserGetAction(c *gin.Context) {
 	lg.Info("[GET] UserGetAction")
 
-	//Param
-	//FirstName := c.Query("firstName")
-	//lg.Debug("firstName:", FirstName)
+	// Param
+	// FirstName := c.Query("firstName")
+	// lg.Debug("firstName:", FirstName)
 	userID := c.Param("id")
 	if userID == "" {
 		c.AbortWithError(400, errors.New("missing id on request parameter"))
@@ -194,7 +192,7 @@ func (ctl *Controller) APIUserGetAction(c *gin.Context) {
 		return
 	}
 
-	//Make json for response and return
+	// Make json for response and return
 	if b {
 		jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON([]models.UsersSL{user}))
 	} else {
@@ -206,7 +204,7 @@ func (ctl *Controller) APIUserGetAction(c *gin.Context) {
 func (ctl *Controller) APIUserPutAction(c *gin.Context) {
 	lg.Info("[PUT] UserPutAction")
 
-	//Param & Check valid
+	// Param & Check valid
 	var uData UserRequest
 	err := ctl.getUserParamAndValidForPut(c, &uData)
 	if err != nil {
@@ -230,15 +228,15 @@ func (ctl *Controller) APIUserPutAction(c *gin.Context) {
 // APIUserDeleteAction is delete specific user [DELETE] (work in progress)
 func (ctl *Controller) APIUserDeleteAction(c *gin.Context) {
 	lg.Info("[DELETE] UserDeleteAction")
-	//check token
+	// check token
 
-	//Param
+	// Param
 	if c.Param("id") == "" {
 		c.AbortWithError(400, errors.New("missing id on request parameter"))
 		return
 	}
 
-	//Delete
+	// Delete
 	affected, err := ctl.db.DeleteUser(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(500, err)
@@ -262,15 +260,15 @@ func (ctl *Controller) APIUserIDsGetAction(c *gin.Context) {
 		return
 	}
 
-	//convert
-	//newIds := make([]int, len(ids))
+	// convert
+	// newIds := make([]int, len(ids))
 	newIds := []int{}
 	for _, id := range ids {
 		newIds = append(newIds, id.ID)
 	}
-	//lg.Debugf("ids: %v", ids)
-	//lg.Debugf("newIds: %v", newIds)
+	// lg.Debugf("ids: %v", ids)
+	// lg.Debugf("newIds: %v", newIds)
 
-	//Make json for response and return
+	// Make json for response and return
 	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserIDsJSON(newIds))
 }

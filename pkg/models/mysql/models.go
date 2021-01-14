@@ -17,11 +17,11 @@ type DBModeler interface {
 
 // NewDBModeler is to return DBModeler interface
 func NewDBModeler(env string, conf *configs.MySQLContentConfig) (DBModeler, error) {
-	//logic is here, if switching is required
+	// logic is here, if switching is required
 
-	//MongoDB
+	// MongoDB
 	return newDBModel(env, conf)
 
-	//or dummy
-	//return &DummyMySQL{}, nil
+	// or dummy
+	// return &DummyMySQL{}, nil
 }

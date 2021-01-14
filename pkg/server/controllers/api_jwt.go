@@ -16,8 +16,8 @@ import (
 func (ctl *Controller) APIJWTIndexPostAction(c *gin.Context) {
 	lg.Debug("[POST] IndexAction")
 
-	//login
-	//check login
+	// login
+	// check login
 	userID, mail, err := ctl.CheckLoginOnAPI(c)
 	if err != nil {
 		c.AbortWithError(400, err)
@@ -32,6 +32,6 @@ func (ctl *Controller) APIJWTIndexPostAction(c *gin.Context) {
 	}
 	lg.Debugf("token: %s", token)
 
-	//Make json for response and return
+	// Make json for response and return
 	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateJWTJson(token))
 }

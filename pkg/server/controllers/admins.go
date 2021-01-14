@@ -11,12 +11,12 @@ import (
 
 // get user, it was set by the BasicAuth middleware
 
-//AdminIndexAction [GET]
+// AdminIndexAction [GET]
 func (ctl *Controller) AdminIndexAction(c *gin.Context) {
 	user := c.MustGet(gin.AuthUserKey).(string)
 	lg.Debugf("[---]gin.AuthUserKey: %s", user)
 
-	//View
+	// View
 	res := gin.H{
 		"title":    "Admin Page",
 		"navi_key": "/admin/",

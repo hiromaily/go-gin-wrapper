@@ -32,7 +32,7 @@ func (us *DBModel) IsUserEmail(email string, password string) (int, error) {
 		return 0, us.DB.Err
 	}
 
-	//no data
+	// no data
 	if !b {
 		return 0, fmt.Errorf("email may be wrong")
 	}
@@ -45,26 +45,25 @@ func (us *DBModel) IsUserEmail(email string, password string) (int, error) {
 
 // OAuth2Login is for OAuth2 login
 func (us *DBModel) OAuth2Login(email string) (*UserAuth, error) {
-	//0:no user -> register and login
-	//1:existing user (google) -> login
-	//2:existing user (no auth or another auth) -> err
+	// 0:no user -> register and login
+	// 1:existing user (google) -> login
+	// 2:existing user (no auth or another auth) -> err
 	sql := "SELECT user_id, oauth2_flg FROM t_users WHERE email=? AND delete_flg=?"
 
 	var user UserAuth
 
 	b := us.DB.SelectIns(sql, email, 0).ScanOne(&user)
 	if us.DB.Err != nil {
-		//0:no user -> register and login
+		// 0:no user -> register and login
 		return nil, us.DB.Err
 	}
 
-	//no data
+	// no data
 	if !b {
 		return nil, nil
 	}
 
 	return &user, nil
-
 }
 
 // GetUserIds is to get user IDs
@@ -82,16 +81,16 @@ func (us *DBModel) GetUserIds(users interface{}) error {
 
 // GetUserList is to get user list
 func (us *DBModel) GetUserList(users interface{}, id string) (bool, error) {
-	//lg.Debug(mysql.ColumnForSQL(users))
+	// lg.Debug(mysql.ColumnForSQL(users))
 
-	//remove password
-	//fields := strings.Replace(mysql.ColumnForSQL(users), "password,", "", 1)
-	//lg.Debug(fields)
+	// remove password
+	// fields := strings.Replace(mysql.ColumnForSQL(users), "password,", "", 1)
+	// lg.Debug(fields)
 
 	sql := "SELECT %s FROM t_users WHERE delete_flg=?"
 	sql = fmt.Sprintf(sql, mysql.ColumnForSQL(users))
 
-	//TODO: When Test for result is 0 record, set 1 to delFlg
+	// TODO: When Test for result is 0 record, set 1 to delFlg
 	delFlg := 0
 
 	var b bool
@@ -114,20 +113,20 @@ func (us *DBModel) InsertUser(users *Users) (int64, error) {
 	lg.Debug(mysql.ColumnForSQL(users))
 
 	sql := "INSERT INTO t_users (first_name, last_name, email, password) VALUES (?,?,?,?)"
-	//sql = fmt.Sprintf(sql, mysql.ColumnForSQL(users))
+	// sql = fmt.Sprintf(sql, mysql.ColumnForSQL(users))
 	if users.OAuth2Flg != "" {
 		sql := "INSERT INTO t_users (first_name, last_name, email, password, oauth2_flg) VALUES (?,?,?,?,?)"
-		//hash password
+		// hash password
 		return us.DB.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""), users.OAuth2Flg)
 	}
 
-	//hash password
+	// hash password
 	return us.DB.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""))
 }
 
 // UpdateUser is to update user
 func (us *DBModel) UpdateUser(users *Users, id string) (int64, error) {
-	//lg.Debug(mysql.ColumnForSQL(users))
+	// lg.Debug(mysql.ColumnForSQL(users))
 
 	vals := []interface{}{}
 	sql := "UPDATE t_users SET"
@@ -152,17 +151,17 @@ func (us *DBModel) UpdateUser(users *Users, id string) (int64, error) {
 		vals = append(vals, users.Updated)
 	}
 
-	//remove last comma
+	// remove last comma
 	sql = string(sql[:(len(sql) - 1)])
 
-	//user id
+	// user id
 	sql += " WHERE user_id=?"
 	vals = append(vals, u.Atoi(id))
 
-	//sql debug
-	//lg.Debugf("update sql: %s", sql)
+	// sql debug
+	// lg.Debugf("update sql: %s", sql)
 
-	//Update
+	// Update
 	return us.DB.Exec(sql, vals...)
 }
 

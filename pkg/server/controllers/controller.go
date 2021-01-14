@@ -6,7 +6,7 @@ import (
 	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/models/mysql"
 )
 
-//TODO: define interface
+// TODO: define interface
 
 // Controller is controller object
 type Controller struct {
@@ -15,7 +15,7 @@ type Controller struct {
 	apiHeader *configs.HeaderConfig
 	auth      *configs.AuthConfig
 	cors      *configs.CORSConfig
-	//TODO: session should be added here
+	// TODO: session should be added here
 }
 
 // NewController is to return Controller
@@ -25,7 +25,6 @@ func NewController(
 	apiHeader *configs.HeaderConfig,
 	auth *configs.AuthConfig,
 	cors *configs.CORSConfig) *Controller {
-
 	return &Controller{
 		db:        db,
 		mongo:     mongo,

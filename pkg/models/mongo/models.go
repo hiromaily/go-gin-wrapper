@@ -11,9 +11,9 @@ type MongoModeler interface {
 
 // NewMongoModeler is to return KVSStorager interface
 func NewMongoModeler(conf *configs.Config) (MongoModeler, error) {
-	//logic is here, if switching is required
-	//MongoDB
+	// logic is here, if switching is required
+	// MongoDB
 	return newMongoModel(conf)
-	//or dummy
-	//return &DummyMongo{}, nil
+	// or dummy
+	// return &DummyMongo{}, nil
 }

@@ -22,15 +22,15 @@ import (
 	"github.com/hiromaily/golibs/cipher/encryption"
 	lg "github.com/hiromaily/golibs/log"
 
-	//u "github.com/hiromaily/golibs/utils"
+	// u "github.com/hiromaily/golibs/utils"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gin-gonic/gin"
 
 	conf "github.com/hiromaily/go-gin-wrapper/pkg/configs"
 )
 
-//TODO:change toml settings automatically as program code.
-//TODO:test for jwt, first code have to be got.
+// TODO:change toml settings automatically as program code.
+// TODO:test for jwt, first code have to be got.
 
 var (
 	r *gin.Engine
@@ -59,10 +59,10 @@ var (
 	onlyAjaxHeaders  = []map[string]string{ajaxHeader}
 	onlyKeyHeaders   = []map[string]string{keyHeader}
 	jwtHeaders       = []map[string]string{ajaxHeader, keyHeader, contentType}
-	//rightHeadersWithJWT = []map[string]string{ajaxHeader, keyHeader, jwtAuth}
+	// rightHeadersWithJWT = []map[string]string{ajaxHeader, keyHeader, jwtAuth}
 )
 
-//FIXME: mongo connection doesn't work
+// FIXME: mongo connection doesn't work
 var getTests = []struct {
 	url      string
 	code     int
@@ -93,35 +93,35 @@ var loginTests = []struct {
 	tokenFlg bool
 	err      error
 }{
-	//1.access by GET first
+	// 1.access by GET first
 	{"/login", http.StatusOK, "GET", nil, "/login", "", "", false, nil},
 	// access by POST, but no form data.
 	{"/login", http.StatusOK, "POST", loginHeaders, "/login", "", "", true, nil},
-	//2.access by GET again
+	// 2.access by GET again
 	{"/login", http.StatusOK, "GET", nil, "/login", "", "", false, nil},
 	// access by POST, but no email.
 	{"/login", http.StatusOK, "POST", loginHeaders, "/login", "", "password", true, nil},
-	//3.access by GET again
+	// 3.access by GET again
 	{"/login", http.StatusOK, "GET", nil, "/login", "", "", false, nil},
 	// access by POST, but no password.
 	{"/login", http.StatusOK, "POST", loginHeaders, "/login", "aaaa@test.nl", "", true, nil},
-	//4.access by GET again
+	// 4.access by GET again
 	{"/login", http.StatusOK, "GET", nil, "/login", "aaaa@test.nl", "", false, nil},
 	// access by POST, but invalid email.
 	{"/login", http.StatusOK, "POST", loginHeaders, "/login", "abcimail.com", "password", true, nil},
-	//5.access by GET again
+	// 5.access by GET again
 	{"/login", http.StatusOK, "GET", nil, "/login", "aaaa@test.nl", "", false, nil},
 	// access by POST, but shorter password.
 	{"/login", http.StatusOK, "POST", loginHeaders, "/login", "aaaa@test.de", "123", true, nil},
-	//6.access by GET again
+	// 6.access by GET again
 	{"/login", http.StatusOK, "GET", nil, "/login", "", "", false, nil},
 	// access by POST, but wrong form data.
 	{"/login", http.StatusOK, "POST", loginHeaders, "/login", "aaaa@test.nl", "password", true, nil},
-	//7.access by GET again
+	// 7.access by GET again
 	{"/login", http.StatusOK, "GET", nil, "/login", "", "", false, nil},
 	// access by POST with right data, but no token
 	{"/login", http.StatusBadRequest, "POST", loginHeaders, "/login", "aaaa@test.jp", "password", false, nil},
-	//8.access by GET again
+	// 8.access by GET again
 	{"/login", http.StatusOK, "GET", nil, "/login", "", "", false, nil},
 	// access by POST with right data. expect to access next page.
 	{"/login", http.StatusFound, "POST", loginHeaders, "/accounts/", "aaaa@test.jp", "password", true, errRedirect},
@@ -129,6 +129,7 @@ var loginTests = []struct {
 
 // Test Data for ajax API (When JWT is off)
 var userID = 12
+
 var getUserAPITests = []struct {
 	url     string
 	code    int
@@ -141,15 +142,15 @@ var getUserAPITests = []struct {
 	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", onlyKeyHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", nil, nil},
-	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, //TODO:value is necessary
+	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, // TODO:value is necessary
 	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
 	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, // TODO:value is necessary
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
-	//TODO:with post data, put data
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, // TODO:no resource is right
+	// TODO:with post data, put data
 }
 
 // Test Data for ajax API (When JWT is on)
@@ -160,22 +161,22 @@ var getUserAPITests2 = []struct {
 	headers []map[string]string
 	err     error
 }{
-	//no jwt token
+	// no jwt token
 	{"/api/users", http.StatusBadRequest, "GET", rightHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", wrongKeyHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", onlyKeyHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", nil, nil},
-	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, //TODO:value is necessary
+	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, // TODO:value is necessary
 	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
 	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, //TODO:value is necessary
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, // TODO:value is necessary
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil}, //TODO:no resource is right
-	//TODO:with post data, put data
-	//TODO:with jwt token
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil}, // TODO:no resource is right
+	// TODO:with post data, put data
+	// TODO:with jwt token
 }
 
 // Test Data for ajax API (When JWT is on, plus jwt)
@@ -186,12 +187,12 @@ var getUserAPITests3 = []struct {
 	headers []map[string]string
 	err     error
 }{
-	//with jwt token
+	// with jwt token
 	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
-	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, //TODO:no resource is right
-	//TODO:with post data, put data
+	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, // TODO:no resource is right
+	// TODO:with post data, put data
 }
 
 // Test Data for ajax API (JWT)
@@ -204,7 +205,7 @@ var getJWTApiTests = []struct {
 	pass    string
 	err     error
 }{
-	//without content-type, it doesn't work.
+	// without content-type, it doesn't work.
 	{"/api/jwt", http.StatusNotFound, "GET", jwtHeaders, "aaaa@test.jp", "password", nil},
 	{"/api/jwt", http.StatusBadRequest, "POST", rightHeaders, "aaaa@test.jp", "password", nil},
 	{"/api/jwt", http.StatusBadRequest, "POST", jwtHeaders, "aaaa@test.jp", "", nil},
@@ -218,7 +219,7 @@ var getJWTApiTests = []struct {
 func setup() {
 	flag.Parse()
 
-	//cipher
+	// cipher
 	if *isEncryptedConf {
 		_, err := encryption.NewCryptWithEnv()
 		if err != nil {
@@ -226,25 +227,25 @@ func setup() {
 		}
 	}
 
-	//config
+	// config
 	conf, err := configs.NewInstance(*tomlPath, *isEncryptedConf)
 	if err != nil {
 		panic(err)
 	}
 
-	//overwrite mode
+	// overwrite mode
 	conf.API.JWT.Mode = uint8(*authMode)
 
-	//Referer for test( set this on header automatically)
+	// Referer for test( set this on header automatically)
 	refererLogin["Referer"] = fmt.Sprintf(
 		"http://%s:%d/login",
 		conf.Server.Host,
 		conf.Server.Port)
 
-	//when changing loglevel
+	// when changing loglevel
 	lg.InitializeLog(lg.DebugStatus, lg.TimeShortFile, "[GOWEB]", "", "hiromaily")
 
-	var isTestMode = true
+	isTestMode := true
 	regi := NewRegistry(conf, isTestMode)
 	server := regi.NewServerer(*portNum)
 	if r, err = server.Start(); err != nil {
@@ -253,7 +254,7 @@ func setup() {
 }
 
 func teardown() {
-	//TODO:Drop test database and test data.
+	// TODO:Drop test database and test data.
 }
 
 func TestMain(m *testing.M) {
@@ -289,13 +290,13 @@ func parseResponse(res *http.Response) ([]byte, int) {
 	if err != nil {
 		panic(err)
 	}
-	//return string(contents), res.StatusCode
+	// return string(contents), res.StatusCode
 	return contents, res.StatusCode
 }
 
 // Set HTTP Header
 func setHTTPHeaders(req *http.Request, headers []map[string]string) {
-	//req.Header.Set("Authorization", "Bearer access-token")
+	// req.Header.Set("Authorization", "Bearer access-token")
 	for _, header := range headers {
 		for k, v := range header {
 			req.Header.Set(k, v)
@@ -321,7 +322,7 @@ func getCookies(cookies []string, key string) (val string) {
 // nolint: unused, deadcode
 func getCookies2(strURL, key string, jar *cookiejar.Jar) (val string) {
 	setCookieURL, _ := url.Parse(strURL)
-	cookies := jar.Cookies(setCookieURL) //cookies []*http.Cookie
+	cookies := jar.Cookies(setCookieURL) // cookies []*http.Cookie
 
 	fmt.Printf("cookies: %v\n", cookies)
 	for _, cookie := range cookies {
@@ -343,14 +344,14 @@ func checkHTTPHeader(req *http.Request) {
 		fmt.Printf("[checkHTTPHeader] headers:\n%s\n", b)
 	}
 
-	//POST /login HTTP/1.1
-	//Host: 127.0.0.1:63513
-	//User-Agent: Go-http-client/1.1
-	//Content-Length: 0
-	//Content-Type: application/x-www-form-urlencoded
-	//Cookie: go-web-ginserver=MTQ3MTA1MDQ3MnxOd3dBTkVOQlJGZE1WRTlRVmxoWldGbEVSVTFYVGxKSk5VZFhXalJYVkRWRlNWazJWRnBQVUVWWlJGSklOMUZSUTB0TE0waGFRVkU9fC_7LJ1pOXIOZo8ZXg-R4oO1LFXaSqJtvA3l0f6Qk9DA
-	//Referer: http://hiromaily.com:8080/login
-	//Accept-Encoding: gzip
+	// POST /login HTTP/1.1
+	// Host: 127.0.0.1:63513
+	// User-Agent: Go-http-client/1.1
+	// Content-Length: 0
+	// Content-Type: application/x-www-form-urlencoded
+	// Cookie: go-web-ginserver=MTQ3MTA1MDQ3MnxOd3dBTkVOQlJGZE1WRTlRVmxoWldGbEVSVTFYVGxKSk5VZFhXalJYVkRWRlNWazJWRnBQVUVWWlJGSklOMUZSUTB0TE0waGFRVkU9fC_7LJ1pOXIOZo8ZXg-R4oO1LFXaSqJtvA3l0f6Qk9DA
+	// Referer: http://hiromaily.com:8080/login
+	// Accept-Encoding: gzip
 }
 
 //
@@ -394,7 +395,7 @@ func getJWT(res *http.Response) (string, error) {
 
 // nolint: unparam
 func TestConfigs(t *testing.T) {
-	//configFiles
+	// configFiles
 	path := "../../configs/"
 	for _, v := range configFiles {
 		conf.New(path+v, false)
@@ -428,7 +429,7 @@ func TestGetRequestOne(t *testing.T) {
 // Table driven test
 // - request code, redirect and address
 func TestGetRequestOnTable(t *testing.T) {
-	//request
+	// request
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
@@ -443,12 +444,12 @@ func TestGetRequestOnTable(t *testing.T) {
 		fmt.Printf("%d [%s] %s\n", i+1, tt.method, ts.URL+tt.url)
 
 		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
-		//Set Http Headers
+		// Set Http Headers
 		if tt.headers != nil {
 			setHTTPHeaders(req, tt.headers)
 		}
 		res, err := client.Do(req)
-		//res, err := client.Get(ts.URL + tt.url)
+		// res, err := client.Get(ts.URL + tt.url)
 
 		//t.Logf("%#v", err)
 		//&url.Error{Op:"Get", URL:"/", Err:(*errors.errorString)(0xc8202101b0)}
@@ -456,14 +457,14 @@ func TestGetRequestOnTable(t *testing.T) {
 		if isURLErr && urlError.Err.Error() != tt.err.Error() {
 			t.Errorf("[%s] this page can't be access. \n error is %s", tt.url, urlError.Err)
 		} else {
-			//check expected status code
+			// check expected status code
 			if res.StatusCode != tt.code {
 				t.Errorf("[%d][%s] status code is not correct. \n return code is %d / expected %d", i+1, tt.url, res.StatusCode, tt.code)
 			}
 		}
-		//check next page
+		// check next page
 		if isURLErr && urlError.Err.Error() == errRedirect.Error() {
-			//t.Log(res.Header["Location"])
+			// t.Log(res.Header["Location"])
 			if tt.nextPage != res.Header["Location"][0] {
 				t.Errorf("[%d][%s] redirect url is not correct. \n url is %s / expected %s", i+1, tt.url, res.Header["Location"][0], tt.nextPage)
 			}
@@ -476,14 +477,14 @@ func TestGetRequestOnTable(t *testing.T) {
 // Login Test
 //-----------------------------------------------------------------------------
 func TestLogin(t *testing.T) {
-	//request
+	// request
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
 	var ginToken string
 	var sendData url.Values
 
-	//cookie
+	// cookie
 	jar, _ := cookiejar.New(nil)
 
 	client := &http.Client{
@@ -497,9 +498,9 @@ func TestLogin(t *testing.T) {
 	for i, tt := range loginTests {
 		fmt.Printf("%d [%s] %s\n", i+1, tt.method, ts.URL+tt.url)
 
-		//Create Post Data
+		// Create Post Data
 		if tt.method == "POST" {
-			//ginToken
+			// ginToken
 			if !tt.tokenFlg {
 				ginToken = ""
 			}
@@ -511,7 +512,7 @@ func TestLogin(t *testing.T) {
 		//
 		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, bytes.NewBuffer([]byte(sendData.Encode())))
 
-		//Set Http Headers
+		// Set Http Headers
 		if tt.headers != nil {
 			setHTTPHeaders(req, tt.headers)
 		}
@@ -522,29 +523,29 @@ func TestLogin(t *testing.T) {
 		if isURLErr && urlError.Err.Error() != tt.err.Error() {
 			t.Errorf("[%s] this page can't be access. \n error is %s", tt.url, urlError.Err)
 		} else {
-			//check expected status code
+			// check expected status code
 			if res.StatusCode != tt.code {
 				t.Errorf("[%d][%s] status code is not correct. \n return code is %d / expected %d", i+1, tt.url, res.StatusCode, tt.code)
 			}
 		}
-		//check next page
+		// check next page
 		if isURLErr && urlError.Err.Error() == errRedirect.Error() {
-			//t.Log(res.Header["Location"])
+			// t.Log(res.Header["Location"])
 			if tt.nextPage != res.Header["Location"][0] {
 				t.Errorf("[%d][%s] redirect url is not correct. \n url is %s / expected %s", i+1, tt.url, res.Header["Location"][0], tt.nextPage)
 			}
 		}
 
-		//get token for next request
+		// get token for next request
 		ginToken = getToken(res)
 
-		//cookie
-		//val := getCookies(res.Header["Set-Cookie"], "go-web-ginserver")
-		//fmt.Printf("go-web-ginserver: \n%s\n", val)
+		// cookie
+		// val := getCookies(res.Header["Set-Cookie"], "go-web-ginserver")
+		// fmt.Printf("go-web-ginserver: \n%s\n", val)
 
-		//check requested http header
+		// check requested http header
 		// As you know, cookie is sent without intentional addition
-		//checkHTTPHeader(req)
+		// checkHTTPHeader(req)
 
 		// Close body
 		res.Body.Close()
@@ -559,7 +560,7 @@ func TestGetJwtAPIRequestOnTable(t *testing.T) {
 		t.SkipNow()
 	}
 
-	//request
+	// request
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
@@ -570,17 +571,17 @@ func TestGetJwtAPIRequestOnTable(t *testing.T) {
 		},
 	}
 
-	//for i, tt := range getApiTests {
+	// for i, tt := range getApiTests {
 	for i, tt := range getJWTApiTests {
 		fmt.Printf("%d [%s] %s\n", i+1, tt.method, ts.URL+tt.url)
 
-		//data
+		// data
 		sendData := createSendData(tt.email, tt.pass, "")
 
 		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, bytes.NewBuffer([]byte(sendData.Encode())))
-		//req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
+		// req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
 
-		//Set Http Headers
+		// Set Http Headers
 		if tt.headers != nil {
 			setHTTPHeaders(req, tt.headers)
 		}
@@ -590,14 +591,14 @@ func TestGetJwtAPIRequestOnTable(t *testing.T) {
 		if isURLErr && urlError.Err.Error() != tt.err.Error() {
 			t.Errorf("[%s] this page can't be access. \n error is %s", tt.url, urlError.Err)
 		} else {
-			//check expected status code
+			// check expected status code
 			if res.StatusCode != tt.code {
 				t.Logf("%#v", tt)
 				t.Errorf("[%d][%s] status code is not correct. \n return code is %d / expected %d", i+1, tt.url, res.StatusCode, tt.code)
 			}
 		}
 
-		//get jwt for next request
+		// get jwt for next request
 		if res.StatusCode == 200 {
 			jwtCode, err = getJWT(res)
 			if err != nil {
@@ -613,8 +614,7 @@ func TestGetJwtAPIRequestOnTable(t *testing.T) {
 // Get Request for User API (Ajax)
 //-----------------------------------------------------------------------------
 func TestGetUserAPIRequestOnTable(t *testing.T) {
-
-	//request
+	// request
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
@@ -627,22 +627,22 @@ func TestGetUserAPIRequestOnTable(t *testing.T) {
 
 	getAPITestsData := getUserAPITests
 	if *authMode != 0 {
-		//Auth is on
+		// Auth is on
 		if jwtCode == "" {
 			getAPITestsData = getUserAPITests2
 		} else {
 			getAPITestsData = getUserAPITests3
-			//TODO:set JWT to header
+			// TODO:set JWT to header
 			jwtAuth["Authorization"] = fmt.Sprintf(jwtAuth["Authorization"], jwtCode)
 		}
 	}
 
-	//for i, tt := range getApiTests {
+	// for i, tt := range getApiTests {
 	for i, tt := range getAPITestsData {
 		fmt.Printf("%d [%s] %s\n", i+1, tt.method, ts.URL+tt.url)
 
 		req, _ := http.NewRequest(tt.method, ts.URL+tt.url, nil)
-		//Set Http Headers
+		// Set Http Headers
 		if tt.headers != nil {
 			if jwtCode != "" {
 				tt.headers = append(tt.headers, jwtAuth)
@@ -655,7 +655,7 @@ func TestGetUserAPIRequestOnTable(t *testing.T) {
 		if isURLErr && urlError.Err.Error() != tt.err.Error() {
 			t.Errorf("[%s] this page can't be access. \n error is %s", tt.url, urlError.Err)
 		} else {
-			//check expected status code
+			// check expected status code
 			if res.StatusCode != tt.code {
 				t.Logf("%#v", tt)
 				t.Errorf("[%d][%s] status code is not correct. \n return code is %d / expected %d", i+1, tt.url, res.StatusCode, tt.code)

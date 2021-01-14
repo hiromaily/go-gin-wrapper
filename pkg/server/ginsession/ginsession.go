@@ -11,30 +11,29 @@ import (
 
 // SetSession is for session
 func SetSession(r *gin.Engine, host, pass string, ses configs.SessionConfig) {
-
 	var store sessions.RedisStore
 	var err error
 
 	if host != "" {
-		//session on Redis
+		// session on Redis
 		store, err = sessions.NewRedisStore(80, "tcp", host, pass, []byte(ses.Key))
 		if err != nil {
 			lg.Errorf("failed to create RedisStore. ", err)
-			//on memory
+			// on memory
 			store = sessions.NewCookieStore([]byte(ses.Key))
 		}
 	} else {
-		//on memory
+		// on memory
 		store = sessions.NewCookieStore([]byte(ses.Key))
 	}
 
 	strOptions := &sessions.Options{
-		//Path: "/",
-		//Domain: "/",   //It's better not to use.
-		//MaxAge: 86400, //1day
-		//MaxAge: 3600,  //1hour
-		MaxAge:   ses.MaxAge, //5minutes
-		Secure:   ses.Secure, //TODO: Set false in development environment, production environment requires true
+		// Path: "/",
+		// Domain: "/",   //It's better not to use.
+		// MaxAge: 86400, //1day
+		// MaxAge: 3600,  //1hour
+		MaxAge:   ses.MaxAge, // 5minutes
+		Secure:   ses.Secure, // TODO: Set false in development environment, production environment requires true
 		HttpOnly: ses.HTTPOnly,
 	}
 	store.Options(*strOptions)
@@ -62,7 +61,7 @@ func IsLogin(c *gin.Context) (bRet bool, uid int) {
 		bRet = true
 		uid = v.(int)
 	}
-	//lg.Debugf("IsLogin: %v", bRet)
+	// lg.Debugf("IsLogin: %v", bRet)
 	return
 }
 
@@ -73,7 +72,7 @@ func Logout(c *gin.Context) {
 	session.Save()
 }
 
-//SetTokenSession is to set token
+// SetTokenSession is to set token
 func SetTokenSession(c *gin.Context, token string) {
 	session := sessions.Default(c)
 	session.Set("token", token)
@@ -115,7 +114,7 @@ func IsTokenSessionValid(c *gin.Context, token string) bool {
 		return true
 	}
 
-	//token delete
+	// token delete
 	DelTokenSession(c)
 
 	lg.Error(strErr)

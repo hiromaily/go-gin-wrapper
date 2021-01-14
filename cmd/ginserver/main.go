@@ -22,7 +22,7 @@ func init() {}
 func main() {
 	flag.Parse()
 
-	//cipher
+	// encryption
 	if *isEncryptedConf {
 		_, err := encryption.NewCryptWithEnv()
 		if err != nil {
@@ -30,25 +30,25 @@ func main() {
 		}
 	}
 
-	//config
+	// config
 	conf, err := configs.NewInstance(*tomlPath, *isEncryptedConf)
 	if err != nil {
 		panic(err)
 	}
-	//FIXME: there are a lot of places singleton is used
-	//configs.New(*tomlPath, true)
+	// FIXME: there are a lot of places singleton is used
+	// configs.New(*tomlPath, true)
 
-	//log
+	// log
 	lg.InitializeLog(lg.LogStatus(conf.Server.Log.Level), lg.TimeShortFile,
 		"[GOWEB]", conf.Server.Log.Path, "hiromaily")
 
 	// debug mode
 	if conf.Environment == "local" {
-		//signal
+		// signal
 		go signal.StartSignal()
 	}
 
-	var isTestMode = false
+	isTestMode := false
 	regi := NewRegistry(conf, isTestMode)
 	server := regi.NewServerer(*portNum)
 	if _, err := server.Start(); err != nil {

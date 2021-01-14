@@ -19,7 +19,7 @@ func NewRedis(conf *configs.Config) (*redis.Conn, error) {
 		conn, err = redis.DialURL(os.Getenv("REDIS_URL"))
 	} else {
 		if red.Pass != "" {
-			//plus password
+			// plus password
 			conn, err = redis.Dial("tcp", fmt.Sprintf("%s:%d", red.Host, red.Port), redis.DialPassword(red.Pass))
 		} else {
 			conn, err = redis.Dial("tcp", fmt.Sprintf("%s:%d", red.Host, red.Port))

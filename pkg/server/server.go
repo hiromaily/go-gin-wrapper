@@ -38,7 +38,6 @@ func NewServerer(
 	port int,
 	dbModeler dbmodel.DBModeler,
 	mongoModeler mongomodel.MongoModeler) Serverer {
-
 	return NewServer(isTestMode, conf, port, dbModeler, mongoModeler)
 }
 
@@ -63,7 +62,6 @@ func NewServer(
 	port int,
 	dbModeler dbmodel.DBModeler,
 	mongoModeler mongomodel.MongoModeler) *Server {
-
 	if port == 0 {
 		port = conf.Server.Port
 	}
@@ -82,7 +80,7 @@ func NewServer(
 // Start is to start server execution
 func (s *Server) Start() (*gin.Engine, error) {
 	if s.conf.Environment == "production" {
-		//For release
+		// For release
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -115,30 +113,30 @@ func (s *Server) Start() (*gin.Engine, error) {
 // Close is to clean up middleware object
 // TODO: not implemented yet
 func (s *Server) Close() {
-	//s.storager.Close()
+	// s.storager.Close()
 }
 
-//Global middleware
+// Global middleware
 func (s *Server) setMiddleWare() {
-	//TODO:skip static files like (jpg, gif, png, js, css, woff)
+	// TODO:skip static files like (jpg, gif, png, js, css, woff)
 
 	s.gin.Use(gin.Logger())
 
-	//r.Use(gin.Recovery())           //After GlobalRecover()
-	s.gin.Use(middlewares.GlobalRecover(s.conf.Develop)) //It's called faster than [gin.Recovery()]
+	// r.Use(gin.Recovery())           //After GlobalRecover()
+	s.gin.Use(middlewares.GlobalRecover(s.conf.Develop)) // It's called faster than [gin.Recovery()]
 
-	//session
+	// session
 	s.initSession()
 
-	//TODO:set ip to toml or redis server
-	//check ip address to refuse specific IP Address
-	//when using load balancer or reverse proxy, set specific IP
+	// TODO:set ip to toml or redis server
+	// check ip address to refuse specific IP Address
+	// when using load balancer or reverse proxy, set specific IP
 	s.gin.Use(middlewares.RejectSpecificIP(s.conf.Proxy))
 
-	//meta data for each rogic
+	// meta data for each rogic
 	s.gin.Use(middlewares.SetMetaData())
 
-	//auto session(expire) update
+	// auto session(expire) update
 	s.gin.Use(middlewares.UpdateUserSession())
 }
 
@@ -163,14 +161,14 @@ func (s *Server) initSession() {
 }
 
 func (s *Server) loadTemplates() {
-	//http://stackoverflow.com/questions/25745701/parseglob-what-is-the-pattern-to-parse-all-templates-recursively-within-a-direc
+	// http://stackoverflow.com/questions/25745701/parseglob-what-is-the-pattern-to-parse-all-templates-recursively-within-a-direc
 
-	//r.LoadHTMLGlob("templates/*")
-	//r.LoadHTMLGlob("templates/**/*")
+	// r.LoadHTMLGlob("templates/*")
+	// r.LoadHTMLGlob("templates/**/*")
 
-	//It's impossible to call more than one. it was overwritten by final call.
-	//r.LoadHTMLGlob(path + "templates/pages/**/*")
-	//r.LoadHTMLGlob(path + "templates/components/*")
+	// It's impossible to call more than one. it was overwritten by final call.
+	// r.LoadHTMLGlob(path + "templates/pages/**/*")
+	// r.LoadHTMLGlob(path + "templates/components/*")
 
 	rootPath := s.conf.Server.Docs.Path
 
@@ -191,7 +189,7 @@ func (s *Server) loadTemplates() {
 
 // template FuncMap
 func getTempFunc() template.FuncMap {
-	//type FuncMap map[string]interface{}
+	// type FuncMap map[string]interface{}
 
 	funcMap := template.FuncMap{
 		"add": func(a, b int) int { return a + b },
@@ -213,9 +211,9 @@ func getTempFunc() template.FuncMap {
 			return ary[i]
 		},
 		"dateFmt": func(t time.Time) string {
-			//fmt := "August 17, 2016 9:51 pm"
-			//fmt := "2006-01-02 15:04:05"
-			//fmt := "Mon Jan _2 15:04:05 2006"
+			// fmt := "August 17, 2016 9:51 pm"
+			// fmt := "2006-01-02 15:04:05"
+			// fmt := "Mon Jan _2 15:04:05 2006"
 			fmt := "Mon Jan _2 15:04:05"
 			return t.Format(fmt)
 		},
@@ -226,7 +224,7 @@ func getTempFunc() template.FuncMap {
 func (s *Server) loadStaticFiles() {
 	rootPath := s.conf.Server.Docs.Path
 
-	//r.Static("/static", "/var/www")
+	// r.Static("/static", "/var/www")
 	s.gin.Static("/statics", rootPath+"/web/statics")
 	s.gin.Static("/assets", rootPath+"/web/statics/assets")
 	s.gin.Static("/favicon.ico", rootPath+"/web/statics/favicon.ico")
@@ -235,7 +233,7 @@ func (s *Server) loadStaticFiles() {
 
 func (s *Server) run() error {
 	if s.conf.Proxy.Mode == 2 {
-		//Proxy(Nginx) settings
+		// Proxy(Nginx) settings
 		color.Red("[WARNING] running on fcgi mode.")
 		lg.Info("running on fcgi mode.")
 		return fcgi.Run(s.gin, fmt.Sprintf(":%d", s.port))

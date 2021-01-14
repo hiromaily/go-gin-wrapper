@@ -17,17 +17,17 @@ type ParamNews struct {
 
 // NewsIndexAction is for top page of news [GET]
 func (ctl *Controller) NewsIndexAction(c *gin.Context) {
-	//Get news
+	// Get news
 	articles, err := ctl.mongo.GetArticlesData(0)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	}
 
-	//Param
+	// Param
 	className := []string{"alert-success", "alert-info", "alert-warning", "alert-danger"}
 
-	//View
+	// View
 	res := gin.H{
 		"title":    "News Page",
 		"navi_key": "/news/",
@@ -39,14 +39,14 @@ func (ctl *Controller) NewsIndexAction(c *gin.Context) {
 
 // NewsIndex2Action is still working in progress.
 func (ctl *Controller) NewsIndex2Action(c *gin.Context) {
-	//Get news
+	// Get news
 	items, err := ctl.mongo.GetArticlesData2(0)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	}
 
-	//View
+	// View
 	c.HTML(http.StatusOK, "pages/news/news.tmpl", gin.H{
 		"title":    "News Page",
 		"navi_key": "/news",
