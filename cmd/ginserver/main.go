@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
-	"github.com/hiromaily/golibs/cipher/encryption"
+	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 	lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/golibs/signal"
 )

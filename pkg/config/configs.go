@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 
-	enc "github.com/hiromaily/golibs/cipher/encryption"
+	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 )
 
 /* singleton */
@@ -254,7 +254,7 @@ func (c *Config) validate() error {
 
 // Cipher is to decrypt crypted string on config
 func (c *Config) Cipher() {
-	crypt := enc.GetCrypt()
+	crypt := encryption.GetCrypt()
 
 	if c.Auth.Google.Encrypted {
 		ag := c.Auth.Google

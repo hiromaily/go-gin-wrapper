@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	enc "github.com/hiromaily/golibs/cipher/encryption"
+	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 	lg "github.com/hiromaily/golibs/log"
 )
 
@@ -44,13 +44,13 @@ func setup() {
 		os.Exit(1)
 	}
 
-	enc.NewCrypt(key, iv)
+	encryption.NewCrypt(key, iv)
 }
 
 func main() {
 	setup()
 
-	crypt := enc.GetCrypt()
+	crypt := encryption.GetCrypt()
 	targetStr := os.Args[3]
 	fmt.Printf("target string is %s\n", targetStr)
 
