@@ -15,12 +15,14 @@ This project has started since 2016 to study Golang and code is quite messy.
 Now it's under `refactoring`.
 
 ## Refactoring
-- [ ] change directory structure like [golang-standards/project-layout](https://github.com/golang-standards/project-layout)
 - [ ] change architecture like Clean Architecture
 - [ ] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
 - [ ] catch up with latest [gin](https://github.com/gin-gonic/gin)
 - [ ] remove mongo-db and use different key-value store
 - [ ] update front-end
+- [ ] unittest by table driven test
+- [ ] refactoring code by [The Second Edition of "Refactoring"](https://martinfowler.com/articles/refactoring-2nd-ed.html)
+- [ ] switch any Japanese to English
 
 ## Example
 This is built on Heroku. You can see [here](https://ginserver.herokuapp.com/).

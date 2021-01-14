@@ -3,8 +3,8 @@ package mysql
 import (
 	"fmt"
 
+	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
-	hs "github.com/hiromaily/golibs/cipher/hash"
 	"github.com/hiromaily/golibs/db/mysql"
 	lg "github.com/hiromaily/golibs/log"
 )
@@ -37,7 +37,7 @@ func (us *DBModel) IsUserEmail(email string, password string) (int, error) {
 		return 0, fmt.Errorf("email may be wrong")
 	}
 
-	if user.Password != hs.GetMD5Plus(password, "") {
+	if user.Password != encryption.GetMD5Plus(password, "") {
 		return 0, fmt.Errorf("password is invalid")
 	}
 	return user.ID, nil
@@ -117,11 +117,11 @@ func (us *DBModel) InsertUser(users *Users) (int64, error) {
 	if users.OAuth2Flg != "" {
 		sql := "INSERT INTO t_users (first_name, last_name, email, password, oauth2_flg) VALUES (?,?,?,?,?)"
 		// hash password
-		return us.DB.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""), users.OAuth2Flg)
+		return us.DB.Insert(sql, users.FirstName, users.LastName, users.Email, encryption.GetMD5Plus(users.Password, ""), users.OAuth2Flg)
 	}
 
 	// hash password
-	return us.DB.Insert(sql, users.FirstName, users.LastName, users.Email, hs.GetMD5Plus(users.Password, ""))
+	return us.DB.Insert(sql, users.FirstName, users.LastName, users.Email, encryption.GetMD5Plus(users.Password, ""))
 }
 
 // UpdateUser is to update user
@@ -144,7 +144,7 @@ func (us *DBModel) UpdateUser(users *Users, id string) (int64, error) {
 	}
 	if users.Password != "" {
 		sql += " password=?,"
-		vals = append(vals, hs.GetMD5Plus(users.Password, ""))
+		vals = append(vals, encryption.GetMD5Plus(users.Password, ""))
 	}
 	if users.Updated != "" {
 		sql += " update_datetime=?,"
