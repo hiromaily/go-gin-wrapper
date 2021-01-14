@@ -8,8 +8,19 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/LICENSE)
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hiromaily/go-gin-wrapper)
 
-Go-gin-wrapper is wrapper of go gin web framework plus reverseproxy. React by ES6 is used on part of front-end.  
-[gin-gonic/gin](https://github.com/gin-gonic/gin)
+Go-gin-wrapper is wrapper of go gin web framework plus reverseproxy. React by ES6 is used on part of front-end. 
+[gin-gonic/gin](https://github.com/gin-gonic/gin)  
+
+This project has started since 2016 to study Golang and code is quite messy.
+Now it's under `refactoring`.
+
+## Refactoring
+- [ ] change directory structure like [golang-standards/project-layout](https://github.com/golang-standards/project-layout)
+- [ ] change architecture like Clean Architecture
+- [ ] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
+- [ ] catch up with latest [gin](https://github.com/gin-gonic/gin)
+- [ ] remove mongo-db and use different key-value store
+- [ ] update front-end
 
 ## Example
 This is built on Heroku. You can see [here](https://ginserver.herokuapp.com/).
