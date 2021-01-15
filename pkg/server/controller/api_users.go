@@ -1,14 +1,14 @@
-package controllers
+package controller
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
 	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
-	lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/golibs/validator"
 )
 
@@ -25,7 +25,7 @@ func (ctl *Controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (
 	// Check token(before send message, pass token)
 
 	contentType := c.Request.Header.Get("Content-Type")
-	lg.Debug("Content-Type is ", contentType)
+	ctl.logger.Debug("getUserParamAndValid", zap.String("Content-Type", contentType))
 
 	if contentType == "application/json" {
 		err = c.BindJSON(data)
@@ -37,11 +37,8 @@ func (ctl *Controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (
 		return err
 	}
 
-	lg.Debug("Request Body: %#v", data)
-
 	// Validation
 	mRet := validator.CheckValidation(data, false)
-	lg.Debug(mRet)
 	if len(mRet) != 0 {
 		return errors.New("validation error")
 	}
@@ -49,21 +46,20 @@ func (ctl *Controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (
 	return nil
 }
 
-func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequest) (err error) {
+func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequest) error {
+	//[POST x application/x-www-form-urlencoded] OK
+	//[PUT x application/x-www-form-urlencoded] OK
+	//[PUT x application/json] NG
+
 	// Param id
 	if c.Param("id") == "" {
 		return errors.New("missing id on request parameter")
 	}
 
-	//[POST x application/x-www-form-urlencoded] OK
-	//[PUT x application/x-www-form-urlencoded] OK
-	//[PUT x application/json] NG
-	//lg.Debug("firstName:", c.PostForm("firstName"))
-	//lg.Debug("email:", c.PostForm("email"))
-
 	contentType := c.Request.Header.Get("Content-Type")
-	lg.Debug("Content-Type is ", contentType)
+	ctl.logger.Debug("getUserParamAndValidForPut", zap.String("Content-Type", contentType))
 
+	var err error
 	if contentType == "application/json" {
 		err = c.BindJSON(data)
 	} else {
@@ -73,8 +69,7 @@ func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequ
 	if err != nil {
 		return err
 	}
-
-	lg.Debug("Request Body: %#v", data)
+	ctl.logger.Debug("getUserParamAndValidForPut", zap.Any("response body", data))
 
 	// Validation
 	if data.FirstName == "" && data.LastName == "" && data.Email == "" && data.Password == "" {
@@ -82,7 +77,6 @@ func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequ
 	}
 
 	mRet := validator.CheckValidation(data, true)
-	lg.Debug(mRet)
 	if len(mRet) != 0 {
 		return errors.New("validation error")
 	}
@@ -125,7 +119,7 @@ func (ctl *Controller) updateUser(data *UserRequest, id string) (int64, error) {
 
 // APIUserListGetAction is get user list [GET]
 func (ctl *Controller) APIUserListGetAction(c *gin.Context) {
-	lg.Info("[GET] UsersListGetAction")
+	ctl.logger.Info("[GET] UsersListGetAction")
 
 	users, err := ctl.userRepo.GetUsers("")
 	if err != nil {
@@ -134,19 +128,19 @@ func (ctl *Controller) APIUserListGetAction(c *gin.Context) {
 	}
 
 	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(users))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserListJSON(users))
 }
 
 // ListOptionsAction is preflight request of CORS before get request
 //func ListOptionsAction(c *gin.Context) {
-//	lg.Info("[OPTIONS] ListOptionsAction")
+//	ctl.logger.Info("[OPTIONS] ListOptionsAction")
 //	//TODO: return void??
 //	cors.SetHeader(c)
 //}
 
 // APIUserInsertPostAction is register for new user [POST]
 func (ctl *Controller) APIUserInsertPostAction(c *gin.Context) {
-	lg.Debug("[POST] UserPostAction")
+	ctl.logger.Debug("[POST] UserPostAction")
 
 	// Param & Check valid
 	var uData UserRequest
@@ -163,16 +157,16 @@ func (ctl *Controller) APIUserInsertPostAction(c *gin.Context) {
 		return
 	}
 
-	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(int(id)))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserJSON(int(id)))
 }
 
 // APIUserGetAction is get specific user [GET]
 func (ctl *Controller) APIUserGetAction(c *gin.Context) {
-	lg.Info("[GET] UserGetAction")
+	ctl.logger.Info("[GET] UserGetAction")
 
 	// Param
 	// FirstName := c.Query("firstName")
-	// lg.Debug("firstName:", FirstName)
+	// ctl.logger.Debug("firstName:", FirstName)
 	userID := c.Param("id")
 	if userID == "" {
 		c.AbortWithError(400, errors.New("missing id on request parameter"))
@@ -186,12 +180,12 @@ func (ctl *Controller) APIUserGetAction(c *gin.Context) {
 	}
 
 	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(users))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserListJSON(users))
 }
 
 // APIUserPutAction is update specific user [PUT]
 func (ctl *Controller) APIUserPutAction(c *gin.Context) {
-	lg.Info("[PUT] UserPutAction")
+	ctl.logger.Info("[PUT] UserPutAction")
 
 	// Param & Check valid
 	var uData UserRequest
@@ -208,15 +202,15 @@ func (ctl *Controller) APIUserPutAction(c *gin.Context) {
 		return
 	}
 	if affected == 0 {
-		lg.Debug("there was no updated data.")
+		ctl.logger.Debug("there was no updated data.")
 	}
 
-	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(str.Atoi(c.Param("id"))))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserJSON(str.Atoi(c.Param("id"))))
 }
 
 // APIUserDeleteAction is delete specific user [DELETE] (work in progress)
 func (ctl *Controller) APIUserDeleteAction(c *gin.Context) {
-	lg.Info("[DELETE] UserDeleteAction")
+	ctl.logger.Info("[DELETE] UserDeleteAction")
 	// check token
 
 	// Param
@@ -232,15 +226,15 @@ func (ctl *Controller) APIUserDeleteAction(c *gin.Context) {
 		return
 	}
 	if affected == 0 {
-		lg.Debug("there was no updated data.")
+		ctl.logger.Debug("there was no updated data.")
 	}
 
-	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserJSON(str.Atoi(c.Param("id"))))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserJSON(str.Atoi(c.Param("id"))))
 }
 
 // APIUserIDsGetAction is get user ids [GET]
 func (ctl *Controller) APIUserIDsGetAction(c *gin.Context) {
-	lg.Info("[GET] IdsGetAction")
+	ctl.logger.Info("[GET] IdsGetAction")
 
 	ids, err := ctl.userRepo.GetUserIDs()
 	if err != nil {
@@ -249,5 +243,5 @@ func (ctl *Controller) APIUserIDsGetAction(c *gin.Context) {
 	}
 
 	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserIDsJSON(ids))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserIDsJSON(ids))
 }

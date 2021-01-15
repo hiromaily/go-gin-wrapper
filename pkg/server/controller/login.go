@@ -1,10 +1,9 @@
-package controllers
+package controller
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	lg "github.com/hiromaily/golibs/log"
 	valid "github.com/hiromaily/golibs/validator"
 )
 
@@ -36,10 +35,6 @@ func (ctl *Controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []s
 	mRet := valid.CheckValidation(posted, false)
 	if len(mRet) != 0 {
 		errs := valid.ConvertErrorMsgs(mRet, ErrFmt)
-		lg.Debugf("validation error: %#v", errs)
-
-		// return
-		// resLogin(c, posted, "", errs)
 		return 0, posted, errs
 	}
 
@@ -47,10 +42,6 @@ func (ctl *Controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []s
 	userID, err := ctl.userRepo.IsUserEmail(posted.Email, posted.Pass)
 	if err != nil {
 		errs := []string{"E-mail or Password is made a mistake."}
-		lg.Debugf("login error: %#v", errs)
-
-		// return
-		// resLogin(c, posted, "", errs)
 		return 0, posted, errs
 	}
 	return userID, nil, nil

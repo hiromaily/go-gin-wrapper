@@ -5,18 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	ctls "github.com/hiromaily/go-gin-wrapper/pkg/server/controllers"
+	ctls "github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
-	"github.com/hiromaily/go-gin-wrapper/pkg/server/middlewares"
-	//"github.com/hiromaily/go-gin-wrapper/controllers/chat"
+	//"github.com/hiromaily/go-gin-wrapper/controller/chat"
 )
 
 // SetURLOnHTTP is for HTTP
-func (s *Server) SetURLOnHTTP(r *gin.Engine) {
+func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	// m := melody.New()
 
 	ctl := ctls.NewController(
 		s.userRepo,
+		s.logger,
 		// s.kvsStorager.CreateDBModel(),
 		s.mongoModeler,
 		s.conf.API.Header,
@@ -41,7 +41,7 @@ func (s *Server) SetURLOnHTTP(r *gin.Engine) {
 
 	// Login
 	r.GET("/login", ctl.BaseLoginGetAction)
-	r.POST("/login", middlewares.CheckHTTPRefererAndCSRF(s.conf.Server), ctl.BaseLoginPostAction)
+	r.POST("/login", s.middleware.CheckHTTPRefererAndCSRF(), ctl.BaseLoginPostAction)
 
 	// Loout
 	r.PUT("/logout", ctl.BaseLogoutPutAction)   // For Ajax
@@ -135,7 +135,7 @@ func (s *Server) SetURLOnHTTP(r *gin.Engine) {
 	//-----------------------
 	// JWT
 	//-----------------------
-	jwt := r.Group("/api/jwt", middlewares.CheckHTTPHeader(s.conf.API))
+	jwt := r.Group("/api/jwt", s.middleware.CheckHTTPHeader())
 	{
 		jwt.POST("", ctl.APIJWTIndexPostAction) // jwt end point
 	}
@@ -147,14 +147,14 @@ func (s *Server) SetURLOnHTTP(r *gin.Engine) {
 	// if it's used as middle ware like as below.
 	//  r.Use(routes.CheckHttpHeader())
 	//  it let us faster to develop instead of a bit less performance.
-	handlers := []gin.HandlerFunc{middlewares.CheckHTTPHeader(s.conf.API)}
+	handlers := []gin.HandlerFunc{s.middleware.CheckHTTPHeader()}
 	// JWT
 	if s.conf.API.JWT.Mode != 0 {
-		handlers = append(handlers, middlewares.CheckJWT())
+		handlers = append(handlers, s.middleware.CheckJWT())
 	}
 	// CORS
 	if s.conf.API.CORS.Enabled {
-		handlers = append(handlers, middlewares.CheckCORS(s.conf.API.CORS))
+		handlers = append(handlers, s.middleware.CheckCORS())
 	}
 
 	// users := r.Group("/api/users", CheckHttpHeader(), CheckJWT())
@@ -171,7 +171,7 @@ func (s *Server) SetURLOnHTTP(r *gin.Engine) {
 		users.GET("/ids", ctl.APIUserIDsGetAction) // Get user list
 
 		// Accept CORS
-		users.OPTIONS("", cors.SetHeader(s.conf.API.CORS))
+		users.OPTIONS("", cors.SetHeader(s.logger, s.conf.API.CORS))
 	}
 
 	// TODO:When user can use only method of GET and POST, X-HTTP-Method-Override header may be helpful.

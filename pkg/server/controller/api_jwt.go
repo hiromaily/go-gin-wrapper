@@ -1,20 +1,20 @@
-package controllers
+package controller
 
 import (
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwt"
 	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
-	jslib "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
-	lg "github.com/hiromaily/golibs/log"
+	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 )
 
 // APIJWTIndexPostAction is JWT End Point [POST]
 func (ctl *Controller) APIJWTIndexPostAction(c *gin.Context) {
-	lg.Debug("[POST] IndexAction")
+	ctl.logger.Debug("APIJWTIndexPostAction")
 
 	// login
 	// check login
@@ -30,8 +30,8 @@ func (ctl *Controller) APIJWTIndexPostAction(c *gin.Context) {
 		c.AbortWithError(500, err)
 		return
 	}
-	lg.Debugf("token: %s", token)
+	ctl.logger.Debug("", zap.String("token: %s", token))
 
 	// Make json for response and return
-	jslib.ResponseUserJSON(c, ctl.cors, 0, js.CreateJWTJson(token))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateJWTJson(token))
 }

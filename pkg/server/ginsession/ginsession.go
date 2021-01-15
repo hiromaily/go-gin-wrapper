@@ -4,13 +4,13 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
-	lg "github.com/hiromaily/golibs/log"
 )
 
 // SetSession is for session
-func SetSession(r *gin.Engine, host, pass string, ses config.SessionConfig) {
+func SetSession(r *gin.Engine, logger *zap.Logger, host, pass string, ses config.SessionConfig) {
 	var store sessions.RedisStore
 	var err error
 
@@ -18,7 +18,7 @@ func SetSession(r *gin.Engine, host, pass string, ses config.SessionConfig) {
 		// session on Redis
 		store, err = sessions.NewRedisStore(80, "tcp", host, pass, []byte(ses.Key))
 		if err != nil {
-			lg.Errorf("failed to create RedisStore. ", err)
+			logger.Error("fail to call sessions.NewRedisStore()", zap.Error(err))
 			// on memory
 			store = sessions.NewCookieStore([]byte(ses.Key))
 		}
@@ -61,7 +61,7 @@ func IsLogin(c *gin.Context) (bRet bool, uid int) {
 		bRet = true
 		uid = v.(int)
 	}
-	// lg.Debugf("IsLogin: %v", bRet)
+	// logger.Debugf("IsLogin: %v", bRet)
 	return
 }
 
@@ -97,33 +97,34 @@ func GetTokenSession(c *gin.Context) string {
 }
 
 // IsTokenSessionValid is whether check token is valid or not
-func IsTokenSessionValid(c *gin.Context, token string) bool {
-	strErr := ""
+func IsTokenSessionValid(c *gin.Context, logger *zap.Logger, token string) bool {
 
-	lg.Info("[IsTokenSessionValid]")
-	lg.Debugf("GetTokenSession(c): %v", GetTokenSession(c))
-	lg.Debugf("token: %v", token)
+	logger.Info("IsTokenSessionValid",
+		zap.String("GetTokenSession()", GetTokenSession(c)),
+		zap.String("token", token),
+	)
 
+	var err error
 	if GetTokenSession(c) == "" && token == "" {
-		strErr = "Token is not allowed as blank."
+		err = errors.New("Token is not allowed as blank.")
 	} else if GetTokenSession(c) == "" {
-		strErr = "Token is missing. Session might have expired."
+		err = errors.New("Token is missing. Session might have expired.")
 	} else if GetTokenSession(c) != token {
-		strErr = "Token is invalid."
+		err = errors.New("Token is invalid.")
 	} else {
 		return true
 	}
 
 	// token delete
 	DelTokenSession(c)
-
-	lg.Error(strErr)
-	c.AbortWithError(400, errors.New((strErr)))
+	logger.Error("session error", zap.Error(err))
+	c.AbortWithError(400, err)
 	return false
 }
 
-// SetCountSession is for test (TODO:delete this func)
-func SetCountSession(c *gin.Context) {
+// SetCountSession is for test
+// TODO:delete this func
+func SetCountSession(c *gin.Context, logger *zap.Logger) {
 	session := sessions.Default(c)
 	var count int
 	v := session.Get("count")
@@ -132,5 +133,5 @@ func SetCountSession(c *gin.Context) {
 	}
 	session.Set("count", count)
 	session.Save()
-	lg.Debugf("session count:%d", count)
+	logger.Debug("SetCountSession", zap.Int("session count", count))
 }

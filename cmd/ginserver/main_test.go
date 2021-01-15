@@ -23,7 +23,6 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	conf "github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
-	lg "github.com/hiromaily/golibs/log"
 )
 
 // TODO:change toml settings automatically as program code.
@@ -239,12 +238,9 @@ func setup() {
 		conf.Server.Host,
 		conf.Server.Port)
 
-	// when changing loglevel
-	lg.InitializeLog(lg.DebugStatus, lg.TimeShortFile, "[GOWEB]", "", "hiromaily")
-
 	isTestMode := true
 	regi := NewRegistry(conf, isTestMode)
-	server := regi.NewServerer(*portNum)
+	server := regi.NewServer(*portNum)
 	if r, err = server.Start(); err != nil {
 		panic(err)
 	}

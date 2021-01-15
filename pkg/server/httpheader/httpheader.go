@@ -5,11 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
-	lg "github.com/hiromaily/golibs/log"
 	reg "github.com/hiromaily/golibs/regexp"
 )
 
@@ -18,21 +18,21 @@ func getURL(scheme, host string, port int) string {
 }
 
 // IsRefererHostValid is check referer for posted page
-func IsRefererHostValid(c *gin.Context, srvConf *config.ServerConfig, pageFrom string) bool {
+func IsRefererHostValid(c *gin.Context, logger *zap.Logger, srvConf *config.ServerConfig, pageFrom string) bool {
 	webserverURL := getURL(srvConf.Scheme, srvConf.Host, srvConf.Port)
 
 	// TODO:Add feature that switch https to http easily.
 	url := fmt.Sprintf("%s/%s", webserverURL, pageFrom)
-	lg.Debugf("expected url: %s", url)
+	logger.Debug("IsRefererHostValid", zap.String("expected url", url))
 
 	// http://localhost:9999/login
-	lg.Debugf("Referer: %s", c.Request.Header.Get("Referer"))
+	logger.Debug("IsRefererHostValid", zap.String("Referer", c.Request.Header.Get("Referer")))
 	// lg.Debugf("Referer: %s", c.Request.Referer())
 
 	// default action
 	if url != c.Request.Referer() {
 		// Invalid access
-		lg.Error("Referer is invalid.")
+		logger.Error("IsRefererHostValid", zap.Error(errors.New("Referer is invalid")))
 
 		// token delete
 		sess.DelTokenSession(c)
@@ -70,8 +70,8 @@ func GetProto(c *gin.Context) string {
 
 // SetResponseHeaderForSecurity is to set HTTP response header
 // TODO:it may be better to set config
-func SetResponseHeaderForSecurity(c *gin.Context, co *config.CORSConfig) {
-	lg.Info("SetResponseHeaderForSecurity")
+func SetResponseHeaderForSecurity(c *gin.Context, logger *zap.Logger, co *config.CORSConfig) {
+	logger.Info("SetResponseHeaderForSecurity")
 	// http://qiita.com/roothybrid7/items/34578037d883c9a99ca8
 
 	c.Writer.Header().Set("X-Content-Type-Options", "nosniff")
@@ -82,7 +82,7 @@ func SetResponseHeaderForSecurity(c *gin.Context, co *config.CORSConfig) {
 
 	// CORS
 	if co.Enabled && c.Request.Method == "GET" {
-		cors.SetHeader(co)(c)
+		cors.SetHeader(logger, co)(c)
 	}
 	// c.Writer.WriteHeader()
 	// c.Writer.WriteString()

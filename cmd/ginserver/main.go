@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
+	"log"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 	"github.com/hiromaily/go-gin-wrapper/pkg/signal"
-	lg "github.com/hiromaily/golibs/log"
 )
 
 var (
@@ -38,10 +38,6 @@ func main() {
 	// FIXME: there are a lot of places singleton is used
 	// config.New(*tomlPath, true)
 
-	// log
-	lg.InitializeLog(lg.LogStatus(conf.Server.Log.Level), lg.TimeShortFile,
-		"[GOWEB]", conf.Server.Log.Path, "hiromaily")
-
 	// debug mode
 	if conf.Environment == "local" {
 		// signal
@@ -50,8 +46,8 @@ func main() {
 
 	isTestMode := false
 	regi := NewRegistry(conf, isTestMode)
-	server := regi.NewServerer(*portNum)
+	server := regi.NewServer(*portNum)
 	if _, err := server.Start(); err != nil {
-		lg.Error(err)
+		log.Fatal(err)
 	}
 }

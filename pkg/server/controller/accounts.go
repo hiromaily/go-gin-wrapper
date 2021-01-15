@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"net/http"
@@ -7,12 +7,11 @@ import (
 
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
-	lg "github.com/hiromaily/golibs/log"
 )
 
 // AccountIndexAction [GET]
 func (ctl *Controller) AccountIndexAction(c *gin.Context) {
-	lg.Info("AccountsGetAction()")
+	ctl.logger.Info("AccountIndexAction")
 
 	// judge login
 	if bRet, _ := sess.IsLogin(c); !bRet {

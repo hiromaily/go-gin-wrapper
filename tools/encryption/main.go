@@ -3,10 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
+	"github.com/pkg/errors"
+
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
-	lg "github.com/hiromaily/golibs/log"
 )
 
 var mode = flag.String("m", "e", "e:encode, d:decode")
@@ -34,13 +36,12 @@ func init() {
 }
 
 func setup() {
-	lg.InitializeLog(lg.DebugStatus, lg.TimeShortFile, "[GOTOOLS GoChipher]", "", "hiromaily")
 
 	key := os.Getenv("ENC_KEY")
 	iv := os.Getenv("ENC_IV")
 
 	if key == "" || iv == "" {
-		lg.Fatalf("%s", "set Environment Valuable: ENC_KEY, ENC_IV")
+		log.Fatal(errors.New("set Environment Valuable: ENC_KEY, ENC_IV"))
 		os.Exit(1)
 	}
 
@@ -57,15 +58,15 @@ func main() {
 	switch *mode {
 	case "e":
 		// encode
-		lg.Info(crypt.EncryptBase64(targetStr))
+		log.Print(crypt.EncryptBase64(targetStr))
 	case "d":
 		// decode
 		str, err := crypt.DecryptBase64(targetStr)
 		if err != nil {
-			lg.Fatal(err)
+			log.Fatal(err)
 		}
-		lg.Info(str)
+		log.Print(str)
 	default:
-		lg.Fatalf("%s", "arguments is wrong")
+		log.Fatal(errors.New("arguments is wrong"))
 	}
 }

@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"sync"
 
+	"go.uber.org/zap"
+
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	lg "github.com/hiromaily/golibs/log"
 )
@@ -18,8 +20,8 @@ type Serverer interface {
 }
 
 // NewServerer is to return Serverer interface
-func NewServerer(conf *config.Config) Serverer {
-	return NewServer(conf)
+func NewServerer(logger *zap.Logger, conf *config.Config) Serverer {
+	return NewServer(logger, conf)
 }
 
 // ----------------------------------------------------------------------------
@@ -28,14 +30,17 @@ func NewServerer(conf *config.Config) Serverer {
 
 // Server is Server object
 type Server struct {
-	conf *config.Config
+	logger *zap.Logger
+	conf   *config.Config
 }
 
 // NewServer is to return server object
 func NewServer(
+	logger *zap.Logger,
 	conf *config.Config) *Server {
 	srv := Server{
-		conf: conf,
+		logger: logger,
+		conf:   conf,
 	}
 	return &srv
 }
@@ -55,14 +60,14 @@ func (s *Server) Start() error {
 
 // Single Reverse Proxy
 func (s *Server) singleReverseProxy() {
-	lg.Info("singleReverseProxy()")
+	s.logger.Info("singleReverseProxy")
 	// Web Server
 	// webserverURL := "http://127.0.0.1:9990"
 	srv := s.conf.Server
 	tmp := getURL(srv.Scheme, srv.Host, srv.Port)
 	webserverURL, _ := url.Parse(tmp)
 
-	fmt.Printf("proxy is runnig ... using Port: %d\n", s.conf.Proxy.Server.Port)
+	s.logger.Info("proxy is runnig ...", zap.Int("port", s.conf.Proxy.Server.Port))
 
 	// Proxy Server
 	proxyAddress := fmt.Sprintf(":%d", s.conf.Proxy.Server.Port)

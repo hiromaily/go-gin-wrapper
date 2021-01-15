@@ -19,6 +19,7 @@ Now it's under `refactoring`.
 - [ ] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
   - [x] use [sqlboiler](https://github.com/volatiletech/sqlboiler) as ORM
   - [ ] delete MongoDB
+  - [ ] replace log to zap logger
 - [ ] add zap logger 
 - [ ] clean up variable name
 - [ ] clean up comments

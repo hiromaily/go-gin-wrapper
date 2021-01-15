@@ -1,6 +1,8 @@
-package controllers
+package controller
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
@@ -10,6 +12,7 @@ import (
 
 // Controller is controller object
 type Controller struct {
+	logger    *zap.Logger
 	userRepo  repository.UserRepositorier
 	mongo     mongomodel.MongoModeler
 	apiHeader *config.HeaderConfig
@@ -21,12 +24,14 @@ type Controller struct {
 // NewController is to return Controller
 func NewController(
 	userRepo repository.UserRepositorier,
+	logger *zap.Logger,
 	mongo mongomodel.MongoModeler,
 	apiHeader *config.HeaderConfig,
 	auth *config.AuthConfig,
 	cors *config.CORSConfig) *Controller {
 	return &Controller{
 		userRepo:  userRepo,
+		logger:    logger,
 		mongo:     mongo,
 		apiHeader: apiHeader,
 		auth:      auth,

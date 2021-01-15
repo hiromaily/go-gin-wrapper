@@ -7,8 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	lg "github.com/hiromaily/golibs/log"
-	//"github.com/josephspurrier/csrfbanana"
+	"go.uber.org/zap"
 )
 
 // TODO: set on TOML
@@ -16,8 +15,8 @@ import (
 const tokenSalt string = "goginwebservertoken"
 
 // CreateToken is to create token string
-func CreateToken() string {
-	lg.Info("[CreateToken]")
+func CreateToken(logger *zap.Logger) string {
+	logger.Info("CreateToken")
 	// TODO: it may be ok to return just session key.
 	h := md5.New()
 
@@ -26,7 +25,7 @@ func CreateToken() string {
 
 	token := fmt.Sprintf("%x", h.Sum(nil))
 
-	lg.Debugf("Token: %s", token)
+	logger.Debug("CreateToken", zap.String("token", token))
 
 	return token
 }

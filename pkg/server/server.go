@@ -9,76 +9,63 @@ import (
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
-	"github.com/hiromaily/go-gin-wrapper/pkg/server/middlewares"
 	fl "github.com/hiromaily/golibs/files"
 	hrk "github.com/hiromaily/golibs/heroku"
-	lg "github.com/hiromaily/golibs/log"
 )
 
-// ----------------------------------------------------------------------------
-// Serverer interface
-// ----------------------------------------------------------------------------
-
-// Serverer is Serverer interface
-type Serverer interface {
+// Server interface
+type Server interface {
 	Start() (*gin.Engine, error)
 	Close()
 }
 
-// NewServerer is to return Serverer interface
-func NewServerer(
-	isTestMode bool,
-	conf *config.Config,
-	port int,
-	userRepo repository.UserRepositorier,
-	mongoModeler mongomodel.MongoModeler) Serverer {
-	return NewServer(isTestMode, conf, port, userRepo, mongoModeler)
-}
-
-// ----------------------------------------------------------------------------
-// Server
-// ----------------------------------------------------------------------------
-
-// Server is Server object
-type Server struct {
+// server object
+type server struct {
+	gin          *gin.Engine
+	middleware   Middlewarer
+	logger       *zap.Logger
 	isTestMode   bool
 	conf         *config.Config
 	port         int
 	userRepo     repository.UserRepositorier
 	mongoModeler mongomodel.MongoModeler
-	gin          *gin.Engine
 }
 
-// NewServer is to return server object
+// NewServer returns Server interface
 func NewServer(
+	gin *gin.Engine,
+	middleware Middlewarer,
+	logger *zap.Logger,
 	isTestMode bool,
 	conf *config.Config,
 	port int,
 	userRepo repository.UserRepositorier,
-	mongoModeler mongomodel.MongoModeler) *Server {
+	mongoModeler mongomodel.MongoModeler) Server {
 	if port == 0 {
 		port = conf.Server.Port
 	}
 
-	srv := Server{
+	return &server{
+		gin:          gin,
+		middleware:   middleware,
+		logger:       logger,
 		isTestMode:   isTestMode,
 		conf:         conf,
 		port:         port,
 		userRepo:     userRepo,
 		mongoModeler: mongoModeler,
-		gin:          gin.New(),
 	}
-	return &srv
 }
 
 // Start is to start server execution
-func (s *Server) Start() (*gin.Engine, error) {
+func (s *server) Start() (*gin.Engine, error) {
 	if s.conf.Environment == "production" {
 		// For release
 		gin.SetMode(gin.ReleaseMode)
@@ -93,7 +80,7 @@ func (s *Server) Start() (*gin.Engine, error) {
 	// Static
 	s.loadStaticFiles()
 
-	// Set router (from urls.go)
+	// Set router (from url.go)
 	s.SetURLOnHTTP(s.gin)
 
 	// Set Profiling
@@ -112,18 +99,18 @@ func (s *Server) Start() (*gin.Engine, error) {
 
 // Close is to clean up middleware object
 // TODO: not implemented yet
-func (s *Server) Close() {
+func (s *server) Close() {
 	// s.storager.Close()
 }
 
 // Global middleware
-func (s *Server) setMiddleWare() {
+func (s *server) setMiddleWare() {
 	// TODO:skip static files like (jpg, gif, png, js, css, woff)
 
 	s.gin.Use(gin.Logger())
 
-	// r.Use(gin.Recovery())           //After GlobalRecover()
-	s.gin.Use(middlewares.GlobalRecover(s.conf.Develop)) // It's called faster than [gin.Recovery()]
+	// r.Use(gin.Recovery())  //After GlobalRecover()
+	s.gin.Use(s.middleware.GlobalRecover()) // It's called faster than [gin.Recovery()]
 
 	// session
 	s.initSession()
@@ -131,16 +118,16 @@ func (s *Server) setMiddleWare() {
 	// TODO:set ip to toml or redis server
 	// check ip address to refuse specific IP Address
 	// when using load balancer or reverse proxy, set specific IP
-	s.gin.Use(middlewares.RejectSpecificIP(s.conf.Proxy))
+	s.gin.Use(s.middleware.RejectSpecificIP())
 
 	// meta data for each rogic
-	s.gin.Use(middlewares.SetMetaData())
+	s.gin.Use(s.middleware.SetMetaData())
 
 	// auto session(expire) update
-	s.gin.Use(middlewares.UpdateUserSession())
+	s.gin.Use(s.middleware.UpdateUserSession())
 }
 
-func (s *Server) initSession() {
+func (s *server) initSession() {
 	red := s.conf.Redis
 	if s.conf.Environment == "heroku" {
 		host, pass, port, err := hrk.GetRedisInfo("")
@@ -153,14 +140,14 @@ func (s *Server) initSession() {
 	}
 
 	if red.Session && red.Host != "" && red.Port != 0 {
-		lg.Debug("redis session start")
-		sess.SetSession(s.gin, fmt.Sprintf("%s:%d", red.Host, red.Port), red.Pass, s.conf.Server.Session)
+		s.logger.Debug("initSession: redis session start")
+		sess.SetSession(s.gin, s.logger, fmt.Sprintf("%s:%d", red.Host, red.Port), red.Pass, s.conf.Server.Session)
 	} else {
-		sess.SetSession(s.gin, "", "", s.conf.Server.Session)
+		sess.SetSession(s.gin, s.logger, "", "", s.conf.Server.Session)
 	}
 }
 
-func (s *Server) loadTemplates() {
+func (s *server) loadTemplates() {
 	// http://stackoverflow.com/questions/25745701/parseglob-what-is-the-pattern-to-parse-all-templates-recursively-within-a-direc
 
 	// r.LoadHTMLGlob("templates/*")
@@ -221,7 +208,7 @@ func getTempFunc() template.FuncMap {
 	return funcMap
 }
 
-func (s *Server) loadStaticFiles() {
+func (s *server) loadStaticFiles() {
 	rootPath := s.conf.Server.Docs.Path
 
 	// r.Static("/static", "/var/www")
@@ -231,11 +218,11 @@ func (s *Server) loadStaticFiles() {
 	s.gin.Static("/swagger", rootPath+"/web/swagger/swagger-ui")
 }
 
-func (s *Server) run() error {
+func (s *server) run() error {
 	if s.conf.Proxy.Mode == 2 {
 		// Proxy(Nginx) settings
 		color.Red("[WARNING] running on fcgi mode.")
-		lg.Info("running on fcgi mode.")
+		s.logger.Info("running on fcgi mode.")
 		return fcgi.Run(s.gin, fmt.Sprintf(":%d", s.port))
 	}
 	return s.gin.Run(fmt.Sprintf(":%d", s.port))

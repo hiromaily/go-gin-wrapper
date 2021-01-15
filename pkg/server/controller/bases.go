@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"net/http"
@@ -29,7 +29,7 @@ func debugContext(c *gin.Context) {
 // response for Login Page
 func (ctl *Controller) resLogin(c *gin.Context, input *LoginRequest, msg string, errors []string) {
 	// token
-	token := csrf.CreateToken()
+	token := csrf.CreateToken(ctl.logger)
 	sess.SetTokenSession(c, token)
 
 	// Google Open ID

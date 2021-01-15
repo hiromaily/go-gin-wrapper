@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
@@ -14,7 +16,6 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
-	lg "github.com/hiromaily/golibs/log"
 )
 
 // ResGoogle is for response data from google
@@ -84,7 +85,7 @@ var (
 
 // OAuth2SignInGoogleAction is sign in by Google [GET]
 func (ctl *Controller) OAuth2SignInGoogleAction(c *gin.Context) {
-	lg.Info("SignInGoogleAction()")
+	ctl.logger.Info("OAuth2SignInGoogleAction")
 
 	auth := ctl.auth.Google
 
@@ -93,7 +94,7 @@ func (ctl *Controller) OAuth2SignInGoogleAction(c *gin.Context) {
 	googleOauthConfig.ClientSecret = auth.ClientSecret
 
 	// token
-	token := csrf.CreateToken()
+	token := csrf.CreateToken(ctl.logger)
 	sess.SetTokenSession(c, token)
 
 	url := googleOauthConfig.AuthCodeURL(token)
@@ -102,7 +103,7 @@ func (ctl *Controller) OAuth2SignInGoogleAction(c *gin.Context) {
 
 // OAuth2SignInFacebookAction is sign in by Facebook [GET]
 func (ctl *Controller) OAuth2SignInFacebookAction(c *gin.Context) {
-	lg.Info("SignInFacebookAction()")
+	ctl.logger.Info("OAuth2SignInFacebookAction")
 
 	auth := ctl.auth.Facebook
 
@@ -111,7 +112,7 @@ func (ctl *Controller) OAuth2SignInFacebookAction(c *gin.Context) {
 	facebookOauthConfig.ClientSecret = auth.ClientSecret
 
 	// token
-	token := csrf.CreateToken()
+	token := csrf.CreateToken(ctl.logger)
 	sess.SetTokenSession(c, token)
 
 	url := facebookOauthConfig.AuthCodeURL(token)
@@ -125,7 +126,7 @@ func (ctl *Controller) OAuth2SignInFacebookAction(c *gin.Context) {
 
 // OAuth2LoginAction is login by Google. (work in progress) [GET]
 func (ctl *Controller) OAuth2LoginAction(c *gin.Context) {
-	lg.Info("LoginAction()")
+	ctl.logger.Info("OAuth2LoginAction")
 	/*
 		https://accounts.google.com/o/oauth2/auth?
 		scope=openid+email+profile&
@@ -137,37 +138,36 @@ func (ctl *Controller) OAuth2LoginAction(c *gin.Context) {
 	//TODO:What is difference of parameter between sign in and login
 }
 
-func checkError(c *gin.Context) bool {
-	lg.Info("checkError()")
+func checkError(c *gin.Context, logger *zap.Logger) bool {
+	logger.Info("checkError")
 
 	// When user choose access deny
 	// http://localhost:9999/oauth2/callback?error=access_denied&state=66bc8679a5629423463943f679383b57
-	qeyErr, _ := c.GetQuery("error")
-	if qeyErr != "" {
-		lg.Debugf("error is %s", qeyErr)
+	if err, _ := c.GetQuery("error"); err != "" {
+		logger.Error("query error", zap.Error(errors.New(err)))
 		c.Redirect(http.StatusTemporaryRedirect, "/login") // 307
 		return false
 	}
 	return true
 }
 
-func checkState(c *gin.Context) bool {
-	lg.Info("checkState()")
+func checkState(c *gin.Context, logger *zap.Logger) bool {
+	logger.Info("checkState")
 
 	state, _ := c.GetQuery("state")
-	// lg.Debugf("state is %s", state)
-	// lg.Debugf("saved state is %s", sess.GetTokenSession(c))
+	// ctl.logger.Debugf("state is %s", state)
+	// ctl.logger.Debugf("saved state is %s", sess.GetTokenSession(c))
 	if state == "" || sess.GetTokenSession(c) != state {
 		// error
-		lg.Error("state is invalid.")
+		logger.Error("checkState", zap.Error(errors.New("state is invalid")))
 		c.Redirect(http.StatusTemporaryRedirect, "/") // 307
 		return false
 	}
 	return true
 }
 
-func getToken(c *gin.Context, mode string) (token *oauth2.Token) {
-	lg.Info("getToken()")
+func getToken(c *gin.Context, logger *zap.Logger, mode string) (token *oauth2.Token) {
+	logger.Info("getToken")
 
 	var err error
 
@@ -181,18 +181,17 @@ func getToken(c *gin.Context, mode string) (token *oauth2.Token) {
 	default:
 		return nil
 	}
-
 	if err != nil {
 		// error
-		lg.Errorf("Code exchange failed with '%s'", err)
+		logger.Error("fail to call auth.Exchange", zap.Error(err))
 		c.Redirect(http.StatusTemporaryRedirect, "/") // 307
 		return nil
 	}
 	return token
 }
 
-func getUserInfo(c *gin.Context, token *oauth2.Token, res interface{}, mode string) bool {
-	lg.Info("getUserInfo()")
+func getUserInfo(c *gin.Context, logger *zap.Logger, token *oauth2.Token, res interface{}, mode string) bool {
+	logger.Info("getUserInfo")
 
 	var url string
 
@@ -211,7 +210,7 @@ func getUserInfo(c *gin.Context, token *oauth2.Token, res interface{}, mode stri
 	response, err := http.Get(url)
 	if err != nil {
 		// error
-		lg.Errorf("Get user info failed with '%s'", err)
+		logger.Error("getUserInfo: fail to call http.Get", zap.String("url", url), zap.Error(err))
 		c.Redirect(http.StatusTemporaryRedirect, "/") // 307
 		return false
 	}
@@ -221,7 +220,7 @@ func getUserInfo(c *gin.Context, token *oauth2.Token, res interface{}, mode stri
 
 	err = json.Unmarshal(contents, res)
 	if err != nil {
-		lg.Errorf("Parse of response as json failed with '%s'", err)
+		logger.Error("getUserInfo: fail to call json.Unmarshal", zap.Error(err))
 		c.Redirect(http.StatusTemporaryRedirect, "/") // 307
 		return false
 	}
@@ -230,13 +229,11 @@ func getUserInfo(c *gin.Context, token *oauth2.Token, res interface{}, mode stri
 }
 
 func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, user *user.User, userAuth *user.UserAuth) {
-	lg.Info("registerOrLogin()")
+	ctl.logger.Info("registerOrLogin")
 
 	if userAuth == nil {
-		lg.Debug("no user on t_users")
+		ctl.logger.Debug("registerOrLogin: no user")
 		// 0:no user -> register and login
-
-		lg.Debug("InsertUser()")
 		id, err := ctl.userRepo.InsertUser(user)
 		if err != nil {
 			c.AbortWithError(500, err)
@@ -246,15 +243,14 @@ func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, user *user.U
 		sess.SetUserSession(c, int(id))
 
 	} else {
-		lg.Debug("There is user: %v", userAuth)
+		ctl.logger.Debug("registerOrLogin", zap.Any("user", userAuth))
 		// oauth_flg //0, 1:google, 2:facebook
 		if userAuth.ID != 0 && userAuth.Auth == mode {
-			lg.Debug("login proceduer")
 			// 1:existing user (google) -> login procedure
 			// Session
 			sess.SetUserSession(c, userAuth.ID)
 		} else {
-			lg.Debug("redirect login page. user is already exsisting.")
+			ctl.logger.Debug("registerOrLogin: redirect login page. user is already existing")
 			// 2:existing user (no auth or another auth) -> err
 			c.Redirect(http.StatusTemporaryRedirect, "/login") // 307
 			return
@@ -271,38 +267,38 @@ func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, user *user.U
 
 // OAuth2CallbackGoogleAction is callback from Google[GET]
 func (ctl *Controller) OAuth2CallbackGoogleAction(c *gin.Context) {
-	lg.Info("CallbackGoogleAction()")
+	ctl.logger.Info("OAuth2CallbackGoogleAction")
 	mode := GoogleAuth
 
 	// 0.check deny
-	bRet := checkError(c)
+	bRet := checkError(c, ctl.logger)
 	if !bRet {
 		return
 	}
 
 	// 1.Confirm State(token)
-	bRet = checkState(c)
+	bRet = checkState(c, ctl.logger)
 	if !bRet {
 		return
 	}
 
 	// 2.connection server to server
-	token := getToken(c, mode)
+	token := getToken(c, ctl.logger, mode)
 	if token == nil {
 		return
 	}
 
 	// 3.get user info
 	resGoogle := ResGoogle{}
-	bRet = getUserInfo(c, token, &resGoogle, mode)
+	bRet = getUserInfo(c, ctl.logger, token, &resGoogle, mode)
 	if !bRet {
 		return
 	}
 
-	lg.Debugf("response body is %+s", resGoogle)
+	ctl.logger.Debug("OAuth2CallbackGoogleAction", zap.Any("response body", resGoogle))
 
 	// 4.check Email
-	lg.Debugf("email is %s", resGoogle.Email)
+	ctl.logger.Debug("", zap.String("email", resGoogle.Email))
 	userAuth, err := ctl.userRepo.OAuth2Login(resGoogle.Email)
 	if err != nil {
 		c.AbortWithError(500, err)
@@ -322,39 +318,39 @@ func (ctl *Controller) OAuth2CallbackGoogleAction(c *gin.Context) {
 
 // OAuth2CallbackFacebookAction is callback from Facebook [GET]
 func (ctl *Controller) OAuth2CallbackFacebookAction(c *gin.Context) {
-	lg.Info("CallbackFacebookAction()")
+	ctl.logger.Info("OAuth2CallbackFacebookAction")
 	mode := FacebookAuth
 
 	// 0.check deny
-	bRet := checkError(c)
+	bRet := checkError(c, ctl.logger)
 	if !bRet {
 		return
 	}
 
 	// 1.Confirm State(token)
-	bRet = checkState(c)
+	bRet = checkState(c, ctl.logger)
 	if !bRet {
 		return
 	}
 
 	// 2.connection server to server
-	token := getToken(c, mode)
+	token := getToken(c, ctl.logger, mode)
 	if token == nil {
 		return
 	}
 
 	// 3.get user info
 	resFacebook := ResFacebook{}
-	bRet = getUserInfo(c, token, &resFacebook, mode)
+	bRet = getUserInfo(c, ctl.logger, token, &resFacebook, mode)
 	if !bRet {
 		return
 	}
 
-	lg.Debugf("response body is %+s", resFacebook)
+	ctl.logger.Debug("OAuth2CallbackFacebookAction", zap.Any("response body", resFacebook))
 	// img := "https://graph.facebook.com/" + id + "/picture?width=180&height=180"
 
 	// 4.check Email
-	lg.Debugf("email is %s", resFacebook.Email)
+	ctl.logger.Debug("OAuth2CallbackFacebookAction", zap.String("email", resFacebook.Email))
 	userAuth, err := ctl.userRepo.OAuth2Login(resFacebook.Email)
 	if err != nil {
 		c.AbortWithError(500, err)

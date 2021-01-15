@@ -1,20 +1,20 @@
-package controllers
+package controller
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
-	lg "github.com/hiromaily/golibs/log"
 )
 
 // get user, it was set by the BasicAuth middleware
 
 // AdminIndexAction [GET]
 func (ctl *Controller) AdminIndexAction(c *gin.Context) {
-	user := c.MustGet(gin.AuthUserKey).(string)
-	lg.Debugf("[---]gin.AuthUserKey: %s", user)
+	key := c.MustGet(gin.AuthUserKey).(string)
+	ctl.logger.Debug("AdminIndexAction", zap.String("gin.AuthUserKey", key))
 
 	// View
 	res := gin.H{
