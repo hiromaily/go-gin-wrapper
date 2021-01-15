@@ -8,9 +8,9 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	"github.com/hiromaily/go-gin-wrapper/pkg/regexps"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
-	reg "github.com/hiromaily/golibs/regexp"
 )
 
 func getURL(scheme, host string, port int) string {
@@ -58,7 +58,7 @@ func GetURL(c *gin.Context) string {
 // IsStaticFile is whether request url is for static file or golang page
 func IsStaticFile(c *gin.Context) bool {
 	url := GetURL(c)
-	return reg.IsStaticFile(url)
+	return regexps.IsStaticFile(url)
 }
 
 // GetProto is to get protocol
