@@ -13,11 +13,11 @@ import (
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/dir"
+	"github.com/hiromaily/go-gin-wrapper/pkg/heroku"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
-	hrk "github.com/hiromaily/golibs/heroku"
 )
 
 // Server interface
@@ -150,7 +150,7 @@ func (s *server) initSession() {
 
 func (s *server) herokuRedisSetting() {
 	if s.redisConf.IsHeroku {
-		host, pass, port, err := hrk.GetRedisInfo("")
+		host, pass, port, err := heroku.GetRedisInfo("")
 		if err == nil && host != "" && port != 0 {
 			s.redisConf.IsSession = true
 			s.redisConf.Host = host

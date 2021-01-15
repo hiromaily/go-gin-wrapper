@@ -30,29 +30,28 @@ func GetFileList(basePath string, extensions []string) []string {
 
 // checkDirectory is to check directory using goroutine as semaphore
 func checkDirectory(basePath string, extensions []string, ch chan<- string, chSmp chan bool, wg *sync.WaitGroup, closeFlg bool) {
-
 	// read directory
 	fis, err := ioutil.ReadDir(basePath)
 	if err != nil {
-		//fmt.Printf("error : %s\n", err)
+		// fmt.Printf("error : %s\n", err)
 		return
 	}
 
 	for _, fi := range fis {
-		//fmt.Printf("file name is %s\n", fi.Name())
+		// fmt.Printf("file name is %s\n", fi.Name())
 		if regexps.IsInvisiblefile(fi.Name()) {
 			continue
 		}
 
 		fullPath := filepath.Join(basePath, fi.Name())
-		//fmt.Printf("full path is %s\n", fullPath)
+		// fmt.Printf("full path is %s\n", fullPath)
 
 		if fi.IsDir() {
 			wg.Add(1)
 			chSmp <- true
 
-			//fmt.Println("this is directory. skip.")
-			//check more deep directory
+			// fmt.Println("this is directory. skip.")
+			// check more deep directory
 			go func() {
 				defer func() {
 					<-chSmp
@@ -62,7 +61,7 @@ func checkDirectory(basePath string, extensions []string, ch chan<- string, chSm
 			}()
 		} else {
 			for _, ex := range extensions {
-				//fmt.Printf("search %s from %s\n", ex, fi.Name())
+				// fmt.Printf("search %s from %s\n", ex, fi.Name())
 				if regexps.IsExtFile(fi.Name(), ex) {
 					ch <- fullPath
 				}
