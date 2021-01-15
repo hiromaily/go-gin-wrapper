@@ -58,7 +58,6 @@ var (
 	// rightHeadersWithJWT = []map[string]string{ajaxHeader, keyHeader, jwtAuth}
 )
 
-// FIXME: mongo connection doesn't work
 var getTests = []struct {
 	url      string
 	code     int

@@ -35,25 +35,6 @@ services:
     restart: always
     command: redis-server --requirepass password --appendonly yes
 
-  # Mongo
-  mongo:
-    build:
-      context: ./build/docker/mongo/
-      dockerfile: Dockerfile
-      args:
-        mongo_port: 27017
-    #image: mongo:4.2
-    image: go-gin-wrapper-mongo:1.0
-    container_name: web-mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root-secret
-    ports:
-      - "27017"
-    #volumes: # it causes error for initialization
-    #  - mdb:/data/db
-    command: mongod --auth
-
   # golang:go-gin-wrapper
   web:
     build:
@@ -72,10 +53,8 @@ services:
     links:
       - mysql:mysql-server
       - redis:redis-server
-      - mongo:mongo-server
     depends_on:
       - mysql
       - redis
-      - mongo
     restart: always
     command: /go/bin/ginserver -f ./configs/docker.toml -crypto

@@ -39,8 +39,8 @@ install:
   # install go packages
   - go mod download
   # setup docker containers
-  - docker-compose -f docker-compose.ci.yml build mysql redis mongo
-  - docker-compose -f docker-compose.ci.yml up -d mysql redis mongo
+  - docker-compose -f docker-compose.ci.yml build mysql redis
+  - docker-compose -f docker-compose.ci.yml up -d mysql redis
   - sleep 3s
   - docker ps -a
 

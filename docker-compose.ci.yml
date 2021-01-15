@@ -25,20 +25,3 @@ services:
       - "6379:6379"
     restart: always
     command: redis-server --requirepass password --appendonly yes
-
-  # Mongo
-  mongo:
-    build:
-      context: ./build/docker/mongo/
-      dockerfile: Dockerfile
-      args:
-        mongo_port: 27017
-    #image: mongo:4.2
-    image: go-gin-wrapper-mongo:1.0
-    container_name: web-mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root-secret
-    ports:
-      - "27017:27017"
-    command: mongod --auth

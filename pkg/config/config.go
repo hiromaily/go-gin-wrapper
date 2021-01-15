@@ -25,8 +25,6 @@ type Config struct {
 	Auth     *AuthConfig
 	MySQL    *MySQLConfig `toml:"mysql" validate:"required"`
 	Redis    *RedisConfig `toml:"redis" validate:"required"`
-	Mongo    *MongoConfig `toml:"mongodb"`
-	Aws      *AwsConfig
 	Develop  *DevelopConfig
 }
 
@@ -172,24 +170,6 @@ type RedisConfig struct {
 	IsHeroku  bool   `toml:"is_heroku"`
 }
 
-// MongoConfig is for MongoDB Server
-type MongoConfig struct {
-	Encrypted bool   `toml:"encrypted"`
-	Host      string `toml:"host"`
-	Port      uint16 `toml:"port"`
-	DbName    string `toml:"dbname"`
-	User      string `toml:"user"`
-	Pass      string `toml:"pass"`
-}
-
-// AwsConfig for Amazon Web Service
-type AwsConfig struct {
-	Encrypted bool   `toml:"encrypted"`
-	AccessKey string `toml:"access_key"`
-	SecretKey string `toml:"secret_key"`
-	Region    string `toml:"region"`
-}
-
 // DevelopConfig is for development environment
 type DevelopConfig struct {
 	ProfileEnable bool `toml:"profile_enable"`
@@ -300,19 +280,5 @@ func (c *Config) Cipher() {
 		r := c.Redis
 		r.Host, _ = crypt.DecryptBase64(r.Host)
 		r.Pass, _ = crypt.DecryptBase64(r.Pass)
-	}
-
-	if c.Mongo.Encrypted {
-		m := c.Mongo
-		m.Host, _ = crypt.DecryptBase64(m.Host)
-		m.DbName, _ = crypt.DecryptBase64(m.DbName)
-		m.User, _ = crypt.DecryptBase64(m.User)
-		m.Pass, _ = crypt.DecryptBase64(m.Pass)
-	}
-
-	if c.Aws.Encrypted {
-		a := c.Aws
-		a.AccessKey, _ = crypt.DecryptBase64(a.AccessKey)
-		a.SecretKey, _ = crypt.DecryptBase64(a.SecretKey)
 	}
 }

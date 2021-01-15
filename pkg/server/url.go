@@ -36,12 +36,11 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	//-----------------------
 	// News
 	//-----------------------
-	newsG := r.Group("/news")
-	{
-		// Top
-		newsG.GET("/", s.controller.NewsIndexAction)
-	}
-	// r.GET("/news/", news.NewsGetAction)
+	//newsG := r.Group("/news")
+	//{
+	//	// Top
+	//	newsG.GET("/", s.controller.NewsIndexAction)
+	//}
 
 	//-----------------------
 	// API List
@@ -52,21 +51,6 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 		apiListG.GET("/", s.controller.APIListIndexAction)
 		apiListG.GET("/index2", s.controller.APIListIndex2Action)
 	}
-
-	//-----------------------
-	// Chat (Work in progress)
-	//-----------------------
-	//chatG := r.Group("/chat")
-	//{
-	//	//Top
-	//	chatG.GET("/", chat.IndexAction)
-	//}
-	//r.GET("/ws", func(c *gin.Context) {
-	//	m.HandleRequest(c.Writer, c.Request)
-	//})
-	//m.HandleMessage(func(s *melody.Session, msg []byte) {
-	//	m.Broadcast(msg)
-	//})
 
 	//-----------------------
 	// OAuth2 Callback

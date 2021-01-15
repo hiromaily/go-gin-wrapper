@@ -18,8 +18,8 @@ Now it's under `refactoring`.
 - [ ] change architecture like Clean Architecture
 - [ ] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
   - [x] use [sqlboiler](https://github.com/volatiletech/sqlboiler) as ORM
-  - [ ] delete MongoDB
-  - [ ] replace log to zap logger
+  - [x] delete MongoDB
+  - [x] replace log to zap logger
 - [ ] add zap logger 
 - [ ] clean up variable name
 - [ ] clean up comments
@@ -61,10 +61,6 @@ This is the easiest way to configure whole environment.
 If you store session data on Redis, Redis is required. 
 But it's not indispensable.
 
-#### MongoDB
-It's used for news information. Another worker program make data regularly.  
-[go-news-mongodb](https://github.com/hiromaily/go-news-mongodb)
-
 #### TOML file
 This is for configuration.
 ```
@@ -83,7 +79,6 @@ ginserver -f /app/config/yourfile.toml
 * auth
 * mysql
 * redis
-* mongodb
 * aws  
 
 ※ As needed, secret information can be ciphered.(using AES encryption)
@@ -109,10 +104,6 @@ $ heroku config | grep CLEARDB_DATABASE_URL
 # Redis
 $ heroku addons:create heroku-redis:hobby-dev -a ginserver 
 $ heroku config | grep REDIS
-
-# MongoDB
-* attach mongodb from news-mongo app on heroku because of sharing.
-* it's better to attach from dashboard.
 
 ## Environment variable
 $ heroku config:add HEROKU_FLG=1

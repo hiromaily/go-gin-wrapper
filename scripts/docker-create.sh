@@ -13,7 +13,6 @@
 CONTAINER_NAME=web
 CONTAINER2_NAME=web-redis
 CONTAINER3_NAME=web-mysql
-CONTAINER4_NAME=web-mongo
 IMAGE_NAME=go-gin-wrapper:v1.1
 
 
@@ -53,12 +52,6 @@ fi
 ###############################################################################
 docker-compose  build
 docker-compose  up -d
-
-#mongo settings
-sleep 3s
-MONGO_PORT=30017
-mongo 127.0.0.1:${MONGO_PORT}/admin --eval "var port = ${MONGO_PORT};" ./build/docker/mongo/init.js
-mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily build/docker/mongo/dump/hiromaily
 
 if [ $RUN_TEST -eq 1 ]; then
     # test mode

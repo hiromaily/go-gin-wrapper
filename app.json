@@ -23,7 +23,6 @@
   "image": "heroku/go",
   "addons": [
     "cleardb",
-    "heroku-redis:hobby-dev",
-    "mongolab:sandbox"
+    "heroku-redis:hobby-dev"
   ]
 }

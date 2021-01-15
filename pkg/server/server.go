@@ -12,7 +12,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
-	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
@@ -29,13 +28,12 @@ type Server interface {
 
 // server object
 type server struct {
-	gin          *gin.Engine
-	port         int
-	middleware   Middlewarer
-	controller   *controller.Controller // TODO: interface
-	logger       *zap.Logger
-	userRepo     repository.UserRepositorier
-	mongoModeler mongomodel.MongoModeler
+	gin        *gin.Engine
+	port       int
+	middleware Middlewarer
+	controller *controller.Controller // TODO: interface
+	logger     *zap.Logger
+	userRepo   repository.UserRepositorier
 
 	serverConf  *config.ServerConfig
 	proxyConf   *config.ProxyConfig
@@ -54,7 +52,6 @@ func NewServer(
 	controller *controller.Controller,
 	logger *zap.Logger,
 	userRepo repository.UserRepositorier,
-	mongoModeler mongomodel.MongoModeler,
 	conf *config.Config,
 	isTestMode bool,
 ) Server {
@@ -63,19 +60,18 @@ func NewServer(
 	}
 
 	return &server{
-		gin:          gin,
-		port:         port,
-		middleware:   middleware,
-		controller:   controller,
-		logger:       logger,
-		userRepo:     userRepo,
-		mongoModeler: mongoModeler,
-		serverConf:   conf.Server,
-		proxyConf:    conf.Proxy,
-		apiConf:      conf.API,
-		redisConf:    conf.Redis,
-		developConf:  conf.Develop,
-		isTestMode:   isTestMode,
+		gin:         gin,
+		port:        port,
+		middleware:  middleware,
+		controller:  controller,
+		logger:      logger,
+		userRepo:    userRepo,
+		serverConf:  conf.Server,
+		proxyConf:   conf.Proxy,
+		apiConf:     conf.API,
+		redisConf:   conf.Redis,
+		developConf: conf.Develop,
+		isTestMode:  isTestMode,
 	}
 }
 

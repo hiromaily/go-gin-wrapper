@@ -3,15 +3,13 @@ package main
 import (
 	"database/sql"
 
-	"github.com/volatiletech/sqlboiler/boil"
-
 	"github.com/gin-gonic/gin"
+	"github.com/volatiletech/sqlboiler/boil"
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwt"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/logger"
-	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
@@ -24,10 +22,10 @@ type Registry interface {
 }
 
 type registry struct {
+	conf        *config.Config
 	logger      *zap.Logger
 	gin         *gin.Engine
 	isTestMode  bool
-	conf        *config.Config
 	mysqlClient *sql.DB
 	// redisClient *redis.Conn
 }
@@ -65,7 +63,6 @@ func (r *registry) NewServer(port int) server.Server {
 		r.newController(),
 		r.newLogger(),
 		r.newUserRepository(),
-		r.newMongoModeler(),
 		r.conf,
 		r.isTestMode,
 	)
@@ -93,7 +90,6 @@ func (r *registry) newController() *controller.Controller {
 	return controller.NewController(
 		r.newLogger(),
 		r.newUserRepository(),
-		r.newMongoModeler(),
 		r.conf.API.Header,
 		r.conf.API.CORS,
 		r.conf.Auth,
@@ -142,11 +138,3 @@ func (r *registry) newUserRepository() repository.UserRepositorier {
 //	}
 //	return r.redisClient
 //}
-
-func (r *registry) newMongoModeler() mongomodel.MongoModeler {
-	storager, err := mongomodel.NewMongoModeler(r.conf)
-	if err != nil {
-		panic(err)
-	}
-	return storager
-}
