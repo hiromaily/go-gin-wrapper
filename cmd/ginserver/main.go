@@ -31,12 +31,10 @@ func main() {
 	}
 
 	// config
-	conf, err := config.NewInstance(*tomlPath, *isEncryptedConf)
+	conf, err := config.New(*tomlPath, *isEncryptedConf)
 	if err != nil {
 		panic(err)
 	}
-	// FIXME: there are a lot of places singleton is used
-	// config.New(*tomlPath, true)
 
 	// debug mode
 	if conf.IsSignal {

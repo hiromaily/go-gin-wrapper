@@ -21,7 +21,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
-	conf "github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 )
 
@@ -33,8 +32,6 @@ var (
 
 	// Test Data
 	errRedirect = errors.New("redirect")
-	// config
-	configFiles = []string{"settings.default.toml", "settings.toml", "docker.toml", "heroku.toml", "travis.toml"}
 	jwtCode     string
 )
 
@@ -223,7 +220,7 @@ func setup() {
 	}
 
 	// config
-	conf, err := config.NewInstance(*tomlPath, *isEncryptedConf)
+	conf, err := config.New(*tomlPath, *isEncryptedConf)
 	if err != nil {
 		panic(err)
 	}
@@ -381,22 +378,6 @@ func getJWT(res *http.Response) (string, error) {
 //-----------------------------------------------------------------------------
 // Test
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-// Config
-//-----------------------------------------------------------------------------
-
-// nolint: unparam
-func TestConfigs(t *testing.T) {
-	// configFiles
-	path := "../../config/"
-	for _, v := range configFiles {
-		conf.New(path+v, false)
-	}
-
-	//
-	conf.New(*tomlPath, false)
-}
-
 //-----------------------------------------------------------------------------
 // Get Request for HTML
 //-----------------------------------------------------------------------------

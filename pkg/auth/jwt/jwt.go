@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	jwt "github.com/dgrijalva/jwt-go"
-	//"time"
+	"github.com/dgrijalva/jwt-go"
 )
 
 // CustomClaims is structure of json for jwt claim
@@ -27,14 +26,9 @@ var (
 	privateKeyParsed *rsa.PrivateKey
 	publicKeyParsed  *rsa.PublicKey
 	audience               = "hiromaily.com"
-	encrypted        uint8 = 2 // 1:HMAC, 2:RSA
+	encrypted        uint8 = RSA // 1:HMAC, 2:RSA
 	secret                 = "default-secret-key"
 )
-
-// InitAudience is to set audience
-func InitAudience(str string) {
-	audience = str
-}
 
 // InitEncrypted is to set encrypted
 func InitEncrypted(mode uint8) {

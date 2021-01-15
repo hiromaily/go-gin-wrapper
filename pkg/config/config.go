@@ -10,11 +10,6 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 )
 
-/* singleton */
-var (
-	conf *Config
-)
-
 // Config is of root
 type Config struct {
 	IsSignal bool    `toml:"is_signal"`
@@ -176,24 +171,8 @@ type DevelopConfig struct {
 	RecoverEnable bool `toml:"recover_enable"`
 }
 
-// New is create instance as singleton
-func New(fileName string, cipherFlg bool) error {
-	var err error
-	if conf == nil {
-		conf, err = loadConfig(fileName)
-	}
-	if err != nil {
-		return err
-	}
-
-	if cipherFlg {
-		conf.Cipher()
-	}
-	return nil
-}
-
-// NewInstance is create instance
-func NewInstance(fileName string, cipherFlg bool) (*Config, error) {
+// New is create instance
+func New(fileName string, cipherFlg bool) (*Config, error) {
 	conf, err := loadConfig(fileName)
 	if err != nil {
 		return nil, err
@@ -203,19 +182,6 @@ func NewInstance(fileName string, cipherFlg bool) (*Config, error) {
 		conf.Cipher()
 	}
 	return conf, err
-}
-
-// GetConf is to get config instance
-func GetConf() *Config {
-	var err error
-	if conf == nil {
-		conf, err = loadConfig("")
-	}
-	if err != nil {
-		panic(err)
-	}
-
-	return conf
 }
 
 // load configfile

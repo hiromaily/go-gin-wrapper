@@ -14,7 +14,7 @@ func init() {}
 func main() {
 	flag.Parse()
 
-	conf, err := config.NewInstance(*tomlPath, false)
+	conf, err := config.New(*tomlPath, false)
 	if err != nil {
 		panic(err)
 	}
