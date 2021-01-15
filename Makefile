@@ -70,7 +70,7 @@ build-swg:
 ###############################################################################
 .PHONY: run
 run:
-	go run ./cmd/ginserver/main.go -f ./configs/settings.toml -crypto
+	go run ./cmd/ginserver/ -f ./configs/settings.toml -crypto
 
 .PHONY: exec
 exec:
