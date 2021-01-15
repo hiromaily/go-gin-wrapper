@@ -14,6 +14,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	fl "github.com/hiromaily/golibs/files"
@@ -29,44 +30,58 @@ type Server interface {
 // server object
 type server struct {
 	gin          *gin.Engine
-	middleware   Middlewarer
-	logger       *zap.Logger
-	isTestMode   bool
-	conf         *config.Config
 	port         int
+	middleware   Middlewarer
+	controller   *controller.Controller // TODO: interface
+	logger       *zap.Logger
 	userRepo     repository.UserRepositorier
 	mongoModeler mongomodel.MongoModeler
+
+	serverConf  *config.ServerConfig
+	proxyConf   *config.ProxyConfig
+	apiConf     *config.APIConfig
+	redisConf   *config.RedisConfig
+	developConf *config.DevelopConfig
+
+	isTestMode bool
 }
 
 // NewServer returns Server interface
 func NewServer(
 	gin *gin.Engine,
-	middleware Middlewarer,
-	logger *zap.Logger,
-	isTestMode bool,
-	conf *config.Config,
 	port int,
+	middleware Middlewarer,
+	controller *controller.Controller,
+	logger *zap.Logger,
 	userRepo repository.UserRepositorier,
-	mongoModeler mongomodel.MongoModeler) Server {
+	mongoModeler mongomodel.MongoModeler,
+	conf *config.Config,
+	isTestMode bool,
+) Server {
 	if port == 0 {
 		port = conf.Server.Port
 	}
 
 	return &server{
 		gin:          gin,
-		middleware:   middleware,
-		logger:       logger,
-		isTestMode:   isTestMode,
-		conf:         conf,
 		port:         port,
+		middleware:   middleware,
+		controller:   controller,
+		logger:       logger,
 		userRepo:     userRepo,
 		mongoModeler: mongoModeler,
+		serverConf:   conf.Server,
+		proxyConf:    conf.Proxy,
+		apiConf:      conf.API,
+		redisConf:    conf.Redis,
+		developConf:  conf.Develop,
+		isTestMode:   isTestMode,
 	}
 }
 
 // Start is to start server execution
 func (s *server) Start() (*gin.Engine, error) {
-	if s.conf.Environment == "production" {
+	if s.serverConf.IsRelease {
 		// For release
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -84,7 +99,7 @@ func (s *server) Start() (*gin.Engine, error) {
 	s.SetURLOnHTTP(s.gin)
 
 	// Set Profiling
-	if s.conf.Develop.ProfileEnable {
+	if s.developConf.ProfileEnable {
 		ginpprof.Wrapper(s.gin)
 	}
 
@@ -128,22 +143,24 @@ func (s *server) setMiddleWare() {
 }
 
 func (s *server) initSession() {
-	red := s.conf.Redis
-	if s.conf.Environment == "heroku" {
+	s.herokuRedisSetting()
+	if s.redisConf.IsSession && s.redisConf.Host != "" && s.redisConf.Port != 0 {
+		s.logger.Debug("initSession: redis session start")
+		sess.SetSession(s.gin, s.logger, fmt.Sprintf("%s:%d", s.redisConf.Host, s.redisConf.Port), s.redisConf.Pass, s.serverConf.Session)
+	} else {
+		sess.SetSession(s.gin, s.logger, "", "", s.serverConf.Session)
+	}
+}
+
+func (s *server) herokuRedisSetting() {
+	if s.redisConf.IsHeroku {
 		host, pass, port, err := hrk.GetRedisInfo("")
 		if err == nil && host != "" && port != 0 {
-			red.Session = true
-			red.Host = host
-			red.Port = uint16(port)
-			red.Pass = pass
+			s.redisConf.IsSession = true
+			s.redisConf.Host = host
+			s.redisConf.Port = uint16(port)
+			s.redisConf.Pass = pass
 		}
-	}
-
-	if red.Session && red.Host != "" && red.Port != 0 {
-		s.logger.Debug("initSession: redis session start")
-		sess.SetSession(s.gin, s.logger, fmt.Sprintf("%s:%d", red.Host, red.Port), red.Pass, s.conf.Server.Session)
-	} else {
-		sess.SetSession(s.gin, s.logger, "", "", s.conf.Server.Session)
 	}
 }
 
@@ -157,7 +174,7 @@ func (s *server) loadTemplates() {
 	// r.LoadHTMLGlob(path + "templates/pages/**/*")
 	// r.LoadHTMLGlob(path + "templates/components/*")
 
-	rootPath := s.conf.Server.Docs.Path
+	rootPath := s.serverConf.Docs.Path
 
 	ext := []string{"tmpl"}
 
@@ -209,7 +226,7 @@ func getTempFunc() template.FuncMap {
 }
 
 func (s *server) loadStaticFiles() {
-	rootPath := s.conf.Server.Docs.Path
+	rootPath := s.serverConf.Docs.Path
 
 	// r.Static("/static", "/var/www")
 	s.gin.Static("/statics", rootPath+"/web/statics")
@@ -219,7 +236,7 @@ func (s *server) loadStaticFiles() {
 }
 
 func (s *server) run() error {
-	if s.conf.Proxy.Mode == 2 {
+	if s.proxyConf.Mode == 2 {
 		// Proxy(Nginx) settings
 		color.Red("[WARNING] running on fcgi mode.")
 		s.logger.Info("running on fcgi mode.")

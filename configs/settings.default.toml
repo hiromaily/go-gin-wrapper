@@ -1,5 +1,5 @@
-#local, heroku, docker, staging, production
-environment = "local"
+
+is_signal = true # enable Ctrl+C to shutdown server
 
 [logger]
 service = "go-gin"
@@ -11,6 +11,7 @@ is_stacktrace = true
 # Server
 #------------------------------------------------------------------------------
 [server]
+is_release = false
 scheme = "http"
 host = "localhost"
 port = 8080
@@ -98,17 +99,18 @@ call_back_url = "http://localhost:8080/oauth2/facebook/callback"
 encrypted = false
 host = "localhost"
 port = 3306
-dbname = "maindb"
-user = "testuser"
-pass = "12345678"
+dbname = "gogin"
+user = "guestuser"
+pass = "secret123"
+is_debug_log = true
 
 [mysql.test]
 encrypted = false
 host = "localhost"
 port = 3306
-dbname = "testdb"
-user = "testuser"
-pass = "12345678"
+dbname = "gogin"
+user = "guestuser"
+pass = "secret123"
 
 #------------------------------------------------------------------------------
 # Redis for cache
@@ -118,7 +120,8 @@ encrypted = false
 host = "localhost"
 port = 6379
 pass = ""
-session = false
+is_session = false
+is_heroku = false
 
 #------------------------------------------------------------------------------
 # MongoDB

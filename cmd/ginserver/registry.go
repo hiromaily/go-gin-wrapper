@@ -2,9 +2,9 @@ package main
 
 import (
 	"database/sql"
-	"log"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/volatiletech/sqlboiler/boil"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
@@ -14,8 +14,8 @@ import (
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/storage/mysql"
-	rd "github.com/hiromaily/go-gin-wrapper/pkg/storage/redis"
 )
 
 // Registry is for registry interface
@@ -29,7 +29,7 @@ type registry struct {
 	isTestMode  bool
 	conf        *config.Config
 	mysqlClient *sql.DB
-	redisConn   *redis.Conn
+	// redisClient *redis.Conn
 }
 
 // NewRegistry is to register regstry interface
@@ -37,7 +37,6 @@ func NewRegistry(conf *config.Config, isTestMode bool) Registry {
 	return &registry{
 		isTestMode: isTestMode,
 		conf:       conf,
-		redisConn:  newRedisConn(conf),
 	}
 }
 
@@ -61,13 +60,14 @@ func (r *registry) NewServer(port int) server.Server {
 
 	return server.NewServer(
 		r.newGin(),
-		r.newMiddleware(),
-		r.newLogger(),
-		r.isTestMode,
-		r.conf,
 		port,
+		r.newMiddleware(),
+		r.newController(),
+		r.newLogger(),
 		r.newUserRepository(),
 		r.newMongoModeler(),
+		r.conf,
+		r.isTestMode,
 	)
 }
 
@@ -80,12 +80,23 @@ func (r *registry) newGin() *gin.Engine {
 
 func (r *registry) newMiddleware() server.Middlewarer {
 	return server.NewMiddleware(
-		r.logger,
+		r.newLogger(),
 		r.conf.Server,
 		r.conf.Proxy,
 		r.conf.API,
 		r.conf.API.CORS,
 		r.conf.Develop,
+	)
+}
+
+func (r *registry) newController() *controller.Controller {
+	return controller.NewController(
+		r.newLogger(),
+		r.newUserRepository(),
+		r.newMongoModeler(),
+		r.conf.API.Header,
+		r.conf.API.CORS,
+		r.conf.Auth,
 	)
 }
 
@@ -109,9 +120,9 @@ func (r *registry) newMySQLClient() *sql.DB {
 		}
 		r.mysqlClient = dbConn
 	}
-	//if r.conf.MySQL.Debug {
-	//	boil.DebugMode = true
-	//}
+	if r.conf.MySQL.IsDebugLog {
+		boil.DebugMode = true
+	}
 
 	return r.mysqlClient
 }
@@ -121,14 +132,16 @@ func (r *registry) newUserRepository() repository.UserRepositorier {
 }
 
 // newRedisConn is to create redis connection
-func newRedisConn(conf *config.Config) *redis.Conn {
-	conn, err := rd.NewRedis(conf)
-	if err != nil {
-		log.Println("failed to create redis connection")
-		return nil
-	}
-	return conn
-}
+//func (r *registry) newRedisConn(conf *config.RedisConfig) *redis.Conn {
+//	if r.redisClient == nil {
+//		redisConn, err := rd.NewRedis(conf)
+//		if err != nil {
+//			panic(err)
+//		}
+//		r.redisClient = redisConn
+//	}
+//	return r.redisClient
+//}
 
 func (r *registry) newMongoModeler() mongomodel.MongoModeler {
 	storager, err := mongomodel.NewMongoModeler(r.conf)

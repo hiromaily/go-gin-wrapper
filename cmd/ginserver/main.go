@@ -39,7 +39,7 @@ func main() {
 	// config.New(*tomlPath, true)
 
 	// debug mode
-	if conf.Environment == "local" {
+	if conf.IsSignal {
 		// signal
 		go signal.StartSignal()
 	}

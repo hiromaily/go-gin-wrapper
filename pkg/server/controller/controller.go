@@ -16,22 +16,22 @@ type Controller struct {
 	userRepo  repository.UserRepositorier
 	mongo     mongomodel.MongoModeler
 	apiHeader *config.HeaderConfig
-	auth      *config.AuthConfig
 	cors      *config.CORSConfig
+	auth      *config.AuthConfig
 	// TODO: session should be added here
 }
 
 // NewController is to return Controller
 func NewController(
-	userRepo repository.UserRepositorier,
 	logger *zap.Logger,
+	userRepo repository.UserRepositorier,
 	mongo mongomodel.MongoModeler,
 	apiHeader *config.HeaderConfig,
-	auth *config.AuthConfig,
-	cors *config.CORSConfig) *Controller {
+	cors *config.CORSConfig,
+	auth *config.AuthConfig) *Controller {
 	return &Controller{
-		userRepo:  userRepo,
 		logger:    logger,
+		userRepo:  userRepo,
 		mongo:     mongo,
 		apiHeader: apiHeader,
 		auth:      auth,

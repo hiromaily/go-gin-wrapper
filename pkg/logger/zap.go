@@ -88,5 +88,5 @@ func NewZapLogger(conf *config.Logger) *zap.Logger {
 		os.Stdout,
 		LogEnv(conf.Env),
 		getLogLevel(conf.Level),
-		conf.IsLogger).Named(conf.Service)
+		conf.IsStackTrace).Named(conf.Service)
 }

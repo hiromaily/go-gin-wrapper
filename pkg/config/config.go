@@ -17,29 +17,30 @@ var (
 
 // Config is of root
 type Config struct {
-	Environment string  `toml:"environment" validate:"required"`
-	Logger      *Logger `toml:"logger"`
-	Server      *ServerConfig
-	Proxy       *ProxyConfig
-	API         *APIConfig
-	Auth        *AuthConfig
-	MySQL       *MySQLConfig `toml:"mysql" validate:"required"`
-	Redis       *RedisConfig `toml:"redis" validate:"required"`
-	Mongo       *MongoConfig `toml:"mongodb"`
-	Aws         *AwsConfig
-	Develop     *DevelopConfig
+	IsSignal bool    `toml:"is_signal"`
+	Logger   *Logger `toml:"logger"`
+	Server   *ServerConfig
+	Proxy    *ProxyConfig
+	API      *APIConfig
+	Auth     *AuthConfig
+	MySQL    *MySQLConfig `toml:"mysql" validate:"required"`
+	Redis    *RedisConfig `toml:"redis" validate:"required"`
+	Mongo    *MongoConfig `toml:"mongodb"`
+	Aws      *AwsConfig
+	Develop  *DevelopConfig
 }
 
 // Logger logger info
 type Logger struct {
-	Service  string `toml:"service" validate:"required"`
-	Env      string `toml:"env" validate:"oneof=dev prod custom"`
-	Level    string `toml:"level" validate:"required"`
-	IsLogger bool   `toml:"is_logger"`
+	Service      string `toml:"service" validate:"required"`
+	Env          string `toml:"env" validate:"oneof=dev prod custom"`
+	Level        string `toml:"level" validate:"required"`
+	IsStackTrace bool   `toml:"is_stacktrace"`
 }
 
 // ServerConfig is for web server
 type ServerConfig struct {
+	IsRelease bool            `toml:"is_release"`
 	Scheme    string          `toml:"scheme" validate:"required"`
 	Host      string          `toml:"host" validate:"required"`
 	Port      int             `toml:"port" validate:"required"`
@@ -152,12 +153,13 @@ type MySQLConfig struct {
 
 // MySQLContentConfig is for MySQL Server
 type MySQLContentConfig struct {
-	Encrypted bool   `toml:"encrypted"`
-	Host      string `toml:"host"`
-	Port      uint16 `toml:"port"`
-	DBName    string `toml:"dbname"`
-	User      string `toml:"user"`
-	Pass      string `toml:"pass"`
+	Encrypted  bool   `toml:"encrypted"`
+	Host       string `toml:"host"`
+	Port       uint16 `toml:"port"`
+	DBName     string `toml:"dbname"`
+	User       string `toml:"user"`
+	Pass       string `toml:"pass"`
+	IsDebugLog bool   `toml:"is_debug_log"`
 }
 
 // RedisConfig is for Redis Server
@@ -166,7 +168,8 @@ type RedisConfig struct {
 	Host      string `toml:"host"`
 	Port      uint16 `toml:"port"`
 	Pass      string `toml:"pass"`
-	Session   bool   `toml:"session"`
+	IsSession bool   `toml:"is_session"`
+	IsHeroku  bool   `toml:"is_heroku"`
 }
 
 // MongoConfig is for MongoDB Server

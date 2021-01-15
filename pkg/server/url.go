@@ -5,25 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	ctls "github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
-	//"github.com/hiromaily/go-gin-wrapper/controller/chat"
 )
 
 // SetURLOnHTTP is for HTTP
 func (s *server) SetURLOnHTTP(r *gin.Engine) {
-	// m := melody.New()
-
-	ctl := ctls.NewController(
-		s.userRepo,
-		s.logger,
-		// s.kvsStorager.CreateDBModel(),
-		s.mongoModeler,
-		s.conf.API.Header,
-		s.conf.Auth,
-		s.conf.API.CORS,
-	)
-
 	/******************************************************************************/
 	/******** Return HTML *********************************************************/
 	/******************************************************************************/
@@ -32,7 +18,7 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	// Base(Top Level)
 	//-----------------------
 
-	r.GET("/", ctl.BaseIndexAction)
+	r.GET("/", s.controller.BaseIndexAction)
 	// Redirect
 	r.GET("/index", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")
@@ -40,12 +26,12 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	r.HEAD("/", func(c *gin.Context) {}) // For helth check
 
 	// Login
-	r.GET("/login", ctl.BaseLoginGetAction)
-	r.POST("/login", s.middleware.CheckHTTPRefererAndCSRF(), ctl.BaseLoginPostAction)
+	r.GET("/login", s.controller.BaseLoginGetAction)
+	r.POST("/login", s.middleware.CheckHTTPRefererAndCSRF(), s.controller.BaseLoginPostAction)
 
 	// Loout
-	r.PUT("/logout", ctl.BaseLogoutPutAction)   // For Ajax
-	r.POST("/logout", ctl.BaseLogoutPostAction) // HTML
+	r.PUT("/logout", s.controller.BaseLogoutPutAction)   // For Ajax
+	r.POST("/logout", s.controller.BaseLogoutPostAction) // HTML
 
 	//-----------------------
 	// News
@@ -53,7 +39,7 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	newsG := r.Group("/news")
 	{
 		// Top
-		newsG.GET("/", ctl.NewsIndexAction)
+		newsG.GET("/", s.controller.NewsIndexAction)
 	}
 	// r.GET("/news/", news.NewsGetAction)
 
@@ -63,8 +49,8 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	apiListG := r.Group("/apilist")
 	{
 		// Top
-		apiListG.GET("/", ctl.APIListIndexAction)
-		apiListG.GET("/index2", ctl.APIListIndex2Action)
+		apiListG.GET("/", s.controller.APIListIndexAction)
+		apiListG.GET("/index2", s.controller.APIListIndex2Action)
 	}
 
 	//-----------------------
@@ -89,14 +75,14 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	{
 		//--Google--
 		//Sign in
-		oauth2G.GET("/google/signin", ctl.OAuth2SignInGoogleAction)
+		oauth2G.GET("/google/signin", s.controller.OAuth2SignInGoogleAction)
 		// Callback
-		oauth2G.GET("/google/callback", ctl.OAuth2CallbackGoogleAction)
+		oauth2G.GET("/google/callback", s.controller.OAuth2CallbackGoogleAction)
 		//--Facebook--
 		//Sign in
-		oauth2G.GET("/facebook/signin", ctl.OAuth2SignInFacebookAction)
+		oauth2G.GET("/facebook/signin", s.controller.OAuth2SignInFacebookAction)
 		// Callback
-		oauth2G.GET("/facebook/callback", ctl.OAuth2CallbackFacebookAction)
+		oauth2G.GET("/facebook/callback", s.controller.OAuth2CallbackFacebookAction)
 	}
 
 	//-----------------------
@@ -106,19 +92,19 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	accountsG := r.Group("/accounts")
 	{
 		// Top
-		accountsG.GET("/", ctl.AccountIndexAction)
+		accountsG.GET("/", s.controller.AccountIndexAction)
 	}
 	// r.GET("/accounts/", accounts.AccountsGetAction)
 
 	//-----------------------
 	// Admin [BasicAuth()]
 	//-----------------------
-	ba := s.conf.Server.BasicAuth
+	basicAuth := s.serverConf.BasicAuth
 	authorized := r.Group("/admin", gin.BasicAuth(gin.Accounts{
-		ba.User: ba.Pass,
+		basicAuth.User: basicAuth.Pass,
 	}))
 
-	authorized.GET("/", ctl.AdminIndexAction)
+	authorized.GET("/", s.controller.AdminIndexAction)
 	authorized.GET("/index", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
@@ -126,8 +112,8 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	//-----------------------
 	/* Error HTML */
 	//-----------------------
-	r.NoRoute(ctl.Error404Action)
-	r.NoMethod(ctl.Error405Action)
+	r.NoRoute(s.controller.Error404Action)
+	r.NoMethod(s.controller.Error405Action)
 
 	/******************************************************************************/
 	/************ REST API (For Ajax) *********************************************/
@@ -137,7 +123,7 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	//-----------------------
 	jwt := r.Group("/api/jwt", s.middleware.CheckHTTPHeader())
 	{
-		jwt.POST("", ctl.APIJWTIndexPostAction) // jwt end point
+		jwt.POST("", s.controller.APIJWTIndexPostAction) // jwt end point
 	}
 
 	//-----------------------
@@ -149,29 +135,29 @@ func (s *server) SetURLOnHTTP(r *gin.Engine) {
 	//  it let us faster to develop instead of a bit less performance.
 	handlers := []gin.HandlerFunc{s.middleware.CheckHTTPHeader()}
 	// JWT
-	if s.conf.API.JWT.Mode != 0 {
+	if s.apiConf.JWT.Mode != 0 {
 		handlers = append(handlers, s.middleware.CheckJWT())
 	}
 	// CORS
-	if s.conf.API.CORS.Enabled {
+	if s.apiConf.CORS.Enabled {
 		handlers = append(handlers, s.middleware.CheckCORS())
 	}
 
 	// users := r.Group("/api/users", CheckHttpHeader(), CheckJWT())
 	users := r.Group("/api/users", handlers...)
 	{
-		users.GET("", ctl.APIUserListGetAction)          // Get user list
-		users.POST("", ctl.APIUserInsertPostAction)      // Register for new user
-		users.GET("/id/:id", ctl.APIUserGetAction)       // Get specific user
-		users.PUT("/id/:id", ctl.APIUserPutAction)       // Update specific user
-		users.DELETE("/id/:id", ctl.APIUserDeleteAction) // Delete specific user
+		users.GET("", s.controller.APIUserListGetAction)          // Get user list
+		users.POST("", s.controller.APIUserInsertPostAction)      // Register for new user
+		users.GET("/id/:id", s.controller.APIUserGetAction)       // Get specific user
+		users.PUT("/id/:id", s.controller.APIUserPutAction)       // Update specific user
+		users.DELETE("/id/:id", s.controller.APIUserDeleteAction) // Delete specific user
 		// for unnecessary parameter, use *XXXX. e.g. /user/:name/*action
 
 		// panic: path segment 'ids' conflicts with existing wildcard ':id' in path '/api/users/ids'
-		users.GET("/ids", ctl.APIUserIDsGetAction) // Get user list
+		users.GET("/ids", s.controller.APIUserIDsGetAction) // Get user list
 
 		// Accept CORS
-		users.OPTIONS("", cors.SetHeader(s.logger, s.conf.API.CORS))
+		users.OPTIONS("", cors.SetHeader(s.logger, s.apiConf.CORS))
 	}
 
 	// TODO:When user can use only method of GET and POST, X-HTTP-Method-Override header may be helpful.

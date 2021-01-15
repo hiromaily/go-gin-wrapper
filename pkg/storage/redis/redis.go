@@ -10,19 +10,17 @@ import (
 )
 
 // NewRedis is to return redis connection
-func NewRedis(conf *config.Config) (*redis.Conn, error) {
-	red := conf.Redis
-
+func NewRedis(conf *config.RedisConfig) (*redis.Conn, error) {
 	var conn redis.Conn
 	var err error
-	if conf.Environment == "heroku" {
+	if conf.IsHeroku {
 		conn, err = redis.DialURL(os.Getenv("REDIS_URL"))
 	} else {
-		if red.Pass != "" {
+		if conf.Pass != "" {
 			// plus password
-			conn, err = redis.Dial("tcp", fmt.Sprintf("%s:%d", red.Host, red.Port), redis.DialPassword(red.Pass))
+			conn, err = redis.Dial("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port), redis.DialPassword(conf.Pass))
 		} else {
-			conn, err = redis.Dial("tcp", fmt.Sprintf("%s:%d", red.Host, red.Port))
+			conn, err = redis.Dial("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 		}
 	}
 	if err != nil {
