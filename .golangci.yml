@@ -3,9 +3,12 @@ run:
   build-tags:
     - integration
   skip-dirs:
+    - build
+    - configs
+    - scripts
+    - testdata
+    - web
     - vendor
-    - data
-    - data
 
 linters-settings:
   misspell:

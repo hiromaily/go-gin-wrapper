@@ -1,5 +1,5 @@
 # Dcokerfile for go-gin-wrapper
-FROM golang:1.13.3-alpine3.10
+FROM golang:1.15.6-alpine3.12
 
 RUN apk add --no-cache git mysql-client
 
