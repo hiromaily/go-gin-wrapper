@@ -6,7 +6,7 @@ run:
     - build
     - configs
     - scripts
-    - testdata
+    - test
     - web
     - vendor
 

@@ -7,13 +7,17 @@ currentVer=$(shell go version | awk '{print $3}' | sed -e "s/go//" | cut -d'.' -
 ###############################################################################
 # Setup
 ###############################################################################
+#.PHONY: gen-jwt-key
+#gen-jwt-key:
+#	openssl genrsa -out private.pem -aes256 4096
+#	openssl rsa -pubout -in private.pem -out public.pem
+
 #.PHONY: install-sqlboiler
 #install-sqlboiler: SQLBOILER_VERSION=4.4.0
 #install-sqlboiler:
 #	echo SQLBOILER_VERSION is $(SQLBOILER_VERSION)
 #	go get github.com/volatiletech/sqlboiler@v$(SQLBOILER_VERSION)
 #	go get github.com/volatiletech/sqlboiler/drivers/sqlboiler-mysql@v$(SQLBOILER_VERSION)
-
 .PHONY: sqlboiler
 sqlboiler:
 	sqlboiler --wipe mysql

@@ -20,7 +20,7 @@ services:
       #- ./cmd:/go/src/github.com/hiromaily/go-gin-wrapper/cmd
       #- ./pkg:/go/src/github.com/hiromaily/go-gin-wrapper/core
       #- ./configs:/go/src/github.com/hiromaily/go-gin-wrapper/configs
-      #- ./testdata:/go/src/github.com/hiromaily/go-gin-wrapper/testdata
+      #- ./test:/go/src/github.com/hiromaily/go-gin-wrapper/test
       #- ./web:/go/src/github.com/hiromaily/go-gin-wrapper/web
       #- ./go.mod:/go/src/github.com/hiromaily/go-gin-wrapper/go.mod
     environment:

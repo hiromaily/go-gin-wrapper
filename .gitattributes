@@ -1,5 +1,5 @@
 *.tmpl linguist-language=golang
-testdata/* linguist-documentation
+test/* linguist-documentation
 build/* linguist-documentation
 go.mod/* linguist-documentation
 vendor/* linguist-documentation

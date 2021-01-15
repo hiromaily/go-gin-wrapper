@@ -71,8 +71,8 @@ key = "key12345"
 [api.jwt]
 mode = 2   #0:off, 1:HMAC, 2:RSA
 secret_code = ""
-private_key = "/Users/hy/.ssh/jwt_rsa"
-public_key = "/Users/hy/.ssh/jwt_rsa.pub"
+private_key = "./test/rsakey/jwttest_rsa"
+public_key = "./test/rsakey/jwttest_rsa.pub"
 
 #------------------------------------------------------------------------------
 # Auth

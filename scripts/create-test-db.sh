@@ -14,7 +14,7 @@ echo ${DB_PASS}
 echo ${DB_PORT}
 echo ${DB_NAME}
 
-SQL_DIR=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/testdata/sql
+SQL_DIR=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/test/sql
 
 # Dump
 #mysqldump -u root -p hiromaily > data_hiromaily.sql
