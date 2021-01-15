@@ -4,26 +4,28 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
-	lg "github.com/hiromaily/golibs/log"
 )
 
 // TODO:define as common use.
 // nolint: unused, deadcode
-func debugContext(c *gin.Context) {
-	lg.Debugf("[c *gin.Context]: %#v \n", c)
-	lg.Debugf("[c.Keys]: %#v \n", c.Keys)
-	lg.Debugf("[c.Request.Method]: %s \n", c.Request.Method)
-	lg.Debugf("[c.Request.Header]: %#v \n", c.Request.Header)
-	lg.Debugf("[c.Request.Body]: %#v \n", c.Request.Body)
-	lg.Debugf("[c.Request.URL]: %#v \n", c.Request.URL)
-	lg.Debugf("[c.Value(ajax)]: %s \n", c.Value("ajax"))
-	lg.Debugf("[hh.GetUrl(c)]: %s \n", hh.GetURL(c))
-	lg.Debugf("[hh.GetProto(c)]: %s \n", hh.GetProto(c))
+func debugContext(c *gin.Context, logger *zap.Logger) {
+	logger.Debug("request",
+		zap.Any("gin_context", c),
+		zap.Any("gin_keys", c.Keys),
+		zap.String("request_method", c.Request.Method),
+		zap.Any("request_header", c.Request.Header),
+		zap.Any("request_body", c.Request.Body),
+		zap.Any("request_url", c.Request.URL),
+		zap.Any("request_ajax", c.Value("ajax")),
+		zap.String("request_get_url", hh.GetURL(c)),
+		zap.String("request_get_protocol", hh.GetProto(c)),
+	)
 }
 
 // response for Login Page
@@ -76,11 +78,9 @@ func (ctl *Controller) BaseLoginGetAction(c *gin.Context) {
 
 	// If already loged in, go another page using redirect
 	// Judge loged in or not.
-	if bRet, id := sess.IsLogin(c); bRet {
-		lg.Debugf("id: %d", id)
-
+	if bRet, _ := sess.IsLogin(c); bRet {
 		// Redirect[GET]
-		// FIXME:Browser request cache data when redirecting at status code 301
+		// FIXME: Browser request cache data when redirecting at status code 301
 		// https://infra.xyz/archives/75
 		// 301 Moved Permanently   (Do cache,   it's possible to change from POST to GET)
 		// 302 Found               (Not cache,  it's possible to change from POST to GET)
@@ -99,9 +99,6 @@ func (ctl *Controller) BaseLoginGetAction(c *gin.Context) {
 
 // BaseLoginPostAction is to receive user request from login page [POST]
 func (ctl *Controller) BaseLoginPostAction(c *gin.Context) {
-	// debug log
-	// debugContext(c)
-
 	// check login
 	userID, posted, errs := ctl.CheckLoginOnHTML(c)
 	if errs != nil {
@@ -124,13 +121,11 @@ func (ctl *Controller) BaseLoginPostAction(c *gin.Context) {
 
 // BaseLogoutPostAction is for logout [POST]
 func (ctl *Controller) BaseLogoutPostAction(c *gin.Context) {
-	lg.Debug("LogoutPostAction")
-	// lg.Debug(sess.IsLogin(c))
+	ctl.logger.Debug("LogoutPostAction")
 
 	// Session
 	sess.Logout(c)
 
-	// View
 	// View
 	res := gin.H{
 		"title":    "Logout Page",
@@ -141,13 +136,10 @@ func (ctl *Controller) BaseLogoutPostAction(c *gin.Context) {
 
 // BaseLogoutPutAction is for logout by Ajax [PUT]
 func (ctl *Controller) BaseLogoutPutAction(c *gin.Context) {
-	lg.Debug("LogoutPutAction")
-	// lg.Debug(sess.IsLogin(c))
+	ctl.logger.Debug("LogoutPutAction")
 
 	// Session
 	sess.Logout(c)
-
-	// lg.Debug(sess.IsLogin(c))
 
 	// View
 	c.JSON(http.StatusOK, gin.H{

@@ -1,14 +1,11 @@
 package encryption
 
 import (
-	//"fmt"
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
-	"fmt"
-
-	// lg "github.com/hiromaily/golibs/log"
 	"encoding/base64"
+	"fmt"
 	"io"
 
 	"golang.org/x/crypto/scrypt"
@@ -74,9 +71,6 @@ func GetScrypt(baseString string) string {
 	salt := "@#$%7G8r"
 	// func Key(password, salt []byte, N, r, p, keyLen int) ([]byte, error) {
 	dk, _ := scrypt.Key([]byte(baseString), []byte(salt), 16384, 8, 1, 32)
-
-	// result is not readable.
-	// lg.Debugf("Scrypt: %s\n", dk)
 
 	// In order to read, it should be encoded by base64
 	result := base64.StdEncoding.EncodeToString(dk)

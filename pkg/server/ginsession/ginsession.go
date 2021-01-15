@@ -98,7 +98,6 @@ func GetTokenSession(c *gin.Context) string {
 
 // IsTokenSessionValid is whether check token is valid or not
 func IsTokenSessionValid(c *gin.Context, logger *zap.Logger, token string) bool {
-
 	logger.Info("IsTokenSessionValid",
 		zap.String("GetTokenSession()", GetTokenSession(c)),
 		zap.String("token", token),
@@ -106,11 +105,11 @@ func IsTokenSessionValid(c *gin.Context, logger *zap.Logger, token string) bool 
 
 	var err error
 	if GetTokenSession(c) == "" && token == "" {
-		err = errors.New("Token is not allowed as blank.")
+		err = errors.New("token is not allowed as blank")
 	} else if GetTokenSession(c) == "" {
-		err = errors.New("Token is missing. Session might have expired.")
+		err = errors.New("token is missing. Session might have expired")
 	} else if GetTokenSession(c) != token {
-		err = errors.New("Token is invalid.")
+		err = errors.New("token is invalid")
 	} else {
 		return true
 	}

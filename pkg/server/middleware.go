@@ -34,7 +34,7 @@ type Middlewarer interface {
 
 // server object
 type middleware struct {
-	//session xxxx
+	// session xxxx
 	logger      *zap.Logger
 	serverConf  *config.ServerConfig
 	proxyConf   *config.ProxyConfig

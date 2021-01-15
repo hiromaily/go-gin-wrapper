@@ -11,7 +11,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
-	lg "github.com/hiromaily/golibs/log"
 )
 
 // Serverer is Serverer interface
@@ -82,7 +81,7 @@ func (s *Server) singleReverseProxy() {
 // Multiple Reverse Proxy
 func (s *Server) multipleReverseProxy() {
 	ports := s.conf.Proxy.Server.WebPort
-	lg.Infof("multipleReverseProxy(): number of servers is %d", len(ports))
+	s.logger.Info("multipleReverseProxy", zap.Int("server_num", len(ports)))
 	// As precondition, increment port number by one.
 
 	// web servers

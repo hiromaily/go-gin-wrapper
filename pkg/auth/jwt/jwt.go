@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 
 	jwt "github.com/dgrijalva/jwt-go"
-
-	lg "github.com/hiromaily/golibs/log"
 	//"time"
 )
 
@@ -32,11 +30,6 @@ var (
 	encrypted        uint8 = 2 // 1:HMAC, 2:RSA
 	secret                 = "default-secret-key"
 )
-
-func init() {
-	// log
-	lg.InitializeLog(lg.DebugStatus, lg.NoDateNoFile, "[JWT]", "", "hiromaily")
-}
 
 // InitAudience is to set audience
 func InitAudience(str string) {
@@ -98,8 +91,6 @@ func getClaims(t int64, clientID, userName string) jwt.StandardClaims {
 // CreateBasicToken is to encode Header,Payload,Signature by Base64 and concatenate these by dot.
 // This is for basic claim
 func CreateBasicToken(t int64, clientID, userName string) (string, error) {
-	lg.Info("CreateBasicToken()")
-
 	// payload
 	claims := getClaims(t, clientID, userName)
 
@@ -118,8 +109,6 @@ func CreateBasicToken(t int64, clientID, userName string) (string, error) {
 // CreateToken is to encode Header,Payload,Signature by Base64 and concatenate these by dot.
 // This is for user defined claim
 func CreateToken(t int64, clientID, userName, option string) (string, error) {
-	lg.Info("CreateToken()")
-
 	// Create the Claims
 	// payload
 	claims := getClaims(t, clientID, userName)
@@ -140,8 +129,6 @@ func CreateToken(t int64, clientID, userName, option string) (string, error) {
 
 // judge parse
 func judgeParse(token *jwt.Token) (interface{}, error) {
-	lg.Info("judgeParse()")
-
 	ok := false
 	if encrypted == HMAC {
 		_, ok = token.Method.(*jwt.SigningMethodHMAC)
@@ -163,8 +150,6 @@ func judgeParse(token *jwt.Token) (interface{}, error) {
 
 // JudgeJWT is to check token (it may be too strict to check)
 func JudgeJWT(tokenString string) error {
-	lg.Info("JudgeJWT()")
-
 	// token
 	token, err := jwt.Parse(tokenString, judgeParse)
 
@@ -180,8 +165,6 @@ func JudgeJWT(tokenString string) error {
 // JudgeJWTWithClaim is to check token by clientID and userName
 // It may be too strict to check
 func JudgeJWTWithClaim(tokenString, clientID, userName string) error {
-	lg.Info("JudgeJWTWithClaim()")
-
 	// token, err := jwt.Parse(tokenString, judgeParse)
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, judgeParse)
 
@@ -207,8 +190,6 @@ func JudgeJWTWithClaim(tokenString, clientID, userName string) error {
 // JudgeJWTWithCustomClaim is to check token by clientId and userName and option
 // It may be too strict to check
 func JudgeJWTWithCustomClaim(tokenString, clientID, userName, option string) error {
-	lg.Info("JudgeJWTWithCustomClaim()")
-
 	// token
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, judgeParse)
 

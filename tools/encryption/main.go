@@ -36,7 +36,6 @@ func init() {
 }
 
 func setup() {
-
 	key := os.Getenv("ENC_KEY")
 	iv := os.Getenv("ENC_IV")
 

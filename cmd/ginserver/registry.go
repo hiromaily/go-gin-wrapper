@@ -52,7 +52,6 @@ func (r *registry) initAuth() {
 		}
 	} else {
 		jwt.InitEncrypted(jwt.HMAC)
-		// lg.Debug("JWT Auth is not available because of toml settings.")
 	}
 }
 

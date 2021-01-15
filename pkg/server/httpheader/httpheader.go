@@ -27,7 +27,6 @@ func IsRefererHostValid(c *gin.Context, logger *zap.Logger, srvConf *config.Serv
 
 	// http://localhost:9999/login
 	logger.Debug("IsRefererHostValid", zap.String("Referer", c.Request.Header.Get("Referer")))
-	// lg.Debugf("Referer: %s", c.Request.Referer())
 
 	// default action
 	if url != c.Request.Referer() {
