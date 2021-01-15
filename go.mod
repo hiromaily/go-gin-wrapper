@@ -10,15 +10,22 @@ require (
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.10.0
+	github.com/friendsofgo/errors v0.9.2
 	github.com/garyburd/redigo v1.6.2
 	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1
+	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/hiromaily/golibs v0.0.0-20201019070620-8c38788571a9
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/spf13/cast v1.3.1 // indirect
 	github.com/ugorji/go v1.2.3 // indirect
+	github.com/volatiletech/inflect v0.0.1 // indirect
+	github.com/volatiletech/null v8.0.0+incompatible
+	github.com/volatiletech/sqlboiler v3.7.1+incompatible
+	go.uber.org/zap v1.14.0
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 	golang.org/x/oauth2 v0.0.0-20210113205817-d3ed898aa8a3
 	golang.org/x/sys v0.0.0-20210113181707-4bcb84eeeb78 // indirect

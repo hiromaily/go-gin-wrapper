@@ -19,9 +19,9 @@ type CustomClaims struct {
 }
 
 const (
-	//HMAC is for signature
+	// HMAC is for signature
 	HMAC uint8 = 1
-	//RSA is for signature
+	// RSA is for signature
 	RSA uint8 = 2
 )
 
@@ -29,12 +29,12 @@ var (
 	privateKeyParsed *rsa.PrivateKey
 	publicKeyParsed  *rsa.PublicKey
 	audience               = "hiromaily.com"
-	encrypted        uint8 = 2 //1:HMAC, 2:RSA
+	encrypted        uint8 = 2 // 1:HMAC, 2:RSA
 	secret                 = "default-secret-key"
 )
 
 func init() {
-	//log
+	// log
 	lg.InitializeLog(lg.DebugStatus, lg.NoDateNoFile, "[JWT]", "", "hiromaily")
 }
 
@@ -72,22 +72,22 @@ func getMethod() jwt.SigningMethod {
 		return jwt.SigningMethodHS256
 	}
 
-	//RSA
+	// RSA
 	return jwt.SigningMethodRS256
 }
 
 // Payload
 func getClaims(t int64, clientID, userName string) jwt.StandardClaims {
-	//Audience  string `json:"aud,omitempty"` // https://login.hiromaily.com
-	//ExpiresAt int64  `json:"exp,omitempty"`
-	//Id        string `json:"jti,omitempty"`
-	//IssuedAt  int64  `json:"iat,omitempty"`
-	//Issuer    string `json:"iss,omitempty"` // OAuth client_id
-	//NotBefore int64  `json:"nbf,omitempty"`
-	//Subject   string `json:"sub,omitempty"` // user name or email
+	// Audience  string `json:"aud,omitempty"` // https://login.hiromaily.com
+	// ExpiresAt int64  `json:"exp,omitempty"`
+	// Id        string `json:"jti,omitempty"`
+	// IssuedAt  int64  `json:"iat,omitempty"`
+	// Issuer    string `json:"iss,omitempty"` // OAuth client_id
+	// NotBefore int64  `json:"nbf,omitempty"`
+	// Subject   string `json:"sub,omitempty"` // user name or email
 	claims := jwt.StandardClaims{
 		Audience: audience,
-		//ExpiresAt: time.Now().Add(time.Second * 2).Unix(),
+		// ExpiresAt: time.Now().Add(time.Second * 2).Unix(),
 		ExpiresAt: t,
 		Issuer:    clientID,
 		Subject:   userName,
@@ -103,16 +103,16 @@ func CreateBasicToken(t int64, clientID, userName string) (string, error) {
 	// payload
 	claims := getClaims(t, clientID, userName)
 
-	//token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token := jwt.NewWithClaims(getMethod(), &claims)
 
-	//return token.SignedString([]byte("secret")) //OK
+	// return token.SignedString([]byte("secret")) //OK
 	if encrypted == HMAC {
 		return token.SignedString([]byte(secret))
 	}
 
-	//RSA
-	return token.SignedString(privateKeyParsed) //use private key
+	// RSA
+	return token.SignedString(privateKeyParsed) // use private key
 }
 
 // CreateToken is to encode Header,Payload,Signature by Base64 and concatenate these by dot.
@@ -129,20 +129,20 @@ func CreateToken(t int64, clientID, userName, option string) (string, error) {
 		claims,
 	}
 
-	//SigningMethodRS256
+	// SigningMethodRS256
 	token := jwt.NewWithClaims(getMethod(), cClaims)
 	if encrypted == HMAC {
 		return token.SignedString([]byte(secret))
 	}
-	//RSA
-	return token.SignedString(privateKeyParsed) //use private key
+	// RSA
+	return token.SignedString(privateKeyParsed) // use private key
 }
 
 // judge parse
 func judgeParse(token *jwt.Token) (interface{}, error) {
 	lg.Info("judgeParse()")
 
-	var ok = false
+	ok := false
 	if encrypted == HMAC {
 		_, ok = token.Method.(*jwt.SigningMethodHMAC)
 	} else if encrypted == RSA {
@@ -157,7 +157,7 @@ func judgeParse(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 		//} else if encrypted == RSA {
 	}
-	//RSA
+	// RSA
 	return publicKeyParsed, nil
 }
 
@@ -165,7 +165,7 @@ func judgeParse(token *jwt.Token) (interface{}, error) {
 func JudgeJWT(tokenString string) error {
 	lg.Info("JudgeJWT()")
 
-	//token
+	// token
 	token, err := jwt.Parse(tokenString, judgeParse)
 
 	if err != nil {
@@ -182,7 +182,7 @@ func JudgeJWT(tokenString string) error {
 func JudgeJWTWithClaim(tokenString, clientID, userName string) error {
 	lg.Info("JudgeJWTWithClaim()")
 
-	//token, err := jwt.Parse(tokenString, judgeParse)
+	// token, err := jwt.Parse(tokenString, judgeParse)
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, judgeParse)
 
 	if err != nil {
@@ -191,7 +191,7 @@ func JudgeJWTWithClaim(tokenString, clientID, userName string) error {
 		return fmt.Errorf("token is invalid")
 	}
 
-	//check claim
+	// check claim
 	claims, ok := token.Claims.(*jwt.StandardClaims)
 	if !ok {
 		return fmt.Errorf("claims data can't be retrieved")
@@ -209,7 +209,7 @@ func JudgeJWTWithClaim(tokenString, clientID, userName string) error {
 func JudgeJWTWithCustomClaim(tokenString, clientID, userName, option string) error {
 	lg.Info("JudgeJWTWithCustomClaim()")
 
-	//token
+	// token
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, judgeParse)
 
 	if err != nil {
@@ -218,7 +218,7 @@ func JudgeJWTWithCustomClaim(tokenString, clientID, userName, option string) err
 		return fmt.Errorf("token is invalid")
 	}
 
-	//check claim
+	// check claim
 	claims, ok := token.Claims.(*CustomClaims)
 	if !ok {
 		return fmt.Errorf("claims data can't be retrieved")

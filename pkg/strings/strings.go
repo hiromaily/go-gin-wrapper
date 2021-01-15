@@ -35,6 +35,7 @@ func SearchIndexLower(target string, sources []string) int {
 	return retIdx
 }
 
+// Itos converts interface to string
 func Itos(val interface{}) string {
 	str, ok := val.(string)
 	if !ok {
@@ -43,6 +44,7 @@ func Itos(val interface{}) string {
 	return str
 }
 
+// Atoi converts string to int
 func Atoi(str string) (ret int) {
 	ret, _ = strconv.Atoi(str)
 	return

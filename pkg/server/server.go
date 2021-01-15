@@ -12,7 +12,7 @@ import (
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
-	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/middlewares"
@@ -36,9 +36,9 @@ func NewServerer(
 	isTestMode bool,
 	conf *config.Config,
 	port int,
-	dbModeler dbmodel.DBModeler,
+	userRepo repository.UserRepositorier,
 	mongoModeler mongomodel.MongoModeler) Serverer {
-	return NewServer(isTestMode, conf, port, dbModeler, mongoModeler)
+	return NewServer(isTestMode, conf, port, userRepo, mongoModeler)
 }
 
 // ----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ type Server struct {
 	isTestMode   bool
 	conf         *config.Config
 	port         int
-	dbModeler    dbmodel.DBModeler
+	userRepo     repository.UserRepositorier
 	mongoModeler mongomodel.MongoModeler
 	gin          *gin.Engine
 }
@@ -60,7 +60,7 @@ func NewServer(
 	isTestMode bool,
 	conf *config.Config,
 	port int,
-	dbModeler dbmodel.DBModeler,
+	userRepo repository.UserRepositorier,
 	mongoModeler mongomodel.MongoModeler) *Server {
 	if port == 0 {
 		port = conf.Server.Port
@@ -70,7 +70,7 @@ func NewServer(
 		isTestMode:   isTestMode,
 		conf:         conf,
 		port:         port,
-		dbModeler:    dbModeler,
+		userRepo:     userRepo,
 		mongoModeler: mongoModeler,
 		gin:          gin.New(),
 	}

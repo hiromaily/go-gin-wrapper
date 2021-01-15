@@ -1,15 +1,13 @@
 package controllers
 
 import (
-	//"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
 	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
-	models "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
-	"github.com/hiromaily/go-gin-wrapper/pkg/time"
 	lg "github.com/hiromaily/golibs/log"
 	"github.com/hiromaily/golibs/validator"
 )
@@ -93,8 +91,8 @@ func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequ
 }
 
 // insert user
-func (ctl *Controller) insertUser(data *UserRequest) (int64, error) {
-	user := &models.Users{
+func (ctl *Controller) insertUser(data *UserRequest) (int, error) {
+	item := &user.User{
 		FirstName: data.FirstName,
 		LastName:  data.LastName,
 		Email:     data.Email,
@@ -102,38 +100,34 @@ func (ctl *Controller) insertUser(data *UserRequest) (int64, error) {
 	}
 
 	// Insert
-	return ctl.db.InsertUser(user)
+	return ctl.userRepo.InsertUser(item)
 }
 
 // update user
 func (ctl *Controller) updateUser(data *UserRequest, id string) (int64, error) {
-	user := &models.Users{}
+	item := &user.User{}
 	if data.FirstName != "" {
-		user.FirstName = data.FirstName
+		item.FirstName = data.FirstName
 	}
 	if data.LastName != "" {
-		user.LastName = data.LastName
+		item.LastName = data.LastName
 	}
 	if data.Email != "" {
-		user.Email = data.Email
+		item.Email = data.Email
 	}
 	if data.Password != "" {
-		user.Password = data.Password
+		item.Password = data.Password
 	}
-	// update date
-	user.Updated = time.GetCurrentDateTimeByStr("")
 
 	// Update
-	return ctl.db.UpdateUser(user, id)
+	return ctl.userRepo.UpdateUser(item, id)
 }
 
 // APIUserListGetAction is get user list [GET]
 func (ctl *Controller) APIUserListGetAction(c *gin.Context) {
 	lg.Info("[GET] UsersListGetAction")
 
-	var users []models.UsersSL
-
-	_, err := ctl.db.GetUserList(&users, "")
+	users, err := ctl.userRepo.GetUsers("")
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
@@ -185,19 +179,14 @@ func (ctl *Controller) APIUserGetAction(c *gin.Context) {
 		return
 	}
 
-	var user models.UsersSL
-	b, err := ctl.db.GetUserList(&user, userID)
+	users, err := ctl.userRepo.GetUsers(userID)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	}
 
 	// Make json for response and return
-	if b {
-		jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON([]models.UsersSL{user}))
-	} else {
-		jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(nil))
-	}
+	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserListJSON(users))
 }
 
 // APIUserPutAction is update specific user [PUT]
@@ -237,7 +226,7 @@ func (ctl *Controller) APIUserDeleteAction(c *gin.Context) {
 	}
 
 	// Delete
-	affected, err := ctl.db.DeleteUser(c.Param("id"))
+	affected, err := ctl.userRepo.DeleteUser(c.Param("id"))
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
@@ -253,22 +242,12 @@ func (ctl *Controller) APIUserDeleteAction(c *gin.Context) {
 func (ctl *Controller) APIUserIDsGetAction(c *gin.Context) {
 	lg.Info("[GET] IdsGetAction")
 
-	var ids []models.UsersIDs
-	err := ctl.db.GetUserIds(&ids)
+	ids, err := ctl.userRepo.GetUserIDs()
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	}
 
-	// convert
-	// newIds := make([]int, len(ids))
-	newIds := []int{}
-	for _, id := range ids {
-		newIds = append(newIds, id.ID)
-	}
-	// lg.Debugf("ids: %v", ids)
-	// lg.Debugf("newIds: %v", newIds)
-
 	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserIDsJSON(newIds))
+	jsonresp.ResponseUserJSON(c, ctl.cors, 0, js.CreateUserIDsJSON(ids))
 }

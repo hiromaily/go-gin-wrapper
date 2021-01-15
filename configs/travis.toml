@@ -1,6 +1,12 @@
 #local, heroku, docker, staging, production
 environment = "travis"
 
+[logger]
+service = "go-gin"
+env = "custom" # dev, prod, custom :for only zap logger
+level = "debug" # debug, info, warn, error
+is_stacktrace = true
+
 #------------------------------------------------------------------------------
 # Server
 #------------------------------------------------------------------------------

@@ -1,14 +1,14 @@
 package json
 
 import (
-	models "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
 )
 
 // UserListResponse is for user list
 type UserListResponse struct {
-	Code    int              `json:"code"`
-	Message string           `json:"message"`
-	Users   []models.UsersSL `json:"users"`
+	Code    int          `json:"code"`
+	Message string       `json:"message"`
+	Users   []*user.User `json:"users"`
 }
 
 // UserIDsResponse is for user IDs
@@ -25,7 +25,7 @@ type UserResponse struct {
 }
 
 // CreateUserListJSON is for response for user list
-func CreateUserListJSON(users []models.UsersSL) *UserListResponse {
+func CreateUserListJSON(users []*user.User) *UserListResponse {
 	var (
 		code int
 		msg  string

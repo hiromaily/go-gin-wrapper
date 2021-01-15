@@ -1,0 +1,15 @@
+no-hooks = true
+no-tests = true
+output = "./pkg/models/rdb"
+
+[mysql]
+dbname = "gogin"
+host = "localhost"
+port = 13306
+user = "root"
+pass = "root"
+sslmode = "false"
+whitelist = [
+    "t_user",
+    "t_book"
+]

@@ -17,7 +17,8 @@ var (
 
 // Config is of root
 type Config struct {
-	Environment string `toml:"environment" validate:"required"`
+	Environment string  `toml:"environment" validate:"required"`
+	Logger      *Logger `toml:"logger"`
 	Server      *ServerConfig
 	Proxy       *ProxyConfig
 	API         *APIConfig
@@ -27,6 +28,14 @@ type Config struct {
 	Mongo       *MongoConfig `toml:"mongodb"`
 	Aws         *AwsConfig
 	Develop     *DevelopConfig
+}
+
+// Logger logger info
+type Logger struct {
+	Service  string `toml:"service" validate:"required"`
+	Env      string `toml:"env" validate:"oneof=dev prod custom"`
+	Level    string `toml:"level" validate:"required"`
+	IsLogger bool   `toml:"is_logger"`
 }
 
 // ServerConfig is for web server
@@ -146,7 +155,7 @@ type MySQLContentConfig struct {
 	Encrypted bool   `toml:"encrypted"`
 	Host      string `toml:"host"`
 	Port      uint16 `toml:"port"`
-	DbName    string `toml:"dbname"`
+	DBName    string `toml:"dbname"`
 	User      string `toml:"user"`
 	Pass      string `toml:"pass"`
 }
@@ -271,7 +280,7 @@ func (c *Config) Cipher() {
 	if c.MySQL.Encrypted {
 		m := c.MySQL
 		m.Host, _ = crypt.DecryptBase64(m.Host)
-		m.DbName, _ = crypt.DecryptBase64(m.DbName)
+		m.DBName, _ = crypt.DecryptBase64(m.DBName)
 		m.User, _ = crypt.DecryptBase64(m.User)
 		m.Pass, _ = crypt.DecryptBase64(m.Pass)
 	}
@@ -279,7 +288,7 @@ func (c *Config) Cipher() {
 	if c.MySQL.Test.Encrypted {
 		mt := c.MySQL.Test
 		mt.Host, _ = crypt.DecryptBase64(mt.Host)
-		mt.DbName, _ = crypt.DecryptBase64(mt.DbName)
+		mt.DBName, _ = crypt.DecryptBase64(mt.DBName)
 		mt.User, _ = crypt.DecryptBase64(mt.User)
 		mt.Pass, _ = crypt.DecryptBase64(mt.Pass)
 	}

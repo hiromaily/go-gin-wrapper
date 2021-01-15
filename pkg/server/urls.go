@@ -16,7 +16,7 @@ func (s *Server) SetURLOnHTTP(r *gin.Engine) {
 	// m := melody.New()
 
 	ctl := ctls.NewController(
-		s.dbModeler,
+		s.userRepo,
 		// s.kvsStorager.CreateDBModel(),
 		s.mongoModeler,
 		s.conf.API.Header,

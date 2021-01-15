@@ -13,7 +13,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hiromaily
+      MYSQL_DATABASE: gogin
       MYSQL_USER: hiromaily
       MYSQL_PASSWORD: 12345678
 

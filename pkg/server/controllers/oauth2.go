@@ -11,7 +11,7 @@ import (
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
 
-	models "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	lg "github.com/hiromaily/golibs/log"
@@ -229,15 +229,15 @@ func getUserInfo(c *gin.Context, token *oauth2.Token, res interface{}, mode stri
 	return true
 }
 
-func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, uA *models.UserAuth, user *models.Users) {
+func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, user *user.User, userAuth *user.UserAuth) {
 	lg.Info("registerOrLogin()")
 
-	if uA == nil {
+	if userAuth == nil {
 		lg.Debug("no user on t_users")
 		// 0:no user -> register and login
 
 		lg.Debug("InsertUser()")
-		id, err := ctl.db.InsertUser(user)
+		id, err := ctl.userRepo.InsertUser(user)
 		if err != nil {
 			c.AbortWithError(500, err)
 			return
@@ -246,13 +246,13 @@ func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, uA *models.U
 		sess.SetUserSession(c, int(id))
 
 	} else {
-		lg.Debug("There is user: %v", uA)
+		lg.Debug("There is user: %v", userAuth)
 		// oauth_flg //0, 1:google, 2:facebook
-		if uA.ID != 0 && uA.Auth == mode {
+		if userAuth.ID != 0 && userAuth.Auth == mode {
 			lg.Debug("login proceduer")
 			// 1:existing user (google) -> login procedure
 			// Session
-			sess.SetUserSession(c, uA.ID)
+			sess.SetUserSession(c, userAuth.ID)
 		} else {
 			lg.Debug("redirect login page. user is already exsisting.")
 			// 2:existing user (no auth or another auth) -> err
@@ -303,21 +303,21 @@ func (ctl *Controller) OAuth2CallbackGoogleAction(c *gin.Context) {
 
 	// 4.check Email
 	lg.Debugf("email is %s", resGoogle.Email)
-	userAuth, err := ctl.db.OAuth2Login(resGoogle.Email)
+	userAuth, err := ctl.userRepo.OAuth2Login(resGoogle.Email)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	}
 
 	// 5. register or login
-	user := &models.Users{
+	user := &user.User{
 		FirstName: resGoogle.FirstName,
 		LastName:  resGoogle.LastName,
 		Email:     resGoogle.Email,
 		Password:  "google-password",
 		OAuth2Flg: mode,
 	}
-	ctl.registerOrLogin(c, mode, userAuth, user)
+	ctl.registerOrLogin(c, mode, user, userAuth)
 }
 
 // OAuth2CallbackFacebookAction is callback from Facebook [GET]
@@ -355,19 +355,19 @@ func (ctl *Controller) OAuth2CallbackFacebookAction(c *gin.Context) {
 
 	// 4.check Email
 	lg.Debugf("email is %s", resFacebook.Email)
-	userAuth, err := ctl.db.OAuth2Login(resFacebook.Email)
+	userAuth, err := ctl.userRepo.OAuth2Login(resFacebook.Email)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
 	}
 
 	// 5. register or login
-	user := &models.Users{
+	user := &user.User{
 		FirstName: resFacebook.FirstName,
 		LastName:  resFacebook.LastName,
 		Email:     resFacebook.Email,
 		Password:  "facebook-password",
 		OAuth2Flg: mode,
 	}
-	ctl.registerOrLogin(c, mode, userAuth, user)
+	ctl.registerOrLogin(c, mode, user, userAuth)
 }

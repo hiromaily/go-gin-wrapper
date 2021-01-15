@@ -1,15 +1,19 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 
 	"github.com/garyburd/redigo/redis"
+	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwt"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	"github.com/hiromaily/go-gin-wrapper/pkg/logger"
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
-	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
+	"github.com/hiromaily/go-gin-wrapper/pkg/storage/mysql"
 	rd "github.com/hiromaily/go-gin-wrapper/pkg/storage/redis"
 )
 
@@ -19,9 +23,11 @@ type Registry interface {
 }
 
 type registry struct {
-	isTestMode bool
-	conf       *config.Config
-	redisConn  *redis.Conn
+	isTestMode  bool
+	conf        *config.Config
+	logger      *zap.Logger
+	mysqlClient *sql.DB
+	redisConn   *redis.Conn
 }
 
 // NewRegistry is to register regstry interface
@@ -31,6 +37,37 @@ func NewRegistry(conf *config.Config, isTestMode bool) Registry {
 		conf:       conf,
 		redisConn:  newRedisConn(conf),
 	}
+}
+
+func (r *registry) newLogger() *zap.Logger {
+	if r.logger == nil {
+		r.logger = logger.NewZapLogger(r.conf.Logger)
+	}
+	return r.logger
+}
+
+func (r *registry) newMySQLClient() *sql.DB {
+	if r.mysqlClient == nil {
+		dbConf := r.conf.MySQL.MySQLContentConfig
+		if r.isTestMode {
+			dbConf = r.conf.MySQL.Test
+		}
+
+		dbConn, err := mysql.NewMySQL(dbConf)
+		if err != nil {
+			panic(err)
+		}
+		r.mysqlClient = dbConn
+	}
+	//if r.conf.MySQL.Debug {
+	//	boil.DebugMode = true
+	//}
+
+	return r.mysqlClient
+}
+
+func (r *registry) newUserRepository() repository.UserRepositorier {
+	return repository.NewUserRepository(r.newMySQLClient(), r.newLogger())
 }
 
 // newRedisConn is to create redis connection
@@ -51,24 +88,9 @@ func (r *registry) NewServerer(port int) server.Serverer {
 		r.isTestMode,
 		r.conf,
 		port,
-		r.newDBModeler(),
+		r.newUserRepository(),
 		r.newMongoModeler(),
 	)
-}
-
-func (r *registry) newDBModeler() dbmodel.DBModeler {
-	var dbConf *config.MySQLContentConfig
-	if r.isTestMode {
-		dbConf = r.conf.MySQL.Test
-	} else {
-		dbConf = r.conf.MySQL.MySQLContentConfig
-	}
-
-	storager, err := dbmodel.NewDBModeler(r.conf.Environment, dbConf)
-	if err != nil {
-		panic(err)
-	}
-	return storager
 }
 
 func (r *registry) newMongoModeler() mongomodel.MongoModeler {

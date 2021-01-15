@@ -3,14 +3,14 @@ package controllers
 import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	mongomodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mongo"
-	dbmodel "github.com/hiromaily/go-gin-wrapper/pkg/model/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 )
 
 // TODO: define interface
 
 // Controller is controller object
 type Controller struct {
-	db        dbmodel.DBModeler
+	userRepo  repository.UserRepositorier
 	mongo     mongomodel.MongoModeler
 	apiHeader *config.HeaderConfig
 	auth      *config.AuthConfig
@@ -20,13 +20,13 @@ type Controller struct {
 
 // NewController is to return Controller
 func NewController(
-	db dbmodel.DBModeler,
+	userRepo repository.UserRepositorier,
 	mongo mongomodel.MongoModeler,
 	apiHeader *config.HeaderConfig,
 	auth *config.AuthConfig,
 	cors *config.CORSConfig) *Controller {
 	return &Controller{
-		db:        db,
+		userRepo:  userRepo,
 		mongo:     mongo,
 		apiHeader: apiHeader,
 		auth:      auth,

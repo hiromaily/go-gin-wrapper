@@ -17,6 +17,11 @@ Now it's under `refactoring`.
 ## Refactoring
 - [ ] change architecture like Clean Architecture
 - [ ] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
+  - [x] use [sqlboiler](https://github.com/volatiletech/sqlboiler) as ORM
+  - [ ] delete MongoDB
+- [ ] add zap logger 
+- [ ] clean up variable name
+- [ ] clean up comments
 - [ ] catch up with latest [gin](https://github.com/gin-gonic/gin)
 - [ ] remove mongo-db and use different key-value store
 - [ ] update front-end

@@ -11,14 +11,7 @@ import (
 // APIListIndexAction is top page for API List (react version)
 func (ctl *Controller) APIListIndexAction(c *gin.Context) {
 	// return header and key
-
-	// Get User ids
-	type UserID struct {
-		ID int
-	}
-	var ids []UserID
-
-	err := ctl.db.GetUserIds(&ids)
+	ids, err := ctl.userRepo.GetUserIDs()
 	if err != nil {
 		c.AbortWithError(500, err)
 		return
@@ -35,16 +28,7 @@ func (ctl *Controller) APIListIndexAction(c *gin.Context) {
 
 // APIListIndex2Action is top page for API List (this is old version)
 func (ctl *Controller) APIListIndex2Action(c *gin.Context) {
-	// debug log
-	// debugContext(c)
-
-	// Get User ids
-	type UserID struct {
-		ID int
-	}
-	var ids []UserID
-
-	err := ctl.db.GetUserIds(&ids)
+	ids, err := ctl.userRepo.GetUserIDs()
 	if err != nil {
 		c.AbortWithError(500, err)
 		return

@@ -5,6 +5,20 @@ modVer=$(shell cat go.mod | head -n 3 | tail -n 1 | awk '{print $2}' | cut -d'.'
 currentVer=$(shell go version | awk '{print $3}' | sed -e "s/go//" | cut -d'.' -f2)
 
 ###############################################################################
+# Setup
+###############################################################################
+#.PHONY: install-sqlboiler
+#install-sqlboiler: SQLBOILER_VERSION=4.4.0
+#install-sqlboiler:
+#	echo SQLBOILER_VERSION is $(SQLBOILER_VERSION)
+#	go get github.com/volatiletech/sqlboiler@v$(SQLBOILER_VERSION)
+#	go get github.com/volatiletech/sqlboiler/drivers/sqlboiler-mysql@v$(SQLBOILER_VERSION)
+
+.PHONY: sqlboiler
+sqlboiler:
+	sqlboiler --wipe mysql
+
+###############################################################################
 # Managing Dependencies
 ###############################################################################
 .PHONY: check-ver
