@@ -12,11 +12,11 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	"github.com/hiromaily/go-gin-wrapper/pkg/dir"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
-	fl "github.com/hiromaily/golibs/files"
 	hrk "github.com/hiromaily/golibs/heroku"
 )
 
@@ -174,9 +174,9 @@ func (s *server) loadTemplates() {
 
 	ext := []string{"tmpl"}
 
-	files1 := fl.GetFileList(rootPath+"/web/templates/pages", ext)
-	files2 := fl.GetFileList(rootPath+"/web/templates/components", ext)
-	files3 := fl.GetFileList(rootPath+"/web/templates/inner_js", ext)
+	files1 := dir.GetFileList(rootPath+"/web/templates/pages", ext)
+	files2 := dir.GetFileList(rootPath+"/web/templates/components", ext)
+	files3 := dir.GetFileList(rootPath+"/web/templates/inner_js", ext)
 
 	var files []string
 	files = append(files, files1...)
