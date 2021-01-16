@@ -7,10 +7,22 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 )
 
-// TODO: define interface
+// Controller  interface
+type Controller interface {
+	Acounter
+	Adminer
+	APIJWTer
+	APIUser
+	APILister
+	Baser
+	Chater
+	Errorer
+	Loginer
+	OAuther
+}
 
-// Controller is controller object
-type Controller struct {
+// controller is controller object
+type controller struct {
 	logger    *zap.Logger
 	userRepo  repository.UserRepositorier
 	apiHeader *config.Header
@@ -25,8 +37,8 @@ func NewController(
 	userRepo repository.UserRepositorier,
 	apiHeader *config.Header,
 	cors *config.CORS,
-	auth *config.Auth) *Controller {
-	return &Controller{
+	auth *config.Auth) Controller {
+	return &controller{
 		logger:    logger,
 		userRepo:  userRepo,
 		apiHeader: apiHeader,

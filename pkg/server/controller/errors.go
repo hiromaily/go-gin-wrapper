@@ -6,8 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Errorer interface
+type Errorer interface {
+	Error404Action(c *gin.Context)
+	Error405Action(c *gin.Context)
+}
+
 // Error404Action is for 404 error [GET]
-func (ctl *Controller) Error404Action(c *gin.Context) {
+func (ctl *controller) Error404Action(c *gin.Context) {
 	refURL := "/"
 	if c.Request.Header.Get("Referer") != "" {
 		refURL = c.Request.Header.Get("Referer")
@@ -26,7 +32,7 @@ func (ctl *Controller) Error404Action(c *gin.Context) {
 }
 
 // Error405Action is for 405 error
-func (ctl *Controller) Error405Action(c *gin.Context) {
+func (ctl *controller) Error405Action(c *gin.Context) {
 	refURL := c.Request.Header.Get("Referer")
 
 	// View

@@ -12,7 +12,15 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
 
-// TODO:define as common use.
+// Baser interface
+type Baser interface {
+	BaseIndexAction(c *gin.Context)
+	BaseLoginGetAction(c *gin.Context)
+	BaseLoginPostAction(c *gin.Context)
+	BaseLogoutPostAction(c *gin.Context)
+	BaseLogoutPutAction(c *gin.Context)
+}
+
 // nolint: unused, deadcode
 func debugContext(c *gin.Context, logger *zap.Logger) {
 	logger.Debug("request",
@@ -29,7 +37,7 @@ func debugContext(c *gin.Context, logger *zap.Logger) {
 }
 
 // response for Login Page
-func (ctl *Controller) resLogin(c *gin.Context, input *LoginRequest, msg string, errors []string) {
+func (ctl *controller) resLogin(c *gin.Context, input *LoginRequest, msg string, errors []string) {
 	// token
 	token := csrf.CreateToken(ctl.logger)
 	sess.SetTokenSession(c, token)
@@ -59,7 +67,7 @@ func (ctl *Controller) resLogin(c *gin.Context, input *LoginRequest, msg string,
 }
 
 // BaseIndexAction is top page
-func (ctl *Controller) BaseIndexAction(c *gin.Context) {
+func (ctl *controller) BaseIndexAction(c *gin.Context) {
 	// debug log
 	// debugContext(c)
 
@@ -72,7 +80,7 @@ func (ctl *Controller) BaseIndexAction(c *gin.Context) {
 }
 
 // BaseLoginGetAction is for login page [GET]
-func (ctl *Controller) BaseLoginGetAction(c *gin.Context) {
+func (ctl *controller) BaseLoginGetAction(c *gin.Context) {
 	// debug log
 	// debugContext(c)
 
@@ -98,7 +106,7 @@ func (ctl *Controller) BaseLoginGetAction(c *gin.Context) {
 }
 
 // BaseLoginPostAction is to receive user request from login page [POST]
-func (ctl *Controller) BaseLoginPostAction(c *gin.Context) {
+func (ctl *controller) BaseLoginPostAction(c *gin.Context) {
 	// check login
 	userID, posted, errs := ctl.CheckLoginOnHTML(c)
 	if errs != nil {
@@ -120,7 +128,7 @@ func (ctl *Controller) BaseLoginPostAction(c *gin.Context) {
 }
 
 // BaseLogoutPostAction is for logout [POST]
-func (ctl *Controller) BaseLogoutPostAction(c *gin.Context) {
+func (ctl *controller) BaseLogoutPostAction(c *gin.Context) {
 	ctl.logger.Debug("LogoutPostAction")
 
 	// Session
@@ -135,7 +143,7 @@ func (ctl *Controller) BaseLogoutPostAction(c *gin.Context) {
 }
 
 // BaseLogoutPutAction is for logout by Ajax [PUT]
-func (ctl *Controller) BaseLogoutPutAction(c *gin.Context) {
+func (ctl *controller) BaseLogoutPutAction(c *gin.Context) {
 	ctl.logger.Debug("LogoutPutAction")
 
 	// Session

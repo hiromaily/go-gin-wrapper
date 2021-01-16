@@ -9,8 +9,13 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
 
+// Acounter interface
+type Acounter interface {
+	AccountIndexAction(c *gin.Context)
+}
+
 // AccountIndexAction [GET]
-func (ctl *Controller) AccountIndexAction(c *gin.Context) {
+func (ctl *controller) AccountIndexAction(c *gin.Context) {
 	ctl.logger.Info("AccountIndexAction")
 
 	// judge login

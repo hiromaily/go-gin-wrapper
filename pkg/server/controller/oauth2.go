@@ -18,6 +18,14 @@ import (
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 )
 
+// OAuther interface
+type OAuther interface {
+	OAuth2SignInGoogleAction(c *gin.Context)
+	OAuth2SignInFacebookAction(c *gin.Context)
+	OAuth2CallbackGoogleAction(c *gin.Context)
+	OAuth2CallbackFacebookAction(c *gin.Context)
+}
+
 // ResGoogle is for response data from google
 type ResGoogle struct {
 	ID            string `json:"id"`
@@ -84,7 +92,7 @@ var (
 )
 
 // OAuth2SignInGoogleAction is sign in by Google [GET]
-func (ctl *Controller) OAuth2SignInGoogleAction(c *gin.Context) {
+func (ctl *controller) OAuth2SignInGoogleAction(c *gin.Context) {
 	ctl.logger.Info("OAuth2SignInGoogleAction")
 
 	auth := ctl.auth.Google
@@ -102,7 +110,7 @@ func (ctl *Controller) OAuth2SignInGoogleAction(c *gin.Context) {
 }
 
 // OAuth2SignInFacebookAction is sign in by Facebook [GET]
-func (ctl *Controller) OAuth2SignInFacebookAction(c *gin.Context) {
+func (ctl *controller) OAuth2SignInFacebookAction(c *gin.Context) {
 	ctl.logger.Info("OAuth2SignInFacebookAction")
 
 	auth := ctl.auth.Facebook
@@ -125,18 +133,18 @@ func (ctl *Controller) OAuth2SignInFacebookAction(c *gin.Context) {
 }
 
 // OAuth2LoginAction is login by Google. (work in progress) [GET]
-func (ctl *Controller) OAuth2LoginAction(c *gin.Context) {
-	ctl.logger.Info("OAuth2LoginAction")
-	/*
-		https://accounts.google.com/o/oauth2/auth?
-		scope=openid+email+profile&
-		state=G6OJI79YNaokmJNIGJRooGk4zUQVTRyi&
-		redirect_uri=https://courses.edx.org/auth/complete/google-oauth2/&
-		response_type=code&
-		client_id=370673641490-nd3s6q740l96uvk1vivsab65rltkgoc0.apps.googleusercontent.com
-	*/
-	//TODO:What is difference of parameter between sign in and login
-}
+//func (ctl *controller) OAuth2LoginAction(c *gin.Context) {
+//	ctl.logger.Info("OAuth2LoginAction")
+//	/*
+//		https://accounts.google.com/o/oauth2/auth?
+//		scope=openid+email+profile&
+//		state=G6OJI79YNaokmJNIGJRooGk4zUQVTRyi&
+//		redirect_uri=https://courses.edx.org/auth/complete/google-oauth2/&
+//		response_type=code&
+//		client_id=370673641490-nd3s6q740l96uvk1vivsab65rltkgoc0.apps.googleusercontent.com
+//	*/
+//	//TODO:What is difference of parameter between sign in and login
+//}
 
 func checkError(c *gin.Context, logger *zap.Logger) bool {
 	logger.Info("checkError")
@@ -228,7 +236,7 @@ func getUserInfo(c *gin.Context, logger *zap.Logger, token *oauth2.Token, res in
 	return true
 }
 
-func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, user *user.User, userAuth *user.UserAuth) {
+func (ctl *controller) registerOrLogin(c *gin.Context, mode string, user *user.User, userAuth *user.UserAuth) {
 	ctl.logger.Info("registerOrLogin")
 
 	if userAuth == nil {
@@ -266,7 +274,7 @@ func (ctl *Controller) registerOrLogin(c *gin.Context, mode string, user *user.U
 }
 
 // OAuth2CallbackGoogleAction is callback from Google[GET]
-func (ctl *Controller) OAuth2CallbackGoogleAction(c *gin.Context) {
+func (ctl *controller) OAuth2CallbackGoogleAction(c *gin.Context) {
 	ctl.logger.Info("OAuth2CallbackGoogleAction")
 	mode := GoogleAuth
 
@@ -317,7 +325,7 @@ func (ctl *Controller) OAuth2CallbackGoogleAction(c *gin.Context) {
 }
 
 // OAuth2CallbackFacebookAction is callback from Facebook [GET]
-func (ctl *Controller) OAuth2CallbackFacebookAction(c *gin.Context) {
+func (ctl *controller) OAuth2CallbackFacebookAction(c *gin.Context) {
 	ctl.logger.Info("OAuth2CallbackFacebookAction")
 	mode := FacebookAuth
 

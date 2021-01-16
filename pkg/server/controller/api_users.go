@@ -12,6 +12,16 @@ import (
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
 )
 
+// APIUser interface
+type APIUser interface {
+	APIUserListGetAction(c *gin.Context)
+	APIUserInsertPostAction(c *gin.Context)
+	APIUserGetAction(c *gin.Context)
+	APIUserPutAction(c *gin.Context)
+	APIUserDeleteAction(c *gin.Context)
+	APIUserIDsGetAction(c *gin.Context)
+}
+
 // UserRequest is expected request form from user
 type UserRequest struct {
 	FirstName string `valid:"nonempty,min=3,max=20" field:"first_name" dispName:"First Name" json:"firstName" form:"firstName"`
@@ -21,7 +31,7 @@ type UserRequest struct {
 }
 
 // get user parameter and check validation
-func (ctl *Controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (err error) {
+func (ctl *controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (err error) {
 	// Check token(before send message, pass token)
 
 	contentType := c.Request.Header.Get("Content-Type")
@@ -46,7 +56,7 @@ func (ctl *Controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (
 	return nil
 }
 
-func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequest) error {
+func (ctl *controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequest) error {
 	//[POST x application/x-www-form-urlencoded] OK
 	//[PUT x application/x-www-form-urlencoded] OK
 	//[PUT x application/json] NG
@@ -85,7 +95,7 @@ func (ctl *Controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequ
 }
 
 // insert user
-func (ctl *Controller) insertUser(data *UserRequest) (int, error) {
+func (ctl *controller) insertUser(data *UserRequest) (int, error) {
 	item := &user.User{
 		FirstName: data.FirstName,
 		LastName:  data.LastName,
@@ -98,7 +108,7 @@ func (ctl *Controller) insertUser(data *UserRequest) (int, error) {
 }
 
 // update user
-func (ctl *Controller) updateUser(data *UserRequest, id string) (int64, error) {
+func (ctl *controller) updateUser(data *UserRequest, id string) (int64, error) {
 	item := &user.User{}
 	if data.FirstName != "" {
 		item.FirstName = data.FirstName
@@ -118,7 +128,7 @@ func (ctl *Controller) updateUser(data *UserRequest, id string) (int64, error) {
 }
 
 // APIUserListGetAction is get user list [GET]
-func (ctl *Controller) APIUserListGetAction(c *gin.Context) {
+func (ctl *controller) APIUserListGetAction(c *gin.Context) {
 	ctl.logger.Info("[GET] UsersListGetAction")
 
 	users, err := ctl.userRepo.GetUsers("")
@@ -139,7 +149,7 @@ func (ctl *Controller) APIUserListGetAction(c *gin.Context) {
 //}
 
 // APIUserInsertPostAction is register for new user [POST]
-func (ctl *Controller) APIUserInsertPostAction(c *gin.Context) {
+func (ctl *controller) APIUserInsertPostAction(c *gin.Context) {
 	ctl.logger.Debug("[POST] UserPostAction")
 
 	// Param & Check valid
@@ -161,7 +171,7 @@ func (ctl *Controller) APIUserInsertPostAction(c *gin.Context) {
 }
 
 // APIUserGetAction is get specific user [GET]
-func (ctl *Controller) APIUserGetAction(c *gin.Context) {
+func (ctl *controller) APIUserGetAction(c *gin.Context) {
 	ctl.logger.Info("[GET] UserGetAction")
 
 	// Param
@@ -184,7 +194,7 @@ func (ctl *Controller) APIUserGetAction(c *gin.Context) {
 }
 
 // APIUserPutAction is update specific user [PUT]
-func (ctl *Controller) APIUserPutAction(c *gin.Context) {
+func (ctl *controller) APIUserPutAction(c *gin.Context) {
 	ctl.logger.Info("[PUT] UserPutAction")
 
 	// Param & Check valid
@@ -209,7 +219,7 @@ func (ctl *Controller) APIUserPutAction(c *gin.Context) {
 }
 
 // APIUserDeleteAction is delete specific user [DELETE] (work in progress)
-func (ctl *Controller) APIUserDeleteAction(c *gin.Context) {
+func (ctl *controller) APIUserDeleteAction(c *gin.Context) {
 	ctl.logger.Info("[DELETE] UserDeleteAction")
 	// check token
 
@@ -233,7 +243,7 @@ func (ctl *Controller) APIUserDeleteAction(c *gin.Context) {
 }
 
 // APIUserIDsGetAction is get user ids [GET]
-func (ctl *Controller) APIUserIDsGetAction(c *gin.Context) {
+func (ctl *controller) APIUserIDsGetAction(c *gin.Context) {
 	ctl.logger.Info("[GET] IdsGetAction")
 
 	ids, err := ctl.userRepo.GetUserIDs()

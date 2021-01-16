@@ -8,8 +8,14 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
 
+// APILister interface
+type APILister interface {
+	APIListIndexAction(c *gin.Context)
+	APIListIndex2Action(c *gin.Context)
+}
+
 // APIListIndexAction is top page for API List (react version)
-func (ctl *Controller) APIListIndexAction(c *gin.Context) {
+func (ctl *controller) APIListIndexAction(c *gin.Context) {
 	// return header and key
 	ids, err := ctl.userRepo.GetUserIDs()
 	if err != nil {
@@ -27,7 +33,7 @@ func (ctl *Controller) APIListIndexAction(c *gin.Context) {
 }
 
 // APIListIndex2Action is top page for API List (this is old version)
-func (ctl *Controller) APIListIndex2Action(c *gin.Context) {
+func (ctl *controller) APIListIndex2Action(c *gin.Context) {
 	ids, err := ctl.userRepo.GetUserIDs()
 	if err != nil {
 		c.AbortWithError(500, err)

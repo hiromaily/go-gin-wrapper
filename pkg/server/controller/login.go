@@ -7,6 +7,12 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/validator"
 )
 
+// Loginer interface
+type Loginer interface {
+	CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []string)
+	CheckLoginOnAPI(c *gin.Context) (int, string, error)
+}
+
 // LoginRequest is request structure for login
 type LoginRequest struct {
 	Email string `valid:"nonempty,email,min=5,max=40" field:"email" dispName:"E-Mail"`
@@ -24,7 +30,7 @@ var ErrFmt = map[string]string{
 }
 
 // CheckLoginOnHTML is check login on html page.
-func (ctl *Controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []string) {
+func (ctl *controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []string) {
 	// Get Post Parameters
 	posted := &LoginRequest{
 		Email: c.PostForm("inputEmail"),
@@ -48,7 +54,7 @@ func (ctl *Controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []s
 }
 
 // CheckLoginOnAPI is check login on API
-func (ctl *Controller) CheckLoginOnAPI(c *gin.Context) (int, string, error) {
+func (ctl *controller) CheckLoginOnAPI(c *gin.Context) (int, string, error) {
 	posted := &LoginRequest{
 		Email: c.PostForm("inputEmail"),
 		Pass:  c.PostForm("inputPassword"),

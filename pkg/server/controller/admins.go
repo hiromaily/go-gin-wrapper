@@ -9,10 +9,13 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
 
-// get user, it was set by the BasicAuth middleware
+// Adminer interface
+type Adminer interface {
+	AdminIndexAction(c *gin.Context)
+}
 
 // AdminIndexAction [GET]
-func (ctl *Controller) AdminIndexAction(c *gin.Context) {
+func (ctl *controller) AdminIndexAction(c *gin.Context) {
 	key := c.MustGet(gin.AuthUserKey).(string)
 	ctl.logger.Debug("AdminIndexAction", zap.String("gin.AuthUserKey", key))
 

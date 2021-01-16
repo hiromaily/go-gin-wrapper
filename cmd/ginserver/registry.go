@@ -86,7 +86,7 @@ func (r *registry) newMiddleware() server.Middlewarer {
 	)
 }
 
-func (r *registry) newController() *controller.Controller {
+func (r *registry) newController() controller.Controller {
 	return controller.NewController(
 		r.newLogger(),
 		r.newUserRepository(),

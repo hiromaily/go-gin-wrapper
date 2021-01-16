@@ -38,7 +38,7 @@ type server struct {
 	gin        *gin.Engine
 	port       int
 	middleware Middlewarer
-	controller *controller.Controller // TODO: interface
+	controller controller.Controller
 	logger     *zap.Logger
 	dbConn     *sql.DB
 	userRepo   repository.UserRepositorier
@@ -56,7 +56,7 @@ type server struct {
 func NewServer(
 	gin *gin.Engine,
 	middleware Middlewarer,
-	controller *controller.Controller,
+	controller controller.Controller,
 	logger *zap.Logger,
 	dbConn *sql.DB,
 	userRepo repository.UserRepositorier,

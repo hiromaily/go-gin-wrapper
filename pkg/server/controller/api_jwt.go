@@ -12,8 +12,13 @@ import (
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 )
 
+// APIJWTer interface
+type APIJWTer interface {
+	APIJWTIndexPostAction(c *gin.Context)
+}
+
 // APIJWTIndexPostAction is JWT End Point [POST]
-func (ctl *Controller) APIJWTIndexPostAction(c *gin.Context) {
+func (ctl *controller) APIJWTIndexPostAction(c *gin.Context) {
 	ctl.logger.Debug("APIJWTIndexPostAction")
 
 	// login
