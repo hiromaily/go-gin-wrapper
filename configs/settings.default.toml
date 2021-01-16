@@ -17,7 +17,9 @@ host = "localhost"
 port = 8080
 
 [server.docs]
-path = "/Users/hy/work/go/src/github.com/hiromaily/go-gin-wrapper"
+# set `go-gin-wrapper` path
+# this path must be chnaged first for specific environment
+path = "${GOPATH}/src/github.com/hiromaily/go-gin-wrapper"
 
 [server.log]
 level = 1

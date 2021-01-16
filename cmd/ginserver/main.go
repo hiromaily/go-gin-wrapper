@@ -4,6 +4,8 @@ import (
 	"flag"
 	"log"
 
+	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 	"github.com/hiromaily/go-gin-wrapper/pkg/signal"

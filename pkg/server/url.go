@@ -8,8 +8,9 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 )
 
-// SetURLOnHTTP is for HTTP
-func (s *server) SetURLOnHTTP(r *gin.Engine) {
+// setRouter is for HTTP
+func (s *server) setRouter(r *gin.Engine) {
+	s.logger.Info("server setRouter()")
 	/******************************************************************************/
 	/******** Return HTML *********************************************************/
 	/******************************************************************************/

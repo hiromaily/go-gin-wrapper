@@ -3,6 +3,8 @@ package server
 import (
 	"fmt"
 	"html/template"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/DeanThompson/ginpprof"
@@ -77,22 +79,25 @@ func NewServer(
 
 // Start is to start server execution
 func (s *server) Start() (*gin.Engine, error) {
+	s.logger.Info("server Start()")
 	if s.serverConf.IsRelease {
 		// For release
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	// Global middleware
-	s.setMiddleWare()
+	s.setMiddleware()
 
 	// Templates
-	s.loadTemplates()
+	if err := s.loadTemplates(); err != nil {
+		return nil, err
+	}
 
 	// Static
 	s.loadStaticFiles()
 
 	// Set router (from url.go)
-	s.SetURLOnHTTP(s.gin)
+	s.setRouter(s.gin)
 
 	// Set Profiling
 	if s.developConf.ProfileEnable {
@@ -111,11 +116,13 @@ func (s *server) Start() (*gin.Engine, error) {
 // Close is to clean up middleware object
 // TODO: not implemented yet
 func (s *server) Close() {
+	s.logger.Info("server Close()")
 	// s.storager.Close()
 }
 
 // Global middleware
-func (s *server) setMiddleWare() {
+func (s *server) setMiddleware() {
+	s.logger.Info("server setMiddleware()")
 	// TODO:skip static files like (jpg, gif, png, js, css, woff)
 
 	s.gin.Use(gin.Logger())
@@ -160,7 +167,8 @@ func (s *server) herokuRedisSetting() {
 	}
 }
 
-func (s *server) loadTemplates() {
+func (s *server) loadTemplates() error {
+	s.logger.Info("server loadTemplates()")
 	// http://stackoverflow.com/questions/25745701/parseglob-what-is-the-pattern-to-parse-all-templates-recursively-within-a-direc
 
 	// r.LoadHTMLGlob("templates/*")
@@ -170,29 +178,42 @@ func (s *server) loadTemplates() {
 	// r.LoadHTMLGlob(path + "templates/pages/**/*")
 	// r.LoadHTMLGlob(path + "templates/components/*")
 
-	rootPath := s.serverConf.Docs.Path
+	projectPath := s.serverConf.Docs.Path
+	// if projectPath includes ${GOPATH}, it should be replaced
+	if strings.Contains(projectPath, "${GOPATH}") {
+		gopath := os.Getenv("GOPATH")
+		projectPath = strings.Replace(projectPath, "${GOPATH}", gopath, 1)
+	}
+	s.logger.Debug("loadTemplates()", zap.String("project_path", projectPath))
+	if f, err := os.Stat(projectPath); os.IsNotExist(err) || !f.IsDir() {
+		// no such directory
+		return err
+	}
 
 	ext := []string{"tmpl"}
-
-	files1 := dir.GetFileList(rootPath+"/web/templates/pages", ext)
-	files2 := dir.GetFileList(rootPath+"/web/templates/components", ext)
-	files3 := dir.GetFileList(rootPath+"/web/templates/inner_js", ext)
+	files1 := dir.GetFileList(projectPath+"/web/templates/pages", ext)
+	files2 := dir.GetFileList(projectPath+"/web/templates/components", ext)
+	files3 := dir.GetFileList(projectPath+"/web/templates/inner_js", ext)
 
 	var files []string
 	files = append(files, files1...)
 	files = append(files, files2...)
 	files = append(files, files3...)
+	s.logger.Debug("loadTemplates()", zap.Int("file_num", len(files)))
+	if len(files) == 0 {
+		return errors.Errorf("file is not found in %s", projectPath)
+	}
 
 	tmpls := template.Must(template.New("").Funcs(getTempFunc()).ParseFiles(files...))
 	s.gin.SetHTMLTemplate(tmpls)
+
+	return nil
 }
 
 // template FuncMap
 func getTempFunc() template.FuncMap {
 	// type FuncMap map[string]interface{}
-
 	funcMap := template.FuncMap{
-		"add": func(a, b int) int { return a + b },
 		"dict": func(values ...interface{}) (map[string]interface{}, error) {
 			if len(values)%2 != 0 {
 				return nil, errors.New("invalid dict call")
@@ -222,6 +243,7 @@ func getTempFunc() template.FuncMap {
 }
 
 func (s *server) loadStaticFiles() {
+	s.logger.Info("server loadStaticFiles()")
 	rootPath := s.serverConf.Docs.Path
 
 	// r.Static("/static", "/var/www")
@@ -232,6 +254,7 @@ func (s *server) loadStaticFiles() {
 }
 
 func (s *server) run() error {
+	s.logger.Info("server run()")
 	if s.proxyConf.Mode == 2 {
 		// Proxy(Nginx) settings
 		color.Red("[WARNING] running on fcgi mode.")
