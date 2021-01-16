@@ -1,10 +1,15 @@
 package server
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"html/template"
+	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/DeanThompson/ginpprof"
@@ -35,6 +40,7 @@ type server struct {
 	middleware Middlewarer
 	controller *controller.Controller // TODO: interface
 	logger     *zap.Logger
+	dbConn     *sql.DB
 	userRepo   repository.UserRepositorier
 
 	serverConf  *config.Server
@@ -52,6 +58,7 @@ func NewServer(
 	middleware Middlewarer,
 	controller *controller.Controller,
 	logger *zap.Logger,
+	dbConn *sql.DB,
 	userRepo repository.UserRepositorier,
 	conf *config.Root,
 	isTestMode bool,
@@ -62,6 +69,7 @@ func NewServer(
 		middleware:  middleware,
 		controller:  controller,
 		logger:      logger,
+		dbConn:      dbConn,
 		userRepo:    userRepo,
 		serverConf:  conf.Server,
 		proxyConf:   conf.Proxy,
@@ -72,47 +80,44 @@ func NewServer(
 	}
 }
 
-// Start is to start server execution
+// Start starts gin server
 func (s *server) Start() (*gin.Engine, error) {
 	s.logger.Info("server Start()")
 	if s.serverConf.IsRelease {
-		// For release
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	// Global middleware
 	s.setMiddleware()
 
-	// Templates
 	if err := s.loadTemplates(); err != nil {
 		return nil, err
 	}
 
-	// Static
 	s.loadStaticFiles()
 
-	// Set router (from url.go)
 	s.setRouter(s.gin)
 
-	// Set Profiling
+	// set profiling for development
 	if s.developConf.ProfileEnable {
 		ginpprof.Wrapper(s.gin)
 	}
 
+	// if working for unittest, s.run() is not required
 	if s.isTestMode {
 		return s.gin, nil
 	}
 
-	// Run
 	err := s.run()
 	return nil, err
 }
 
-// Close is to clean up middleware object
-// TODO: not implemented yet
+// Close cleans up any middleware when shutdown server
 func (s *server) Close() {
 	s.logger.Info("server Close()")
-	// s.storager.Close()
+
+	if s.dbConn != nil {
+		s.dbConn.Close()
+	}
 }
 
 // Global middleware
@@ -122,21 +127,14 @@ func (s *server) setMiddleware() {
 
 	s.gin.Use(gin.Logger())
 
-	// r.Use(gin.Recovery())  //After GlobalRecover()
 	s.gin.Use(s.middleware.GlobalRecover()) // It's called faster than [gin.Recovery()]
 
-	// session
 	s.initSession()
 
-	// TODO:set ip to toml or redis server
-	// check ip address to refuse specific IP Address
-	// when using load balancer or reverse proxy, set specific IP
 	s.gin.Use(s.middleware.RejectSpecificIP())
 
-	// meta data
 	s.gin.Use(s.middleware.SetMetaData())
 
-	// auto session(expire) update
 	s.gin.Use(s.middleware.UpdateUserSession())
 }
 
@@ -194,7 +192,6 @@ func (s *server) loadTemplates() error {
 	files = append(files, files1...)
 	files = append(files, files2...)
 	files = append(files, files3...)
-	s.logger.Debug("loadTemplates()", zap.Int("file_num", len(files)))
 	if len(files) == 0 {
 		return errors.Errorf("file is not found in %s", projectPath)
 	}
@@ -241,7 +238,6 @@ func (s *server) loadStaticFiles() {
 	s.logger.Info("server loadStaticFiles()")
 	rootPath := s.serverConf.Docs.Path
 
-	// r.Static("/static", "/var/www")
 	s.gin.Static("/statics", rootPath+"/web/statics")
 	s.gin.Static("/assets", rootPath+"/web/statics/assets")
 	s.gin.Static("/favicon.ico", rootPath+"/web/statics/favicon.ico")
@@ -250,11 +246,49 @@ func (s *server) loadStaticFiles() {
 
 func (s *server) run() error {
 	s.logger.Info("server run()")
+	addr := fmt.Sprintf(":%d", s.port)
 	if s.proxyConf.Mode == 2 {
-		// Proxy(Nginx) settings
-		color.Red("[WARNING] running on fcgi mode.")
-		s.logger.Info("running on fcgi mode.")
-		return fcgi.Run(s.gin, fmt.Sprintf(":%d", s.port))
+		s.runFCGI(addr)
 	}
-	return s.gin.Run(fmt.Sprintf(":%d", s.port))
+	return s.runGin(addr)
+}
+
+func (s *server) runFCGI(addr ...string) error {
+	// Proxy(Nginx) settings
+	color.Red("[WARNING] running on fcgi mode.")
+	s.logger.Info("running server as fcgi mode.")
+	return fcgi.Run(s.gin, addr...)
+}
+
+// how to shutdown with gin
+// https://github.com/gin-gonic/examples/blob/master/graceful-shutdown/graceful-shutdown/server.go
+func (s *server) runGin(addr string) error {
+	// s.gin.Run() would not return until error happens or detecting signal
+	// return s.gin.Run(fmt.Sprintf(":%d", s.port))
+	s.logger.Debug(fmt.Sprintf("Listening and serving HTTP on %s", addr))
+
+	srv := &http.Server{
+		Addr:    addr,
+		Handler: s.gin,
+	}
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			s.logger.Error("fail to call ListenAndServe()", zap.Error(err))
+		}
+	}()
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+	<-done
+
+	s.logger.Info("Shutting down server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		cancel()
+		s.Close()
+	}()
+	if err := srv.Shutdown(ctx); err != nil {
+		s.logger.Error("fatal to call Shutdown():", zap.Error(err))
+		return err
+	}
+	return nil
 }

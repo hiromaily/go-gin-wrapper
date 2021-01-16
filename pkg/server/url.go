@@ -145,6 +145,6 @@ func (s *server) setRouter(r *gin.Engine) {
 		users.OPTIONS("", cors.SetHeader(s.logger, s.apiConf.CORS))
 	}
 
-	// TODO:When user can use only method of GET and POST, X-HTTP-Method-Override header may be helpful.
+	// TODO: when user can use only method of GET and POST, X-HTTP-Method-Override header may be helpful.
 	// Or use parameter `_method`
 }

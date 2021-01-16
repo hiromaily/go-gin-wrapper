@@ -61,6 +61,7 @@ func (r *registry) NewServer() server.Server {
 		r.newMiddleware(),
 		r.newController(),
 		r.newLogger(),
+		r.newMySQLClient(),
 		r.newUserRepository(),
 		r.conf,
 		r.isTestMode,
