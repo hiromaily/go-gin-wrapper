@@ -35,9 +35,18 @@ This is built on Heroku. You can see [here](https://ginserver.herokuapp.com/).
 
 ## Installation
 ```
-$ go get github.com/hiromaily/go-gin-wrapper ./...
- or
-$ go get github.com/hiromaily/go-gin-wrapper ./cmd/ginserver/...
+# 1. clone repository
+$ git clone https://github.com/hiromaily/go-gin-wrapper.git
+
+# 2. copy settings.default.toml
+$ cp configs/settings.default.toml configs/settings.toml
+
+# 3. edit `configs/settings.toml`
+# 3.1. you may need to modify in settings.toml
+ [server.docs]
+ # set `go-gin-wrapper` path
+ # this path must be chnaged first for specific environment
+ path = "${GOPATH}/src/github.com/hiromaily/go-gin-wrapper"
 ```
 
 #### Setup for local environment with Docker
