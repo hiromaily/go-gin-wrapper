@@ -25,14 +25,14 @@ type Server interface {
 // Server object
 type server struct {
 	logger     *zap.Logger
-	serverConf *config.ServerConfig
-	proxyConf  *config.ProxyConfig
+	serverConf *config.Server
+	proxyConf  *config.Proxy
 }
 
 // NewServer returns Server interface
 func NewServer(
 	logger *zap.Logger,
-	conf *config.Config) Server {
+	conf *config.Root) Server {
 	srv := server{
 		logger:     logger,
 		serverConf: conf.Server,

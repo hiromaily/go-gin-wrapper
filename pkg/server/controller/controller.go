@@ -13,9 +13,9 @@ import (
 type Controller struct {
 	logger    *zap.Logger
 	userRepo  repository.UserRepositorier
-	apiHeader *config.HeaderConfig
-	cors      *config.CORSConfig
-	auth      *config.AuthConfig
+	apiHeader *config.Header
+	cors      *config.CORS
+	auth      *config.Auth
 	// TODO: session should be added here
 }
 
@@ -23,9 +23,9 @@ type Controller struct {
 func NewController(
 	logger *zap.Logger,
 	userRepo repository.UserRepositorier,
-	apiHeader *config.HeaderConfig,
-	cors *config.CORSConfig,
-	auth *config.AuthConfig) *Controller {
+	apiHeader *config.Header,
+	cors *config.CORS,
+	auth *config.Auth) *Controller {
 	return &Controller{
 		logger:    logger,
 		userRepo:  userRepo,

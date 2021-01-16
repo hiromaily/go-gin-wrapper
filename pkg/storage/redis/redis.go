@@ -10,7 +10,7 @@ import (
 )
 
 // NewRedis is to return redis connection
-func NewRedis(conf *config.RedisConfig) (*redis.Conn, error) {
+func NewRedis(conf *config.Redis) (*redis.Conn, error) {
 	var conn redis.Conn
 	var err error
 	if conf.IsHeroku {

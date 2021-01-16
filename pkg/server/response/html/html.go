@@ -7,7 +7,7 @@ import (
 )
 
 // Response is to add common parameter for html response
-func Response(obj gin.H, api *config.HeaderConfig) gin.H {
+func Response(obj gin.H, api *config.Header) gin.H {
 	// type H map[string]interface{}
 
 	obj["header"] = api.Header

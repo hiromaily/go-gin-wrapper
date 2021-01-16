@@ -15,11 +15,11 @@ type Registry interface {
 
 type registry struct {
 	logger *zap.Logger
-	conf   *config.Config
+	conf   *config.Root
 }
 
 // NewRegistry returns registry interface
-func NewRegistry(conf *config.Config) Registry {
+func NewRegistry(conf *config.Root) Registry {
 	return &registry{
 		conf: conf,
 	}

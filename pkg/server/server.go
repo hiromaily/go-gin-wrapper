@@ -37,11 +37,11 @@ type server struct {
 	logger     *zap.Logger
 	userRepo   repository.UserRepositorier
 
-	serverConf  *config.ServerConfig
-	proxyConf   *config.ProxyConfig
-	apiConf     *config.APIConfig
-	redisConf   *config.RedisConfig
-	developConf *config.DevelopConfig
+	serverConf  *config.Server
+	proxyConf   *config.Proxy
+	apiConf     *config.API
+	redisConf   *config.Redis
+	developConf *config.Develop
 
 	isTestMode bool
 }
@@ -53,7 +53,7 @@ func NewServer(
 	controller *controller.Controller,
 	logger *zap.Logger,
 	userRepo repository.UserRepositorier,
-	conf *config.Config,
+	conf *config.Root,
 	isTestMode bool,
 ) Server {
 	return &server{

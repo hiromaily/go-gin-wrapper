@@ -11,7 +11,7 @@ import (
 )
 
 // ResponseUserJSON is Return user json
-func ResponseUserJSON(c *gin.Context, logger *zap.Logger, co *config.CORSConfig, code int, obj interface{}) {
+func ResponseUserJSON(c *gin.Context, logger *zap.Logger, co *config.CORS, code int, obj interface{}) {
 	// Set Header
 	hh.SetResponseHeaderForSecurity(c, logger, co)
 

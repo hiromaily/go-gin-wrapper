@@ -10,7 +10,7 @@ import (
 )
 
 // NewMySQL creates mysql db connection
-func NewMySQL(conf *config.MySQLContentConfig) (*sql.DB, error) {
+func NewMySQL(conf *config.MySQLContent) (*sql.DB, error) {
 	db, err := sql.Open("mysql",
 		fmt.Sprintf(
 			"%s:%s@tcp(%s)/%s?parseTime=true&charset=utf8mb4",

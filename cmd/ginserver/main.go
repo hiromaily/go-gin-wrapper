@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// config
-	conf, err := config.New(*tomlPath, *isEncrypted)
+	conf, err := config.NewConfig(*tomlPath, *isEncrypted)
 	if err != nil {
 		panic(err)
 	}

@@ -10,7 +10,7 @@ import (
 )
 
 // SetSession is for session
-func SetSession(r *gin.Engine, logger *zap.Logger, host, pass string, ses config.SessionConfig) {
+func SetSession(r *gin.Engine, logger *zap.Logger, host, pass string, ses config.Session) {
 	var store sessions.RedisStore
 	var err error
 

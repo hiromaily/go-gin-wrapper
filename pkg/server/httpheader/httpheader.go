@@ -18,7 +18,7 @@ func getURL(scheme, host string, port int) string {
 }
 
 // IsRefererHostValid is check referer for posted page
-func IsRefererHostValid(c *gin.Context, logger *zap.Logger, srvConf *config.ServerConfig, pageFrom string) bool {
+func IsRefererHostValid(c *gin.Context, logger *zap.Logger, srvConf *config.Server, pageFrom string) bool {
 	webserverURL := getURL(srvConf.Scheme, srvConf.Host, srvConf.Port)
 
 	// TODO:Add feature that switch https to http easily.
@@ -69,7 +69,7 @@ func GetProto(c *gin.Context) string {
 
 // SetResponseHeaderForSecurity is to set HTTP response header
 // TODO:it may be better to set config
-func SetResponseHeaderForSecurity(c *gin.Context, logger *zap.Logger, co *config.CORSConfig) {
+func SetResponseHeaderForSecurity(c *gin.Context, logger *zap.Logger, co *config.CORS) {
 	logger.Info("SetResponseHeaderForSecurity")
 	// http://qiita.com/roothybrid7/items/34578037d883c9a99ca8
 

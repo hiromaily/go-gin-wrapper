@@ -22,7 +22,7 @@ type Registry interface {
 }
 
 type registry struct {
-	conf        *config.Config
+	conf        *config.Root
 	logger      *zap.Logger
 	gin         *gin.Engine
 	isTestMode  bool
@@ -31,7 +31,7 @@ type registry struct {
 }
 
 // NewRegistry returns registry interface
-func NewRegistry(conf *config.Config, isTestMode bool) Registry {
+func NewRegistry(conf *config.Root, isTestMode bool) Registry {
 	return &registry{
 		isTestMode: isTestMode,
 		conf:       conf,
@@ -104,7 +104,7 @@ func (r *registry) newLogger() *zap.Logger {
 
 func (r *registry) newMySQLClient() *sql.DB {
 	if r.mysqlClient == nil {
-		dbConf := r.conf.MySQL.MySQLContentConfig
+		dbConf := r.conf.MySQL.MySQLContent
 		if r.isTestMode {
 			dbConf = r.conf.MySQL.Test
 		}

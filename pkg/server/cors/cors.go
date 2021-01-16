@@ -25,7 +25,7 @@ const (
 
 // CheckHeader is for CORS before handling request
 //  check preflight of XMLHttpRequest Level2 XMLHttpRequest
-func CheckHeader(c *gin.Context, logger *zap.Logger, corsConf *config.CORSConfig) {
+func CheckHeader(c *gin.Context, logger *zap.Logger, corsConf *config.CORS) {
 	logger.Info("CheckHeader")
 
 	// TODO: should it be checked when `Options` method??
@@ -69,7 +69,7 @@ func CheckHeader(c *gin.Context, logger *zap.Logger, corsConf *config.CORSConfig
 }
 
 // SetHeader is for CORS
-func SetHeader(logger *zap.Logger, corsConf *config.CORSConfig) gin.HandlerFunc {
+func SetHeader(logger *zap.Logger, corsConf *config.CORS) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logger.Info("SetHeader")
 		if corsConf.Enabled {

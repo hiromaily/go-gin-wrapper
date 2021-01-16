@@ -36,21 +36,21 @@ type Middlewarer interface {
 type middleware struct {
 	// session xxxx
 	logger      *zap.Logger
-	serverConf  *config.ServerConfig
-	proxyConf   *config.ProxyConfig
-	apiConf     *config.APIConfig
-	corsConf    *config.CORSConfig
-	developConf *config.DevelopConfig
+	serverConf  *config.Server
+	proxyConf   *config.Proxy
+	apiConf     *config.API
+	corsConf    *config.CORS
+	developConf *config.Develop
 }
 
 // NewMiddleware returns Server interface
 func NewMiddleware(
 	logger *zap.Logger,
-	serverConf *config.ServerConfig,
-	proxyConf *config.ProxyConfig,
-	apiConf *config.APIConfig,
-	corsConf *config.CORSConfig,
-	developConf *config.DevelopConfig,
+	serverConf *config.Server,
+	proxyConf *config.Proxy,
+	apiConf *config.API,
+	corsConf *config.CORS,
+	developConf *config.Develop,
 ) Middlewarer {
 	return &middleware{
 		logger:      logger,
