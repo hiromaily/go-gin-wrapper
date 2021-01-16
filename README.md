@@ -16,13 +16,13 @@ Now it's under `refactoring`.
 
 ## Refactoring
 - [ ] change architecture like Clean Architecture
-- [ ] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
+- [x] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
   - [x] use [sqlboiler](https://github.com/volatiletech/sqlboiler) as ORM
   - [x] remove MongoDB
   - [x] replace log to zap logger
 - [x] add zap logger
 - [ ] add graceful shutdown  
-- [ ] clean up variable name
+- [ ] clean up variable, func name
 - [ ] clean up comments
 - [ ] catch up with latest [gin](https://github.com/gin-gonic/gin)
 - [ ] update front-end
