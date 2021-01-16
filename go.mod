@@ -16,6 +16,7 @@ require (
 	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/hiromaily/golibs v0.0.0-20201019070620-8c38788571a9

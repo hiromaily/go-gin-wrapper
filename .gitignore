@@ -2,9 +2,6 @@
 .DS_Store
 .idea/
 
-private.pem
-public.pem
-
 #main
 configs/settings.toml
 configs/heroku.toml
