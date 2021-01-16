@@ -12,20 +12,18 @@ import (
 )
 
 var (
-	tomlPath        = flag.String("f", "", "toml file path")
-	portNum         = flag.Int("p", 0, "port of server")
-	isEncryptedConf = flag.Bool("crypto", false, "if true, config file is handled as encrypted value")
+	tomlPath    = flag.String("f", "", "toml file path")
+	portNum     = flag.Int("p", 0, "port of server")
+	isEncrypted = flag.Bool("crypto", false, "if true, values in config file are encrypted")
 )
 
 func init() {}
 
-// Creates a gin router with default middleware:
-// logger and recovery (crash-free) middleware
 func main() {
 	flag.Parse()
 
 	// encryption
-	if *isEncryptedConf {
+	if *isEncrypted {
 		_, err := encryption.NewCryptWithEnv()
 		if err != nil {
 			panic(err)
@@ -33,20 +31,23 @@ func main() {
 	}
 
 	// config
-	conf, err := config.New(*tomlPath, *isEncryptedConf)
+	conf, err := config.New(*tomlPath, *isEncrypted)
 	if err != nil {
 		panic(err)
 	}
 
-	// debug mode
+	// overwrite config by args
+	if *portNum != 0 {
+		conf.Server.Port = *portNum
+	}
+
+	// accept signal
 	if conf.IsSignal {
-		// signal
 		go signal.StartSignal()
 	}
 
-	isTestMode := false
-	regi := NewRegistry(conf, isTestMode)
-	server := regi.NewServer(*portNum)
+	regi := NewRegistry(conf, false)
+	server := regi.NewServer()
 	if _, err := server.Start(); err != nil {
 		log.Fatal(err)
 	}

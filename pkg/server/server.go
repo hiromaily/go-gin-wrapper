@@ -49,7 +49,6 @@ type server struct {
 // NewServer returns Server interface
 func NewServer(
 	gin *gin.Engine,
-	port int,
 	middleware Middlewarer,
 	controller *controller.Controller,
 	logger *zap.Logger,
@@ -57,13 +56,9 @@ func NewServer(
 	conf *config.Config,
 	isTestMode bool,
 ) Server {
-	if port == 0 {
-		port = conf.Server.Port
-	}
-
 	return &server{
 		gin:         gin,
-		port:        port,
+		port:        conf.Server.Port,
 		middleware:  middleware,
 		controller:  controller,
 		logger:      logger,

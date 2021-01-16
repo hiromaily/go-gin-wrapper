@@ -18,7 +18,7 @@ import (
 
 // Registry is for registry interface
 type Registry interface {
-	NewServer(port int) server.Server
+	NewServer() server.Server
 }
 
 type registry struct {
@@ -53,12 +53,11 @@ func (r *registry) initAuth() {
 }
 
 // NewServerer is to register for serverer interface
-func (r *registry) NewServer(port int) server.Server {
+func (r *registry) NewServer() server.Server {
 	r.initAuth()
 
 	return server.NewServer(
 		r.newGin(),
-		port,
 		r.newMiddleware(),
 		r.newController(),
 		r.newLogger(),

@@ -208,11 +208,12 @@ var getJWTApiTests = []struct {
 // Test Framework
 //-----------------------------------------------------------------------------
 
+// FIXME: this code is related to main() in main.go
 func setup() {
 	flag.Parse()
 
 	// cipher
-	if *isEncryptedConf {
+	if *isEncrypted {
 		_, err := encryption.NewCryptWithEnv()
 		if err != nil {
 			panic(err)
@@ -220,12 +221,15 @@ func setup() {
 	}
 
 	// config
-	conf, err := config.New(*tomlPath, *isEncryptedConf)
+	conf, err := config.New(*tomlPath, *isEncrypted)
 	if err != nil {
 		panic(err)
 	}
 
-	// overwrite mode
+	// overwrite config by args
+	if *portNum != 0 {
+		conf.Server.Port = *portNum
+	}
 	conf.API.JWT.Mode = uint8(*authMode)
 
 	// Referer for test( set this on header automatically)
@@ -234,9 +238,8 @@ func setup() {
 		conf.Server.Host,
 		conf.Server.Port)
 
-	isTestMode := true
-	regi := NewRegistry(conf, isTestMode)
-	server := regi.NewServer(*portNum)
+	regi := NewRegistry(conf, true) // run as test mode
+	server := regi.NewServer()
 	if r, err = server.Start(); err != nil {
 		panic(err)
 	}
