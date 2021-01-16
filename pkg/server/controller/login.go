@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	valid "github.com/hiromaily/golibs/validator"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/validator"
 )
 
 // LoginRequest is request structure for login
@@ -32,9 +32,9 @@ func (ctl *Controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []s
 	}
 
 	// Validation
-	mRet := valid.CheckValidation(posted, false)
+	mRet := validator.CheckValidation(posted, false)
 	if len(mRet) != 0 {
-		errs := valid.ConvertErrorMsgs(mRet, ErrFmt)
+		errs := validator.ConvertErrorMsgs(mRet, ErrFmt)
 		return 0, posted, errs
 	}
 
@@ -55,7 +55,7 @@ func (ctl *Controller) CheckLoginOnAPI(c *gin.Context) (int, string, error) {
 	}
 
 	// Validation
-	mRet := valid.CheckValidation(posted, false)
+	mRet := validator.CheckValidation(posted, false)
 	if len(mRet) != 0 {
 		return 0, "", errors.New("validation error")
 	}

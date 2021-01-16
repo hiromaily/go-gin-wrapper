@@ -8,8 +8,8 @@ import (
 	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
 	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/validator"
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
-	"github.com/hiromaily/golibs/validator"
 )
 
 // UserRequest is expected request form from user
