@@ -12,15 +12,14 @@ import (
 
 // Config is of root
 type Config struct {
-	IsSignal bool    `toml:"is_signal"`
-	Logger   *Logger `toml:"logger"`
-	Server   *ServerConfig
-	Proxy    *ProxyConfig
-	API      *APIConfig
-	Auth     *AuthConfig
-	MySQL    *MySQLConfig `toml:"mysql" validate:"required"`
-	Redis    *RedisConfig `toml:"redis" validate:"required"`
-	Develop  *DevelopConfig
+	Logger  *Logger `toml:"logger"`
+	Server  *ServerConfig
+	Proxy   *ProxyConfig
+	API     *APIConfig
+	Auth    *AuthConfig
+	MySQL   *MySQLConfig `toml:"mysql" validate:"required"`
+	Redis   *RedisConfig `toml:"redis" validate:"required"`
+	Develop *DevelopConfig
 }
 
 // Logger logger info
@@ -38,7 +37,6 @@ type ServerConfig struct {
 	Host      string          `toml:"host" validate:"required"`
 	Port      int             `toml:"port" validate:"required"`
 	Docs      DocsConfig      `toml:"docs"`
-	Log       LogConfig       `toml:"log" validate:"required"`
 	Session   SessionConfig   `toml:"session" validate:"required"`
 	BasicAuth BasicAuthConfig `toml:"basic_auth" validate:"required"`
 }
@@ -46,12 +44,6 @@ type ServerConfig struct {
 // DocsConfig is path for document root of webserver
 type DocsConfig struct {
 	Path string `toml:"path"`
-}
-
-// LogConfig is for Log
-type LogConfig struct {
-	Level uint8  `toml:"level"`
-	Path  string `toml:"path"`
 }
 
 // SessionConfig is for Session
@@ -77,11 +69,10 @@ type ProxyConfig struct {
 
 // ProxyServerConfig is for Reverse Proxy Server
 type ProxyServerConfig struct {
-	Scheme  string    `toml:"scheme"`
-	Host    string    `toml:"host"`
-	Port    int       `toml:"port"`
-	WebPort []int     `toml:"web_port"`
-	Log     LogConfig `toml:"log"`
+	Scheme  string `toml:"scheme"`
+	Host    string `toml:"host"`
+	Port    int    `toml:"port"`
+	WebPort []int  `toml:"web_port"`
 }
 
 // APIConfig is for Rest API

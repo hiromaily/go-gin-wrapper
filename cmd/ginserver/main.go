@@ -8,7 +8,6 @@ import (
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
-	"github.com/hiromaily/go-gin-wrapper/pkg/signal"
 )
 
 var (
@@ -39,11 +38,6 @@ func main() {
 	// overwrite config by args
 	if *portNum != 0 {
 		conf.Server.Port = *portNum
-	}
-
-	// accept signal
-	if conf.IsSignal {
-		go signal.StartSignal()
 	}
 
 	regi := NewRegistry(conf, false)

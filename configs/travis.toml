@@ -1,6 +1,4 @@
 
-is_signal = false # enable Ctrl+C to shutdown server
-
 [logger]
 service = "go-gin"
 env = "custom" # dev, prod, custom :for only zap logger
@@ -18,10 +16,6 @@ port = 8080
 
 [server.docs]
 path = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper"
-
-[server.log]
-level = 1
-path = "/var/log/goweb/ginserver.log"
 
 [server.session]
 name = "go-web-ginserver"
