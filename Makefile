@@ -1,11 +1,10 @@
-# Note: tabs by space can't not used for Makefile!
-MONGO_PORT=27017
+# Note: tabs by space can't not used on Makefile!
 CURRENTDIR=`pwd`
 modVer=$(shell cat go.mod | head -n 3 | tail -n 1 | awk '{print $2}' | cut -d'.' -f2)
 currentVer=$(shell go version | awk '{print $3}' | sed -e "s/go//" | cut -d'.' -f2)
 
 ###############################################################################
-# Setup
+# setup
 ###############################################################################
 #.PHONY: gen-jwt-key
 #gen-jwt-key:
@@ -23,7 +22,7 @@ sqlboiler:
 	sqlboiler --wipe mysql
 
 ###############################################################################
-# Managing Dependencies
+# dependencies
 ###############################################################################
 .PHONY: check-ver
 check-ver:
@@ -36,13 +35,14 @@ check-ver:
 
 .PHONY: update
 update:
+	go get -u github.com/volatiletech/sqlboiler
 	GO111MODULE=off go get -u github.com/oxequa/realize
 	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	go get -u -d -v ./...
 
 
 ###############################################################################
-# Golang formatter and detection
+# linter and formatter
 ###############################################################################
 .PHONY: lint
 lint:
@@ -54,7 +54,7 @@ imports:
 
 
 ###############################################################################
-# Local Build
+# local build
 ###############################################################################
 .PHONY: build
 build:
@@ -70,15 +70,17 @@ build-swg:
 
 
 ###############################################################################
-# Execution
+# execution
 ###############################################################################
 .PHONY: run
 run:
-	go run ./cmd/ginserver/ -f ./configs/settings.toml -crypto
+	#go run ./cmd/ginserver/ -f ./configs/settings.toml -crypto
+	go run ./cmd/ginserver/ -f ./configs/settings.toml
 
 .PHONY: exec
 exec:
-	ginserver -f ./configs/settings.toml -crypto
+	#ginserver -f ./configs/settings.toml -crypto
+	ginserver -f ./configs/settings.toml
 
 .PHONY: exec-proxy
 exec-proxy:

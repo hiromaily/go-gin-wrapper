@@ -20,7 +20,8 @@ Now it's under `refactoring`.
   - [x] use [sqlboiler](https://github.com/volatiletech/sqlboiler) as ORM
   - [x] remove MongoDB
   - [x] replace log to zap logger
-- [x] add zap logger 
+- [x] add zap logger
+- [ ] add graceful shutdown  
 - [ ] clean up variable name
 - [ ] clean up comments
 - [ ] catch up with latest [gin](https://github.com/gin-gonic/gin)
@@ -28,6 +29,7 @@ Now it's under `refactoring`.
 - [ ] unittest by table driven test
 - [ ] refactoring code by [The Second Edition of "Refactoring"](https://martinfowler.com/articles/refactoring-2nd-ed.html)
 - [ ] switch any Japanese to English
+- [ ] refactoring and fix test
 
 ## Example
 This is built on Heroku. You can see [here](https://ginserver.herokuapp.com/).
@@ -47,6 +49,9 @@ $ cp configs/settings.default.toml configs/settings.toml
  # set `go-gin-wrapper` path
  # this path must be chnaged first for specific environment
  path = "${GOPATH}/src/github.com/hiromaily/go-gin-wrapper"
+ 
+# 4. make sure `go run works`
+$ go run ./cmd/ginserver/ -f ./configs/settings.toml
 ```
 
 #### Setup for local environment with Docker
