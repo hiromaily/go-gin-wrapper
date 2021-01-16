@@ -133,7 +133,7 @@ func (s *server) setMiddleware() {
 	// when using load balancer or reverse proxy, set specific IP
 	s.gin.Use(s.middleware.RejectSpecificIP())
 
-	// meta data for each rogic
+	// meta data
 	s.gin.Use(s.middleware.SetMetaData())
 
 	// auto session(expire) update

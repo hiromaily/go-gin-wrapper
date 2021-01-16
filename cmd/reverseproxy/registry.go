@@ -8,9 +8,9 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/reverseproxy"
 )
 
-// Registry is for registry interface
+// Registry interface
 type Registry interface {
-	NewProxyServerer() reverseproxy.Serverer
+	NewProxyServer() reverseproxy.Server
 }
 
 type registry struct {
@@ -18,16 +18,16 @@ type registry struct {
 	conf   *config.Config
 }
 
-// NewRegistry is to register regstry interface
+// NewRegistry returns registry interface
 func NewRegistry(conf *config.Config) Registry {
 	return &registry{
 		conf: conf,
 	}
 }
 
-// NewProxyServerer is to register for serverer interface
-func (r *registry) NewProxyServerer() reverseproxy.Serverer {
-	return reverseproxy.NewServerer(
+// NewProxyServer returns Server interface
+func (r *registry) NewProxyServer() reverseproxy.Server {
+	return reverseproxy.NewServer(
 		r.newLogger(),
 		r.conf,
 	)

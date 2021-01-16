@@ -12,7 +12,7 @@ import (
 
 var (
 	tomlPath    = flag.String("f", "", "toml file path")
-	portNum     = flag.Int("p", 0, "port of server")
+	portNum     = flag.Int("p", 0, "sever port")
 	isEncrypted = flag.Bool("crypto", false, "if true, values in config file are encrypted")
 )
 

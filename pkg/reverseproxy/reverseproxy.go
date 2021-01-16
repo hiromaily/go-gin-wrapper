@@ -13,40 +13,37 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 )
 
-// Serverer is Serverer interface
-type Serverer interface {
+// Server interface
+type Server interface {
 	Start() error
-}
-
-// NewServerer is to return Serverer interface
-func NewServerer(logger *zap.Logger, conf *config.Config) Serverer {
-	return NewServer(logger, conf)
 }
 
 // ----------------------------------------------------------------------------
 // Server
 // ----------------------------------------------------------------------------
 
-// Server is Server object
-type Server struct {
-	logger *zap.Logger
-	conf   *config.Config
+// Server object
+type server struct {
+	logger     *zap.Logger
+	serverConf *config.ServerConfig
+	proxyConf  *config.ProxyConfig
 }
 
-// NewServer is to return server object
+// NewServer returns Server interface
 func NewServer(
 	logger *zap.Logger,
-	conf *config.Config) *Server {
-	srv := Server{
-		logger: logger,
-		conf:   conf,
+	conf *config.Config) Server {
+	srv := server{
+		logger:     logger,
+		serverConf: conf.Server,
+		proxyConf:  conf.Proxy,
 	}
 	return &srv
 }
 
-// Start is to start server execution
-func (s *Server) Start() error {
-	ports := s.conf.Proxy.Server.WebPort
+// Start starts reverse proxy server
+func (s *server) Start() error {
+	ports := s.proxyConf.Server.WebPort
 
 	if len(ports) == 1 {
 		s.singleReverseProxy()
@@ -58,18 +55,17 @@ func (s *Server) Start() error {
 }
 
 // Single Reverse Proxy
-func (s *Server) singleReverseProxy() {
+func (s *server) singleReverseProxy() {
 	s.logger.Info("singleReverseProxy")
 	// Web Server
 	// webserverURL := "http://127.0.0.1:9990"
-	srv := s.conf.Server
-	tmp := getURL(srv.Scheme, srv.Host, srv.Port)
+	tmp := getURL(s.serverConf.Scheme, s.serverConf.Host, s.serverConf.Port)
 	webserverURL, _ := url.Parse(tmp)
 
-	s.logger.Info("proxy is runnig ...", zap.Int("port", s.conf.Proxy.Server.Port))
+	s.logger.Info("proxy is runnig ...", zap.Int("port", s.proxyConf.Server.Port))
 
 	// Proxy Server
-	proxyAddress := fmt.Sprintf(":%d", s.conf.Proxy.Server.Port)
+	proxyAddress := fmt.Sprintf(":%d", s.proxyConf.Server.Port)
 	proxyHandler := httputil.NewSingleHostReverseProxy(webserverURL)
 	server := http.Server{
 		Addr:    proxyAddress,
@@ -79,17 +75,15 @@ func (s *Server) singleReverseProxy() {
 }
 
 // Multiple Reverse Proxy
-func (s *Server) multipleReverseProxy() {
-	ports := s.conf.Proxy.Server.WebPort
+func (s *server) multipleReverseProxy() {
+	ports := s.proxyConf.Server.WebPort
 	s.logger.Info("multipleReverseProxy", zap.Int("server_num", len(ports)))
-	// As precondition, increment port number by one.
+	// as precondition, increment port number by one.
 
 	// web servers
-	srv := s.conf.Server
 	hostRing := ring.New(len(ports))
 	for _, port := range ports {
-		// url, _ := url.Parse(getURL(srv.Scheme, srv.Host, srv.Port+i))
-		url, _ := url.Parse(getURL(srv.Scheme, srv.Host, port))
+		url, _ := url.Parse(getURL(s.serverConf.Scheme, s.serverConf.Host, port))
 		hostRing.Value = url
 		hostRing = hostRing.Next()
 	}
@@ -99,14 +93,14 @@ func (s *Server) multipleReverseProxy() {
 	director := func(request *http.Request) {
 		mutex.Lock()
 		defer mutex.Unlock()
-		request.URL.Scheme = srv.Scheme
+		request.URL.Scheme = s.serverConf.Scheme
 		request.URL.Host = hostRing.Value.(*url.URL).Host
 		hostRing = hostRing.Next()
 	}
 
 	// proxy
 	proxy := &httputil.ReverseProxy{Director: director}
-	proxyAddress := fmt.Sprintf(":%d", s.conf.Proxy.Server.Port)
+	proxyAddress := fmt.Sprintf(":%d", s.proxyConf.Server.Port)
 
 	server := http.Server{
 		Addr:    proxyAddress,

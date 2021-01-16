@@ -16,7 +16,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/storage/mysql"
 )
 
-// Registry is for registry interface
+// Registry interface
 type Registry interface {
 	NewServer() server.Server
 }
@@ -30,7 +30,7 @@ type registry struct {
 	// redisClient *redis.Conn
 }
 
-// NewRegistry is to register regstry interface
+// NewRegistry returns registry interface
 func NewRegistry(conf *config.Config, isTestMode bool) Registry {
 	return &registry{
 		isTestMode: isTestMode,
@@ -52,7 +52,7 @@ func (r *registry) initAuth() {
 	}
 }
 
-// NewServerer is to register for serverer interface
+// NewServer returns Server interface
 func (r *registry) NewServer() server.Server {
 	r.initAuth()
 
@@ -126,7 +126,7 @@ func (r *registry) newUserRepository() repository.UserRepositorier {
 	return repository.NewUserRepository(r.newMySQLClient(), r.newLogger())
 }
 
-// newRedisConn is to create redis connection
+// newRedisConn returns redis connection
 //func (r *registry) newRedisConn(conf *config.RedisConfig) *redis.Conn {
 //	if r.redisClient == nil {
 //		redisConn, err := rd.NewRedis(conf)
