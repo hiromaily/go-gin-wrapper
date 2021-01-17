@@ -97,11 +97,11 @@ func (j *jwtee) keyFunc(token *jwt.Token) (interface{}, error) {
 
 // ValidateToken validates token string, it may be too strict
 func (j *jwtee) ValidateToken(tokenString string) error {
-	// token
 	token, err := jwt.Parse(tokenString, j.keyFunc)
 	if err != nil {
 		return err
-	} else if !token.Valid {
+	}
+	if !token.Valid {
 		return errors.New("token is invalid")
 	}
 	return nil
@@ -113,17 +113,20 @@ func (j *jwtee) ValidateTokenWithClaim(tokenString, clientID, userName string) e
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, j.keyFunc)
 	if err != nil {
 		return err
-	} else if !token.Valid {
+	}
+	if !token.Valid {
 		return errors.New("token is invalid")
 	}
 
-	// validate claim as well
+	// validate claim
 	claims, ok := token.Claims.(*jwt.StandardClaims)
 	if !ok {
 		return errors.New("fail to validate claim: claims can't be retrieved")
-	} else if claims.Issuer != clientID {
+	}
+	if claims.Issuer != clientID {
 		return errors.New("fail to validate claim: issuer is invalid")
-	} else if claims.Subject != userName {
+	}
+	if claims.Subject != userName {
 		return errors.New("fail to validate claim: subject is invalid")
 	}
 	return nil
@@ -136,11 +139,12 @@ func (j *jwtee) ValidateTokenWithCustomClaim(tokenString, clientID, userName, op
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, j.keyFunc)
 	if err != nil {
 		return err
-	} else if !token.Valid {
+	}
+	if !token.Valid {
 		return errors.New("token is invalid")
 	}
 
-	// check claim
+	// validate claim
 	claims, ok := token.Claims.(*CustomClaims)
 	if !ok {
 		return errors.New("fail to validate claim: claims data can't be retrieved")
