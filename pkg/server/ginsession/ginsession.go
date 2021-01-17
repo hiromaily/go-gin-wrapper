@@ -9,38 +9,37 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 )
 
-// SetSession is for session
-func SetSession(r *gin.Engine, logger *zap.Logger, host, pass string, ses config.Session) {
-	var store sessions.RedisStore
-	var err error
-
-	if host != "" {
-		// session on Redis
-		store, err = sessions.NewRedisStore(80, "tcp", host, pass, []byte(ses.Key))
-		if err != nil {
-			logger.Error("fail to call sessions.NewRedisStore()", zap.Error(err))
-			// on memory
-			store = sessions.NewCookieStore([]byte(ses.Key))
-		}
-	} else {
+// NewRedisStore returns redis session store
+func NewRedisStore(logger *zap.Logger, host, pass string, conf *config.Session) sessions.Store {
+	store, err := sessions.NewRedisStore(80, "tcp", host, pass, []byte(conf.Key))
+	if err != nil {
+		logger.Error("fail to call sessions.NewRedisStore()", zap.Error(err))
 		// on memory
-		store = sessions.NewCookieStore([]byte(ses.Key))
+		store = sessions.NewCookieStore([]byte(conf.Key))
 	}
-
-	strOptions := &sessions.Options{
-		// Path: "/",
-		// Domain: "/",   //It's better not to use.
-		// MaxAge: 86400, //1day
-		// MaxAge: 3600,  //1hour
-		MaxAge:   ses.MaxAge, // 5minutes
-		Secure:   ses.Secure, // TODO: Set false in development environment, production environment requires true
-		HttpOnly: ses.HTTPOnly,
-	}
-	store.Options(*strOptions)
-	r.Use(sessions.Sessions(ses.Name, store))
+	return store
 }
 
-// SetUserSession is set user session data
+// NewCookieStore returns cookie store
+func NewCookieStore(conf *config.Session) sessions.Store {
+	return sessions.NewCookieStore([]byte(conf.Key))
+}
+
+// SetOption sets option to session store
+func SetOption(store sessions.RedisStore, conf *config.Session) {
+	strOptions := &sessions.Options{
+		// Path: "/",
+		// Domain: "/",   // It's better not to use
+		// MaxAge: 86400, // 1 day
+		// MaxAge: 3600,  // 1 hour
+		MaxAge:   conf.MaxAge, // 5 minutes
+		Secure:   conf.Secure, // TODO: Set false in development environment, production environment requires true
+		HttpOnly: conf.HTTPOnly,
+	}
+	store.Options(*strOptions)
+}
+
+// SetUserSession sets user session
 func SetUserSession(c *gin.Context, userID int) {
 	session := sessions.Default(c)
 	v := session.Get("uid")
@@ -50,19 +49,14 @@ func SetUserSession(c *gin.Context, userID int) {
 	}
 }
 
-// IsLogin is whether user have already loged in or not.
-func IsLogin(c *gin.Context) (bRet bool, uid int) {
+// IsLogin returns boolean whether user have already login or not and uid
+func IsLogin(c *gin.Context) (bool, int) {
 	session := sessions.Default(c)
 	v := session.Get("uid")
 	if v == nil {
-		bRet = false
-		uid = 0
-	} else {
-		bRet = true
-		uid = v.(int)
+		return false, 0
 	}
-	// logger.Debugf("IsLogin: %v", bRet)
-	return
+	return true, v.(int)
 }
 
 // Logout is to clear session

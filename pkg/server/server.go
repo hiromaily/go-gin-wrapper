@@ -14,13 +14,13 @@ import (
 
 	"github.com/DeanThompson/ginpprof"
 	"github.com/fatih/color"
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/dir"
-	"github.com/hiromaily/go-gin-wrapper/pkg/heroku"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
@@ -35,13 +35,14 @@ type Server interface {
 
 // server object
 type server struct {
-	gin        *gin.Engine
-	port       int
-	middleware Middlewarer
-	controller controller.Controller
-	logger     *zap.Logger
-	dbConn     *sql.DB
-	userRepo   repository.UserRepositorier
+	gin          *gin.Engine
+	port         int
+	sessionStore sessions.Store
+	middleware   Middlewarer
+	controller   controller.Controller
+	logger       *zap.Logger
+	dbConn       *sql.DB
+	userRepo     repository.UserRepositorier
 
 	serverConf  *config.Server
 	proxyConf   *config.Proxy
@@ -55,6 +56,7 @@ type server struct {
 // NewServer returns Server interface
 func NewServer(
 	gin *gin.Engine,
+	sessionStore sessions.Store,
 	middleware Middlewarer,
 	controller controller.Controller,
 	logger *zap.Logger,
@@ -64,19 +66,20 @@ func NewServer(
 	isTestMode bool,
 ) Server {
 	return &server{
-		gin:         gin,
-		port:        conf.Server.Port,
-		middleware:  middleware,
-		controller:  controller,
-		logger:      logger,
-		dbConn:      dbConn,
-		userRepo:    userRepo,
-		serverConf:  conf.Server,
-		proxyConf:   conf.Proxy,
-		apiConf:     conf.API,
-		redisConf:   conf.Redis,
-		developConf: conf.Develop,
-		isTestMode:  isTestMode,
+		gin:          gin,
+		port:         conf.Server.Port,
+		sessionStore: sessionStore,
+		middleware:   middleware,
+		controller:   controller,
+		logger:       logger,
+		dbConn:       dbConn,
+		userRepo:     userRepo,
+		serverConf:   conf.Server,
+		proxyConf:    conf.Proxy,
+		apiConf:      conf.API,
+		redisConf:    conf.Redis,
+		developConf:  conf.Develop,
+		isTestMode:   isTestMode,
 	}
 }
 
@@ -129,35 +132,14 @@ func (s *server) setMiddleware() {
 
 	s.gin.Use(s.middleware.GlobalRecover()) // It's called faster than [gin.Recovery()]
 
-	s.initSession()
+	sess.SetOption(s.sessionStore, s.serverConf.Session)
+	s.gin.Use(sessions.Sessions(s.serverConf.Session.Name, s.sessionStore))
 
 	s.gin.Use(s.middleware.RejectSpecificIP())
 
 	s.gin.Use(s.middleware.SetMetaData())
 
 	s.gin.Use(s.middleware.UpdateUserSession())
-}
-
-func (s *server) initSession() {
-	s.herokuRedisSetting()
-	if s.redisConf.IsSession && s.redisConf.Host != "" && s.redisConf.Port != 0 {
-		s.logger.Debug("initSession: redis session start")
-		sess.SetSession(s.gin, s.logger, fmt.Sprintf("%s:%d", s.redisConf.Host, s.redisConf.Port), s.redisConf.Pass, s.serverConf.Session)
-	} else {
-		sess.SetSession(s.gin, s.logger, "", "", s.serverConf.Session)
-	}
-}
-
-func (s *server) herokuRedisSetting() {
-	if s.redisConf.IsHeroku {
-		host, pass, port, err := heroku.GetRedisInfo("")
-		if err == nil && host != "" && port != 0 {
-			s.redisConf.IsSession = true
-			s.redisConf.Host = host
-			s.redisConf.Port = uint16(port)
-			s.redisConf.Pass = pass
-		}
-	}
 }
 
 func (s *server) loadTemplates() error {

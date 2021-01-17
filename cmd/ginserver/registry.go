@@ -2,17 +2,21 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/volatiletech/sqlboiler/boil"
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwt"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	"github.com/hiromaily/go-gin-wrapper/pkg/heroku"
 	"github.com/hiromaily/go-gin-wrapper/pkg/logger"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
+	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/storage/mysql"
 )
 
@@ -58,6 +62,7 @@ func (r *registry) NewServer() server.Server {
 
 	return server.NewServer(
 		r.newGin(),
+		r.newSessionStore(),
 		r.newMiddleware(),
 		r.newController(),
 		r.newLogger(),
@@ -73,6 +78,33 @@ func (r *registry) newGin() *gin.Engine {
 		r.gin = gin.New()
 	}
 	return r.gin
+}
+
+func (r *registry) newSessionStore() sessions.Store {
+	red := r.conf.Redis
+	herokuRedisSetting(red)
+
+	if red.IsSession && red.Host != "" && red.Port != 0 {
+		r.newLogger().Debug("newSessionStore(): redis session start")
+		return sess.NewRedisStore(
+			r.newLogger(),
+			fmt.Sprintf("%s:%d", red.Host, red.Port),
+			red.Pass,
+			r.conf.Server.Session)
+	}
+	return sess.NewCookieStore(r.conf.Server.Session)
+}
+
+func herokuRedisSetting(redisConf *config.Redis) {
+	if redisConf.IsHeroku {
+		host, pass, port, err := heroku.GetRedisInfo("")
+		if err == nil && host != "" && port != 0 {
+			redisConf.IsSession = true
+			redisConf.Host = host
+			redisConf.Port = uint16(port)
+			redisConf.Pass = pass
+		}
+	}
 }
 
 func (r *registry) newMiddleware() server.Middlewarer {
@@ -128,9 +160,9 @@ func (r *registry) newUserRepository() repository.UserRepositorier {
 }
 
 // newRedisConn returns redis connection
-//func (r *registry) newRedisConn(conf *config.RedisConfig) *redis.Conn {
+//func (r *registry) newRedisConn(conf *config.Redis) *redis.Conn {
 //	if r.redisClient == nil {
-//		redisConn, err := rd.NewRedis(conf)
+//		redisConn, err := rds.NewRedis(conf)
 //		if err != nil {
 //			panic(err)
 //		}

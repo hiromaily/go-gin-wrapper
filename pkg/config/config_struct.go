@@ -22,13 +22,13 @@ type Logger struct {
 
 // Server is web server property
 type Server struct {
-	IsRelease bool      `toml:"is_release"`
-	Scheme    string    `toml:"scheme" validate:"required"`
-	Host      string    `toml:"host" validate:"required"`
-	Port      int       `toml:"port" validate:"required"`
-	Docs      Docs      `toml:"docs"`
-	Session   Session   `toml:"session" validate:"required"`
-	BasicAuth BasicAuth `toml:"basic_auth" validate:"required"`
+	IsRelease bool       `toml:"is_release"`
+	Scheme    string     `toml:"scheme" validate:"required"`
+	Host      string     `toml:"host" validate:"required"`
+	Port      int        `toml:"port" validate:"required"`
+	Docs      *Docs      `toml:"docs"`
+	Session   *Session   `toml:"session" validate:"required"`
+	BasicAuth *BasicAuth `toml:"basic_auth" validate:"required"`
 }
 
 // Docs is document root path of webserver
