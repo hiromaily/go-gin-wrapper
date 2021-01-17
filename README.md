@@ -14,6 +14,7 @@ React by ES6 is used on part of front-end. But it's quite outdated.
 This project has started since 2016 to study Golang and code is quite messy.
 Now it's under `refactoring`.
 
+
 ## Refactoring
 - [ ] change architecture like Clean Architecture
 - [x] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
@@ -32,11 +33,32 @@ Now it's under `refactoring`.
 - [ ] switch any Japanese to English
 - [ ] refactoring and fix test
 
+
 ## Example
 Example is [here](https://ginserver.herokuapp.com/) on Heroku.
 
 
-## Installation
+## Functionalities
+### Authentication for Login
+`OAuth2` authentication with Google/Facebook is available.
+
+#### Authentication for API
+`JWT(Json Web Token)` is used  for authentication.
+See configuration `[api.auth]` in toml file.
+
+#### APIs documentation by [Swagger](http://localhost:8080/swagger/?url=https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/swagger/swagger.yaml)
+
+
+## Configuration
+See `./configs/settings.default.toml`  
+As needed, secret information can be encrypted.(using AES encryption)
+
+## Dependent middleware
+- MySQL
+- Redis whose used as session store
+
+
+## Installation on local (MacOS is expected)
 ```
 # 1. clone repository
 $ git clone https://github.com/hiromaily/go-gin-wrapper.git
@@ -59,26 +81,21 @@ $ go run ./cmd/ginserver/ -f ./configs/settings.toml
 ```
 
 
-## Configuration
-See `./configs/settings.default.toml`  
-As needed, secret information can be encrypted.(using AES encryption)
+## Installation on Docker
+```
+$ docker-compose build
+$ docker-compose up
+```
 
-## Dependent middleware
-- MySQL 
-- Redis whose used as session store
-
-
-
-#### Authentication for Login
-`OAuth2` authentication with Google/Facebook is available.
-
-#### Authentication for API
-It's implemented by JWT(Json Web Token) for authentication.
-Set ```[api.auth]``` on toml file.
-You can choose HMAC or RSA as signature pattern.
+#### Docker related files
+* configs/docker.toml
+* docker-compose.yml
+* docker-compose.override.yml
+* Dockerfile
+* ./build/docker/*
 
 
-### 2. On heroku
+## Installation on Heroku
 ```
 ## Install 
 $ heroku create ginserver --buildpack heroku/go
@@ -105,44 +122,27 @@ $ heroku ps -a ginserver
 $ git push -f heroku master
 ``` 
 
-* Access (For check hot to work)  
-[site on heroku](https://ginserver.herokuapp.com/)
+* [site on heroku](https://ginserver.herokuapp.com/)
 
-
-* Heroku environment set configs/heroku.toml when starting to run.  
+* `./configs/heroku.toml` is used to run server.  
 ```
-ginserver -f /app/configs/heroku.toml -crypto
+$ ginserver -f /app/configs/heroku.toml -crypto
 ```
 
-### 3. On Docker
-Docker environment set data/toml/docker.toml when starting to run.  
 
-#### Docker related files
-* docker-compose.yml
-* docker-compose.override.yml
-* Dockerfile
-* ./build/docker/*
+## Environment variables
+| NAME              | Value            | Explanation      |
+|:------------------|:-----------------|:-----------------|
+| ENC_KEY           | xxxxx            | encryption       |
+| ENC_IV            | xxxxx            | encryption       |
 
-
-## Environment variable e.g.
-### 1. Common
-| NAME              | Value            |
-|:------------------|:-----------------|
-| ENC_KEY           | xxxxx            |
-| ENC_IV            | xxxxx            |
-
-### 2. For Heroku environment
+#### Only Heroku environment
 | NAME              | Value            |
 |:------------------|:-----------------|
 | HEROKU_FLG        | 1                |
 | PORT              | 8080             |
 
-Heroku server use ```PORT``` automatically as environment variable.
-
-
-## APIs
-Documentation is prepared using Swagger
-[swagger](http://localhost:8080/swagger/?url=https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/swagger/swagger.yaml)
+- Heroku server use `PORT` automatically as environment variable.
 
 
 ## Usage
@@ -150,21 +150,23 @@ Documentation is prepared using Swagger
 Usage: ginserver [options...]
 
 Options:
-  -f     Toml file path
+  -f      Toml file path
+  -p      Overwriten server port number
+  -crypto if true, values in config file are encrypted
 
 e.g.
- $ ginserver -f /app/configs/yourfile.toml
+ $ ginserver -f /app/configs/yourfile.toml -crypto
 ```
 
 
 ## Profiling
-Set config first.
+See config file.
 ```
 [profile]
 enable = true
 ```
 
-After running werserver, acccess tha below links.
+After running ginserver, acccess the below links.
 ```
 [GIN-debug] GET    /debug/pprof/
 [GIN-debug] GET    /debug/pprof/heap
