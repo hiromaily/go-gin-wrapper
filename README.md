@@ -8,8 +8,8 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/hiromaily/go-gin-wrapper/master/LICENSE)
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hiromaily/go-gin-wrapper)
 
-Go-gin-wrapper is wrapper of go gin web framework plus reverseproxy. React by ES6 is used on part of front-end. 
-[gin-gonic/gin](https://github.com/gin-gonic/gin)  
+Go-gin-wrapper is wrapper of [gin-gonic/gin](https://github.com/gin-gonic/gin) web framework plus reverse proxy.  
+React by ES6 is used on part of front-end. But it's quite outdated. 
 
 This project has started since 2016 to study Golang and code is quite messy.
 Now it's under `refactoring`.
@@ -33,7 +33,7 @@ Now it's under `refactoring`.
 - [ ] refactoring and fix test
 
 ## Example
-This is built on Heroku. You can see [here](https://ginserver.herokuapp.com/).
+Example is [here](https://ginserver.herokuapp.com/) on Heroku.
 
 
 ## Installation
@@ -50,55 +50,27 @@ $ cp configs/settings.default.toml configs/settings.toml
  # set `go-gin-wrapper` path
  # this path must be chnaged first for specific environment
  path = "${GOPATH}/src/github.com/hiromaily/go-gin-wrapper"
+
+$ 4. start MySQL
+$ docker-compose up mysql
  
-# 4. make sure `go run works`
+# 5. make sure `go run` works
 $ go run ./cmd/ginserver/ -f ./configs/settings.toml
 ```
 
-#### Setup for local environment with Docker
-```
-# it would be better to execute build, up separately for first the build
-$ docker-compose build
-$ docker-compose up
-```
 
 ## Configuration
+See `./configs/settings.default.toml`  
+As needed, secret information can be encrypted.(using AES encryption)
 
-### 1. Common settings
-#### MySQL
-It requires set database and table.  
-If you want know more details, use docker environment usign docker-create.sh.  
-This is the easiest way to configure whole environment.
+## Dependent middleware
+- MySQL 
+- Redis whose used as session store
 
 
-#### Redis
-If you store session data on Redis, Redis is required. 
-But it's not indispensable.
-
-#### TOML file
-This is for configuration.
-```
-$ cp ./configs/settings.default.toml ./configs/settings.toml
-
-```
-When running web server, go-gin-wrapper requires toml file as configuration information.  
-Without command line arguments for toml file path, this try to read ```configs/settings.toml```.   
-If you want to use original toml file, use command line arguments ```-f filepath```.  
-```
-ginserver -f /app/config/yourfile.toml
-```
-
-* server
-* proxy
-* auth
-* mysql
-* redis
-* aws  
-
-※ As needed, secret information can be ciphered.(using AES encryption)
 
 #### Authentication for Login
-It's available using Google or Facebook account using OAuth2 authentication.
+`OAuth2` authentication with Google/Facebook is available.
 
 #### Authentication for API
 It's implemented by JWT(Json Web Token) for authentication.
