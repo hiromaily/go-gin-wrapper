@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwt"
+	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwts"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
@@ -36,6 +36,7 @@ type Middlewarer interface {
 type middleware struct {
 	// session xxxx
 	logger      *zap.Logger
+	jwter       jwts.JWTer
 	serverConf  *config.Server
 	proxyConf   *config.Proxy
 	apiConf     *config.API
@@ -46,6 +47,7 @@ type middleware struct {
 // NewMiddleware returns Server interface
 func NewMiddleware(
 	logger *zap.Logger,
+	jwter jwts.JWTer,
 	serverConf *config.Server,
 	proxyConf *config.Proxy,
 	apiConf *config.API,
@@ -54,6 +56,7 @@ func NewMiddleware(
 ) Middlewarer {
 	return &middleware{
 		logger:      logger,
+		jwter:       jwter,
 		serverConf:  serverConf,
 		proxyConf:   proxyConf,
 		apiConf:     apiConf,
@@ -386,25 +389,24 @@ func (m *middleware) CheckJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		m.logger.Info("[CheckJWT]")
 
-		var err error
-
 		IsAuth := c.Request.Header.Get("Authorization")
-		if IsAuth != "" {
-			aAry := strings.Split(IsAuth, " ")
-			if len(aAry) != 2 {
-				err = errors.New("Authorization header is invalid")
-			} else {
-				if aAry[0] != "Bearer" {
-					err = errors.New("Authorization header is invalid")
-				} else {
-					token := aAry[1]
-					err = jwt.JudgeJWT(token)
-				}
-			}
-		} else {
-			err = errors.New("authorization header was missed")
+		if IsAuth == "" {
+			c.AbortWithError(400, errors.New("authorization header is missing"))
+			return
 		}
 
+		var err error
+		aAry := strings.Split(IsAuth, " ")
+		if len(aAry) != 2 {
+			err = errors.New("Authorization header is invalid")
+		} else {
+			if aAry[0] != "Bearer" {
+				err = errors.New("Authorization header is invalid")
+			} else {
+				token := aAry[1]
+				err = m.jwter.ValidateToken(token)
+			}
+		}
 		if err != nil {
 			c.AbortWithError(400, err)
 			return

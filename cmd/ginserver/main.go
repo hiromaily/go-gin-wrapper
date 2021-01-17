@@ -16,8 +16,6 @@ var (
 	isEncrypted = flag.Bool("crypto", false, "if true, values in config file are encrypted")
 )
 
-func init() {}
-
 func main() {
 	flag.Parse()
 
@@ -40,6 +38,7 @@ func main() {
 		conf.Server.Port = *portNum
 	}
 
+	// server
 	regi := NewRegistry(conf, false)
 	server := regi.NewServer()
 	if _, err := server.Start(); err != nil {

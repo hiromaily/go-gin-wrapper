@@ -21,7 +21,8 @@ Now it's under `refactoring`.
   - [x] remove MongoDB
   - [x] replace log to zap logger
 - [x] add zap logger
-- [x] add graceful shutdown  
+- [x] add graceful shutdown
+- [x] refactoring jwt package  
 - [ ] clean up variable, func name
 - [ ] clean up comments
 - [ ] catch up with latest [gin](https://github.com/gin-gonic/gin)

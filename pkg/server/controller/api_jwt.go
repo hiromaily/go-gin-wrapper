@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwt"
 	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 )
@@ -30,7 +29,7 @@ func (ctl *controller) APIJWTIndexPostAction(c *gin.Context) {
 	}
 
 	ti := time.Now().Add(time.Minute * 60).Unix()
-	token, err := jwt.CreateBasicToken(ti, strconv.Itoa(userID), mail)
+	token, err := ctl.jwter.CreateBasicToken(ti, strconv.Itoa(userID), mail)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return

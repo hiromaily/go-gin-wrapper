@@ -25,7 +25,7 @@ import (
 )
 
 // TODO:change toml settings automatically as program code.
-// TODO:test for jwt, first code have to be got.
+// TODO:test for jwts, first code have to be got.
 
 var (
 	r *gin.Engine
@@ -153,7 +153,7 @@ var getUserAPITests2 = []struct {
 	headers []map[string]string
 	err     error
 }{
-	// no jwt token
+	// no jwts token
 	{"/api/users", http.StatusBadRequest, "GET", rightHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", wrongKeyHeaders, nil},
 	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
@@ -168,10 +168,10 @@ var getUserAPITests2 = []struct {
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "DELETE", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil}, // TODO:no resource is right
 	// TODO:with post data, put data
-	// TODO:with jwt token
+	// TODO:with jwts token
 }
 
-// Test Data for ajax API (When JWT is on, plus jwt)
+// Test Data for ajax API (When JWT is on, plus jwts)
 var getUserAPITests3 = []struct {
 	url     string
 	code    int
@@ -179,7 +179,7 @@ var getUserAPITests3 = []struct {
 	headers []map[string]string
 	err     error
 }{
-	// with jwt token
+	// with jwts token
 	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
 	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
@@ -198,10 +198,10 @@ var getJWTApiTests = []struct {
 	err     error
 }{
 	// without content-type, it doesn't work.
-	{"/api/jwt", http.StatusNotFound, "GET", jwtHeaders, "aaaa@test.jp", "password", nil},
-	{"/api/jwt", http.StatusBadRequest, "POST", rightHeaders, "aaaa@test.jp", "password", nil},
-	{"/api/jwt", http.StatusBadRequest, "POST", jwtHeaders, "aaaa@test.jp", "", nil},
-	{"/api/jwt", http.StatusOK, "POST", jwtHeaders, "aaaa@test.jp", "password", nil},
+	{"/api/jwts", http.StatusNotFound, "GET", jwtHeaders, "aaaa@test.jp", "password", nil},
+	{"/api/jwts", http.StatusBadRequest, "POST", rightHeaders, "aaaa@test.jp", "password", nil},
+	{"/api/jwts", http.StatusBadRequest, "POST", jwtHeaders, "aaaa@test.jp", "", nil},
+	{"/api/jwts", http.StatusOK, "POST", jwtHeaders, "aaaa@test.jp", "password", nil},
 }
 
 //-----------------------------------------------------------------------------
@@ -574,11 +574,11 @@ func TestGetJwtAPIRequestOnTable(t *testing.T) {
 			}
 		}
 
-		// get jwt for next request
+		// get jwts for next request
 		if res.StatusCode == 200 {
 			jwtCode, err = getJWT(res)
 			if err != nil {
-				t.Errorf("[%d][%s] jwt code was not got from response. error is %s", i+1, tt.url, err)
+				t.Errorf("[%d][%s] jwts code was not got from response. error is %s", i+1, tt.url, err)
 			}
 		}
 

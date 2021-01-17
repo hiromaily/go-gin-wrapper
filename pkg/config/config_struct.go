@@ -70,7 +70,7 @@ type API struct {
 	Ajax   bool    `toml:"only_ajax"`
 	CORS   *CORS   `toml:"cors"`
 	Header *Header `toml:"header"`
-	JWT    *JWT    `toml:"jwt"`
+	JWT    *JWT    `toml:"jwts"`
 }
 
 // CORS is CORS property
@@ -92,6 +92,7 @@ type Header struct {
 // JWT is JWT Auth property
 type JWT struct {
 	Mode       uint8  `toml:"mode"` // 0:off, 1:HMAC, 2:RSA
+	Audience   string `toml:"audience"`
 	Secret     string `toml:"secret_code"`
 	PrivateKey string `toml:"private_key"`
 	PublicKey  string `toml:"public_key"`

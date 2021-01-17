@@ -106,9 +106,9 @@ func (s *server) setRouter(r *gin.Engine) {
 	//-----------------------
 	// JWT
 	//-----------------------
-	jwt := r.Group("/api/jwt", s.middleware.CheckHTTPHeader())
+	jwt := r.Group("/api/jwts", s.middleware.CheckHTTPHeader())
 	{
-		jwt.POST("", s.controller.APIJWTIndexPostAction) // jwt end point
+		jwt.POST("", s.controller.APIJWTIndexPostAction) // jwts end point
 	}
 
 	//-----------------------

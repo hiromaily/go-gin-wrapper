@@ -86,9 +86,6 @@ func NewServer(
 // Start starts gin server
 func (s *server) Start() (*gin.Engine, error) {
 	s.logger.Info("server Start()")
-	if s.serverConf.IsRelease {
-		gin.SetMode(gin.ReleaseMode)
-	}
 
 	s.setMiddleware()
 

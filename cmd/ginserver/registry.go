@@ -6,10 +6,11 @@ import (
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/boil"
 	"go.uber.org/zap"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwt"
+	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwts"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/heroku"
 	"github.com/hiromaily/go-gin-wrapper/pkg/logger"
@@ -29,6 +30,7 @@ type registry struct {
 	conf        *config.Root
 	logger      *zap.Logger
 	gin         *gin.Engine
+	jwter       jwts.JWTer
 	isTestMode  bool
 	mysqlClient *sql.DB
 	// redisClient *redis.Conn
@@ -42,24 +44,8 @@ func NewRegistry(conf *config.Root, isTestMode bool) Registry {
 	}
 }
 
-func (r *registry) initAuth() {
-	auth := r.conf.API.JWT
-	if auth.Mode == jwt.HMAC && auth.Secret != "" {
-		jwt.InitSecretKey(auth.Secret)
-	} else if auth.Mode == jwt.RSA && auth.PrivateKey != "" && auth.PublicKey != "" {
-		err := jwt.InitKeys(auth.PrivateKey, auth.PublicKey)
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		jwt.InitEncrypted(jwt.HMAC)
-	}
-}
-
 // NewServer returns Server interface
 func (r *registry) NewServer() server.Server {
-	r.initAuth()
-
 	return server.NewServer(
 		r.newGin(),
 		r.newSessionStore(),
@@ -76,6 +62,9 @@ func (r *registry) NewServer() server.Server {
 func (r *registry) newGin() *gin.Engine {
 	if r.gin == nil {
 		r.gin = gin.New()
+		if r.conf.Server.IsRelease {
+			gin.SetMode(gin.ReleaseMode)
+		}
 	}
 	return r.gin
 }
@@ -110,6 +99,7 @@ func herokuRedisSetting(redisConf *config.Redis) {
 func (r *registry) newMiddleware() server.Middlewarer {
 	return server.NewMiddleware(
 		r.newLogger(),
+		r.newJWT(),
 		r.conf.Server,
 		r.conf.Proxy,
 		r.conf.API,
@@ -122,10 +112,31 @@ func (r *registry) newController() controller.Controller {
 	return controller.NewController(
 		r.newLogger(),
 		r.newUserRepository(),
+		r.newJWT(),
 		r.conf.API.Header,
 		r.conf.API.CORS,
 		r.conf.Auth,
 	)
+}
+
+func (r *registry) newJWT() jwts.JWTer {
+	if r.jwter == nil {
+		auth := r.conf.API.JWT
+		var signAlgo jwts.SigAlgoer
+		if auth.Mode == jwts.HMAC && auth.Secret != "" {
+			signAlgo = jwts.NewHMAC(auth.Secret)
+		} else if auth.Mode == jwts.RSA && auth.PrivateKey != "" && auth.PublicKey != "" {
+			var err error
+			signAlgo, err = jwts.NewRSA(auth.PrivateKey, auth.PublicKey)
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			panic(errors.New("invalid jwt config"))
+		}
+		r.jwter = jwts.NewJWT(auth.Audience, signAlgo)
+	}
+	return r.jwter
 }
 
 func (r *registry) newLogger() *zap.Logger {

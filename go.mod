@@ -19,6 +19,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
+	github.com/hiromaily/golibs v0.0.0-20201019070620-8c38788571a9
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
