@@ -2,11 +2,11 @@ package config
 
 // Root is config root
 type Root struct {
-	Logger  *Logger `toml:"logger"`
-	Server  *Server
-	Proxy   *Proxy
-	API     *API
-	Auth    *Auth
+	Logger  *Logger `toml:"logger" validate:"required"`
+	Server  *Server `toml:"server" validate:"required"`
+	Proxy   *Proxy `toml:"proxy" validate:"required"`
+	API     *API `toml:"api" validate:"required"`
+	Auth    *Auth `toml:"auth" validate:"required"`
 	MySQL   *MySQL `toml:"mysql" validate:"required"`
 	Redis   *Redis `toml:"redis" validate:"required"`
 	Develop *Develop
@@ -26,35 +26,35 @@ type Server struct {
 	Scheme    string     `toml:"scheme" validate:"required"`
 	Host      string     `toml:"host" validate:"required"`
 	Port      int        `toml:"port" validate:"required"`
-	Docs      *Docs      `toml:"docs"`
+	Docs      *Docs      `toml:"docs" validate:"required"`
 	Session   *Session   `toml:"session" validate:"required"`
 	BasicAuth *BasicAuth `toml:"basic_auth" validate:"required"`
 }
 
-// Docs is document root path of webserver
+// Docs is document root path of go-gin-wrapper project
 type Docs struct {
-	Path string `toml:"path"`
+	Path string `toml:"path" validate:"required"`
 }
 
-// Session is for session property
+// Session is session property
 type Session struct {
-	Name     string `toml:"name"`
-	Key      string `toml:"key"`
-	MaxAge   int    `toml:"max_age"`
+	Name     string `toml:"name" validate:"required"`
+	Key      string `toml:"key" validate:"required"`
+	MaxAge   int    `toml:"max_age" validate:"required"`
 	Secure   bool   `toml:"secure"`
 	HTTPOnly bool   `toml:"http_only"`
 }
 
 // BasicAuth is Basic Auth property
 type BasicAuth struct {
-	User string `toml:"user"`
-	Pass string `toml:"pass"`
+	User string `toml:"user" validate:"required"`
+	Pass string `toml:"pass" validate:"required"`
 }
 
 // Proxy is reverse proxy server property
 type Proxy struct {
-	Mode   uint8       `toml:"mode"` // 0:off, 1:go, 2,nginx
-	Server ProxyServer `toml:"server"`
+	Mode   uint8       `toml:"mode" validate:"lte=3"` // 0:off, 1:go, 2,nginx
+	Server *ProxyServer `toml:"server"`
 }
 
 // ProxyServer is reverse proxy server property
@@ -68,31 +68,31 @@ type ProxyServer struct {
 // API is Rest API property
 type API struct {
 	Ajax   bool    `toml:"only_ajax"`
-	CORS   *CORS   `toml:"cors"`
-	Header *Header `toml:"header"`
-	JWT    *JWT    `toml:"jwts"`
+	CORS   *CORS   `toml:"cors" validate:"required"`
+	Header *Header `toml:"header" validate:"required"`
+	JWT    *JWT    `toml:"jwt" validate:"required"`
 }
 
 // CORS is CORS property
 type CORS struct {
 	Enabled     bool     `toml:"enabled"`
-	Origins     []string `toml:"origins"`
-	Headers     []string `toml:"headers"`
-	Methods     []string `toml:"methods"`
+	Origins     []string `toml:"origins" validate:"required"`
+	Headers     []string `toml:"headers" validate:"required"`
+	Methods     []string `toml:"methods" validate:"required"`
 	Credentials bool     `toml:"credentials"`
 }
 
 // Header is original http header property for authentication
 type Header struct {
 	Enabled bool   `toml:"enabled"`
-	Header  string `toml:"header"`
-	Key     string `toml:"key"`
+	Header  string `toml:"header" validate:"required"`
+	Key     string `toml:"key" validate:"required"`
 }
 
 // JWT is JWT Auth property
 type JWT struct {
-	Mode       uint8  `toml:"mode"` // 0:off, 1:HMAC, 2:RSA
-	Audience   string `toml:"audience"`
+	Mode       uint8  `toml:"mode" validate:"lte=3"` // 0:off, 1:HMAC, 2:RSA
+	Audience   string `toml:"audience" validate:"required"`
 	Secret     string `toml:"secret_code"`
 	PrivateKey string `toml:"private_key"`
 	PublicKey  string `toml:"public_key"`
@@ -147,7 +147,7 @@ type Redis struct {
 	IsHeroku  bool   `toml:"is_heroku"`
 }
 
-// Develop is development use setting
+// Develop is development use
 type Develop struct {
 	ProfileEnable bool `toml:"profile_enable"`
 	RecoverEnable bool `toml:"recover_enable"`
