@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 )
 
@@ -37,5 +36,5 @@ func (ctl *controller) APIJWTIndexPostAction(c *gin.Context) {
 	ctl.logger.Debug("", zap.String("token: %s", token))
 
 	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateJWTJson(token))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateJWTJson(token))
 }

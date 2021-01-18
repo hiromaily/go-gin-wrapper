@@ -6,20 +6,22 @@ import (
 	"log"
 	"os"
 
-	"github.com/pkg/errors"
-
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 )
 
-var mode = flag.String("m", "e", "e:encode, d:decode")
+var (
+	isEncoded = flag.Bool("encode", false, "encode target")
+	isDecoded = flag.Bool("decode", false, "encode target")
+)
 
 var usage = `Usage: %s [options...]
 Options:
-  -m  e:encode, d:decode.
+  -encode
+  -decode
 e.g.:
-  encryption -m e xxxxxxxx
+  encryption -encode xxxxxxxx
     or
-  encryption -m d xxxxxxxx
+  encryption -decode xxxxxxxx
 `
 
 func init() {
@@ -28,7 +30,7 @@ func init() {
 	}
 	flag.Parse()
 
-	if len(os.Args) != 4 {
+	if len(os.Args) != 3 {
 		flag.Usage()
 		os.Exit(1)
 		return
@@ -44,19 +46,19 @@ func main() {
 	target := os.Args[3]
 	log.Printf("target string is %s\n", target)
 
-	switch *mode {
-	case "e":
+	if *isEncoded {
 		// encode
 		log.Print(crypt.EncryptBase64(target))
-	case "d":
+		return
+	}
+	if *isDecoded {
 		// decode
 		decrypted, err := crypt.DecryptBase64(target)
 		if err != nil {
 			log.Fatal(err)
 		}
 		log.Print(decrypted)
-	default:
-		flag.Usage()
-		log.Fatal(errors.New("arguments `-m` is wrong"))
+		return
 	}
+	flag.Usage()
 }

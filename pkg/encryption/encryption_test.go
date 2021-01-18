@@ -53,6 +53,18 @@ func TestEncryption(t *testing.T) {
 				isErr: true,
 			},
 		},
+		{
+			name: "blank target",
+			args: args{
+				key:    "8#75aaR+ba5Ztest",
+				iv:     "@~wp-7hPs<mEtest",
+				target: "",
+			},
+			want: want{
+				isErr:     false,
+				encrypted: "",
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -67,12 +79,13 @@ func TestEncryption(t *testing.T) {
 			}
 			got := crypt.EncryptBase64(tt.args.target)
 			if got != tt.want.encrypted {
-				t.Errorf("crypt.EncryptBase64() = %v, want %v", got, tt.want.encrypted)
+				t.Errorf("crypt.EncryptBase64() = %s, want %s", got, tt.want.encrypted)
 				return
 			}
 			got, _ = crypt.DecryptBase64(got)
 			if got != tt.args.target {
-				t.Errorf("crypt.DecryptBase64() = %v, want %v", got, tt.args.target)
+				t.Errorf("crypt.DecryptBase64() = %s, want %s", got, tt.args.target)
+				return
 			}
 		})
 	}

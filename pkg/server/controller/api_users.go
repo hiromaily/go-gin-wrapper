@@ -5,7 +5,6 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	js "github.com/hiromaily/go-gin-wrapper/pkg/json"
 	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/validator"
@@ -138,7 +137,7 @@ func (ctl *controller) APIUserListGetAction(c *gin.Context) {
 	}
 
 	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserListJSON(users))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserListJSON(users))
 }
 
 // ListOptionsAction is preflight request of CORS before get request
@@ -167,7 +166,7 @@ func (ctl *controller) APIUserInsertPostAction(c *gin.Context) {
 		return
 	}
 
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserJSON(int(id)))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserJSON(int(id)))
 }
 
 // APIUserGetAction is get specific user [GET]
@@ -190,7 +189,7 @@ func (ctl *controller) APIUserGetAction(c *gin.Context) {
 	}
 
 	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserListJSON(users))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserListJSON(users))
 }
 
 // APIUserPutAction is update specific user [PUT]
@@ -215,7 +214,7 @@ func (ctl *controller) APIUserPutAction(c *gin.Context) {
 		ctl.logger.Debug("there was no updated data.")
 	}
 
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserJSON(str.Atoi(c.Param("id"))))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserJSON(str.Atoi(c.Param("id"))))
 }
 
 // APIUserDeleteAction is delete specific user [DELETE] (work in progress)
@@ -239,7 +238,7 @@ func (ctl *controller) APIUserDeleteAction(c *gin.Context) {
 		ctl.logger.Debug("there was no updated data.")
 	}
 
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserJSON(str.Atoi(c.Param("id"))))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserJSON(str.Atoi(c.Param("id"))))
 }
 
 // APIUserIDsGetAction is get user ids [GET]
@@ -253,5 +252,5 @@ func (ctl *controller) APIUserIDsGetAction(c *gin.Context) {
 	}
 
 	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, js.CreateUserIDsJSON(ids))
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserIDsJSON(ids))
 }
