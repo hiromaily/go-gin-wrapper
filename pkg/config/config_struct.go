@@ -4,11 +4,11 @@ package config
 type Root struct {
 	Logger  *Logger `toml:"logger" validate:"required"`
 	Server  *Server `toml:"server" validate:"required"`
-	Proxy   *Proxy `toml:"proxy" validate:"required"`
-	API     *API `toml:"api" validate:"required"`
-	Auth    *Auth `toml:"auth" validate:"required"`
-	MySQL   *MySQL `toml:"mysql" validate:"required"`
-	Redis   *Redis `toml:"redis" validate:"required"`
+	Proxy   *Proxy  `toml:"proxy" validate:"required"`
+	API     *API    `toml:"api" validate:"required"`
+	Auth    *Auth   `toml:"auth" validate:"required"`
+	MySQL   *MySQL  `toml:"mysql" validate:"required"`
+	Redis   *Redis  `toml:"redis" validate:"required"`
 	Develop *Develop
 }
 
@@ -53,7 +53,7 @@ type BasicAuth struct {
 
 // Proxy is reverse proxy server property
 type Proxy struct {
-	Mode   uint8       `toml:"mode" validate:"lte=3"` // 0:off, 1:go, 2,nginx
+	Mode   uint8        `toml:"mode" validate:"lte=3"` // 0:off, 1:go, 2,nginx
 	Server *ProxyServer `toml:"server"`
 }
 
