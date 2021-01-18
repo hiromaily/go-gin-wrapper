@@ -7,7 +7,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
-	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 )
 
 var (
@@ -18,14 +17,6 @@ var (
 
 func main() {
 	flag.Parse()
-
-	// encryption
-	if *isEncrypted {
-		_, err := encryption.NewCryptWithEnv()
-		if err != nil {
-			panic(err)
-		}
-	}
 
 	// config
 	conf, err := config.NewConfig(*tomlPath, *isEncrypted)

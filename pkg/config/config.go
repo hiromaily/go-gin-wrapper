@@ -18,7 +18,11 @@ func NewConfig(fileName string, isEncrypted bool) (*Root, error) {
 	}
 
 	if isEncrypted {
-		conf.decrypt()
+		crypt, err := encryption.NewCryptWithEnv()
+		if err != nil {
+			return nil, err
+		}
+		conf.decrypt(crypt)
 	}
 	return conf, err
 }
@@ -50,9 +54,7 @@ func (c *Root) validate() error {
 }
 
 // decrypt decrypts encrypted values in config file
-func (c *Root) decrypt() {
-	crypt := encryption.GetCrypt()
-
+func (c *Root) decrypt(crypt encryption.Crypt) {
 	if c.Auth.Google.Encrypted {
 		ag := c.Auth.Google
 		ag.ClientID, _ = crypt.DecryptBase64(ag.ClientID)

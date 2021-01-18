@@ -35,37 +35,28 @@ func init() {
 	}
 }
 
-func setup() {
-	key := os.Getenv("ENC_KEY")
-	iv := os.Getenv("ENC_IV")
-
-	if key == "" || iv == "" {
-		log.Fatal(errors.New("set Environment Valuable: ENC_KEY, ENC_IV"))
-		os.Exit(1)
+func main() {
+	crypt, err := encryption.NewCryptWithEnv()
+	if err != nil {
+		panic(err)
 	}
 
-	encryption.NewCrypt(key, iv)
-}
-
-func main() {
-	setup()
-
-	crypt := encryption.GetCrypt()
-	targetStr := os.Args[3]
-	fmt.Printf("target string is %s\n", targetStr)
+	target := os.Args[3]
+	log.Printf("target string is %s\n", target)
 
 	switch *mode {
 	case "e":
 		// encode
-		log.Print(crypt.EncryptBase64(targetStr))
+		log.Print(crypt.EncryptBase64(target))
 	case "d":
 		// decode
-		str, err := crypt.DecryptBase64(targetStr)
+		decrypted, err := crypt.DecryptBase64(target)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Print(str)
+		log.Print(decrypted)
 	default:
-		log.Fatal(errors.New("arguments is wrong"))
+		flag.Usage()
+		log.Fatal(errors.New("arguments `-m` is wrong"))
 	}
 }
