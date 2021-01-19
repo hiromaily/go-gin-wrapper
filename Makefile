@@ -121,7 +121,11 @@ health-check:
 ###############################################################################
 .PHONY: test
 test:
-	go test -v ./...
+	go test -race -v ./...
+
+.PHONY: integration-test
+integration-test:
+	go test -race -tags=integration -v ./...
 
 .PHONY: maintest-setup
 maintest-setup:

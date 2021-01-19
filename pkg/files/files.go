@@ -5,10 +5,20 @@ import (
 	"path/filepath"
 	"regexp"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 // GetFileList returns file path from basePath directory with acceptable extension files
-func GetFileList(basePath string, exts []string) []string {
+func GetFileList(basePath string, exts []string) ([]string, error) {
+	// validate
+	if _, err := ioutil.ReadDir(basePath); err != nil {
+		return nil, err
+	}
+	if len(exts) == 0 {
+		return nil, errors.New("no extensions in parameter")
+	}
+
 	files := []string{}
 	pool := 20
 	ch := make(chan string, pool)
@@ -23,7 +33,7 @@ func GetFileList(basePath string, exts []string) []string {
 		}
 		files = append(files, v)
 	}
-	return files
+	return files, nil
 }
 
 func checkDir(basePath string, exts []string, ch chan<- string, chSmp chan bool, wg *sync.WaitGroup, isClose bool) {

@@ -2,6 +2,8 @@
 
 package main
 
+// TODO: refactoring
+
 import (
 	"bytes"
 	"encoding/json"
@@ -26,13 +28,10 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 )
 
-// TODO:change toml settings automatically as program code.
-// TODO:test for jwts, first code have to be got.
-
 var (
 	r *gin.Engine
 
-	// Test Data
+	// test data
 	errRedirect = errors.New("redirect")
 	jwtCode     string
 )

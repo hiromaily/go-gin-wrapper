@@ -163,19 +163,24 @@ func (s *server) loadTemplates() error {
 	}
 
 	ext := []string{"tmpl"}
-	files1 := files.GetFileList(projectPath+"/web/templates/pages", ext)
-	files2 := files.GetFileList(projectPath+"/web/templates/components", ext)
-	files3 := files.GetFileList(projectPath+"/web/templates/inner_js", ext)
-
-	var files []string
-	files = append(files, files1...)
-	files = append(files, files2...)
-	files = append(files, files3...)
-	if len(files) == 0 {
+	targetPath := []string{
+		projectPath + "/web/templates/pages",
+		projectPath + "/web/templates/components",
+		projectPath + "/web/templates/inner_js",
+	}
+	var fileList []string
+	for _, path := range targetPath {
+		fl, err := files.GetFileList(path, ext)
+		if err != nil {
+			return err
+		}
+		fileList = append(fileList, fl...)
+	}
+	if len(fileList) == 0 {
 		return errors.Errorf("file is not found in %s", projectPath)
 	}
 
-	tmpls := template.Must(template.New("").Funcs(getTempFunc()).ParseFiles(files...))
+	tmpls := template.Must(template.New("").Funcs(getTempFunc()).ParseFiles(fileList...))
 	s.gin.SetHTMLTemplate(tmpls)
 
 	return nil

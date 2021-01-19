@@ -33,7 +33,6 @@ func TestHashMD5(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := HashMD5(tt.args.target)
@@ -43,7 +42,6 @@ func TestHashMD5(t *testing.T) {
 		})
 	}
 }
-
 func TestHashSHA1(t *testing.T) {
 	type args struct {
 		target string
@@ -75,7 +73,6 @@ func TestHashSHA1(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := HashSHA1(tt.args.target)
@@ -85,7 +82,6 @@ func TestHashSHA1(t *testing.T) {
 		})
 	}
 }
-
 func TestHashSHA256(t *testing.T) {
 	type args struct {
 		target string
@@ -117,7 +113,6 @@ func TestHashSHA256(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := HashSHA256(tt.args.target)
@@ -127,7 +122,6 @@ func TestHashSHA256(t *testing.T) {
 		})
 	}
 }
-
 func TestMD5_Hash(t *testing.T) {
 	type args struct {
 		salt1  string
@@ -176,7 +170,6 @@ func TestMD5_Hash(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			md5Hash := NewMD5(tt.args.salt1, tt.args.salt2)
@@ -187,7 +180,6 @@ func TestMD5_Hash(t *testing.T) {
 		})
 	}
 }
-
 func TestMD5_HashWith(t *testing.T) {
 	type args struct {
 		salt1      string
@@ -252,7 +244,6 @@ func TestMD5_HashWith(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			md5Hash := NewMD5(tt.args.salt1, tt.args.salt2)
@@ -263,7 +254,6 @@ func TestMD5_HashWith(t *testing.T) {
 		})
 	}
 }
-
 func TestScrypt_Hash(t *testing.T) {
 	type args struct {
 		salt   string
@@ -308,7 +298,6 @@ func TestScrypt_Hash(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			scryptHash := NewScrypt(tt.args.salt)
