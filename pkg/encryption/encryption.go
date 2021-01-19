@@ -33,9 +33,8 @@ type crypt struct {
 // The key will be padded to the given size if needed.
 // An IV is created as a series of NULL bytes of necessary length
 // when there is no iv string passed as 3rd value to function.
-//func NewCryptUtil(size int, key string, more ...string) (*CryptUtil, error) {
 
-// NewCrypt is to create crypt instance
+// NewCrypt returns Crypt interface
 // key size should be 16,24,32
 // iv size should be 16
 func NewCrypt(key, iv string) (Crypt, error) {
@@ -55,7 +54,7 @@ func NewCrypt(key, iv string) (Crypt, error) {
 	return &crypt{block, bIv}, nil
 }
 
-// NewCryptWithEnv is setup with default settings.
+// NewCryptWithEnv returns Crypt interface created by environment variable.
 func NewCryptWithEnv() (Crypt, error) {
 	key := os.Getenv("ENC_KEY")
 	iv := os.Getenv("ENC_IV")
@@ -76,7 +75,7 @@ func (c *crypt) padSlice(src []byte) []byte {
 	return srcPadded
 }
 
-// Encrypt is encrypt a slice of bytes, producing a new, freshly allocated slice
+// Encrypt encrypts a slice of bytes, producing a new, freshly allocated slice
 // Source will be padded with null bytes if necessary
 func (c *crypt) Encrypt(src []byte) []byte {
 	if len(src)%aes.BlockSize != 0 {
@@ -87,7 +86,7 @@ func (c *crypt) Encrypt(src []byte) []byte {
 	return dst
 }
 
-// Decrypt is to decrypt a slice of bytes, producing a new, freshly allocated slice
+// Decrypt decrypts a slice of bytes, producing a new, freshly allocated slice
 // Source will be padded with null bytes if necessary
 func (c *crypt) Decrypt(src []byte) []byte {
 	if len(src)%aes.BlockSize != 0 {
@@ -99,14 +98,14 @@ func (c *crypt) Decrypt(src []byte) []byte {
 	return trimmed
 }
 
-// EncryptBase64 is encrypt and encode by base64 string
+// EncryptBase64 encrypts and encode by base64
 func (c *crypt) EncryptBase64(plainText string) string {
 	encryptedBytes := c.Encrypt([]byte(plainText))
 	base64 := base64.StdEncoding.EncodeToString(encryptedBytes)
 	return base64
 }
 
-// DecryptBase64 is to decrypt decoded Base64 string
+// DecryptBase64 decrypts decoded Base64 string
 func (c *crypt) DecryptBase64(base64String string) (string, error) {
 	unbase64, err := base64.StdEncoding.DecodeString(base64String)
 	if err != nil {

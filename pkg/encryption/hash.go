@@ -17,6 +17,10 @@ import (
 
 // HashMD5 hashes by MD5 message-digest algorithm
 func HashMD5(target string) string {
+	if target == "" {
+		return ""
+	}
+
 	h := md5.New()
 	io.WriteString(h, target)
 	return fmt.Sprintf("%x", h.Sum(nil))
@@ -24,6 +28,10 @@ func HashMD5(target string) string {
 
 // HashSHA1 hashes by SHA1
 func HashSHA1(target string) string {
+	if target == "" {
+		return ""
+	}
+
 	h := sha1.New()
 	io.WriteString(h, target)
 	return fmt.Sprintf("%x", h.Sum(nil))
@@ -31,6 +39,10 @@ func HashSHA1(target string) string {
 
 // HashSHA256 hashes by SHA256
 func HashSHA256(target string) string {
+	if target == "" {
+		return ""
+	}
+
 	h := sha256.New()
 	io.WriteString(h, target)
 	return fmt.Sprintf("%x", h.Sum(nil))
@@ -97,7 +109,7 @@ func (m *md5Hash) hash(target, additional string) string {
 // Scrypt
 //-----------------------------------------------------------------------------
 
-// Scrypt intrface
+// Scrypt interface
 type Scrypt interface {
 	Hash(target string) string
 }
