@@ -3,12 +3,13 @@ package httpheader
 import (
 	"fmt"
 
+	"github.com/hiromaily/go-gin-wrapper/pkg/files"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
-	"github.com/hiromaily/go-gin-wrapper/pkg/regexps"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 )
@@ -58,7 +59,7 @@ func GetURL(c *gin.Context) string {
 // IsStaticFile is whether request url is for static file or golang page
 func IsStaticFile(c *gin.Context) bool {
 	url := GetURL(c)
-	return regexps.IsStaticFile(url)
+	return files.IsStaticFile(url)
 }
 
 // GetProto is to get protocol

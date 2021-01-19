@@ -19,14 +19,21 @@ func GetRedisInfo(url string) (string, string, int, error) {
 	//redis://h:xxx@xxx:20819
 	//<password>@<hostname>:<port>
 	tmp := strings.Split(url, "//")
+	if len(tmp) < 2 {
+		return "", "", 0, errors.New("url is invalid")
+	}
 	tmp = strings.Split(tmp[1], ":")
+	if len(tmp) < 3 {
+		return "", "", 0, errors.New("url is invalid")
+	}
 	port := str.Atoi(tmp[2])
 
 	tmp = strings.Split(tmp[1], "@")
+	if len(tmp) < 2 {
+		return "", "", 0, errors.New("url is invalid")
+	}
 	pass := tmp[0]
-
-	tmp = strings.Split(tmp[1], ":")
-	host := tmp[0]
+	host := tmp[1]
 
 	return host, pass, port, nil
 }

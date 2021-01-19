@@ -16,6 +16,7 @@ Now it's under `refactoring`.
 
 
 ## Refactoring
+- [ ] refactoring code by [The Second Edition of "Refactoring"](https://martinfowler.com/articles/refactoring-2nd-ed.html)
 - [ ] change architecture like Clean Architecture
 - [x] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
   - [x] use [sqlboiler](https://github.com/volatiletech/sqlboiler) as ORM
@@ -24,14 +25,13 @@ Now it's under `refactoring`.
 - [x] add zap logger
 - [x] add graceful shutdown
 - [x] refactoring jwt package  
+- [ ] unittest by table driven test
 - [ ] clean up variable, func name
 - [ ] clean up comments
 - [ ] catch up with latest [gin](https://github.com/gin-gonic/gin)
 - [ ] update front-end
-- [ ] unittest by table driven test
-- [ ] refactoring code by [The Second Edition of "Refactoring"](https://martinfowler.com/articles/refactoring-2nd-ed.html)
 - [ ] switch any Japanese to English
-- [ ] refactoring and fix test
+- [ ] fix test
 
 
 ## Example

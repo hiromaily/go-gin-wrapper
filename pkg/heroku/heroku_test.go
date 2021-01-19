@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestEncryption(t *testing.T) {
+func TestGetRedisInfo(t *testing.T) {
 	type args struct {
 		target string
 	}
@@ -32,11 +32,55 @@ func TestEncryption(t *testing.T) {
 				port:  12345,
 			},
 		},
+		{
+			name: "wrong string",
+			args: args{
+				target: "foo-bar-foo-bar",
+			},
+			want: want{
+				isErr: true,
+			},
+		},
+		{
+			name: "wrong string, no `//`",
+			args: args{
+				target: "redis:||h:password@host:12345",
+			},
+			want: want{
+				isErr: true,
+			},
+		},
+		{
+			name: "wrong string, no first `:`",
+			args: args{
+				target: "redis://h-password@host:12345",
+			},
+			want: want{
+				isErr: true,
+			},
+		},
+		{
+			name: "wrong string, no last `:`",
+			args: args{
+				target: "redis://h:password@host=12345",
+			},
+			want: want{
+				isErr: true,
+			},
+		},
+		{
+			name: "wrong string, no `@`",
+			args: args{
+				target: "redis://h:password=host:12345",
+			},
+			want: want{
+				isErr: true,
+			},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// TODO: add environment variable pattern
 			for _, v := range []string{"", "env"} {
 				target := tt.args.target
 				if v == "env" {

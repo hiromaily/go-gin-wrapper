@@ -12,12 +12,3 @@ func Track(start time.Time, name string) {
 	elapsed := time.Since(start)
 	fmt.Printf("%s took %s\n", name, elapsed)
 }
-
-// GetCurrentDateTimeByStr is to get current time by string
-func GetCurrentDateTimeByStr(format string) string {
-	if format == "" {
-		format = "2006-01-02 15:04:05"
-	}
-	t := time.Now()
-	return t.Format(format)
-}

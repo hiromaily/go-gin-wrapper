@@ -20,7 +20,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
-	"github.com/hiromaily/go-gin-wrapper/pkg/dir"
+	"github.com/hiromaily/go-gin-wrapper/pkg/files"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
@@ -163,9 +163,9 @@ func (s *server) loadTemplates() error {
 	}
 
 	ext := []string{"tmpl"}
-	files1 := dir.GetFileList(projectPath+"/web/templates/pages", ext)
-	files2 := dir.GetFileList(projectPath+"/web/templates/components", ext)
-	files3 := dir.GetFileList(projectPath+"/web/templates/inner_js", ext)
+	files1 := files.GetFileList(projectPath+"/web/templates/pages", ext)
+	files2 := files.GetFileList(projectPath+"/web/templates/components", ext)
+	files3 := files.GetFileList(projectPath+"/web/templates/inner_js", ext)
 
 	var files []string
 	files = append(files, files1...)

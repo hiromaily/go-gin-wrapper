@@ -1,11 +1,10 @@
-package dir
+package files
 
 import (
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"sync"
-
-	"github.com/hiromaily/go-gin-wrapper/pkg/regexps"
 )
 
 // GetFileList returns file path from basePath directory with acceptable extension files
@@ -28,19 +27,19 @@ func GetFileList(basePath string, exts []string) []string {
 }
 
 func checkDir(basePath string, exts []string, ch chan<- string, chSmp chan bool, wg *sync.WaitGroup, isClose bool) {
-	fis, err := ioutil.ReadDir(basePath)
+	filelist, err := ioutil.ReadDir(basePath)
 	if err != nil {
 		// fmt.Printf("error : %s\n", err)
 		return
 	}
 
-	for _, fi := range fis {
-		if regexps.IsInvisiblefile(fi.Name()) {
+	for _, file := range filelist {
+		if IsInvisiblefile(file.Name()) {
 			continue
 		}
 
-		fullPath := filepath.Join(basePath, fi.Name())
-		if fi.IsDir() {
+		fullPath := filepath.Join(basePath, file.Name())
+		if file.IsDir() {
 			wg.Add(1)
 			chSmp <- true
 
@@ -53,8 +52,8 @@ func checkDir(basePath string, exts []string, ch chan<- string, chSmp chan bool,
 				checkDir(fullPath, exts, ch, chSmp, wg, false)
 			}()
 		} else {
-			for _, ex := range exts {
-				if regexps.IsExtFile(fi.Name(), ex) {
+			for _, ext := range exts {
+				if IsExtFile(file.Name(), ext) {
 					ch <- fullPath
 				}
 			}
@@ -65,4 +64,26 @@ func checkDir(basePath string, exts []string, ch chan<- string, chSmp chan bool,
 		wg.Wait()
 		close(ch)
 	}
+}
+
+// IsStaticFile checks whether target is static file which has extension in file name or not
+func IsStaticFile(target string) bool {
+	//is there any suffix
+	//.+\.(csv|pdf)
+	return compileRegexp(`^.*\.`, target)
+}
+
+// IsInvisiblefile checks whether target is invisible file or not
+func IsInvisiblefile(target string) bool {
+	return compileRegexp(`^[\\.].*$`, target)
+}
+
+// IsExtFile checks whether target includes ext string
+func IsExtFile(target, ext string) bool {
+	return compileRegexp(`^.*\.`+ext+`$`, target)
+}
+
+// compileRegexp compiles regex string
+func compileRegexp(reg, str string) bool {
+	return regexp.MustCompile(reg).Match([]byte(str))
 }
