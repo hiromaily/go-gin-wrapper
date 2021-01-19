@@ -119,9 +119,12 @@ health-check:
 ###############################################################################
 # Test
 ###############################################################################
+.PHONY: test
+test:
+	go test -v ./...
 
-.PHONY: test-setup
-test-setup:
+.PHONY: maintest-setup
+maintest-setup:
 	# Create Test Data
 	export DB_NAME=hiromaily2 &&\
 	export DB_PORT=13306 &&\
@@ -129,8 +132,8 @@ test-setup:
 	export DB_PASS=root &&\
 	sh ./scripts/create-test-db.sh
 
-.PHONY: test
-test:
+.PHONY: maintest
+maintest:
 	# Execute
 	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
 	-f ../../configs/settings.toml -crypto -om 0
