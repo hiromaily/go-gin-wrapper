@@ -12,6 +12,7 @@ import (
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwts"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	"github.com/hiromaily/go-gin-wrapper/pkg/encryption"
 	"github.com/hiromaily/go-gin-wrapper/pkg/heroku"
 	"github.com/hiromaily/go-gin-wrapper/pkg/logger"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
@@ -33,6 +34,7 @@ type registry struct {
 	jwter       jwts.JWTer
 	isTestMode  bool
 	mysqlClient *sql.DB
+	hash        encryption.MD5
 	// redisClient *redis.Conn
 }
 
@@ -167,7 +169,18 @@ func (r *registry) newMySQLClient() *sql.DB {
 }
 
 func (r *registry) newUserRepository() repository.UserRepositorier {
-	return repository.NewUserRepository(r.newMySQLClient(), r.newLogger())
+	return repository.NewUserRepository(
+		r.newMySQLClient(),
+		r.newLogger(),
+		r.newHash(),
+	)
+}
+
+func (r *registry) newHash() encryption.Hasher {
+	if r.hash == nil {
+		r.hash = encryption.NewMD5(r.conf.Hash.Salt1, r.conf.Hash.Salt2)
+	}
+	return r.hash
 }
 
 // newRedisConn returns redis connection

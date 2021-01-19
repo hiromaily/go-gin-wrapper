@@ -5,6 +5,10 @@ env = "custom" # dev, prod, custom :for only zap logger
 level = "debug" # debug, info, warn, error
 is_stacktrace = true
 
+[hash]
+salt1 = "foo-bar"
+salt2 = "hoge-hoge"
+
 #------------------------------------------------------------------------------
 # Server
 #------------------------------------------------------------------------------

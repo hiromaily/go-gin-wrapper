@@ -32,14 +32,16 @@ type userRepository struct {
 	dbConn    *sql.DB
 	tableName string
 	logger    *zap.Logger
+	hash      encryption.Hasher
 }
 
 // NewUserRepository returns UserRepositorier
-func NewUserRepository(dbConn *sql.DB, logger *zap.Logger) UserRepositorier {
+func NewUserRepository(dbConn *sql.DB, logger *zap.Logger, hash encryption.Hasher) UserRepositorier {
 	return &userRepository{
 		dbConn:    dbConn,
 		tableName: "t_user",
 		logger:    logger,
+		hash:      hash,
 	}
 }
 
@@ -65,7 +67,7 @@ func (u *userRepository) IsUserEmail(email, password string) (int, error) {
 	}
 
 	// check
-	if user.Password != encryption.GetMD5Plus(password, "") {
+	if user.Password != u.hash.Hash(password) {
 		return 0, errors.Errorf("password is invalid")
 	}
 	return user.ID, nil
@@ -172,7 +174,7 @@ func (u *userRepository) InsertUser(user *user.User) (int, error) {
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
-		Password:  encryption.GetMD5Plus(user.Password, ""),
+		Password:  u.hash.Hash(user.Password),
 		Oauth2FLG: null.StringFrom(user.OAuth2Flg),
 	}
 
@@ -213,7 +215,7 @@ func (u *userRepository) UpdateUser(users *user.User, id string) (int64, error) 
 		updCols[models.TUserColumns.Email] = users.Email
 	}
 	if users.Password != "" {
-		updCols[models.TUserColumns.Password] = encryption.GetMD5Plus(users.Password, "")
+		updCols[models.TUserColumns.Password] = u.hash.Hash(users.Password)
 	}
 	updCols[models.TUserColumns.UpdatedAt] = null.TimeFrom(time.Now())
 

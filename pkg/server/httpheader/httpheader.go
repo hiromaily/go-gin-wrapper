@@ -3,13 +3,12 @@ package httpheader
 import (
 	"fmt"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/files"
-
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	"github.com/hiromaily/go-gin-wrapper/pkg/files"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 )

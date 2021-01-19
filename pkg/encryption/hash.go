@@ -15,65 +15,106 @@ import (
 // HASH
 //-----------------------------------------------------------------------------
 
-// GetMD5 is to hash by MD5
-func GetMD5(baseString string) string {
-	// md5
+// HashMD5 hashes by MD5 message-digest algorithm
+func HashMD5(target string) string {
 	h := md5.New()
-	io.WriteString(h, baseString)
-	ret := fmt.Sprintf("%x", h.Sum(nil))
-	return ret
+	io.WriteString(h, target)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-// GetSHA1 is to hash by SHA1
-func GetSHA1(baseString string) string {
-	// sha1
+// HashSHA1 hashes by SHA1
+func HashSHA1(target string) string {
 	h := sha1.New()
-	io.WriteString(h, baseString)
-	ret := fmt.Sprintf("%x", h.Sum(nil))
-	return ret
+	io.WriteString(h, target)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-// GetSHA256 is to hash by SHA256
-func GetSHA256(baseString string) string {
-	// sha256
+// HashSHA256 hashes by SHA256
+func HashSHA256(target string) string {
 	h := sha256.New()
-	io.WriteString(h, baseString)
-	ret := fmt.Sprintf("%x", h.Sum(nil))
-	return ret
+	io.WriteString(h, target)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-// GetMD5Plus is to hash by MD5 Plus salt
-// 1.ユーザが入力したパスワードに対してMD5で一度暗号化
-// 2.得られたMD5の値の前後に管理者自身だけが知っているランダムな文字列を追加
-// 3.再度MD5で暗号化
-func GetMD5Plus(baseString string, strPlus string) string {
-	h := md5.New()
-	io.WriteString(h, baseString)
-	pwmd5 := fmt.Sprintf("%x", h.Sum(nil))
+//-----------------------------------------------------------------------------
+// Interface
+//-----------------------------------------------------------------------------
 
-	salt1 := "@#$%"
-	salt2 := "^&*()"
+// Hasher interface
+type Hasher interface {
+	Hash(target string) string
+}
 
-	// salt1 + username + salt2+MD5を連結。
-	io.WriteString(h, salt1)
-	io.WriteString(h, salt2)
-	if strPlus != "" {
-		io.WriteString(h, strPlus)
+//-----------------------------------------------------------------------------
+// MD5 Plus
+//-----------------------------------------------------------------------------
+
+// MD5 interface
+type MD5 interface {
+	Hash(target string) string
+	HashWith(target, additional string) string
+}
+
+type md5Hash struct {
+	salt1 string
+	salt2 string
+}
+
+// NewMD5 returns MD5 interface
+func NewMD5(salt1, salt2 string) MD5 {
+	return &md5Hash{
+		salt1: salt1,
+		salt2: salt2,
 	}
-	io.WriteString(h, pwmd5)
-
-	ret := fmt.Sprintf("%x", h.Sum(nil))
-	return ret
 }
 
-// GetScrypt to hash by Scrypt
-func GetScrypt(baseString string) string {
-	salt := "@#$%7G8r"
-	// func Key(password, salt []byte, N, r, p, keyLen int) ([]byte, error) {
-	dk, _ := scrypt.Key([]byte(baseString), []byte(salt), 16384, 8, 1, 32)
+// Hash hashes target
+func (m *md5Hash) Hash(target string) string {
+	return m.hash(target, "")
+}
 
-	// In order to read, it should be encoded by base64
-	result := base64.StdEncoding.EncodeToString(dk)
+// HashWith hashes target with additional salt
+func (m *md5Hash) HashWith(target, additional string) string {
+	return m.hash(target, additional)
+}
 
+func (m *md5Hash) hash(target, additional string) string {
+	h := md5.New()
+	io.WriteString(h, target)
+	hashed := fmt.Sprintf("%x", h.Sum(nil))
+
+	io.WriteString(h, m.salt1)
+	io.WriteString(h, m.salt2)
+	if additional != "" {
+		io.WriteString(h, additional)
+	}
+	io.WriteString(h, hashed)
+
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+//-----------------------------------------------------------------------------
+// Scrypt
+//-----------------------------------------------------------------------------
+
+// Scrypt intrface
+type Scrypt interface {
+	Hash(target string) string
+}
+
+type scryptHash struct {
+	salt string
+}
+
+// NewScrypt returns Scrypt interface
+func NewScrypt(salt string) Scrypt {
+	return &scryptHash{
+		salt: salt,
+	}
+}
+
+func (s *scryptHash) Hash(target string) string {
+	key, _ := scrypt.Key([]byte(target), []byte(s.salt), 16384, 8, 1, 32)
+	result := base64.StdEncoding.EncodeToString(key)
 	return result
 }

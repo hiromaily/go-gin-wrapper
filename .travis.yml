@@ -16,7 +16,7 @@ addons:
 env:
   global:
     - GO111MODULE=on
-    - DOCKER_COMPOSE_VERSION=1.24.1
+    - DOCKER_COMPOSE_VERSION=1.27.4
 
 cache:
   directories:
@@ -45,7 +45,7 @@ install:
   - docker ps -a
 
 before_script:
-  - ./scripts/wait-mysql.sh 127.0.0.1 echo "go test!go test!go test!"
+  - ./scripts/wait-mysql.sh 127.0.0.1 echo "go test! go test! go test!"
 
 script:
   #- golangci-lint run

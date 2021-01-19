@@ -3,6 +3,7 @@ package config
 // Root is config root
 type Root struct {
 	Logger  *Logger `toml:"logger" validate:"required"`
+	Hash    *Hash   `toml:"hash" validate:"required"`
 	Server  *Server `toml:"server" validate:"required"`
 	Proxy   *Proxy  `toml:"proxy" validate:"required"`
 	API     *API    `toml:"api" validate:"required"`
@@ -18,6 +19,12 @@ type Logger struct {
 	Env          string `toml:"env" validate:"oneof=dev prod custom"`
 	Level        string `toml:"level" validate:"required"`
 	IsStackTrace bool   `toml:"is_stacktrace"`
+}
+
+// Hash is hash salt
+type Hash struct {
+	Salt1 string `toml:"salt1" validate:"required"`
+	Salt2 string `toml:"salt2" validate:"required"`
 }
 
 // Server is web server property
