@@ -109,7 +109,7 @@ is_debug_log = true
 encrypted = false
 host = "localhost"
 port = 3306
-dbname = "gogin"
+dbname = "gogin-test"
 user = "guestuser"
 pass = "secret123"
 

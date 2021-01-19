@@ -127,14 +127,19 @@ test:
 integration-test:
 	go test -race -tags=integration -v ./...
 
-.PHONY: maintest-setup
-maintest-setup:
-	# Create Test Data
-	export DB_NAME=hiromaily2 &&\
+.PHONY: setup-testdb
+setup-testdb:
+	./scripts/create-test-db-docker.sh
+
+.PHONY: setup-testdb-mac
+setup-testdb-mac:
+	# create test data
+	export DB_NAME=gogin-test &&\
 	export DB_PORT=13306 &&\
 	export DB_USER=root &&\
 	export DB_PASS=root &&\
 	sh ./scripts/create-test-db.sh
+
 
 .PHONY: maintest
 maintest:

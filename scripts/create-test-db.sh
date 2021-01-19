@@ -17,12 +17,14 @@ echo ${DB_NAME}
 SQL_DIR=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/test/sql
 
 # Dump
-#mysqldump -u root -p hiromaily > data_hiromaily.sql
+# mysqldump -u root -p hiromaily > data_hiromaily.sql
 
 
-# Create TestDB
+# create test db
 # Note:
-# mysql command is required to run, `brew services start mysql`
+# mysql command is required to run
+# `brew services list`
+# `brew services start mysql`
 # if facing `sh: mysql: command not found`, try to run `brew link mysql` or `brew link --overwrite mysql`
 expect -c "
     set timeout 30
