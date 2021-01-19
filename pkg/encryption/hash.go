@@ -91,6 +91,10 @@ func (m *md5Hash) HashWith(target, additional string) string {
 }
 
 func (m *md5Hash) hash(target, additional string) string {
+	if target == "" {
+		return ""
+	}
+
 	h := md5.New()
 	io.WriteString(h, target)
 	hashed := fmt.Sprintf("%x", h.Sum(nil))
@@ -126,6 +130,10 @@ func NewScrypt(salt string) Scrypt {
 }
 
 func (s *scryptHash) Hash(target string) string {
+	if target == "" {
+		return ""
+	}
+
 	key, _ := scrypt.Key([]byte(target), []byte(s.salt), 16384, 8, 1, 32)
 	result := base64.StdEncoding.EncodeToString(key)
 	return result
