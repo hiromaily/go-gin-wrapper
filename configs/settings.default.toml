@@ -98,8 +98,8 @@ call_back_url = "http://localhost:8080/oauth2/facebook/callback"
 #------------------------------------------------------------------------------
 [mysql]
 encrypted = false
-host = "localhost"
-port = 3306
+host = "127.0.0.1"
+port = 13306
 dbname = "gogin"
 user = "guestuser"
 pass = "secret123"
@@ -107,8 +107,8 @@ is_debug_log = true
 
 [mysql.test]
 encrypted = false
-host = "localhost"
-port = 3306
+host = "127.0.0.1"
+port = 13306
 dbname = "gogin-test"
 user = "guestuser"
 pass = "secret123"

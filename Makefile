@@ -131,15 +131,14 @@ integration-test:
 setup-testdb:
 	./scripts/create-test-db-docker.sh
 
-.PHONY: setup-testdb-mac
-setup-testdb-mac:
-	# create test data
-	export DB_NAME=gogin-test &&\
-	export DB_PORT=13306 &&\
-	export DB_USER=root &&\
-	export DB_PASS=root &&\
-	sh ./scripts/create-test-db.sh
-
+#.PHONY: setup-testdb
+#setup-testdb:
+#	# create test data
+#	export DB_NAME=gogin-test &&\
+#	export DB_PORT=13306 &&\
+#	export DB_USER=root &&\
+#	export DB_PASS=root &&\
+#	sh ./scripts/create-test-db.sh
 
 .PHONY: maintest
 maintest:
@@ -172,19 +171,6 @@ test-quick:
 # Docker-Compose
 ###############################################################################
 
-.PHONY: dc-bld
-dc-bld:
-	docker-compose build
-
-.PHONY: dc-up
-dc-up:
-	docker-compose up
-
-.PHONY: dc-bld-up
-dc-bld-up:
-	docker-compose up --build
-
-
 # .PHONY: dc-test
 # dc-test:
 # 	export RUN_TEST=1
@@ -214,20 +200,6 @@ dc-bld-up:
 # 	done
 
 
-###############################################################################
-# Create Data
-###############################################################################
-.PHONY: init-db
-init-db:
-	export DB_NAME=hiromaily
-	sh ./scripts/create-test-db.sh
-
-# .PHONY: init-mongo
-# init-mongo:
-# 	#After running mongodb
-# 	mongo 127.0.0.1:$(MONGO_PORT)/admin --eval "var port = $(MONGO_PORT);" ./docker/mongo/init.js
-# 	mongorestore -h 127.0.0.1:${MONGO_PORT} --db hiromaily docker/mongo/dump/hiromaily
-
 
 ###############################################################################
 # Tools
@@ -235,12 +207,16 @@ init-db:
 ###############################################################################
 .PHONY: tool-encode
 tool-encode:
-	go run ./tools/encryption/ -m e important-password
+	go run ./tools/encryption/ -encode important-password
 
 .PHONY: tool-decode
 tool-decode:
-	go run ./tools/encryption/ -m d o5PDC2aLqoYxhY9+mL0W/IdG+rTTH0FWPUT4u1XBzko=
+	go run ./tools/encryption/ -decode o5PDC2aLqoYxhY9+mL0W/IdG+rTTH0FWPUT4u1XBzko=
 
+.PHONY: tool-md5
+tool-md5:
+	go run ./tools/hash/ -md5 -salt1 foo-bar -salt2 hoge-hoge -target password
+	go run ./tools/hash/ -md5 -salt1 foo-bar -salt2 hoge-hoge -target secret-string
 
 ###############################################################################
 # Front End

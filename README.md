@@ -17,6 +17,7 @@ Now it's under `refactoring`.
 
 ## Refactoring
 - [ ] refactoring code by [The Second Edition of "Refactoring"](https://martinfowler.com/articles/refactoring-2nd-ed.html)
+- [ ] refactoring code by [codebeat.co](https://codebeat.co/projects/github-com-hiromaily-go-gin-wrapper-master/ratings)
 - [ ] change architecture like Clean Architecture
 - [x] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
   - [x] use [sqlboiler](https://github.com/volatiletech/sqlboiler) as ORM

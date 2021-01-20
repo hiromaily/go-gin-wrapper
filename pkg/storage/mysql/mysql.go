@@ -3,6 +3,7 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/pkg/errors"
 
@@ -11,15 +12,18 @@ import (
 
 // NewMySQL creates mysql db connection
 func NewMySQL(conf *config.MySQLContent) (*sql.DB, error) {
-	db, err := sql.Open("mysql",
-		fmt.Sprintf(
-			"%s:%s@tcp(%s)/%s?parseTime=true&charset=utf8mb4",
-			conf.User,
-			conf.Pass,
-			conf.Host,
-			conf.DBName))
+	dbSource := fmt.Sprintf(
+		"%s:%s@tcp(%s:%d)/%s?parseTime=true&charset=utf8mb4",
+		conf.User,
+		conf.Pass,
+		conf.Host,
+		conf.Port,
+		conf.DBName)
+	log.Printf("db source: %s", dbSource)
+	db, err := sql.Open("mysql", dbSource)
 	if err != nil {
-		return nil, errors.Errorf("Connection(): error: %v", err)
+		return nil, errors.Errorf("fail to call sql.Open(): %v", err)
 	}
-	return db, nil
+
+	return db, db.Ping()
 }
