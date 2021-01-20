@@ -53,7 +53,8 @@ func TestIsUserEmail(t *testing.T) {
 		password string
 	}
 	type want struct {
-		isErr bool
+		userID int
+		isErr  bool
 	}
 	tests := []struct {
 		name string
@@ -67,7 +68,8 @@ func TestIsUserEmail(t *testing.T) {
 				password: "password",
 			},
 			want: want{
-				isErr: false,
+				userID: 1,
+				isErr:  false,
 			},
 		},
 		{
@@ -77,7 +79,8 @@ func TestIsUserEmail(t *testing.T) {
 				password: "secret-string",
 			},
 			want: want{
-				isErr: false,
+				userID: 2,
+				isErr:  false,
 			},
 		},
 		{
@@ -124,7 +127,7 @@ func TestIsUserEmail(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := repo.IsUserEmail(tt.args.email, tt.args.password)
+			userID, err := repo.IsUserEmail(tt.args.email, tt.args.password)
 			if (err != nil) != tt.want.isErr {
 				t.Errorf("IsUserEmail() actual error: %t, want error: %t", err != nil, tt.want.isErr)
 				if err != nil {
@@ -134,6 +137,9 @@ func TestIsUserEmail(t *testing.T) {
 			}
 			if err != nil {
 				return
+			}
+			if userID != tt.want.userID {
+				t.Errorf("IsUserEmail(): userID = %d, want %d", userID, tt.want.userID)
 			}
 		})
 	}

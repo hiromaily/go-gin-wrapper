@@ -42,6 +42,7 @@ func TestHashMD5(t *testing.T) {
 		})
 	}
 }
+
 func TestHashSHA1(t *testing.T) {
 	type args struct {
 		target string
@@ -82,6 +83,7 @@ func TestHashSHA1(t *testing.T) {
 		})
 	}
 }
+
 func TestHashSHA256(t *testing.T) {
 	type args struct {
 		target string
@@ -122,6 +124,7 @@ func TestHashSHA256(t *testing.T) {
 		})
 	}
 }
+
 func TestMD5_Hash(t *testing.T) {
 	type args struct {
 		salt1  string
@@ -180,6 +183,7 @@ func TestMD5_Hash(t *testing.T) {
 		})
 	}
 }
+
 func TestMD5_HashWith(t *testing.T) {
 	type args struct {
 		salt1      string
@@ -254,6 +258,7 @@ func TestMD5_HashWith(t *testing.T) {
 		})
 	}
 }
+
 func TestScrypt_Hash(t *testing.T) {
 	type args struct {
 		salt   string
