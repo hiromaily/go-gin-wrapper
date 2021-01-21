@@ -1,5 +1,6 @@
 build/**
 configs/**
+pkg/models/rdb/*
 scripts/**
 test/**
 web/**
