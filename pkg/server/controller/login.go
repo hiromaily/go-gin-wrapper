@@ -45,7 +45,7 @@ func (ctl *controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []s
 	}
 
 	// Check inputed mail and password
-	userID, err := ctl.userRepo.IsUserEmail(posted.Email, posted.Pass)
+	userID, err := ctl.userRepo.Login(posted.Email, posted.Pass)
 	if err != nil {
 		errs := []string{"E-mail or Password is made a mistake."}
 		return 0, posted, errs
@@ -67,7 +67,7 @@ func (ctl *controller) CheckLoginOnAPI(c *gin.Context) (int, string, error) {
 	}
 
 	// Check inputed mail and password
-	userID, err := ctl.userRepo.IsUserEmail(posted.Email, posted.Pass)
+	userID, err := ctl.userRepo.Login(posted.Email, posted.Pass)
 	if err != nil {
 		return 0, "", errors.New("login error")
 	}

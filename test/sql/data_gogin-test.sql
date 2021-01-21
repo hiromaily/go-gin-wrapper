@@ -46,7 +46,8 @@ LOCK TABLES `t_user` WRITE;
 INSERT INTO `t_user` VALUES (1,'foo','bar','foobar@gogin.com','baa62a499e9b21940c2d763f58a25647',0,'0','2021-01-10 21:43:15','2021-01-10 21:43:15'),
                             (2,'mark','harry','mark@gogin.com','d978eb967fbe04345371478a97f3c903',0,'0','2021-01-11 20:20:28','2021-01-11 20:20:28'),
                             (3,'check','authtype1','chk-authtype1@gogin.com','d978eb967fbe04345371478a97f3c903',1,'0','2021-01-11 20:20:28','2021-01-11 20:20:28'),
-                            (4,'check','authtype2','chk-authtype2@gogin.com','d978eb967fbe04345371478a97f3c903',2,'0','2021-01-11 20:20:28','2021-01-11 20:20:28');
+                            (4,'check','authtype2','chk-authtype2@gogin.com','d978eb967fbe04345371478a97f3c903',2,'0','2021-01-11 20:20:28','2021-01-11 20:20:28'),
+                            (5,'check','deleted','chk-deleted@gogin.com','d978eb967fbe04345371478a97f3c903',0,'1','2021-01-11 20:20:28','2021-01-11 20:20:28');
 /*!40000 ALTER TABLE `t_user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

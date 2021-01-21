@@ -25,7 +25,7 @@ type Controller interface {
 // controller is controller object
 type controller struct {
 	logger    *zap.Logger
-	userRepo  repository.UserRepositorier
+	userRepo  repository.UserRepository
 	jwter     jwts.JWTer
 	apiHeader *config.Header
 	cors      *config.CORS
@@ -35,7 +35,7 @@ type controller struct {
 // NewController is to return Controller
 func NewController(
 	logger *zap.Logger,
-	userRepo repository.UserRepositorier,
+	userRepo repository.UserRepository,
 	jwter jwts.JWTer,
 	apiHeader *config.Header,
 	cors *config.CORS,

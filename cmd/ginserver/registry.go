@@ -168,7 +168,7 @@ func (r *registry) newMySQLClient() *sql.DB {
 	return r.mysqlClient
 }
 
-func (r *registry) newUserRepository() repository.UserRepositorier {
+func (r *registry) newUserRepository() repository.UserRepository {
 	return repository.NewUserRepository(
 		r.newMySQLClient(),
 		r.newLogger(),

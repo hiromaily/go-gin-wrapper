@@ -16,9 +16,9 @@ import (
 	models "github.com/hiromaily/go-gin-wrapper/pkg/models/rdb"
 )
 
-// UserRepositorier is UserRepository interface
-type UserRepositorier interface {
-	IsUserEmail(email, password string) (int, error)
+// UserRepository interface
+type UserRepository interface {
+	Login(email, password string) (int, error)
 	OAuth2Login(email string) (*user.UserAuth, error)
 	GetUserIDs() ([]int, error)
 	GetUsers(id string) ([]*user.User, error)
@@ -27,7 +27,6 @@ type UserRepositorier interface {
 	DeleteUser(id string) (int64, error)
 }
 
-// userRepository is repository for t_users table
 type userRepository struct {
 	dbConn    *sql.DB
 	tableName string
@@ -35,8 +34,8 @@ type userRepository struct {
 	hash      encryption.Hasher
 }
 
-// NewUserRepository returns UserRepositorier
-func NewUserRepository(dbConn *sql.DB, logger *zap.Logger, hash encryption.Hasher) UserRepositorier {
+// NewUserRepository returns UserRepository
+func NewUserRepository(dbConn *sql.DB, logger *zap.Logger, hash encryption.Hasher) UserRepository {
 	return &userRepository{
 		dbConn:    dbConn,
 		tableName: "t_user",
@@ -45,8 +44,8 @@ func NewUserRepository(dbConn *sql.DB, logger *zap.Logger, hash encryption.Hashe
 	}
 }
 
-// IsUserEmail is for User authorization when login
-func (u *userRepository) IsUserEmail(email, password string) (int, error) {
+// Login validates email and password when login
+func (u *userRepository) Login(email, password string) (int, error) {
 	type LoginUser struct {
 		ID       int    `boil:"id"`
 		Email    string `boil:"email"`
@@ -73,7 +72,7 @@ func (u *userRepository) IsUserEmail(email, password string) (int, error) {
 	return user.ID, nil
 }
 
-// OAuth2Login is for OAuth2 login
+// OAuth2Login validates users when OAuth2 login
 func (u *userRepository) OAuth2Login(email string) (*user.UserAuth, error) {
 	// 0:no user -> register and login
 	// 1:existing user (google) -> login
@@ -95,7 +94,7 @@ func (u *userRepository) OAuth2Login(email string) (*user.UserAuth, error) {
 	return &user, nil
 }
 
-// GetUserIDs is to get user IDs
+// GetUserIDs returns all user IDs
 func (u *userRepository) GetUserIDs() ([]int, error) {
 	ctx := context.Background()
 
@@ -120,7 +119,7 @@ func (u *userRepository) GetUserIDs() ([]int, error) {
 	return ids, nil
 }
 
-// GetUsers is to get user list
+// GetUsers returns user list
 //  parameter id accepts blank
 func (u *userRepository) GetUsers(id string) ([]*user.User, error) {
 	// sql := "SELECT %s FROM t_user WHERE delete_flg=?"
@@ -136,6 +135,10 @@ func (u *userRepository) GetUsers(id string) ([]*user.User, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to call models.TUsers().All()")
 	}
+	if len(items) == 0 {
+		return nil, errors.Errorf("users not found")
+	}
+
 	// convert
 	converted := make([]*user.User, len(items))
 	for i, item := range items {
@@ -168,7 +171,7 @@ func (u *userRepository) getUserByEmail(email string) (*models.TUser, error) {
 	return item, nil
 }
 
-// InsertUser is to insert user
+// InsertUser inserts user
 func (u *userRepository) InsertUser(user *user.User) (int, error) {
 	item := &models.TUser{
 		FirstName:  user.FirstName,
@@ -199,7 +202,7 @@ func (u *userRepository) InsertUser(user *user.User) (int, error) {
 	//return us.DB.Insert(sql, users.FirstName, users.LastName, users.Email, encryption.GetMD5Plus(users.Password, ""))
 }
 
-// UpdateUser is to update user
+// UpdateUser updates user
 func (u *userRepository) UpdateUser(users *user.User, id string) (int64, error) {
 	ctx := context.Background()
 
@@ -224,7 +227,7 @@ func (u *userRepository) UpdateUser(users *user.User, id string) (int64, error) 
 	).UpdateAll(ctx, u.dbConn, updCols)
 }
 
-// DeleteUser is to delete user
+// DeleteUser deletes user
 func (u *userRepository) DeleteUser(id string) (int64, error) {
 	ctx := context.Background()
 

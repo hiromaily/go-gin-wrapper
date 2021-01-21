@@ -2,7 +2,7 @@ package user
 
 import "time"
 
-// User is for t_user table structure. This is used on Insert, Update method.
+// User is customized user response from t_user table
 type User struct {
 	ID        int        `boil:"id" json:"id,omitempty"`
 	FirstName string     `boil:"first_name" json:"firstName,omitempty"`
@@ -14,7 +14,7 @@ type User struct {
 	Updated   *time.Time `boil:"updated_at" json:"updated_at,omitempty"`
 }
 
-// UserAuth is response when OAuth2 login is used.
+// UserAuth is response of OAuth2 login
 type UserAuth struct {
 	ID   int   `boil:"id"`
 	Auth uint8 `boil:"oauth2_type"`

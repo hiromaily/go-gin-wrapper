@@ -42,7 +42,7 @@ type server struct {
 	controller   controller.Controller
 	logger       *zap.Logger
 	dbConn       *sql.DB
-	userRepo     repository.UserRepositorier
+	userRepo     repository.UserRepository
 
 	serverConf  *config.Server
 	proxyConf   *config.Proxy
@@ -61,7 +61,7 @@ func NewServer(
 	controller controller.Controller,
 	logger *zap.Logger,
 	dbConn *sql.DB,
-	userRepo repository.UserRepositorier,
+	userRepo repository.UserRepository,
 	conf *config.Root,
 	isTestMode bool,
 ) Server {
