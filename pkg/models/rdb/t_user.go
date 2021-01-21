@@ -24,64 +24,80 @@ import (
 
 // TUser is an object representing the database table.
 type TUser struct {
-	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	FirstName string      `boil:"first_name" json:"first_name" toml:"first_name" yaml:"first_name"`
-	LastName  string      `boil:"last_name" json:"last_name" toml:"last_name" yaml:"last_name"`
-	Email     string      `boil:"email" json:"email" toml:"email" yaml:"email"`
-	Password  string      `boil:"password" json:"password" toml:"password" yaml:"password"`
-	Oauth2FLG null.String `boil:"oauth2_flg" json:"oauth2_flg,omitempty" toml:"oauth2_flg" yaml:"oauth2_flg,omitempty"`
-	DeleteFLG null.String `boil:"delete_flg" json:"delete_flg,omitempty" toml:"delete_flg" yaml:"delete_flg,omitempty"`
-	CreatedAt null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	ID         int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	FirstName  string      `boil:"first_name" json:"first_name" toml:"first_name" yaml:"first_name"`
+	LastName   string      `boil:"last_name" json:"last_name" toml:"last_name" yaml:"last_name"`
+	Email      string      `boil:"email" json:"email" toml:"email" yaml:"email"`
+	Password   string      `boil:"password" json:"password" toml:"password" yaml:"password"`
+	Oauth2Type uint8       `boil:"oauth2_type" json:"oauth2_type" toml:"oauth2_type" yaml:"oauth2_type"`
+	DeleteFLG  null.String `boil:"delete_flg" json:"delete_flg,omitempty" toml:"delete_flg" yaml:"delete_flg,omitempty"`
+	CreatedAt  null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt  null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
 	R *tUserR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L tUserL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var TUserColumns = struct {
-	ID        string
-	FirstName string
-	LastName  string
-	Email     string
-	Password  string
-	Oauth2FLG string
-	DeleteFLG string
-	CreatedAt string
-	UpdatedAt string
+	ID         string
+	FirstName  string
+	LastName   string
+	Email      string
+	Password   string
+	Oauth2Type string
+	DeleteFLG  string
+	CreatedAt  string
+	UpdatedAt  string
 }{
-	ID:        "id",
-	FirstName: "first_name",
-	LastName:  "last_name",
-	Email:     "email",
-	Password:  "password",
-	Oauth2FLG: "oauth2_flg",
-	DeleteFLG: "delete_flg",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
+	ID:         "id",
+	FirstName:  "first_name",
+	LastName:   "last_name",
+	Email:      "email",
+	Password:   "password",
+	Oauth2Type: "oauth2_type",
+	DeleteFLG:  "delete_flg",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
 }
 
 // Generated where
 
+type whereHelperuint8 struct{ field string }
+
+func (w whereHelperuint8) EQ(x uint8) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperuint8) NEQ(x uint8) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperuint8) LT(x uint8) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperuint8) LTE(x uint8) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperuint8) GT(x uint8) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperuint8) GTE(x uint8) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperuint8) IN(slice []uint8) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+
 var TUserWhere = struct {
-	ID        whereHelperint
-	FirstName whereHelperstring
-	LastName  whereHelperstring
-	Email     whereHelperstring
-	Password  whereHelperstring
-	Oauth2FLG whereHelpernull_String
-	DeleteFLG whereHelpernull_String
-	CreatedAt whereHelpernull_Time
-	UpdatedAt whereHelpernull_Time
+	ID         whereHelperint
+	FirstName  whereHelperstring
+	LastName   whereHelperstring
+	Email      whereHelperstring
+	Password   whereHelperstring
+	Oauth2Type whereHelperuint8
+	DeleteFLG  whereHelpernull_String
+	CreatedAt  whereHelpernull_Time
+	UpdatedAt  whereHelpernull_Time
 }{
-	ID:        whereHelperint{field: "`t_user`.`id`"},
-	FirstName: whereHelperstring{field: "`t_user`.`first_name`"},
-	LastName:  whereHelperstring{field: "`t_user`.`last_name`"},
-	Email:     whereHelperstring{field: "`t_user`.`email`"},
-	Password:  whereHelperstring{field: "`t_user`.`password`"},
-	Oauth2FLG: whereHelpernull_String{field: "`t_user`.`oauth2_flg`"},
-	DeleteFLG: whereHelpernull_String{field: "`t_user`.`delete_flg`"},
-	CreatedAt: whereHelpernull_Time{field: "`t_user`.`created_at`"},
-	UpdatedAt: whereHelpernull_Time{field: "`t_user`.`updated_at`"},
+	ID:         whereHelperint{field: "`t_user`.`id`"},
+	FirstName:  whereHelperstring{field: "`t_user`.`first_name`"},
+	LastName:   whereHelperstring{field: "`t_user`.`last_name`"},
+	Email:      whereHelperstring{field: "`t_user`.`email`"},
+	Password:   whereHelperstring{field: "`t_user`.`password`"},
+	Oauth2Type: whereHelperuint8{field: "`t_user`.`oauth2_type`"},
+	DeleteFLG:  whereHelpernull_String{field: "`t_user`.`delete_flg`"},
+	CreatedAt:  whereHelpernull_Time{field: "`t_user`.`created_at`"},
+	UpdatedAt:  whereHelpernull_Time{field: "`t_user`.`updated_at`"},
 }
 
 // TUserRels is where relationship names are stored.
@@ -101,9 +117,9 @@ func (*tUserR) NewStruct() *tUserR {
 type tUserL struct{}
 
 var (
-	tUserAllColumns            = []string{"id", "first_name", "last_name", "email", "password", "oauth2_flg", "delete_flg", "created_at", "updated_at"}
+	tUserAllColumns            = []string{"id", "first_name", "last_name", "email", "password", "oauth2_type", "delete_flg", "created_at", "updated_at"}
 	tUserColumnsWithoutDefault = []string{"first_name", "last_name", "email", "password"}
-	tUserColumnsWithDefault    = []string{"id", "oauth2_flg", "delete_flg", "created_at", "updated_at"}
+	tUserColumnsWithDefault    = []string{"id", "oauth2_type", "delete_flg", "created_at", "updated_at"}
 	tUserPrimaryKeyColumns     = []string{"id"}
 )
 

@@ -23,17 +23,17 @@ DROP TABLE IF EXISTS `t_user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `t_user` (
-                          `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'user id',
-                          `first_name` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'first name',
-                          `last_name` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'last name',
-                          `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'mail address',
-                          `password` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'password',
-                          `oauth2_flg` char(1) COLLATE utf8_unicode_ci DEFAULT '0' COMMENT 'oauth flg',
-                          `delete_flg` char(1) COLLATE utf8_unicode_ci DEFAULT '0' COMMENT 'delete flg',
-                          `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'created date',
-                          `updated_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'updated date',
-                          PRIMARY KEY (`id`),
-                          UNIQUE KEY `idx_email` (`email`)
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'user id',
+  `first_name` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'first name',
+  `last_name` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT 'last name',
+  `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'mail address',
+  `password` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'password',
+  `oauth2_type` tinyint(2) UNSIGNED NOT NULL DEFAULT 0 COMMENT'oauth2 type, google, facebook',
+  `delete_flg` char(1) COLLATE utf8_unicode_ci DEFAULT '0' COMMENT 'delete flg',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'created date',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'updated date',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='user table';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -43,8 +43,10 @@ CREATE TABLE `t_user` (
 
 LOCK TABLES `t_user` WRITE;
 /*!40000 ALTER TABLE `t_user` DISABLE KEYS */;
-INSERT INTO `t_user` VALUES (1,'foo','bar','foobar@gogin.com','baa62a499e9b21940c2d763f58a25647','0','0','2021-01-10 21:43:15','2021-01-10 21:43:15'),
-                            (2,'mark','harry','mark@gogin.com','d978eb967fbe04345371478a97f3c903','0','0','2021-01-11 20:20:28','2021-01-11 20:20:28');
+INSERT INTO `t_user` VALUES (1,'foo','bar','foobar@gogin.com','baa62a499e9b21940c2d763f58a25647',0,'0','2021-01-10 21:43:15','2021-01-10 21:43:15'),
+                            (2,'mark','harry','mark@gogin.com','d978eb967fbe04345371478a97f3c903',0,'0','2021-01-11 20:20:28','2021-01-11 20:20:28'),
+                            (3,'check','authtype1','chk-authtype1@gogin.com','d978eb967fbe04345371478a97f3c903',1,'0','2021-01-11 20:20:28','2021-01-11 20:20:28'),
+                            (4,'check','authtype2','chk-authtype2@gogin.com','d978eb967fbe04345371478a97f3c903',2,'0','2021-01-11 20:20:28','2021-01-11 20:20:28');
 /*!40000 ALTER TABLE `t_user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

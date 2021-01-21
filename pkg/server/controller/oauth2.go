@@ -64,9 +64,9 @@ type FBPic struct {
 
 const (
 	// GoogleAuth is for google
-	GoogleAuth string = "1"
+	GoogleAuth uint8 = 1
 	// FacebookAuth is for Facebook
-	FacebookAuth string = "2"
+	FacebookAuth uint8 = 2
 )
 
 var (
@@ -174,7 +174,7 @@ func checkState(c *gin.Context, logger *zap.Logger) bool {
 	return true
 }
 
-func getToken(c *gin.Context, logger *zap.Logger, mode string) (token *oauth2.Token) {
+func getToken(c *gin.Context, logger *zap.Logger, mode uint8) (token *oauth2.Token) {
 	logger.Info("getToken")
 
 	var err error
@@ -198,7 +198,7 @@ func getToken(c *gin.Context, logger *zap.Logger, mode string) (token *oauth2.To
 	return token
 }
 
-func getUserInfo(c *gin.Context, logger *zap.Logger, token *oauth2.Token, res interface{}, mode string) bool {
+func getUserInfo(c *gin.Context, logger *zap.Logger, token *oauth2.Token, res interface{}, mode uint8) bool {
 	logger.Info("getUserInfo")
 
 	var url string
@@ -236,7 +236,7 @@ func getUserInfo(c *gin.Context, logger *zap.Logger, token *oauth2.Token, res in
 	return true
 }
 
-func (ctl *controller) registerOrLogin(c *gin.Context, mode string, user *user.User, userAuth *user.UserAuth) {
+func (ctl *controller) registerOrLogin(c *gin.Context, mode uint8, user *user.User, userAuth *user.UserAuth) {
 	ctl.logger.Info("registerOrLogin")
 
 	if userAuth == nil {
@@ -319,7 +319,7 @@ func (ctl *controller) OAuth2CallbackGoogleAction(c *gin.Context) {
 		LastName:  resGoogle.LastName,
 		Email:     resGoogle.Email,
 		Password:  "google-password",
-		OAuth2Flg: mode,
+		OAuth2:    mode,
 	}
 	ctl.registerOrLogin(c, mode, user, userAuth)
 }
@@ -371,7 +371,7 @@ func (ctl *controller) OAuth2CallbackFacebookAction(c *gin.Context) {
 		LastName:  resFacebook.LastName,
 		Email:     resFacebook.Email,
 		Password:  "facebook-password",
-		OAuth2Flg: mode,
+		OAuth2:    mode,
 	}
 	ctl.registerOrLogin(c, mode, user, userAuth)
 }

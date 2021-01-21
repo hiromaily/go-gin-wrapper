@@ -82,9 +82,9 @@ func (u *userRepository) OAuth2Login(email string) (*user.UserAuth, error) {
 	ctx := context.Background()
 
 	var user user.UserAuth
-	// sql := "SELECT id, oauth2_flg FROM t_users WHERE email=? AND delete_flg=?"
+	// sql := "SELECT id, oauth2_type FROM t_users WHERE email=? AND delete_flg=?"
 	err := models.TUsers(
-		qm.Select("id, oauth2_flg"),
+		qm.Select("id, oauth2_type"),
 		qm.Where("email=?", email),
 		qm.And("delete_flg=?", 0),
 	).Bind(ctx, u.dbConn, &user)
@@ -145,7 +145,7 @@ func (u *userRepository) GetUsers(id string) ([]*user.User, error) {
 			LastName:  item.LastName,
 			Email:     item.Email,
 			Password:  item.Password,
-			OAuth2Flg: item.Oauth2FLG.String,
+			OAuth2:    item.Oauth2Type,
 			Created:   &item.CreatedAt.Time,
 			Updated:   &item.UpdatedAt.Time,
 		}
@@ -171,11 +171,11 @@ func (u *userRepository) getUserByEmail(email string) (*models.TUser, error) {
 // InsertUser is to insert user
 func (u *userRepository) InsertUser(user *user.User) (int, error) {
 	item := &models.TUser{
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Email:     user.Email,
-		Password:  u.hash.Hash(user.Password),
-		Oauth2FLG: null.StringFrom(user.OAuth2Flg),
+		FirstName:  user.FirstName,
+		LastName:   user.LastName,
+		Email:      user.Email,
+		Password:   u.hash.Hash(user.Password),
+		Oauth2Type: user.OAuth2,
 	}
 
 	ctx := context.Background()
@@ -191,7 +191,7 @@ func (u *userRepository) InsertUser(user *user.User) (int, error) {
 	}
 	return use.ID, nil
 	//if users.OAuth2Flg != "" {
-	//	sql := "INSERT INTO t_users (first_name, last_name, email, password, oauth2_flg) VALUES (?,?,?,?,?)"
+	//	sql := "INSERT INTO t_users (first_name, last_name, email, password, oauth2_type) VALUES (?,?,?,?,?)"
 	//	// hash password
 	//	return us.DB.Insert(sql, users.FirstName, users.LastName, users.Email, encryption.GetMD5Plus(users.Password, ""), users.OAuth2Flg)
 	//}
