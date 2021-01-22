@@ -6,7 +6,7 @@ services:
     image: mysql:5.7
     container_name: web-mysql
     ports:
-      - "3306:3306"
+      - "13306:3306"
     volumes:
       - ./build/docker/mysql/conf.d2:/etc/mysql/conf.d
       - ./build/docker/mysql/init.d:/docker-entrypoint-initdb.d
@@ -22,6 +22,6 @@ services:
     image: redis:6.0.10-alpine3.12
     container_name: web-redis
     ports:
-      - "6379:6379"
+      - "16379:6379"
     restart: always
     command: redis-server --requirepass password --appendonly yes
