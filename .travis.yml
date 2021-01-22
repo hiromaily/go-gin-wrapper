@@ -17,7 +17,7 @@ env:
   global:
     - GO111MODULE=on
     - DOCKER_COMPOSE_VERSION=1.27.4
-    - GOGIN_CONF=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml
+    - GOGIN_CONF=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/configs/travis.toml
 
 cache:
   directories:
@@ -41,8 +41,8 @@ install:
   - go mod download
   # setup docker containers
   ## comment out until test fixed and refactoring done
-  - docker-compose -f docker-compose.ci.yml build mysql redis
-  - docker-compose -f docker-compose.ci.yml up -d mysql redis
+  - docker-compose -f docker-compose.ci.yml build mysql
+  - docker-compose -f docker-compose.ci.yml up -d mysql
   - sleep 3s
   - docker ps -a
 
