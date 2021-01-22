@@ -4,6 +4,7 @@ package repository
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 
@@ -25,25 +26,42 @@ import (
 // $ docker-compose mysql
 // $ make setup-testdb
 
-var userRepo UserRepository
+var (
+	conf     *config.Root
+	userRepo UserRepository
+	crypt    encryption.Hasher
+)
 
-func getUserRepo(t *testing.T) UserRepository {
-	if userRepo == nil {
-		// config
-		conf, err := config.GetConf("settings.toml")
+func getConf(t *testing.T) *config.Root {
+	if conf == nil {
+		var err error
+		conf, err = config.GetConf("settings.toml")
 		if err != nil {
 			t.Fatal(err)
 		}
+	}
+	return conf
+}
+
+func getCrypt(t *testing.T) encryption.Hasher {
+	if crypt == nil {
+		crypt = encryption.NewMD5(getConf(t).Hash.Salt1, getConf(t).Hash.Salt2)
+	}
+	return crypt
+}
+
+func getUserRepo(t *testing.T) UserRepository {
+	if userRepo == nil {
 		// db
-		dbConn, err := mysql.NewMySQL(conf.MySQL.Test)
+		dbConn, err := mysql.NewMySQL(getConf(t).MySQL.Test)
 		if err != nil {
 			t.Fatal(err)
 		}
 		//
 		userRepo = NewUserRepository(
 			dbConn,
-			logger.NewZapLogger(conf.Logger),
-			encryption.NewMD5(conf.Hash.Salt1, conf.Hash.Salt2),
+			logger.NewZapLogger(getConf(t).Logger),
+			getCrypt(t),
 		)
 	}
 	return userRepo
@@ -385,6 +403,98 @@ func TestGetUsers(t *testing.T) {
 			//	t.Log(u)
 			//	t.Log(tt.want.users[idx])
 			//}
+		})
+	}
+}
+
+func TestInsertUser(t *testing.T) {
+	repo := getUserRepo(t)
+
+	user1 := &user.User{
+		FirstName: "first",
+		LastName:  "last",
+		Email:     "test@gogin-test.com",
+		Password:  "plain-text",
+		OAuth2:    1,
+	}
+
+	oldTimeUnix := time.Now().UTC().UnixNano()
+
+	type args struct {
+		user *user.User
+	}
+	type want struct {
+		id    int
+		isErr bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			name: "happy path 1",
+			args: args{
+				user: user1,
+			},
+			want: want{
+				id:    6,
+				isErr: false,
+			},
+		},
+		{
+			name: "insert duplicated user",
+			args: args{
+				user: user1,
+			},
+			want: want{
+				isErr: true,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			id, err := repo.InsertUser(tt.args.user)
+			if (err != nil) != tt.want.isErr {
+				t.Errorf("InsertUser() actual error: %t, want error: %t", err != nil, tt.want.isErr)
+				if err != nil {
+					t.Log(err)
+				}
+				return
+			}
+			if err != nil {
+				return
+			}
+			if id != tt.want.id {
+				t.Errorf("InsertUser() id = %d, want %d", id, tt.want.id)
+			}
+			// select
+			users, err := repo.GetUsers(strconv.Itoa(id))
+			if err != nil {
+				t.Fatal(err)
+			}
+			// validate
+			if tt.args.user.FirstName != users[0].FirstName {
+				t.Errorf("InsertUser() FirstName = %s, want %s", users[0].FirstName, tt.args.user.FirstName)
+			}
+			if tt.args.user.LastName != users[0].LastName {
+				t.Errorf("InsertUser() LastName = %s, want %s", users[0].LastName, tt.args.user.LastName)
+			}
+			if tt.args.user.Email != users[0].Email {
+				t.Errorf("InsertUser() Email = %s, want %s", users[0].Email, tt.args.user.Email)
+			}
+			if getCrypt(t).Hash(tt.args.user.Password) != users[0].Password {
+				t.Errorf("InsertUser() Password = %s, want %s", users[0].Password, getCrypt(t).Hash(tt.args.user.Password))
+			}
+			if tt.args.user.OAuth2 != users[0].OAuth2 {
+				t.Errorf("InsertUser() OAuth2 = %d, want %d", users[0].OAuth2, tt.args.user.OAuth2)
+			}
+			if users[0].Created.UnixNano() >= oldTimeUnix {
+				t.Errorf("InsertUser() Created = %d, old time unit(): %d", users[0].Created.Unix(), oldTimeUnix)
+			}
+			// debug
+			t.Log(users[0])
 		})
 	}
 }
