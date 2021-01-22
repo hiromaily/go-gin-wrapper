@@ -3,6 +3,8 @@ CURRENTDIR=`pwd`
 modVer=$(shell cat go.mod | head -n 3 | tail -n 1 | awk '{print $2}' | cut -d'.' -f2)
 currentVer=$(shell go version | awk '{print $3}' | sed -e "s/go//" | cut -d'.' -f2)
 
+PROJECT_ROOT=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper
+
 ###############################################################################
 # setup
 ###############################################################################
@@ -126,6 +128,12 @@ test:
 .PHONY: integration-test
 integration-test: setup-testdb
 	go test -race -tags=integration -v ./...
+
+
+.PHONY: user-db-test
+user-db-test: setup-testdb
+	go test -race -tags=integration -v ./pkg/repository/...
+
 
 .PHONY: setup-testdb
 setup-testdb:

@@ -17,6 +17,7 @@ env:
   global:
     - GO111MODULE=on
     - DOCKER_COMPOSE_VERSION=1.27.4
+    - GOGIN_CONF=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml
 
 cache:
   directories:
@@ -25,7 +26,7 @@ cache:
     - $HOME/gopath/pkg/mod
 
 before_install:
-  # install docker
+  # install docker compose
   - sudo rm /usr/local/bin/docker-compose
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o docker-compose
   - chmod +x docker-compose
@@ -40,21 +41,22 @@ install:
   - go mod download
   # setup docker containers
   ## comment out until test fixed and refactoring done
-  #- docker-compose -f docker-compose.ci.yml build mysql redis
-  #- docker-compose -f docker-compose.ci.yml up -d mysql redis
-  #- sleep 3s
-  #- docker ps -a
+  - docker-compose -f docker-compose.ci.yml build mysql redis
+  - docker-compose -f docker-compose.ci.yml up -d mysql redis
+  - sleep 3s
+  - docker ps -a
 
 ## comment out until test fixed and refactoring done
-#before_script:
-#  - ./scripts/wait-mysql.sh 127.0.0.1 echo "go test! go test! go test!"
+before_script:
+  - ./scripts/wait-mysql.sh 127.0.0.1 echo "go test! go test! go test!"
+  - make setup-testdb
 
 script:
   #- golangci-lint run
   ## comment out until test fixed and refactoring done
   #- go test -v -race -covermode=atomic -coverprofile=profile.cov ./cmd/ginserver/... -f ../../configs/travis.toml -crypto -om 0
   #- goveralls -coverprofile=profile.cov -service=travis-ci
-  - go test -race -v -covermode=atomic -coverprofile=profile.cov ./...
+  - go test -race -tags=integration -v -covermode=atomic -coverprofile=profile.cov ./...
   - goveralls -coverprofile=profile.cov -service=travis-ci
 
 branches:

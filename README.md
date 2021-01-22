@@ -79,6 +79,9 @@ $ docker-compose up mysql
  
 # 5. make sure `go run` works
 $ go run ./cmd/ginserver/ -f ./configs/settings.toml
+
+# 6. unit test requires ${GOGIN_CONF} environment variable
+- define proper path on `.envrc`
 ```
 
 
@@ -132,10 +135,11 @@ $ ginserver -f /app/configs/heroku.toml -crypto
 
 
 ## Environment variables
-| NAME              | Value            | Explanation      |
-|:------------------|:-----------------|:-----------------|
-| ENC_KEY           | xxxxx            | encryption       |
-| ENC_IV            | xxxxx            | encryption       |
+| NAME              | Value            | Explanation                        |
+|:------------------|:-----------------|:-----------------------------------|
+| GOGIN_CONF        | xxxxx            | config path, required in unit test |
+| ENC_KEY           | xxxxx            | encryption                         |
+| ENC_IV            | xxxxx            | encryption                         |
 
 #### Only Heroku environment
 | NAME              | Value            |

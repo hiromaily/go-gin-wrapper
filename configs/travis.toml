@@ -96,7 +96,7 @@ call_back_url = "http://localhost:8080/oauth2/facebook/callback"
 #------------------------------------------------------------------------------
 [mysql]
 encrypted = false
-host = "localhost"
+host = "127.0.0.1"
 port = 3306
 dbname = "gogin"
 user = ""
@@ -105,11 +105,11 @@ is_debug_log = false
 
 [mysql.test]
 encrypted = false
-host = "localhost"
+host = "127.0.0.1"
 port = 3306
-dbname = "hiromaily"
-user = "hiromaily"
-pass = "12345678"
+dbname = "gogin-test"
+user = "guestuser"
+pass = "secret123"
 
 #------------------------------------------------------------------------------
 # Redis for cache

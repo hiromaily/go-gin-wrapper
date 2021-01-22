@@ -9,7 +9,6 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/wacul/ptr"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
@@ -36,7 +35,7 @@ var (
 func getConf(t *testing.T) *config.Root {
 	if conf == nil {
 		var err error
-		conf, err = config.GetConf("settings.toml")
+		conf, err = config.GetEnvConf()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -69,7 +68,8 @@ func getUserRepo(t *testing.T) UserRepository {
 }
 
 func init() {
-	boil.DebugMode = true
+	// for debug use
+	//boil.DebugMode = true
 }
 
 func TestLogin(t *testing.T) {

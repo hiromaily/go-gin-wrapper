@@ -14,8 +14,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: gogin
-      MYSQL_USER: hiromaily
-      MYSQL_PASSWORD: 12345678
+      MYSQL_USER: guestuser
+      MYSQL_PASSWORD: secret123
 
   # Redis
   redis:
