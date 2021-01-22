@@ -9,7 +9,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 )
 
-// NewRedis is to return redis connection
+// NewRedis creates redis connection
 func NewRedis(conf *config.Redis) (*redis.Conn, error) {
 	var conn redis.Conn
 	var err error

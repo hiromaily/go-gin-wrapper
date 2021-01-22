@@ -19,7 +19,7 @@ func GetConf(fileName string) (*Root, error) {
 
 // GetEnvConf returns *Root from environment variable `$GOING_CONF` for unittest
 func GetEnvConf() (*Root, error) {
-	return newConf(os.Getenv("GOING_CONF"))
+	return newConf(os.Getenv("GO_GIN_CONF"))
 }
 
 func newConf(filePath string) (*Root, error) {

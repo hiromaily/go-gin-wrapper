@@ -17,7 +17,7 @@ env:
   global:
     - GO111MODULE=on
     - DOCKER_COMPOSE_VERSION=1.27.4
-    - GOGIN_CONF=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/configs/travis.toml
+    - GO_GIN_CONF=${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/configs/travis.toml
 
 cache:
   directories:
