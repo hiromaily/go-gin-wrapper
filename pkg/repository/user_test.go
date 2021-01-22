@@ -412,7 +412,6 @@ func TestGetUsers(t *testing.T) {
 	}
 }
 
-// db data should be reset by `make setup-testdb`
 func TestInsertUser(t *testing.T) {
 	repo := getUserRepo(t)
 
@@ -579,6 +578,52 @@ func TestUpdateUser(t *testing.T) {
 			//}
 			// debug
 			t.Log(users[0])
+		})
+	}
+}
+
+func TestDeleteUser(t *testing.T) {
+	repo := getUserRepo(t)
+
+	type args struct {
+		id int
+	}
+	type want struct {
+		isErr bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			name: "happy path 1",
+			args: args{
+				id: 1,
+			},
+			want: want{
+				isErr: false,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := repo.DeleteUser(tt.args.id)
+			if (err != nil) != tt.want.isErr {
+				t.Errorf("DeleteUser() actual error: %t, want error: %t", err != nil, tt.want.isErr)
+				if err != nil {
+					t.Log(err)
+				}
+				return
+			}
+			if err != nil {
+				return
+			}
+			// select
+			if _, err := repo.GetUsers(strconv.Itoa(tt.args.id)); err == nil {
+				t.Errorf("DeleteUser() user: %d is not deleted yet", tt.args.id)
+			}
 		})
 	}
 }

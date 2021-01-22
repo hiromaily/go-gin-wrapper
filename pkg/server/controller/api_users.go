@@ -232,9 +232,14 @@ func (ctl *controller) APIUserDeleteAction(c *gin.Context) {
 		c.AbortWithError(400, errors.New("missing id on request parameter"))
 		return
 	}
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(400, errors.Errorf("invalid id: %s", c.Param("id")))
+		return
+	}
 
 	// Delete
-	affected, err := ctl.userRepo.DeleteUser(c.Param("id"))
+	affected, err := ctl.userRepo.DeleteUser(id)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return

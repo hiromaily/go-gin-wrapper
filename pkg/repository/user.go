@@ -24,7 +24,7 @@ type UserRepository interface {
 	GetUsers(id string) ([]*user.User, error)
 	InsertUser(user *user.User) (int, error)
 	UpdateUser(users *user.User, id int) (int64, error)
-	DeleteUser(id string) (int64, error)
+	DeleteUser(id int) (int64, error)
 }
 
 type userRepository struct {
@@ -232,7 +232,7 @@ func (u *userRepository) UpdateUser(users *user.User, id int) (int64, error) {
 }
 
 // DeleteUser deletes user
-func (u *userRepository) DeleteUser(id string) (int64, error) {
+func (u *userRepository) DeleteUser(id int) (int64, error) {
 	ctx := context.Background()
 
 	// Set updating columns
