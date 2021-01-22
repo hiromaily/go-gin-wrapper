@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"sync"
 
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
@@ -22,7 +23,6 @@ type Server interface {
 // Server
 // ----------------------------------------------------------------------------
 
-// Server object
 type server struct {
 	logger     *zap.Logger
 	serverConf *config.Server
@@ -50,8 +50,7 @@ func (s *server) Start() error {
 	} else if len(ports) > 1 {
 		s.multipleReverseProxy()
 	}
-
-	return nil
+	return errors.New("port setting is not found in config")
 }
 
 // Single Reverse Proxy
@@ -59,17 +58,15 @@ func (s *server) singleReverseProxy() {
 	s.logger.Info("singleReverseProxy")
 	// Web Server
 	// webserverURL := "http://127.0.0.1:9990"
-	tmp := getURL(s.serverConf.Scheme, s.serverConf.Host, s.serverConf.Port)
-	webserverURL, _ := url.Parse(tmp)
+	serverURL, _ := url.Parse(
+		getURL(s.serverConf.Scheme, s.serverConf.Host, s.serverConf.Port),
+	)
 
+	// proxy Server
 	s.logger.Info("proxy is runnig ...", zap.Int("port", s.proxyConf.Server.Port))
-
-	// Proxy Server
-	proxyAddress := fmt.Sprintf(":%d", s.proxyConf.Server.Port)
-	proxyHandler := httputil.NewSingleHostReverseProxy(webserverURL)
 	server := http.Server{
-		Addr:    proxyAddress,
-		Handler: proxyHandler,
+		Addr:    fmt.Sprintf(":%d", s.proxyConf.Server.Port),
+		Handler: httputil.NewSingleHostReverseProxy(serverURL),
 	}
 	server.ListenAndServe()
 }
@@ -98,13 +95,10 @@ func (s *server) multipleReverseProxy() {
 		hostRing = hostRing.Next()
 	}
 
-	// proxy
-	proxy := &httputil.ReverseProxy{Director: director}
-	proxyAddress := fmt.Sprintf(":%d", s.proxyConf.Server.Port)
-
+	// proxy Server
 	server := http.Server{
-		Addr:    proxyAddress,
-		Handler: proxy,
+		Addr:    fmt.Sprintf(":%d", s.proxyConf.Server.Port),
+		Handler: &httputil.ReverseProxy{Director: director},
 	}
 	server.ListenAndServe()
 }
