@@ -23,7 +23,7 @@ type UserRepository interface {
 	GetUserIDs() ([]int, error)
 	GetUsers(id string) ([]*user.User, error)
 	InsertUser(user *user.User) (int, error)
-	UpdateUser(users *user.User, id string) (int64, error)
+	UpdateUser(users *user.User, id int) (int64, error)
 	DeleteUser(id string) (int64, error)
 }
 
@@ -203,7 +203,11 @@ func (u *userRepository) InsertUser(user *user.User) (int, error) {
 }
 
 // UpdateUser updates user
-func (u *userRepository) UpdateUser(users *user.User, id string) (int64, error) {
+func (u *userRepository) UpdateUser(users *user.User, id int) (int64, error) {
+	if id == 0 {
+		return 0, errors.New("parameter:id is invalid")
+	}
+
 	ctx := context.Background()
 
 	// Set updating columns
@@ -220,7 +224,7 @@ func (u *userRepository) UpdateUser(users *user.User, id string) (int64, error) 
 	if users.Password != "" {
 		updCols[models.TUserColumns.Password] = u.hash.Hash(users.Password)
 	}
-	updCols[models.TUserColumns.UpdatedAt] = null.TimeFrom(time.Now())
+	updCols[models.TUserColumns.UpdatedAt] = null.TimeFrom(time.Now().UTC())
 
 	return models.TUsers(
 		qm.Where("id=?", id),

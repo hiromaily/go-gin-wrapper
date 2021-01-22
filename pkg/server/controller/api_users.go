@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -55,20 +57,23 @@ func (ctl *controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (
 	return nil
 }
 
-func (ctl *controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequest) error {
+func (ctl *controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequest) (int, error) {
 	//[POST x application/x-www-form-urlencoded] OK
 	//[PUT x application/x-www-form-urlencoded] OK
 	//[PUT x application/json] NG
 
 	// Param id
 	if c.Param("id") == "" {
-		return errors.New("missing id on request parameter")
+		return 0, errors.New("missing id on request parameter")
+	}
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return 0, errors.Errorf("invalid id: %s", c.Param("id"))
 	}
 
 	contentType := c.Request.Header.Get("Content-Type")
 	ctl.logger.Debug("getUserParamAndValidForPut", zap.String("Content-Type", contentType))
 
-	var err error
 	if contentType == "application/json" {
 		err = c.BindJSON(data)
 	} else {
@@ -76,21 +81,21 @@ func (ctl *controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequ
 		err = c.Bind(data)
 	}
 	if err != nil {
-		return err
+		return 0, err
 	}
 	ctl.logger.Debug("getUserParamAndValidForPut", zap.Any("response body", data))
 
 	// Validation
 	if data.FirstName == "" && data.LastName == "" && data.Email == "" && data.Password == "" {
-		return errors.New("validation no data error")
+		return 0, errors.New("validation no data error")
 	}
 
 	mRet := validator.CheckValidation(data, true)
 	if len(mRet) != 0 {
-		return errors.New("validation error")
+		return 0, errors.New("validation error")
 	}
 
-	return nil
+	return id, nil
 }
 
 // insert user
@@ -107,7 +112,7 @@ func (ctl *controller) insertUser(data *UserRequest) (int, error) {
 }
 
 // update user
-func (ctl *controller) updateUser(data *UserRequest, id string) (int64, error) {
+func (ctl *controller) updateUser(data *UserRequest, id int) (int64, error) {
 	item := &user.User{}
 	if data.FirstName != "" {
 		item.FirstName = data.FirstName
@@ -198,14 +203,14 @@ func (ctl *controller) APIUserPutAction(c *gin.Context) {
 
 	// Param & Check valid
 	var uData UserRequest
-	err := ctl.getUserParamAndValidForPut(c, &uData)
+	id, err := ctl.getUserParamAndValidForPut(c, &uData)
 	if err != nil {
 		c.AbortWithError(400, err)
 		return
 	}
 
 	// Update
-	affected, err := ctl.updateUser(&uData, c.Param("id"))
+	affected, err := ctl.updateUser(&uData, id)
 	if err != nil {
 		c.AbortWithError(500, err)
 		return

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/wacul/ptr"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
@@ -65,6 +66,10 @@ func getUserRepo(t *testing.T) UserRepository {
 		)
 	}
 	return userRepo
+}
+
+func init() {
+	boil.DebugMode = true
 }
 
 func TestLogin(t *testing.T) {
@@ -407,6 +412,7 @@ func TestGetUsers(t *testing.T) {
 	}
 }
 
+// db data should be reset by `make setup-testdb`
 func TestInsertUser(t *testing.T) {
 	repo := getUserRepo(t)
 
@@ -490,9 +496,87 @@ func TestInsertUser(t *testing.T) {
 			if tt.args.user.OAuth2 != users[0].OAuth2 {
 				t.Errorf("InsertUser() OAuth2 = %d, want %d", users[0].OAuth2, tt.args.user.OAuth2)
 			}
-			if users[0].Created.UnixNano() >= oldTimeUnix {
-				t.Errorf("InsertUser() Created = %d, old time unit(): %d", users[0].Created.Unix(), oldTimeUnix)
+			if users[0].Created.UnixNano() < oldTimeUnix {
+				t.Errorf("InsertUser() Created = %d, old time unit(): %d", users[0].Created.UnixNano(), oldTimeUnix)
 			}
+			if users[0].Updated.UnixNano() < oldTimeUnix {
+				t.Errorf("InsertUser() Updated = %d, old time unit(): %d", users[0].Updated.UnixNano(), oldTimeUnix)
+			}
+			// debug
+			t.Log(users[0])
+		})
+	}
+}
+
+// db data should be reset by `make setup-testdb`
+func TestUpdateUser(t *testing.T) {
+	repo := getUserRepo(t)
+
+	user1 := &user.User{
+		FirstName: "first-updated",
+		LastName:  "last-updated",
+		Email:     "test-updated@gogin-test.com",
+		Password:  "plain-text-updated",
+	}
+
+	type args struct {
+		user   *user.User
+		userID int
+	}
+	type want struct {
+		isErr bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			name: "happy path 1",
+			args: args{
+				user:   user1,
+				userID: 1,
+			},
+			want: want{
+				isErr: false,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := repo.UpdateUser(tt.args.user, tt.args.userID)
+			if (err != nil) != tt.want.isErr {
+				t.Errorf("UpdateUser() actual error: %t, want error: %t", err != nil, tt.want.isErr)
+				if err != nil {
+					t.Log(err)
+				}
+				return
+			}
+			if err != nil {
+				return
+			}
+			// select
+			users, err := repo.GetUsers(strconv.Itoa(tt.args.userID))
+			if err != nil {
+				t.Fatal(err)
+			}
+			// validate
+			if tt.args.user.FirstName != users[0].FirstName {
+				t.Errorf("UpdateUser() FirstName = %s, want %s", users[0].FirstName, tt.args.user.FirstName)
+			}
+			if tt.args.user.LastName != users[0].LastName {
+				t.Errorf("UpdateUser() LastName = %s, want %s", users[0].LastName, tt.args.user.LastName)
+			}
+			if tt.args.user.Email != users[0].Email {
+				t.Errorf("UpdateUser() Email = %s, want %s", users[0].Email, tt.args.user.Email)
+			}
+			if getCrypt(t).Hash(tt.args.user.Password) != users[0].Password {
+				t.Errorf("UpdateUser() Password = %s, want %s", users[0].Password, getCrypt(t).Hash(tt.args.user.Password))
+			}
+			//if users[0].Updated.UnixNano() < oldTimeUnix {
+			//	t.Errorf("InsertUser() Updated = %d, old time unit(): %d", users[0].Updated.UnixNano(), oldTimeUnix)
+			//}
 			// debug
 			t.Log(users[0])
 		})
