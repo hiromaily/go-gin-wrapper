@@ -12,6 +12,9 @@ import (
 
 // NewMySQL creates mysql db connection
 func NewMySQL(conf *config.MySQLContent) (*sql.DB, error) {
+	if conf == nil {
+		return nil, errors.New("conf is nil")
+	}
 	dbSource := fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?parseTime=true&charset=utf8mb4",
 		conf.User,
@@ -25,5 +28,6 @@ func NewMySQL(conf *config.MySQLContent) (*sql.DB, error) {
 		return nil, errors.Errorf("fail to call sql.Open(): %v", err)
 	}
 
+	// db.Ping() doesn't handle timeout
 	return db, db.Ping()
 }
