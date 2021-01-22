@@ -5,39 +5,40 @@ import (
 	"strings"
 )
 
-// SearchIndex is to search string
+// SearchIndex searches target string from list
 func SearchIndex(target string, sources []string) int {
-	retIdx := -1
+	idx := -1
 	if len(sources) == 0 {
-		return retIdx
+		return idx
 	}
 	for i, val := range sources {
 		if val == target {
-			retIdx = i
+			idx = i
 			break
 		}
 	}
-	return retIdx
+	return idx
 }
 
-// SearchIndexLower doesn't distinguish  upper case and lower case
+// SearchIndexLower searches target string from list
+// which doesn't distinguish  upper case and lower case
 func SearchIndexLower(target string, sources []string) int {
-	retIdx := -1
+	idx := -1
 	if len(sources) == 0 {
-		return retIdx
+		return idx
 	}
-	for i, val := range sources {
-		if strings.EqualFold(val, target) {
-			retIdx = i
+	for i, source := range sources {
+		if strings.EqualFold(source, target) {
+			idx = i
 			break
 		}
 	}
-	return retIdx
+	return idx
 }
 
 // Itos converts interface to string
-func Itos(val interface{}) string {
-	str, ok := val.(string)
+func Itos(target interface{}) string {
+	str, ok := target.(string)
 	if !ok {
 		return ""
 	}
@@ -45,7 +46,8 @@ func Itos(val interface{}) string {
 }
 
 // Atoi converts string to int
-func Atoi(str string) (ret int) {
-	ret, _ = strconv.Atoi(str)
-	return
+// take care to use this func because error is ignored
+func Atoi(str string) int {
+	num, _ := strconv.Atoi(str)
+	return num
 }

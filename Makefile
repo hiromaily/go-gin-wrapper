@@ -124,7 +124,7 @@ test:
 	go test -race -v ./...
 
 .PHONY: integration-test
-integration-test:
+integration-test: setup-testdb
 	go test -race -tags=integration -v ./...
 
 .PHONY: setup-testdb
