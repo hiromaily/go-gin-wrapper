@@ -25,7 +25,7 @@ services:
 
   # Redis
   redis:
-    image: 6.0-alpine3.12
+    image: redis:6.0.10-alpine3.12
     container_name: web-redis
     ports:
       - "6379"
