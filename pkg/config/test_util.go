@@ -13,15 +13,17 @@ func GetConf(fileName string) (*Root, error) {
 		return nil, err
 	}
 	basePath := fmt.Sprintf("%s/../../configs", pwd)
-	conf, err := NewConfig(fmt.Sprintf("%s/%s", basePath, fileName), false)
-	if err != nil {
-		return nil, err
-	}
-	return conf, nil
+
+	return newConf(fmt.Sprintf("%s/%s", basePath, fileName))
 }
 
+// GetEnvConf returns *Root from environment variable `$GOING_CONF` for unittest
 func GetEnvConf() (*Root, error) {
-	conf, err := NewConfig(os.Getenv("GOGIN_CONF"), false)
+	return newConf(os.Getenv("GOING_CONF"))
+}
+
+func newConf(filePath string) (*Root, error) {
+	conf, err := NewConfig(filePath, false)
 	if err != nil {
 		return nil, err
 	}

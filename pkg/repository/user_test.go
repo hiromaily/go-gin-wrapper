@@ -69,7 +69,7 @@ func getUserRepo(t *testing.T) UserRepository {
 
 func init() {
 	// for debug use
-	//boil.DebugMode = true
+	// boil.DebugMode = true
 }
 
 func TestLogin(t *testing.T) {
