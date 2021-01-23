@@ -5,11 +5,12 @@
 set -e
 
 host="$1"
-shift
+port="$2"
+shift 2
 cmd="$@"
 
 count=0
-while ! mysqladmin ping -h"$host" --silent; do
+while ! mysqladmin ping -h"$host" -P"$port" --silent; do
     >&2 echo "Database is unavailable - sleeping"
     count=$((++count))
     if [ "$count" -gt 30 ]; then

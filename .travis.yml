@@ -47,7 +47,7 @@ install:
 
 ## comment out until test fixed and refactoring done
 before_script:
-  - ./scripts/wait-mysql.sh 127.0.0.1 echo "go test! go test! go test!"
+  - ./scripts/wait-mysql.sh 127.0.0.1 13306 echo "go test! go test! go test!"
   - make setup-testdb
 
 script:

@@ -46,14 +46,16 @@ update:
 ###############################################################################
 # linter and formatter
 ###############################################################################
-.PHONY: lint
-lint:
-	golangci-lint run --fix
+.PHONY: lint-all
+lint-all: imports lint
 
 .PHONY: imports
 imports:
 	./scripts/imports.sh
 
+.PHONY: lint
+lint:
+	golangci-lint run --fix
 
 ###############################################################################
 # local build
@@ -174,6 +176,14 @@ maintest:
 test-quick:
 	go test -run TestLogin -v cmd/ginserver/*.go -f ../../configs/settings.toml -crypto
 
+
+###############################################################################
+# CI
+###############################################################################
+.PHONY: check-ci-compose
+check-ci-compose:
+	docker-compose -f docker-compose.ci.yml build mysql
+	docker-compose -f docker-compose.ci.yml up mysql
 
 ###############################################################################
 # Docker-Compose
