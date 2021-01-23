@@ -102,12 +102,18 @@ func (r *registry) newMiddleware() server.Middlewarer {
 	return server.NewMiddleware(
 		r.newLogger(),
 		r.newJWT(),
+		r.rejectIPs(),
 		r.conf.Server,
 		r.conf.Proxy,
 		r.conf.API,
 		r.conf.API.CORS,
 		r.conf.Develop,
 	)
+}
+
+// TODO: add logic
+func (r *registry) rejectIPs() []string {
+	return []string{}
 }
 
 func (r *registry) newController() controller.Controller {

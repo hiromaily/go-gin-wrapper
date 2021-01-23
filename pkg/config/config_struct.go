@@ -1,5 +1,9 @@
 package config
 
+import (
+	"github.com/hiromaily/go-gin-wrapper/pkg/reverseproxy/types"
+)
+
 // Root is config root
 type Root struct {
 	Logger  *Logger `toml:"logger" validate:"required"`
@@ -60,8 +64,8 @@ type BasicAuth struct {
 
 // Proxy is reverse proxy server property
 type Proxy struct {
-	Mode   uint8        `toml:"mode" validate:"lte=3"` // 0:off, 1:go, 2,nginx
-	Server *ProxyServer `toml:"server"`
+	Mode   types.ProxyMode `toml:"mode" validate:"oneof=no go-gin-proxy nginx"`
+	Server *ProxyServer    `toml:"server"`
 }
 
 // ProxyServer is reverse proxy server property

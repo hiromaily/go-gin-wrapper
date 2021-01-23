@@ -22,6 +22,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/files"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
+	"github.com/hiromaily/go-gin-wrapper/pkg/reverseproxy/types"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/fcgi"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
@@ -132,7 +133,7 @@ func (s *server) setMiddleware() {
 	sess.SetOption(s.sessionStore, s.serverConf.Session)
 	s.gin.Use(sessions.Sessions(s.serverConf.Session.Name, s.sessionStore))
 
-	s.gin.Use(s.middleware.RejectSpecificIP())
+	s.gin.Use(s.middleware.FilterIP())
 
 	s.gin.Use(s.middleware.SetMetaData())
 
@@ -231,7 +232,7 @@ func (s *server) loadStaticFiles() {
 func (s *server) run() error {
 	s.logger.Info("server run()")
 	addr := fmt.Sprintf(":%d", s.port)
-	if s.proxyConf.Mode == 2 {
+	if s.proxyConf.Mode == types.NginxProxy {
 		s.runFCGI(addr)
 	}
 	return s.runGin(addr)

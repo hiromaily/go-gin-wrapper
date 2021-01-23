@@ -28,7 +28,11 @@ func (s *server) setRouter(r *gin.Engine) {
 
 	// Login
 	r.GET("/login", s.controller.BaseLoginGetAction)
-	r.POST("/login", s.middleware.CheckHTTPRefererAndCSRF(), s.controller.BaseLoginPostAction)
+	r.POST("/login",
+		s.middleware.CheckHTTPReferer(),
+		s.middleware.CheckCSRF(),
+		s.controller.BaseLoginPostAction,
+	)
 
 	// Loout
 	r.PUT("/logout", s.controller.BaseLogoutPutAction)   // For Ajax

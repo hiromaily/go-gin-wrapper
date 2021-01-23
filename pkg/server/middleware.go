@@ -11,6 +11,7 @@ import (
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwts"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
+	"github.com/hiromaily/go-gin-wrapper/pkg/reverseproxy/types"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
@@ -19,11 +20,10 @@ import (
 
 // Middlewarer interface
 type Middlewarer interface {
-	RejectSpecificIP() gin.HandlerFunc
+	GlobalRecover() gin.HandlerFunc
+	FilterIP() gin.HandlerFunc
 	SetMetaData() gin.HandlerFunc
 	UpdateUserSession() gin.HandlerFunc
-	GlobalRecover() gin.HandlerFunc
-	CheckHTTPRefererAndCSRF() gin.HandlerFunc
 	CheckHTTPReferer() gin.HandlerFunc
 	CheckCSRF() gin.HandlerFunc
 	RejectNonHTTPS() gin.HandlerFunc
@@ -37,6 +37,7 @@ type middleware struct {
 	// session xxxx
 	logger      *zap.Logger
 	jwter       jwts.JWTer
+	rejectIPs   []string
 	serverConf  *config.Server
 	proxyConf   *config.Proxy
 	apiConf     *config.API
@@ -48,6 +49,7 @@ type middleware struct {
 func NewMiddleware(
 	logger *zap.Logger,
 	jwter jwts.JWTer,
+	rejectIPs []string,
 	serverConf *config.Server,
 	proxyConf *config.Proxy,
 	apiConf *config.API,
@@ -57,6 +59,7 @@ func NewMiddleware(
 	return &middleware{
 		logger:      logger,
 		jwter:       jwter,
+		rejectIPs:   rejectIPs,
 		serverConf:  serverConf,
 		proxyConf:   proxyConf,
 		apiConf:     apiConf,
@@ -75,29 +78,104 @@ var RefererURLs = map[string]string{
 // basic
 //-----------------------------------------------------------------------------
 
-// TODO:skip static files like (jpg, gif, png, js, css, woff)
-
-// [WIP] RejectSpecificIP rejects IP addresses in blacklist
-// TODO: reject all except reverse　proxy ip address.
-func (m *middleware) RejectSpecificIP() gin.HandlerFunc {
+// GlobalRecover is after request, handle aborted code or 500 error.
+// When 404 or 405 error occurred, response already been set in controller/errors/errors.go
+func (m *middleware) GlobalRecover() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if httpheader.IsStaticFile(c) {
-			c.Next()
+		defer func(c *gin.Context) {
+			if !preCheck(c) {
+				return
+			}
+
+			m.logger.Info("GlobalRecover()")
+			if c.IsAborted() {
+				m.logger.Debug("GlobalRecover", zap.Bool("c.IsAborted()", c.IsAborted()))
+				m.setResponse(c, getErrMsg(c), c.Writer.Status())
+				return
+			}
+
+			if m.developConf.RecoverEnable {
+				if rec := recover(); rec != nil {
+					m.logger.Debug("GlobalRecover", zap.Any("recover()", rec))
+					m.setResponse(c, str.Itos(rec), http.StatusInternalServerError)
+					return
+				}
+			}
+		}(c)
+
+		c.Next()
+		// Next is `main gin Recovery`
+	}
+}
+
+func (m *middleware) setResponse(c *gin.Context, errMsg string, code int) {
+	referer := c.Request.Header.Get("Referer")
+	if referer == "" {
+		referer = "/"
+	}
+
+	if m.isAcceptHeaderJSON(c) {
+		c.JSON(c.Writer.Status(), gin.H{
+			"code":  fmt.Sprintf("%d", code),
+			"error": errMsg,
+		})
+		return
+	}
+	c.HTML(c.Writer.Status(), "pages/errors/error.tmpl", gin.H{
+		"code":    fmt.Sprintf("%d", code),
+		"message": errMsg,
+		"url":     referer,
+	})
+}
+
+func getErrMsg(c *gin.Context) string {
+	if c.Errors != nil && c.Errors.Last() != nil {
+		return c.Errors.Last().Err.Error()
+	}
+
+	switch c.Writer.Status() {
+	case 400:
+		return http.StatusText(http.StatusBadRequest)
+	case 401:
+		return http.StatusText(http.StatusUnauthorized)
+	case 403:
+		return http.StatusText(http.StatusForbidden)
+	case 404:
+		return http.StatusText(http.StatusNotFound)
+	case 405:
+		return http.StatusText(http.StatusMethodNotAllowed)
+	case 406:
+		return http.StatusText(http.StatusNotAcceptable)
+	case 407:
+		return http.StatusText(http.StatusProxyAuthRequired)
+	case 408:
+		return http.StatusText(http.StatusRequestTimeout)
+	case 500:
+		return http.StatusText(http.StatusInternalServerError)
+	}
+	return fmt.Sprintf("unexpected error: http status: %d", c.Writer.Status())
+}
+
+// FilterIP rejects IP addresses in blacklist
+func (m *middleware) FilterIP() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !preCheck(c) {
 			return
 		}
 
-		m.logger.Info("RejectSpecificIp")
+		m.logger.Info("FilterIP")
 		ip := c.ClientIP()
 		// proxy
-		if m.proxyConf.Mode != 0 {
-			if m.proxyConf.Server.Host != ip {
+		if m.proxyConf.Mode != types.NoProxy && m.proxyConf.Server.Host != ip {
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+		for _, rejectIP := range m.rejectIPs {
+			if ip == rejectIP {
 				c.AbortWithStatus(403)
 				return
 			}
 		}
-		//if ip != "127.0.0.1" {
-		//	c.AbortWithStatus(403)
-		//}
 		c.Next()
 	}
 }
@@ -105,10 +183,10 @@ func (m *middleware) RejectSpecificIP() gin.HandlerFunc {
 // SetMetaData is to set meta data
 func (m *middleware) SetMetaData() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if httpheader.IsStaticFile(c) {
-			c.Next()
+		if !preCheck(c) {
 			return
 		}
+
 		m.logger.Info("SetMetaData")
 
 		// Context Meta Data
@@ -158,184 +236,67 @@ func (m *middleware) SetMetaData() gin.HandlerFunc {
 	}
 }
 
-// UpdateUserSession is update user session expire
-// TODO:When session has already started, update session expired
+// UpdateUserSession updates user session expire
 func (m *middleware) UpdateUserSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if httpheader.IsStaticFile(c) {
-			c.Next()
+		if !preCheck(c) {
 			return
 		}
+
 		m.logger.Info("UpdateUserSession")
-		if bRet, uid := sess.IsLogin(c); bRet {
+		if logined, uid := sess.IsLogin(c); logined {
 			sess.SetUserSession(c, uid)
 		}
 		c.Next()
 	}
 }
 
-// GlobalRecover is after request, handle aborted code or 500 error.
-// When 404 or 405 error occurred, response already been set in controller/errors/errors.go
-func (m *middleware) GlobalRecover() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		defer func(c *gin.Context) {
-			if httpheader.IsStaticFile(c) {
-				c.Next()
-				return
-			}
-			m.logger.Info("[GlobalRecover] defer func()")
-
-			// when crossing request, context data can't be left.
-			// c.Set("skipMiddleWare", "1")
-
-			if c.IsAborted() {
-				m.logger.Debug("GlobalRecover", zap.Bool("c.IsAborted()", c.IsAborted()))
-
-				// response
-				m.setResponse(c, getErrMsg(c), c.Writer.Status())
-				return
-			}
-
-			if m.developConf.RecoverEnable {
-				if rec := recover(); rec != nil {
-					m.logger.Debug("GlobalRecover", zap.Any("recover()", rec))
-					// TODO:How should response data be decided whether html or json?
-					// TODO:Ajax or not doesn't matter to response. HTTP header of Accept may be better.
-					// TODO:How precise should I follow specifications of HTTP header.
-					m.setResponse(c, str.Itos(rec), 500)
-					return
-				}
-			}
-		}(c)
-
-		c.Next()
-		// Next is [Main gin Recovery]
-	}
-}
-
-func (m *middleware) setResponse(c *gin.Context, errMsg string, code int) {
-	refURL := "/"
-	if c.Request.Header.Get("Referer") != "" {
-		refURL = c.Request.Header.Get("Referer")
-	}
-
-	if m.isXHR(c) {
-		c.JSON(c.Writer.Status(), gin.H{
-			"code":  fmt.Sprintf("%d", code),
-			"error": errMsg,
-		})
-	} else {
-		c.HTML(c.Writer.Status(), "pages/errors/error.tmpl", gin.H{
-			"code":    fmt.Sprintf("%d", code),
-			"message": errMsg,
-			"url":     refURL,
-		})
-	}
-}
-
-func getErrMsg(c *gin.Context) string {
-	var errMsg string
-
-	if c.Errors != nil {
-		if c.Errors.Last() != nil {
-			errMsg = c.Errors.Last().Err.Error()
-		}
-	}
-
-	if errMsg == "" {
-		switch c.Writer.Status() {
-		case 400:
-			errMsg = http.StatusText(http.StatusBadRequest)
-		case 401:
-			errMsg = http.StatusText(http.StatusUnauthorized)
-		case 403:
-			errMsg = http.StatusText(http.StatusForbidden)
-		case 404:
-			errMsg = http.StatusText(http.StatusNotFound)
-		case 405:
-			errMsg = http.StatusText(http.StatusMethodNotAllowed)
-		case 406:
-			errMsg = http.StatusText(http.StatusNotAcceptable)
-		case 407:
-			errMsg = http.StatusText(http.StatusProxyAuthRequired)
-		case 408:
-			errMsg = http.StatusText(http.StatusRequestTimeout)
-		case 500:
-			errMsg = http.StatusText(http.StatusInternalServerError)
-		default:
-			errMsg = fmt.Sprintf("unexpected error: http status: %d", c.Writer.Status())
-		}
-	}
-
-	return errMsg
-}
-
 //-----------------------------------------------------------------------------
 // required by each controller
 //-----------------------------------------------------------------------------
 
-// [WIP] CheckHTTPRefererAndCSRF checks referer and CSRF token
-func (m *middleware) CheckHTTPRefererAndCSRF() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		m.logger.Info("[CheckHTTPRefererAndCSRF]")
-		// Referer
-		url := httpheader.GetURL(c)
-		// get referer data mapping table using url (map[string])
-		if refURL, ok := RefererURLs[url]; ok {
-			// Check Referer
-			if !httpheader.IsRefererHostValid(c, m.logger, m.serverConf, refURL) {
-				c.Next()
-				return
-			}
-		}
-
-		// CSRF
-		sess.IsTokenSessionValid(c, m.logger, c.PostForm("gintoken"))
-		c.Next()
-	}
-}
-
-// [WIP] CheckHTTPReferer is to check HTTP Referer.
+// CheckHTTPReferer checks referer
 func (m *middleware) CheckHTTPReferer() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("[heckHttpReferer]")
-		url := httpheader.GetURL(c)
-		// get referer data mapping table using url (map[string])
-		if refURL, ok := RefererURLs[url]; ok {
-			// Check Referer
-			httpheader.IsRefererHostValid(c, m.logger, m.serverConf, refURL)
+		m.logger.Info("CheckHTTPReferer")
+		defer c.Next()
+
+		targetURL, found := RefererURLs[httpheader.GetURL(c)]
+		if !found {
+			return
 		}
-		c.Next()
+		// check referer
+		httpheader.IsRefererHostValid(c, m.logger, m.serverConf, targetURL)
 	}
 }
 
-// [WIP] CheckCSRF is to check CSRF token
+// CheckHTTPReferer checks CSRF token
 func (m *middleware) CheckCSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("[CheckCSRF]")
+		m.logger.Info("CheckCSRF")
 		sess.IsTokenSessionValid(c, m.logger, c.PostForm("gintoken"))
 		c.Next()
 	}
 }
 
-// [WIP] RejectNonHTTPS is to reject non HTTPS access.
+// RejectNonHTTPS rejects if request is NOT HTTPS
 func (m *middleware) RejectNonHTTPS() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("[RejectNonHTTPS]")
+		m.logger.Info("RejectNonHTTPS")
 
-		//TODO:check protocol of url
-		//if strings.Index(c.url, "https://") == -1 {
-		//	c.AbortWithStatus(403)
-		//}
+		if !strings.Contains(httpheader.GetURL(c), "https://") {
+			c.AbortWithStatus(403)
+			return
+		}
 		c.Next()
 	}
 }
 
 //-----------------------------------------------------------------------------
-// For Web API
+// web API use
 //-----------------------------------------------------------------------------
 
-// CheckHTTPHeader is to check HTTP Header for Ajax request. (For REST)
+// CheckHTTPHeader checks HTTP Header
 func (m *middleware) CheckHTTPHeader() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		m.logger.Info("CheckHttpHeader",
@@ -344,71 +305,56 @@ func (m *middleware) CheckHTTPHeader() gin.HandlerFunc {
 			zap.Any("request_body", c.Request.Body),
 			zap.String("client_ip", c.ClientIP()),
 			zap.String("request_method", c.Request.Method),
+			zap.String("http_header_X-Custom-Header-Gin", c.Request.Header.Get("X-Custom-Header-Gin")),
 		)
-		// IsAjax := c.Request.Header.Get("X-Requested-With")
-		// logger.Debugf("[X-Requested-With] %s", IsAjax)
-
-		// IsKey := c.Request.Header.Get("X-Custom-Header-Gin")
-		// logger.Debugf("[X-Custom-Header-Gin] %s", IsKey)
-
-		// TODO:when preflight request, X-Requested-With may be not sent
-		// TODO:all cors requests don't include X-Requested-With..
-		if c.Request.Method != "OPTIONS" && c.Request.Header.Get("X-Custom-Header-Cors") == "" {
-			if m.apiConf.Ajax && !m.isXHR(c) {
-				// error
-				m.logger.Error("Ajax request is required")
-				c.AbortWithStatus(400)
-				return
-			}
-		}
 
 		if m.apiConf.Header.Enabled {
-			valOfaddedHeader := c.Request.Header.Get(m.apiConf.Header.Header)
-			if valOfaddedHeader != m.apiConf.Header.Key {
-				// error
+			// X-Custom-Header-Gin
+			if c.Request.Header.Get(m.apiConf.Header.Header) != m.apiConf.Header.Key {
 				m.logger.Error("header and key are invalid")
-				c.AbortWithStatus(400)
+				c.AbortWithStatus(http.StatusBadRequest)
 				return
 			}
 		}
 
-		//TODO:if no Content-Type, how should be handled.
-		//contentType := c.Request.Header.Get("Content-Type")
-		//if contentType == "application/json" {
-		//}
-
-		// Context Meta Data
-		// SetMetaData(c)
-
+		// TODO: when preflight request, `X-Requested-With` may be not sent
+		if c.Request.Method != "OPTIONS" {
+			c.Next()
+			return
+		}
+		// TODO: all cors requests don't include `X-Requested-With`
+		if m.apiConf.Ajax && !m.isXHR(c) {
+			m.logger.Error("Ajax request is required")
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
 		c.Next()
 	}
 }
 
-// CheckJWT is to check JWT token code
+// CheckJWT checks JWT token code
 func (m *middleware) CheckJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("[CheckJWT]")
+		m.logger.Info("CheckJWT")
 
-		IsAuth := c.Request.Header.Get("Authorization")
-		if IsAuth == "" {
-			c.AbortWithError(400, errors.New("authorization header is missing"))
+		auth := c.Request.Header.Get("Authorization")
+		if auth == "" {
+			c.AbortWithError(http.StatusBadRequest, errors.New("authorization header is missing"))
 			return
 		}
 
-		var err error
-		aAry := strings.Split(IsAuth, " ")
-		if len(aAry) != 2 {
-			err = errors.New("Authorization header is invalid")
-		} else {
-			if aAry[0] != "Bearer" {
-				err = errors.New("Authorization header is invalid")
-			} else {
-				token := aAry[1]
-				err = m.jwter.ValidateToken(token)
-			}
+		// Bearer token
+		authParts := strings.Split(auth, " ")
+		if len(authParts) != 2 {
+			c.AbortWithError(http.StatusBadRequest, errors.New("Authorization header is invalid"))
+			return
 		}
-		if err != nil {
-			c.AbortWithError(400, err)
+		if authParts[0] != "Bearer" {
+			c.AbortWithError(http.StatusBadRequest, errors.New("Authorization header is invalid"))
+			return
+		}
+		if err := m.jwter.ValidateToken(authParts[1]); err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
@@ -416,7 +362,7 @@ func (m *middleware) CheckJWT() gin.HandlerFunc {
 	}
 }
 
-// CheckCORS is to check CORS
+// CheckCORS checks CORS
 func (m *middleware) CheckCORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		m.logger.Info("CheckCORS")
@@ -424,48 +370,50 @@ func (m *middleware) CheckCORS() gin.HandlerFunc {
 		if c.Request.Method == "OPTIONS" && c.Request.Header.Get("Origin") != "" {
 			cors.CheckHeader(c, m.logger, m.corsConf)
 		}
-
 		c.Next()
 	}
 }
 
 //-----------------------------------------------------------------------------
-// functions
+// funcs
 //-----------------------------------------------------------------------------
+
+func preCheck(c *gin.Context) bool {
+	if httpheader.IsStaticFile(c) {
+		c.Next()
+		return false
+	}
+	return true
+}
 
 // IsXHR is whether request is Ajax or not
 func (m *middleware) isXHR(c *gin.Context) bool {
 	return strings.ToLower(c.Request.Header.Get("X-Requested-With")) == "xmlhttprequest"
 }
 
-// IsAcceptHeaderJSON is whether request require JSON or not
+// IsAcceptHeaderJSON is whether request accepts JSON or not
 func (m *middleware) isAcceptHeaderJSON(c *gin.Context) bool {
 	accept := strings.ToLower(c.Request.Header.Get("Accept"))
 	return strings.Contains(accept, "application/json")
 }
 
-// IsContentTypeJSON is whether data format of request is JSON or not
+// IsContentTypeJSON is whether Content-Type of request is JSON or not
 func (m *middleware) isContentTypeJSON(c *gin.Context) bool {
 	accept := strings.ToLower(c.Request.Header.Get("Content-Type"))
 	return strings.Contains(accept, "application/json")
 }
 
-// GetUserAgent is get user agent
-// TODO: work in progress
+// GetUserAgent returns user agent
 func (m *middleware) getUserAgent(c *gin.Context) string {
-	// "User-Agent":[]string{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36
-	// (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36"},
-	tmpUserAgent := c.Request.Header.Get("User-Agent")
-	return tmpUserAgent
+	return c.Request.Header.Get("User-Agent")
 }
 
-// GetLanguage is to get Language of top priority
-// TODO: work in progress
+// GetLanguage returns language of highest priority
 func (m *middleware) getLanguage(c *gin.Context) string {
 	// "Accept-Language":[]string{"ja,en-US;q=0.8,en;q=0.6,de;q=0.4,nl;q=0.2"},
-	tmpLanguage := c.Request.Header.Get("Accept-Language")
-	if tmpLanguage != "" {
-		return strings.Split(tmpLanguage, ",")[0]
+	lang := c.Request.Header.Get("Accept-Language")
+	if lang == "" {
+		return ""
 	}
-	return ""
+	return strings.Split(lang, ",")[0]
 }
