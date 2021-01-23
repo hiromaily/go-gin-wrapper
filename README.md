@@ -26,13 +26,12 @@ Now it's under `refactoring`.
 - [x] add zap logger
 - [x] add graceful shutdown
 - [x] refactoring jwt package  
+- [ ] fix test
 - [ ] unittest by table driven test
 - [ ] clean up variable, func name
 - [ ] clean up comments
 - [ ] catch up with latest [gin](https://github.com/gin-gonic/gin)
 - [ ] update front-end
-- [ ] switch any Japanese to English
-- [ ] fix test
 
 
 ## Example

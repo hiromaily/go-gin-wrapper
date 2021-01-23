@@ -265,10 +265,12 @@ func (m *middleware) CheckHTTPReferer() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		m.logger.Info("middleware CheckHTTPReferer")
 
+		// FIXME: looks strange, key requires only path
 		targetURL, found := RefererURLs[ginurl.GetURLString(ctx)]
 		if !found {
 			return
 		}
+
 		// check referer
 		if err := m.validateReferer(ctx, targetURL); err != nil {
 			// invalid access
