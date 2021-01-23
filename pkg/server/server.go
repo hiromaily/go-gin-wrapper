@@ -240,11 +240,11 @@ func (s *server) run() error {
 	return s.runGin(addr)
 }
 
-func (s *server) runFCGI(addr ...string) error {
+func (s *server) runFCGI(addr string) error {
 	// Proxy(Nginx) settings
-	color.Red("[WARNING] running on fcgi mode.")
+	color.Red("[WARNING] server as fcgi mode.")
 	s.logger.Info("running server as fcgi mode.")
-	return fcgi.Run(s.gin, addr...)
+	return fcgi.Run(s.gin, addr)
 }
 
 // how to shutdown with gin
