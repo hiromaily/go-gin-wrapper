@@ -13,7 +13,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: gogin
+      MYSQL_DATABASE: go-gin
       MYSQL_USER: guestuser
       MYSQL_PASSWORD: secret123
 

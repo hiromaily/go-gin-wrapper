@@ -15,13 +15,13 @@
 
 
 --
--- DATABASE gogin
+-- DATABASE go-gin
 --
-DROP DATABASE IF EXISTS `gogin`;
+DROP DATABASE IF EXISTS `go-gin`;
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `gogin` /*!40100 DEFAULT CHARACTER SET utf8 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `go-gin` /*!40100 DEFAULT CHARACTER SET utf8 */;
 
-USE `gogin`;
+USE `go-gin`;
 
 
 --

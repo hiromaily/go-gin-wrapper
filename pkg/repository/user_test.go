@@ -19,7 +19,7 @@ import (
 )
 
 // Note:
-// - test data is in ./test/sql/data_gogin-test.sql
+// - test data is in ./test/sql/data_go-gin-test.sql
 // - `settings.toml` is used for this unittest
 // - result of md5 hash can be found by command `tool-md5`, see Makefile
 // - run the below commands before this unittest

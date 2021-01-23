@@ -94,7 +94,7 @@ call_back_url = "http://localhost:8080/oauth2/facebook/callback"
 encrypted = false
 host = "127.0.0.1"
 port = 13306
-dbname = "gogin"
+dbname = "go-gin"
 user = "guestuser"
 pass = "secret123"
 is_debug_log = false
@@ -103,7 +103,7 @@ is_debug_log = false
 encrypted = false
 host = "127.0.0.1"
 port = 13306
-dbname = "gogin-test"
+dbname = "go-gin-test"
 user = "guestuser"
 pass = "secret123"
 

@@ -35,7 +35,7 @@ func TestNewMySQL(t *testing.T) {
 				conf: &config.MySQLContent{
 					Host:   "127.0.0.1",
 					Port:   13306,
-					DBName: "going-test",
+					DBName: "go-gin-test",
 					User:   "guestuser",
 					Pass:   "secret123",
 				},
@@ -50,7 +50,7 @@ func TestNewMySQL(t *testing.T) {
 				conf: &config.MySQLContent{
 					Host:   "127.0.0.100",
 					Port:   13306,
-					DBName: "going-test",
+					DBName: "go-gin-test",
 					User:   "guestuser",
 					Pass:   "secret123",
 				},
@@ -65,7 +65,7 @@ func TestNewMySQL(t *testing.T) {
 				conf: &config.MySQLContent{
 					Host:   "127.0.0.1",
 					Port:   13316,
-					DBName: "going-test",
+					DBName: "go-gin-test",
 					User:   "guestuser",
 					Pass:   "secret123",
 				},
@@ -80,7 +80,7 @@ func TestNewMySQL(t *testing.T) {
 				conf: &config.MySQLContent{
 					Host:   "127.0.0.1",
 					Port:   13306,
-					DBName: "going-wrong-test",
+					DBName: "go-gin-wrong-test",
 					User:   "guestuser",
 					Pass:   "secret123",
 				},
@@ -95,7 +95,7 @@ func TestNewMySQL(t *testing.T) {
 				conf: &config.MySQLContent{
 					Host:   "127.0.0.1",
 					Port:   13306,
-					DBName: "going-test",
+					DBName: "go-gin-test",
 					User:   "guest-wrong-user",
 					Pass:   "secret123",
 				},
