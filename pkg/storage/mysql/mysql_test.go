@@ -44,21 +44,21 @@ func TestNewMySQL(t *testing.T) {
 				isErr: false,
 			},
 		},
-		{
-			name: "wrong host, timeout should happen",
-			args: args{
-				conf: &config.MySQLContent{
-					Host:   "127.0.0.100",
-					Port:   13306,
-					DBName: "go-gin-test",
-					User:   "guestuser",
-					Pass:   "secret123",
-				},
-			},
-			want: want{
-				isErr: true,
-			},
-		},
+		//{
+		//	name: "wrong host, timeout should happen",
+		//	args: args{
+		//		conf: &config.MySQLContent{
+		//			Host:   "127.0.0.100",
+		//			Port:   13306,
+		//			DBName: "go-gin-test",
+		//			User:   "guestuser",
+		//			Pass:   "secret123",
+		//		},
+		//	},
+		//	want: want{
+		//		isErr: true,
+		//	},
+		//},
 		{
 			name: "wrong port",
 			args: args{

@@ -53,6 +53,7 @@ before_script:
 script:
   #- golangci-lint run
   #- go test -v -race -covermode=atomic -coverprofile=profile.cov ./cmd/ginserver/... -f ../../configs/travis.toml -crypto -om 0
+  - go clean -testcache
   - go test -race -tags=integration -v -covermode=atomic -coverprofile=profile.cov ./...
   - goveralls -coverprofile=profile.cov -service=travis-ci
 

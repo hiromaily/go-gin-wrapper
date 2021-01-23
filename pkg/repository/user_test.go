@@ -438,6 +438,7 @@ func TestInsertUser(t *testing.T) {
 		want want
 	}{
 		{
+			// sometimes failed
 			name: "happy path 1",
 			args: args{
 				user: user1,

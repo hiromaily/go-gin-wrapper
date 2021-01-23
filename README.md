@@ -33,6 +33,11 @@ Now it's under `refactoring`.
 - [ ] catch up with latest [gin](https://github.com/gin-gonic/gin)
 - [ ] update front-end
 
+## Requirements
+- Golang 1.15+
+- Docker compose
+  - MySQL 5.7
+  - Redis
 
 ## Example
 Example is [here](https://ginserver.herokuapp.com/) on Heroku.

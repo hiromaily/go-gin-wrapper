@@ -123,6 +123,14 @@ health-check:
 ###############################################################################
 # Test
 ###############################################################################
+.PHONY: clean-test-cache
+clean-test-cache:
+	go clean -testcache
+
+.PHONY: setup-testdb
+setup-testdb:
+	./scripts/create-test-db-docker.sh
+
 .PHONY: test
 test:
 	go test -race -v ./...
@@ -136,10 +144,6 @@ integration-test: setup-testdb
 user-db-test: setup-testdb
 	go test -race -tags=integration -v ./pkg/repository/...
 
-
-.PHONY: setup-testdb
-setup-testdb:
-	./scripts/create-test-db-docker.sh
 
 #.PHONY: setup-testdb
 #setup-testdb:
@@ -184,6 +188,10 @@ test-quick:
 check-ci-compose:
 	docker-compose -f docker-compose.ci.yml build mysql
 	docker-compose -f docker-compose.ci.yml up mysql
+
+# Note: change `GO_GIN_CONF` in `.envrc`
+# then run `make integration-test`
+
 
 ###############################################################################
 # Docker-Compose
