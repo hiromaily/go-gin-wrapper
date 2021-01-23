@@ -23,7 +23,7 @@ type APIUser interface {
 	APIUserIDsGetAction(c *gin.Context)
 }
 
-// UserRequest is expected request form from user
+// UserRequest is expected request payload
 type UserRequest struct {
 	FirstName string `valid:"nonempty,min=3,max=20" field:"first_name" dispName:"First Name" json:"firstName" form:"firstName"`
 	LastName  string `valid:"nonempty,min=3,max=20" field:"last_name" dispName:"Last Name" json:"lastName" form:"lastName"`

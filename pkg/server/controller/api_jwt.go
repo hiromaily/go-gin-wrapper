@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"net/http"
 	"strconv"
 	"time"
 
@@ -15,26 +16,28 @@ type APIJWTer interface {
 	APIJWTIndexPostAction(c *gin.Context)
 }
 
-// APIJWTIndexPostAction is JWT End Point [POST]
+// APIJWTIndexPostAction is JWT endpoint [POST]
 func (ctl *controller) APIJWTIndexPostAction(c *gin.Context) {
-	ctl.logger.Debug("APIJWTIndexPostAction")
+	ctl.logger.Debug("controler APIJWTIndexPostAction")
 
-	// login
 	// check login
-	userID, mail, err := ctl.CheckLoginOnAPI(c)
+	userID, mail, err := ctl.checkAPILogin(c)
 	if err != nil {
-		c.AbortWithError(400, err)
+		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	ti := time.Now().Add(time.Minute * 60).Unix()
-	token, err := ctl.jwter.CreateBasicToken(ti, strconv.Itoa(userID), mail)
+	token, err := ctl.jwter.CreateBasicToken(
+		time.Now().Add(time.Minute*60).Unix(),
+		strconv.Itoa(userID),
+		mail,
+	)
 	if err != nil {
-		c.AbortWithError(500, err)
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	ctl.logger.Debug("", zap.String("token: %s", token))
+	ctl.logger.Debug("APIJWTIndexPostAction", zap.String("token", token))
 
-	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateJWTJson(token))
+	// json response
+	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, http.StatusOK, jsonresp.CreateJWTJson(token))
 }

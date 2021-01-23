@@ -10,7 +10,7 @@ import (
 
 // Controller  interface
 type Controller interface {
-	Acounter
+	Accounter
 	Adminer
 	APIJWTer
 	APIUser
@@ -22,7 +22,6 @@ type Controller interface {
 	OAuther
 }
 
-// controller is controller object
 type controller struct {
 	logger    *zap.Logger
 	userRepo  repository.UserRepository
@@ -32,7 +31,7 @@ type controller struct {
 	auth      *config.Auth
 }
 
-// NewController is to return Controller
+// NewController returns Controller
 func NewController(
 	logger *zap.Logger,
 	userRepo repository.UserRepository,

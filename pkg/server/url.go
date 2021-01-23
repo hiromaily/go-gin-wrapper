@@ -2,8 +2,6 @@ package server
 
 import (
 	"net/http"
-
-
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 
 	"github.com/gin-gonic/gin"

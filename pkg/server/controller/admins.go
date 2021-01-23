@@ -17,9 +17,9 @@ type Adminer interface {
 // AdminIndexAction [GET]
 func (ctl *controller) AdminIndexAction(c *gin.Context) {
 	key := c.MustGet(gin.AuthUserKey).(string)
-	ctl.logger.Debug("AdminIndexAction", zap.String("gin.AuthUserKey", key))
+	ctl.logger.Debug("controller AdminIndexAction", zap.String("gin.AuthUserKey", key))
 
-	// View
+	// view
 	res := gin.H{
 		"title":    "Admin Page",
 		"navi_key": "/admin/",

@@ -10,7 +10,7 @@ import (
 // Loginer interface
 type Loginer interface {
 	CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []string)
-	CheckLoginOnAPI(c *gin.Context) (int, string, error)
+	checkAPILogin(c *gin.Context) (int, string, error)
 }
 
 // LoginRequest is request structure for login
@@ -53,8 +53,8 @@ func (ctl *controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []s
 	return userID, nil, nil
 }
 
-// CheckLoginOnAPI is check login on API
-func (ctl *controller) CheckLoginOnAPI(c *gin.Context) (int, string, error) {
+// checkAPILogin checks login by API
+func (ctl *controller) checkAPILogin(c *gin.Context) (int, string, error) {
 	posted := &LoginRequest{
 		Email: c.PostForm("inputEmail"),
 		Pass:  c.PostForm("inputPassword"),
