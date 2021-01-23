@@ -3,30 +3,42 @@ package server
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
+
+	"github.com/gin-gonic/gin"
 )
 
-// setRouter is for HTTP
+// setRouter is mapper for request path and handler
 func (s *server) setRouter(r *gin.Engine) {
 	s.logger.Info("server setRouter()")
-	/******************************************************************************/
-	/******** Return HTML *********************************************************/
-	/******************************************************************************/
-	//TODO:When http request method is POST, check referer in advance automatically.
-	//-----------------------
-	// Base(Top Level)
-	//-----------------------
 
+	// for html response
+	s.setBaseRouter(r)
+	s.setAPIListRouter(r)
+	s.setOAuth2Router(r)
+	s.setAccountRouter(r)
+	s.setAdminRouter(r)
+	s.setErrorRouter(r)
+
+	// for API use
+	s.setJWTRouter(r)
+	s.setUserRouter(r)
+
+	// TODO: X-HTTP-Method-Override header may be helpful when user can use only `GET`, `POST` method of GET and POST
+	// Or use parameter `_method`
+}
+
+// base router (top level)
+func (s *server) setBaseRouter(r *gin.Engine) {
+	// top level
 	r.GET("/", s.controller.BaseIndexAction)
-	// Redirect
-	r.GET("/index", func(c *gin.Context) {
+	r.GET("/index", func(c *gin.Context) { // redirect
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
-	r.HEAD("/", func(c *gin.Context) {}) // For helth check
+	r.HEAD("/", func(c *gin.Context) {}) // health check
 
-	// Login
+	// login
 	r.GET("/login", s.controller.BaseLoginGetAction)
 	r.POST("/login",
 		s.middleware.CheckHTTPReferer(),
@@ -34,60 +46,43 @@ func (s *server) setRouter(r *gin.Engine) {
 		s.controller.BaseLoginPostAction,
 	)
 
-	// Loout
-	r.PUT("/logout", s.controller.BaseLogoutPutAction)   // For Ajax
-	r.POST("/logout", s.controller.BaseLogoutPostAction) // HTML
+	// logout
+	r.PUT("/logout", s.controller.BaseLogoutPutAction)   // for ajax
+	r.POST("/logout", s.controller.BaseLogoutPostAction) // html
+}
 
-	//-----------------------
-	// News
-	//-----------------------
-	//newsG := r.Group("/news")
-	//{
-	//	// Top
-	//	newsG.GET("/", s.controller.NewsIndexAction)
-	//}
-
-	//-----------------------
-	// API List
-	//-----------------------
+// API list router
+func (s *server) setAPIListRouter(r *gin.Engine) {
 	apiListG := r.Group("/apilist")
-	{
-		// Top
-		apiListG.GET("/", s.controller.APIListIndexAction)
-		apiListG.GET("/index2", s.controller.APIListIndex2Action)
-	}
 
-	//-----------------------
-	// OAuth2 Callback
-	//-----------------------
+	apiListG.GET("/", s.controller.APIListIndexAction)
+	apiListG.GET("/index2", s.controller.APIListIndex2Action)
+}
+
+// OAuth2 router
+func (s *server) setOAuth2Router(r *gin.Engine) {
 	oauth2G := r.Group("/oauth2")
-	{
-		//--Google--
-		//Sign in
-		oauth2G.GET("/google/signin", s.controller.OAuth2SignInGoogleAction)
-		// Callback
-		oauth2G.GET("/google/callback", s.controller.OAuth2CallbackGoogleAction)
-		//--Facebook--
-		//Sign in
-		oauth2G.GET("/facebook/signin", s.controller.OAuth2SignInFacebookAction)
-		// Callback
-		oauth2G.GET("/facebook/callback", s.controller.OAuth2CallbackFacebookAction)
-	}
 
-	//-----------------------
-	// Account(MyPage)
-	//-----------------------
-	//After login
+	// google sign in
+	oauth2G.GET("/google/signin", s.controller.OAuth2SignInGoogleAction)
+	// google callback
+	oauth2G.GET("/google/callback", s.controller.OAuth2CallbackGoogleAction)
+	// facebook sign in
+	oauth2G.GET("/facebook/signin", s.controller.OAuth2SignInFacebookAction)
+	// facebook callback
+	oauth2G.GET("/facebook/callback", s.controller.OAuth2CallbackFacebookAction)
+}
+
+// account router (my page)
+// - used after login
+func (s *server) setAccountRouter(r *gin.Engine) {
 	accountsG := r.Group("/accounts")
-	{
-		// Top
-		accountsG.GET("/", s.controller.AccountIndexAction)
-	}
-	// r.GET("/accounts/", accounts.AccountsGetAction)
 
-	//-----------------------
-	// Admin [BasicAuth()]
-	//-----------------------
+	accountsG.GET("/", s.controller.AccountIndexAction)
+}
+
+// admin router with basic auth
+func (s *server) setAdminRouter(r *gin.Engine) {
 	basicAuth := s.serverConf.BasicAuth
 	authorized := r.Group("/admin", gin.BasicAuth(gin.Accounts{
 		basicAuth.User: basicAuth.Pass,
@@ -97,58 +92,42 @@ func (s *server) setRouter(r *gin.Engine) {
 	authorized.GET("/index", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
+}
 
-	//-----------------------
-	/* Error HTML */
-	//-----------------------
+// error router
+func (s *server) setErrorRouter(r *gin.Engine) {
 	r.NoRoute(s.controller.Error404Action)
 	r.NoMethod(s.controller.Error405Action)
+}
 
-	/******************************************************************************/
-	/************ REST API (For Ajax) *********************************************/
-	/******************************************************************************/
-	//-----------------------
-	// JWT
-	//-----------------------
+// JWT API router
+func (s *server) setJWTRouter(r *gin.Engine) {
 	jwt := r.Group("/api/jwts", s.middleware.CheckHTTPHeader())
-	{
-		jwt.POST("", s.controller.APIJWTIndexPostAction) // jwts end point
-	}
 
-	//-----------------------
-	// User
-	//-----------------------
-	//TODO: which is better to use CheckHttpHeader() for ajax request to check http header.
-	// if it's used as middle ware like as below.
-	//  r.Use(routes.CheckHttpHeader())
-	//  it let us faster to develop instead of a bit less performance.
+	jwt.POST("", s.controller.APIJWTIndexPostAction) // jwt end point
+}
+
+// user API router
+func (s *server) setUserRouter(r *gin.Engine) {
+	// additional middleware handler
 	handlers := []gin.HandlerFunc{s.middleware.CheckHTTPHeader()}
-	// JWT
 	if s.apiConf.JWT.Mode != 0 {
 		handlers = append(handlers, s.middleware.CheckJWT())
 	}
-	// CORS
 	if s.apiConf.CORS.Enabled {
 		handlers = append(handlers, s.middleware.CheckCORS())
 	}
 
-	// users := r.Group("/api/users", CheckHttpHeader(), CheckJWT())
 	users := r.Group("/api/users", handlers...)
-	{
-		users.GET("", s.controller.APIUserListGetAction)          // Get user list
-		users.POST("", s.controller.APIUserInsertPostAction)      // Register for new user
-		users.GET("/id/:id", s.controller.APIUserGetAction)       // Get specific user
-		users.PUT("/id/:id", s.controller.APIUserPutAction)       // Update specific user
-		users.DELETE("/id/:id", s.controller.APIUserDeleteAction) // Delete specific user
-		// for unnecessary parameter, use *XXXX. e.g. /user/:name/*action
 
-		// panic: path segment 'ids' conflicts with existing wildcard ':id' in path '/api/users/ids'
-		users.GET("/ids", s.controller.APIUserIDsGetAction) // Get user list
+	users.GET("", s.controller.APIUserListGetAction)
+	users.POST("", s.controller.APIUserInsertPostAction)
+	users.GET("/id/:id", s.controller.APIUserGetAction)
+	users.PUT("/id/:id", s.controller.APIUserPutAction)
+	users.DELETE("/id/:id", s.controller.APIUserDeleteAction)
 
-		// Accept CORS
-		users.OPTIONS("", cors.SetHeader(s.logger, s.apiConf.CORS))
-	}
+	users.GET("/ids", s.controller.APIUserIDsGetAction) // get user list
 
-	// TODO: when user can use only method of GET and POST, X-HTTP-Method-Override header may be helpful.
-	// Or use parameter `_method`
+	// accept CORS
+	users.OPTIONS("", cors.SetHeader(s.logger, s.apiConf.CORS))
 }

@@ -34,7 +34,6 @@ type Server interface {
 	Close()
 }
 
-// server object
 type server struct {
 	gin          *gin.Engine
 	port         int
@@ -98,12 +97,12 @@ func (s *server) Start() (*gin.Engine, error) {
 
 	s.setRouter(s.gin)
 
-	// set profiling for development
+	// set profiling for development use
 	if s.developConf.ProfileEnable {
 		ginpprof.Wrapper(s.gin)
 	}
 
-	// if working for unittest, s.run() is not required
+	// s.run() is not required if working for unittest
 	if s.isTestMode {
 		return s.gin, nil
 	}
@@ -121,15 +120,14 @@ func (s *server) Close() {
 	}
 }
 
-// Global middleware
 func (s *server) setMiddleware() {
 	s.logger.Info("server setMiddleware()")
-	// TODO:skip static files like (jpg, gif, png, js, css, woff)
 
 	s.gin.Use(gin.Logger())
 
 	s.gin.Use(s.middleware.GlobalRecover()) // It's called faster than [gin.Recovery()]
 
+	// session
 	sess.SetOption(s.sessionStore, s.serverConf.Session)
 	s.gin.Use(sessions.Sessions(s.serverConf.Session.Name, s.sessionStore))
 
@@ -140,28 +138,32 @@ func (s *server) setMiddleware() {
 	s.gin.Use(s.middleware.UpdateUserSession())
 }
 
-func (s *server) loadTemplates() error {
-	s.logger.Info("server loadTemplates()")
-	// http://stackoverflow.com/questions/25745701/parseglob-what-is-the-pattern-to-parse-all-templates-recursively-within-a-direc
-
-	// r.LoadHTMLGlob("templates/*")
-	// r.LoadHTMLGlob("templates/**/*")
-
-	// It's impossible to call more than one. it was overwritten by final call.
-	// r.LoadHTMLGlob(path + "templates/pages/**/*")
-	// r.LoadHTMLGlob(path + "templates/components/*")
-
+func (s *server) projectRoot() (string, error) {
 	projectPath := s.serverConf.Docs.Path
 	// if projectPath includes ${GOPATH}, it should be replaced
 	if strings.Contains(projectPath, "${GOPATH}") {
 		gopath := os.Getenv("GOPATH")
 		projectPath = strings.Replace(projectPath, "${GOPATH}", gopath, 1)
 	}
-	s.logger.Debug("loadTemplates()", zap.String("project_path", projectPath))
 	if f, err := os.Stat(projectPath); os.IsNotExist(err) || !f.IsDir() {
 		// no such directory
+		return "", err
+	}
+	return projectPath, nil
+}
+
+func (s *server) loadTemplates() error {
+	s.logger.Info("server loadTemplates()")
+
+	// it's impossible to call more than one. it was overwritten by final call.
+	// r.LoadHTMLGlob("templates/*")
+	// r.LoadHTMLGlob("templates/**/*")
+
+	projectPath, err := s.projectRoot()
+	if err != nil {
 		return err
 	}
+	s.logger.Debug("loadTemplates()", zap.String("project_path", projectPath))
 
 	ext := []string{"tmpl"}
 	targetPath := []string{

@@ -87,7 +87,7 @@ func (m *middleware) GlobalRecover() gin.HandlerFunc {
 				return
 			}
 
-			m.logger.Info("GlobalRecover()")
+			m.logger.Info("middleware GlobalRecover()")
 			if c.IsAborted() {
 				m.logger.Debug("GlobalRecover", zap.Bool("c.IsAborted()", c.IsAborted()))
 				m.setResponse(c, getErrMsg(c), c.Writer.Status())
@@ -163,7 +163,7 @@ func (m *middleware) FilterIP() gin.HandlerFunc {
 			return
 		}
 
-		m.logger.Info("FilterIP")
+		m.logger.Info("middleware FilterIP")
 		ip := c.ClientIP()
 		// proxy
 		if m.proxyConf.Mode != types.NoProxy && m.proxyConf.Server.Host != ip {
@@ -187,7 +187,7 @@ func (m *middleware) SetMetaData() gin.HandlerFunc {
 			return
 		}
 
-		m.logger.Info("SetMetaData")
+		m.logger.Info("middleware SetMetaData")
 
 		// Context Meta Data
 		// http.Header{
@@ -243,7 +243,7 @@ func (m *middleware) UpdateUserSession() gin.HandlerFunc {
 			return
 		}
 
-		m.logger.Info("UpdateUserSession")
+		m.logger.Info("middleware UpdateUserSession")
 		if logined, uid := sess.IsLogin(c); logined {
 			sess.SetUserSession(c, uid)
 		}
@@ -258,7 +258,7 @@ func (m *middleware) UpdateUserSession() gin.HandlerFunc {
 // CheckHTTPReferer checks referer
 func (m *middleware) CheckHTTPReferer() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("CheckHTTPReferer")
+		m.logger.Info("middleware CheckHTTPReferer")
 		defer c.Next()
 
 		targetURL, found := RefererURLs[httpheader.GetURL(c)]
@@ -273,7 +273,7 @@ func (m *middleware) CheckHTTPReferer() gin.HandlerFunc {
 // CheckHTTPReferer checks CSRF token
 func (m *middleware) CheckCSRF() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("CheckCSRF")
+		m.logger.Info("middleware CheckCSRF")
 		sess.IsTokenSessionValid(c, m.logger, c.PostForm("gintoken"))
 		c.Next()
 	}
@@ -282,7 +282,7 @@ func (m *middleware) CheckCSRF() gin.HandlerFunc {
 // RejectNonHTTPS rejects if request is NOT HTTPS
 func (m *middleware) RejectNonHTTPS() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("RejectNonHTTPS")
+		m.logger.Info("middleware RejectNonHTTPS")
 
 		if !strings.Contains(httpheader.GetURL(c), "https://") {
 			c.AbortWithStatus(403)
@@ -299,7 +299,7 @@ func (m *middleware) RejectNonHTTPS() gin.HandlerFunc {
 // CheckHTTPHeader checks HTTP Header
 func (m *middleware) CheckHTTPHeader() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("CheckHttpHeader",
+		m.logger.Info("middleware CheckHttpHeader",
 			zap.Any("request_header", c.Request.Header),
 			zap.Any("request_form", c.Request.Form),
 			zap.Any("request_body", c.Request.Body),
@@ -335,7 +335,7 @@ func (m *middleware) CheckHTTPHeader() gin.HandlerFunc {
 // CheckJWT checks JWT token code
 func (m *middleware) CheckJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("CheckJWT")
+		m.logger.Info("middleware CheckJWT")
 
 		auth := c.Request.Header.Get("Authorization")
 		if auth == "" {
@@ -365,7 +365,7 @@ func (m *middleware) CheckJWT() gin.HandlerFunc {
 // CheckCORS checks CORS
 func (m *middleware) CheckCORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		m.logger.Info("CheckCORS")
+		m.logger.Info("middleware CheckCORS")
 
 		if c.Request.Method == "OPTIONS" && c.Request.Header.Get("Origin") != "" {
 			cors.CheckHeader(c, m.logger, m.corsConf)
