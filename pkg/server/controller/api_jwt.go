@@ -8,22 +8,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
+	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 )
 
 // APIJWTer interface
 type APIJWTer interface {
-	APIJWTIndexPostAction(c *gin.Context)
+	APIJWTIndexPostAction(ctx *gin.Context)
 }
 
 // APIJWTIndexPostAction is JWT endpoint [POST]
-func (ctl *controller) APIJWTIndexPostAction(c *gin.Context) {
+func (ctl *controller) APIJWTIndexPostAction(ctx *gin.Context) {
 	ctl.logger.Debug("controler APIJWTIndexPostAction")
 
 	// check login
-	userID, mail, err := ctl.checkAPILogin(c)
+	userID, mail, err := ctl.checkAPILogin(ctx)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
@@ -33,11 +34,16 @@ func (ctl *controller) APIJWTIndexPostAction(c *gin.Context) {
 		mail,
 	)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 	ctl.logger.Debug("APIJWTIndexPostAction", zap.String("token", token))
 
+	hh.SetResponseHeader(ctx, ctl.logger)
+	// FIXME
+	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
+	//	cors.SetHeader(ctx)
+	//}
 	// json response
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, http.StatusOK, jsonresp.CreateJWTJson(token))
+	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateJWTJson(token))
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/storage/mysql"
 )
@@ -102,6 +103,7 @@ func (r *registry) newMiddleware() server.Middlewarer {
 	return server.NewMiddleware(
 		r.newLogger(),
 		r.newJWT(),
+		r.newCORS(),
 		r.rejectIPs(),
 		r.conf.Server,
 		r.conf.Proxy,
@@ -109,6 +111,10 @@ func (r *registry) newMiddleware() server.Middlewarer {
 		r.conf.API.CORS,
 		r.conf.Develop,
 	)
+}
+
+func (r *registry) newCORS() cors.CORSer {
+	return cors.NewCORS(r.newLogger(), r.conf.API.CORS)
 }
 
 // TODO: add logic

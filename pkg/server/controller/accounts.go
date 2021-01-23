@@ -11,17 +11,17 @@ import (
 
 // Accounter interface
 type Accounter interface {
-	AccountIndexAction(c *gin.Context)
+	AccountIndexAction(ctx *gin.Context)
 }
 
 // AccountIndexAction [GET]
-func (ctl *controller) AccountIndexAction(c *gin.Context) {
+func (ctl *controller) AccountIndexAction(ctx *gin.Context) {
 	ctl.logger.Info("controller AccountIndexAction")
 
 	// validate access
-	if logined, _ := sess.IsLogin(c); !logined {
+	if logined, _ := sess.IsLogin(ctx); !logined {
 		// redirect [GET]
-		c.Redirect(http.StatusTemporaryRedirect, "/login")
+		ctx.Redirect(http.StatusTemporaryRedirect, "/login")
 		return
 	}
 
@@ -30,5 +30,5 @@ func (ctl *controller) AccountIndexAction(c *gin.Context) {
 		"title":    "Accounts Page",
 		"navi_key": "/accounts/",
 	}
-	c.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", html.Response(resp, ctl.apiHeader))
+	ctx.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", html.Response(resp, ctl.apiHeader))
 }

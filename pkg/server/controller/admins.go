@@ -11,12 +11,12 @@ import (
 
 // Adminer interface
 type Adminer interface {
-	AdminIndexAction(c *gin.Context)
+	AdminIndexAction(ctx *gin.Context)
 }
 
 // AdminIndexAction [GET]
-func (ctl *controller) AdminIndexAction(c *gin.Context) {
-	key := c.MustGet(gin.AuthUserKey).(string)
+func (ctl *controller) AdminIndexAction(ctx *gin.Context) {
+	key := ctx.MustGet(gin.AuthUserKey).(string)
 	ctl.logger.Debug("controller AdminIndexAction", zap.String("gin.AuthUserKey", key))
 
 	// view
@@ -24,5 +24,5 @@ func (ctl *controller) AdminIndexAction(c *gin.Context) {
 		"title":    "Admin Page",
 		"navi_key": "/admin/",
 	}
-	c.HTML(http.StatusOK, "pages/admins/gallery.tmpl", html.Response(res, ctl.apiHeader))
+	ctx.HTML(http.StatusOK, "pages/admins/gallery.tmpl", html.Response(res, ctl.apiHeader))
 }

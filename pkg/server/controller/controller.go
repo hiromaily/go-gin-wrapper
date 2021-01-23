@@ -27,8 +27,8 @@ type controller struct {
 	userRepo  repository.UserRepository
 	jwter     jwts.JWTer
 	apiHeader *config.Header
-	cors      *config.CORS
-	auth      *config.Auth
+	corsConf  *config.CORS
+	authConf  *config.Auth
 }
 
 // NewController returns Controller
@@ -44,7 +44,7 @@ func NewController(
 		userRepo:  userRepo,
 		jwter:     jwter,
 		apiHeader: apiHeader,
-		auth:      auth,
-		cors:      cors,
+		authConf:  auth,
+		corsConf:  cors,
 	}
 }

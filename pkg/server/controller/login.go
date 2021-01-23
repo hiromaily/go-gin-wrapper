@@ -9,8 +9,8 @@ import (
 
 // Loginer interface
 type Loginer interface {
-	CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []string)
-	checkAPILogin(c *gin.Context) (int, string, error)
+	CheckLoginOnHTML(ctx *gin.Context) (int, *LoginRequest, []string)
+	checkAPILogin(ctx *gin.Context) (int, string, error)
 }
 
 // LoginRequest is request structure for login
@@ -30,11 +30,11 @@ var ErrFmt = map[string]string{
 }
 
 // CheckLoginOnHTML is check login on html page.
-func (ctl *controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []string) {
+func (ctl *controller) CheckLoginOnHTML(ctx *gin.Context) (int, *LoginRequest, []string) {
 	// Get Post Parameters
 	posted := &LoginRequest{
-		Email: c.PostForm("inputEmail"),
-		Pass:  c.PostForm("inputPassword"),
+		Email: ctx.PostForm("inputEmail"),
+		Pass:  ctx.PostForm("inputPassword"),
 	}
 
 	// Validation
@@ -54,10 +54,10 @@ func (ctl *controller) CheckLoginOnHTML(c *gin.Context) (int, *LoginRequest, []s
 }
 
 // checkAPILogin checks login by API
-func (ctl *controller) checkAPILogin(c *gin.Context) (int, string, error) {
+func (ctl *controller) checkAPILogin(ctx *gin.Context) (int, string, error) {
 	posted := &LoginRequest{
-		Email: c.PostForm("inputEmail"),
-		Pass:  c.PostForm("inputPassword"),
+		Email: ctx.PostForm("inputEmail"),
+		Pass:  ctx.PostForm("inputPassword"),
 	}
 
 	// Validation
@@ -71,5 +71,5 @@ func (ctl *controller) checkAPILogin(c *gin.Context) (int, string, error) {
 	if err != nil {
 		return 0, "", errors.New("login error")
 	}
-	return userID, c.PostForm("inputEmail"), nil
+	return userID, ctx.PostForm("inputEmail"), nil
 }

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
+	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/validator"
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
@@ -15,12 +17,12 @@ import (
 
 // APIUser interface
 type APIUser interface {
-	APIUserListGetAction(c *gin.Context)
-	APIUserInsertPostAction(c *gin.Context)
-	APIUserGetAction(c *gin.Context)
-	APIUserPutAction(c *gin.Context)
-	APIUserDeleteAction(c *gin.Context)
-	APIUserIDsGetAction(c *gin.Context)
+	APIUserListGetAction(ctx *gin.Context)
+	APIUserInsertPostAction(ctx *gin.Context)
+	APIUserGetAction(ctx *gin.Context)
+	APIUserPutAction(ctx *gin.Context)
+	APIUserDeleteAction(ctx *gin.Context)
+	APIUserIDsGetAction(ctx *gin.Context)
 }
 
 // UserRequest is expected request payload
@@ -32,17 +34,18 @@ type UserRequest struct {
 }
 
 // get user parameter and check validation
-func (ctl *controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (err error) {
+func (ctl *controller) getUserParamAndValid(ctx *gin.Context, data *UserRequest) (err error) {
 	// Check token(before send message, pass token)
 
-	contentType := c.Request.Header.Get("Content-Type")
+	// FIXME: middleware has responsibility
+	contentType := ctx.Request.Header.Get("Content-Type")
 	ctl.logger.Debug("getUserParamAndValid", zap.String("Content-Type", contentType))
 
 	if contentType == "application/json" {
-		err = c.BindJSON(data)
+		err = ctx.BindJSON(data)
 	} else {
 		// application/x-www-form-urlencoded
-		err = c.Bind(data)
+		err = ctx.Bind(data)
 	}
 	if err != nil {
 		return err
@@ -57,28 +60,28 @@ func (ctl *controller) getUserParamAndValid(c *gin.Context, data *UserRequest) (
 	return nil
 }
 
-func (ctl *controller) getUserParamAndValidForPut(c *gin.Context, data *UserRequest) (int, error) {
+func (ctl *controller) getUserParamAndValidForPut(ctx *gin.Context, data *UserRequest) (int, error) {
 	//[POST x application/x-www-form-urlencoded] OK
 	//[PUT x application/x-www-form-urlencoded] OK
 	//[PUT x application/json] NG
 
 	// Param id
-	if c.Param("id") == "" {
+	if ctx.Param("id") == "" {
 		return 0, errors.New("missing id on request parameter")
 	}
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		return 0, errors.Errorf("invalid id: %s", c.Param("id"))
+		return 0, errors.Errorf("invalid id: %s", ctx.Param("id"))
 	}
 
-	contentType := c.Request.Header.Get("Content-Type")
+	contentType := ctx.Request.Header.Get("Content-Type")
 	ctl.logger.Debug("getUserParamAndValidForPut", zap.String("Content-Type", contentType))
 
 	if contentType == "application/json" {
-		err = c.BindJSON(data)
+		err = ctx.BindJSON(data)
 	} else {
 		// application/x-www-form-urlencoded
-		err = c.Bind(data)
+		err = ctx.Bind(data)
 	}
 	if err != nil {
 		return 0, err
@@ -132,135 +135,168 @@ func (ctl *controller) updateUser(data *UserRequest, id int) (int64, error) {
 }
 
 // APIUserListGetAction is get user list [GET]
-func (ctl *controller) APIUserListGetAction(c *gin.Context) {
+func (ctl *controller) APIUserListGetAction(ctx *gin.Context) {
 	ctl.logger.Info("[GET] UsersListGetAction")
 
 	users, err := ctl.userRepo.GetUsers("")
 	if err != nil {
-		c.AbortWithError(500, err)
+		ctx.AbortWithError(500, err)
 		return
 	}
 
-	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserListJSON(users))
+	hh.SetResponseHeader(ctx, ctl.logger)
+	// FIXME
+	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
+	//	cors.SetHeader(ctx)
+	//}
+	// json response
+	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserListJSON(users))
 }
 
 // ListOptionsAction is preflight request of CORS before get request
-//func ListOptionsAction(c *gin.Context) {
+//func ListOptionsAction(ctx *gin.Context) {
 //	ctl.logger.Info("[OPTIONS] ListOptionsAction")
 //	//TODO: return void??
-//	cors.SetHeader(c)
+//	cors.SetHeader(ctx)
 //}
 
 // APIUserInsertPostAction is register for new user [POST]
-func (ctl *controller) APIUserInsertPostAction(c *gin.Context) {
+func (ctl *controller) APIUserInsertPostAction(ctx *gin.Context) {
 	ctl.logger.Debug("[POST] UserPostAction")
 
 	// Param & Check valid
 	var uData UserRequest
-	err := ctl.getUserParamAndValid(c, &uData)
+	err := ctl.getUserParamAndValid(ctx, &uData)
 	if err != nil {
-		c.AbortWithError(400, err)
+		ctx.AbortWithError(400, err)
 		return
 	}
 
 	// Insert
 	id, err := ctl.insertUser(&uData)
 	if err != nil {
-		c.AbortWithError(500, err)
+		ctx.AbortWithError(500, err)
 		return
 	}
 
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserJSON(int(id)))
+	hh.SetResponseHeader(ctx, ctl.logger)
+	// FIXME
+	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
+	//	cors.SetHeader(ctx)
+	//}
+	// json response
+	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserJSON(id))
 }
 
 // APIUserGetAction is get specific user [GET]
-func (ctl *controller) APIUserGetAction(c *gin.Context) {
+func (ctl *controller) APIUserGetAction(ctx *gin.Context) {
 	ctl.logger.Info("[GET] UserGetAction")
 
 	// Param
-	// FirstName := c.Query("firstName")
+	// FirstName := ctx.Query("firstName")
 	// ctl.logger.Debug("firstName:", FirstName)
-	userID := c.Param("id")
+	userID := ctx.Param("id")
 	if userID == "" {
-		c.AbortWithError(400, errors.New("missing id on request parameter"))
+		ctx.AbortWithError(400, errors.New("missing id on request parameter"))
 		return
 	}
 
 	users, err := ctl.userRepo.GetUsers(userID)
 	if err != nil {
-		c.AbortWithError(500, err)
+		ctx.AbortWithError(500, err)
 		return
 	}
 
-	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserListJSON(users))
+	hh.SetResponseHeader(ctx, ctl.logger)
+	// FIXME
+	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
+	//	cors.SetHeader(ctx)
+	//}
+	// json response
+	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserListJSON(users))
 }
 
 // APIUserPutAction is update specific user [PUT]
-func (ctl *controller) APIUserPutAction(c *gin.Context) {
+func (ctl *controller) APIUserPutAction(ctx *gin.Context) {
 	ctl.logger.Info("[PUT] UserPutAction")
 
 	// Param & Check valid
 	var uData UserRequest
-	id, err := ctl.getUserParamAndValidForPut(c, &uData)
+	id, err := ctl.getUserParamAndValidForPut(ctx, &uData)
 	if err != nil {
-		c.AbortWithError(400, err)
+		ctx.AbortWithError(400, err)
 		return
 	}
 
 	// Update
 	affected, err := ctl.updateUser(&uData, id)
 	if err != nil {
-		c.AbortWithError(500, err)
+		ctx.AbortWithError(500, err)
 		return
 	}
 	if affected == 0 {
 		ctl.logger.Debug("there was no updated data.")
 	}
 
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserJSON(str.Atoi(c.Param("id"))))
+	hh.SetResponseHeader(ctx, ctl.logger)
+	// FIXME
+	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
+	//	cors.SetHeader(ctx)
+	//}
+	// json response
+	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserJSON(str.Atoi(ctx.Param("id"))))
 }
 
 // APIUserDeleteAction is delete specific user [DELETE] (work in progress)
-func (ctl *controller) APIUserDeleteAction(c *gin.Context) {
+func (ctl *controller) APIUserDeleteAction(ctx *gin.Context) {
 	ctl.logger.Info("[DELETE] UserDeleteAction")
 	// check token
 
 	// Param
-	if c.Param("id") == "" {
-		c.AbortWithError(400, errors.New("missing id on request parameter"))
+	if ctx.Param("id") == "" {
+		ctx.AbortWithError(400, errors.New("missing id on request parameter"))
 		return
 	}
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		c.AbortWithError(400, errors.Errorf("invalid id: %s", c.Param("id")))
+		ctx.AbortWithError(400, errors.Errorf("invalid id: %s", ctx.Param("id")))
 		return
 	}
 
 	// Delete
 	affected, err := ctl.userRepo.DeleteUser(id)
 	if err != nil {
-		c.AbortWithError(500, err)
+		ctx.AbortWithError(500, err)
 		return
 	}
 	if affected == 0 {
 		ctl.logger.Debug("there was no updated data.")
 	}
 
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserJSON(str.Atoi(c.Param("id"))))
+	hh.SetResponseHeader(ctx, ctl.logger)
+	// FIXME
+	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
+	//	cors.SetHeader(ctx)
+	//}
+	// json response
+	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserJSON(str.Atoi(ctx.Param("id"))))
 }
 
 // APIUserIDsGetAction is get user ids [GET]
-func (ctl *controller) APIUserIDsGetAction(c *gin.Context) {
+func (ctl *controller) APIUserIDsGetAction(ctx *gin.Context) {
 	ctl.logger.Info("[GET] IdsGetAction")
 
 	ids, err := ctl.userRepo.GetUserIDs()
 	if err != nil {
-		c.AbortWithError(500, err)
+		ctx.AbortWithError(500, err)
 		return
 	}
 
-	// Make json for response and return
-	jsonresp.ResponseUserJSON(c, ctl.logger, ctl.cors, 0, jsonresp.CreateUserIDsJSON(ids))
+	hh.SetResponseHeader(ctx, ctl.logger)
+	// FIXME
+	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
+	//	cors.SetHeader(ctx)
+	//}
+	// json response
+	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserIDsJSON(ids))
 }

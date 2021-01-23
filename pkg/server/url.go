@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,10 +30,10 @@ func (s *server) setRouter(r *gin.Engine) {
 func (s *server) setBaseRouter(r *gin.Engine) {
 	// top level
 	r.GET("/", s.controller.BaseIndexAction)
-	r.GET("/index", func(c *gin.Context) { // redirect
-		c.Redirect(http.StatusMovedPermanently, "/")
+	r.GET("/index", func(ctx *gin.Context) { // redirect
+		ctx.Redirect(http.StatusMovedPermanently, "/")
 	})
-	r.HEAD("/", func(c *gin.Context) {}) // health check
+	r.HEAD("/", func(ctx *gin.Context) {}) // health check
 
 	// login
 	r.GET("/login", s.controller.BaseLoginGetAction)
@@ -87,8 +86,8 @@ func (s *server) setAdminRouter(r *gin.Engine) {
 	}))
 
 	authorized.GET("/", s.controller.AdminIndexAction)
-	authorized.GET("/index", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/")
+	authorized.GET("/index", func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusMovedPermanently, "/")
 	})
 }
 
@@ -127,5 +126,5 @@ func (s *server) setUserRouter(r *gin.Engine) {
 	users.GET("/ids", s.controller.APIUserIDsGetAction) // get user list
 
 	// accept CORS
-	users.OPTIONS("", cors.SetHeader(s.logger, s.apiConf.CORS))
+	users.OPTIONS("", s.middleware.SetCORSHeader())
 }

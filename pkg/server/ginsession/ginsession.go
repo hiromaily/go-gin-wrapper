@@ -40,8 +40,8 @@ func SetOption(store sessions.RedisStore, conf *config.Session) {
 }
 
 // SetUserSession sets user session
-func SetUserSession(c *gin.Context, userID int) {
-	session := sessions.Default(c)
+func SetUserSession(ctx *gin.Context, userID int) {
+	session := sessions.Default(ctx)
 	v := session.Get("uid")
 	if v == nil {
 		session.Set("uid", userID)
@@ -50,8 +50,8 @@ func SetUserSession(c *gin.Context, userID int) {
 }
 
 // IsLogin returns boolean whether user have already login or not and uid
-func IsLogin(c *gin.Context) (bool, int) {
-	session := sessions.Default(c)
+func IsLogin(ctx *gin.Context) (bool, int) {
+	session := sessions.Default(ctx)
 	v := session.Get("uid")
 	if v == nil {
 		return false, 0
@@ -60,29 +60,29 @@ func IsLogin(c *gin.Context) (bool, int) {
 }
 
 // Logout is to clear session
-func Logout(c *gin.Context) {
-	session := sessions.Default(c)
+func Logout(ctx *gin.Context) {
+	session := sessions.Default(ctx)
 	session.Clear()
 	session.Save()
 }
 
 // SetTokenSession is to set token
-func SetTokenSession(c *gin.Context, token string) {
-	session := sessions.Default(c)
+func SetTokenSession(ctx *gin.Context, token string) {
+	session := sessions.Default(ctx)
 	session.Set("token", token)
 	session.Save()
 }
 
 // DelTokenSession is to delete token
-func DelTokenSession(c *gin.Context) {
-	session := sessions.Default(c)
+func DelTokenSession(ctx *gin.Context) {
+	session := sessions.Default(ctx)
 	session.Delete("token")
 	session.Save()
 }
 
 // GetTokenSession is to get token
-func GetTokenSession(c *gin.Context) string {
-	session := sessions.Default(c)
+func GetTokenSession(ctx *gin.Context) string {
+	session := sessions.Default(ctx)
 	v := session.Get("token")
 	if v == nil {
 		return ""
@@ -91,34 +91,34 @@ func GetTokenSession(c *gin.Context) string {
 }
 
 // IsTokenSessionValid is whether check token is valid or not
-func IsTokenSessionValid(c *gin.Context, logger *zap.Logger, token string) bool {
+func IsTokenSessionValid(ctx *gin.Context, logger *zap.Logger, token string) bool {
 	logger.Info("IsTokenSessionValid",
-		zap.String("GetTokenSession()", GetTokenSession(c)),
+		zap.String("GetTokenSession()", GetTokenSession(ctx)),
 		zap.String("token", token),
 	)
 
 	var err error
-	if GetTokenSession(c) == "" && token == "" {
+	if GetTokenSession(ctx) == "" && token == "" {
 		err = errors.New("token is not allowed as blank")
-	} else if GetTokenSession(c) == "" {
+	} else if GetTokenSession(ctx) == "" {
 		err = errors.New("token is missing. Session might have expired")
-	} else if GetTokenSession(c) != token {
+	} else if GetTokenSession(ctx) != token {
 		err = errors.New("token is invalid")
 	} else {
 		return true
 	}
 
 	// token delete
-	DelTokenSession(c)
+	DelTokenSession(ctx)
 	logger.Error("session error", zap.Error(err))
-	c.AbortWithError(400, err)
+	ctx.AbortWithError(400, err)
 	return false
 }
 
 // SetCountSession is for test
 // TODO:delete this func
-func SetCountSession(c *gin.Context, logger *zap.Logger) {
-	session := sessions.Default(c)
+func SetCountSession(ctx *gin.Context, logger *zap.Logger) {
+	session := sessions.Default(ctx)
 	var count int
 	v := session.Get("count")
 	if v != nil {

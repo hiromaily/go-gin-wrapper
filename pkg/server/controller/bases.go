@@ -8,39 +8,39 @@ import (
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
-	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginurl"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
 
 // Baser interface
 type Baser interface {
-	BaseIndexAction(c *gin.Context)
-	BaseLoginGetAction(c *gin.Context)
-	BaseLoginPostAction(c *gin.Context)
-	BaseLogoutPostAction(c *gin.Context)
-	BaseLogoutPutAction(c *gin.Context)
+	BaseIndexAction(ctx *gin.Context)
+	BaseLoginGetAction(ctx *gin.Context)
+	BaseLoginPostAction(ctx *gin.Context)
+	BaseLogoutPostAction(ctx *gin.Context)
+	BaseLogoutPutAction(ctx *gin.Context)
 }
 
 // nolint: unused, deadcode
-func debugContext(c *gin.Context, logger *zap.Logger) {
+func debugContext(ctx *gin.Context, logger *zap.Logger) {
 	logger.Debug("request",
-		zap.Any("gin_context", c),
-		zap.Any("gin_keys", c.Keys),
-		zap.String("request_method", c.Request.Method),
-		zap.Any("request_header", c.Request.Header),
-		zap.Any("request_body", c.Request.Body),
-		zap.Any("request_url", c.Request.URL),
-		zap.Any("request_ajax", c.Value("ajax")),
-		zap.String("request_get_url", hh.GetURL(c)),
-		zap.String("request_get_protocol", hh.GetProto(c)),
+		zap.Any("gin_ctx", ctx),
+		zap.Any("gin_ctx_keys", ctx.Keys),
+		zap.String("request_method", ctx.Request.Method),
+		zap.Any("request_header", ctx.Request.Header),
+		zap.Any("request_body", ctx.Request.Body),
+		zap.Any("request_url", ctx.Request.URL),
+		zap.String("request_url_string", ginurl.GetURLString(ctx)),
+		zap.String("request_protocol", ctx.Request.Proto),
+		zap.Any("ctx_value_ajax", ctx.Value("ajax")),
 	)
 }
 
 // response for Login Page
-func (ctl *controller) resLogin(c *gin.Context, input *LoginRequest, msg string, errors []string) {
+func (ctl *controller) resLogin(ctx *gin.Context, input *LoginRequest, msg string, errors []string) {
 	// token
 	token := csrf.CreateToken(ctl.logger)
-	sess.SetTokenSession(c, token)
+	sess.SetTokenSession(ctx, token)
 
 	// Google Open ID
 	gURL := "/oauth2/google/signin"
@@ -56,7 +56,7 @@ func (ctl *controller) resLogin(c *gin.Context, input *LoginRequest, msg string,
 	}
 
 	// View
-	c.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
+	ctx.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
 		"message":               msg,
 		"input":                 input,
 		"github.com/pkg/errors": errors,
@@ -67,26 +67,26 @@ func (ctl *controller) resLogin(c *gin.Context, input *LoginRequest, msg string,
 }
 
 // BaseIndexAction is top page
-func (ctl *controller) BaseIndexAction(c *gin.Context) {
+func (ctl *controller) BaseIndexAction(ctx *gin.Context) {
 	// debug log
-	// debugContext(c)
+	// debugContext(ctx)
 
 	// View
 	res := gin.H{
 		"title":    "Top Page",
 		"navi_key": "/",
 	}
-	c.HTML(http.StatusOK, "pages/bases/index.tmpl", html.Response(res, ctl.apiHeader))
+	ctx.HTML(http.StatusOK, "pages/bases/index.tmpl", html.Response(res, ctl.apiHeader))
 }
 
 // BaseLoginGetAction is for login page [GET]
-func (ctl *controller) BaseLoginGetAction(c *gin.Context) {
+func (ctl *controller) BaseLoginGetAction(ctx *gin.Context) {
 	// debug log
-	// debugContext(c)
+	// debugContext(ctx)
 
 	// If already loged in, go another page using redirect
 	// Judge loged in or not.
-	if bRet, _ := sess.IsLogin(c); bRet {
+	if bRet, _ := sess.IsLogin(ctx); bRet {
 		// Redirect[GET]
 		// FIXME: Browser request cache data when redirecting at status code 301
 		// https://infra.xyz/archives/75
@@ -95,62 +95,62 @@ func (ctl *controller) BaseLoginGetAction(c *gin.Context) {
 		// 307 Temporary Redirect  (Not cache,  it's not possible to change from POST to GET)
 		// 308 Moved Permanently   (Do cache,   it's not possible to change from POST to GET)
 
-		// c.Redirect(http.StatusMovedPermanently, "/accounts/") //301
-		c.Redirect(http.StatusTemporaryRedirect, "/accounts/") // 307
+		// ctx.Redirect(http.StatusMovedPermanently, "/accounts/") //301
+		ctx.Redirect(http.StatusTemporaryRedirect, "/accounts/") // 307
 
 		return
 	}
 
 	// return
-	ctl.resLogin(c, nil, "", nil)
+	ctl.resLogin(ctx, nil, "", nil)
 }
 
 // BaseLoginPostAction is to receive user request from login page [POST]
-func (ctl *controller) BaseLoginPostAction(c *gin.Context) {
+func (ctl *controller) BaseLoginPostAction(ctx *gin.Context) {
 	// check login
-	userID, posted, errs := ctl.CheckLoginOnHTML(c)
+	userID, posted, errs := ctl.CheckLoginOnHTML(ctx)
 	if errs != nil {
-		ctl.resLogin(c, posted, "", errs)
+		ctl.resLogin(ctx, posted, "", errs)
 		return
 	}
 
 	// When login is successful
 	// Session
-	sess.SetUserSession(c, userID)
+	sess.SetUserSession(ctx, userID)
 
 	// token delete
-	sess.DelTokenSession(c)
+	sess.DelTokenSession(ctx)
 
 	// Change method POST to GET
 	// Redirect[GET]
 	// Status code 307 can't change post to get, 302 is suitable
-	c.Redirect(http.StatusFound, "/accounts/")
+	ctx.Redirect(http.StatusFound, "/accounts/")
 }
 
 // BaseLogoutPostAction is for logout [POST]
-func (ctl *controller) BaseLogoutPostAction(c *gin.Context) {
+func (ctl *controller) BaseLogoutPostAction(ctx *gin.Context) {
 	ctl.logger.Debug("LogoutPostAction")
 
 	// Session
-	sess.Logout(c)
+	sess.Logout(ctx)
 
 	// View
 	res := gin.H{
 		"title":    "Logout Page",
 		"navi_key": "/logout",
 	}
-	c.HTML(http.StatusOK, "pages/bases/logout.tmpl", html.Response(res, ctl.apiHeader))
+	ctx.HTML(http.StatusOK, "pages/bases/logout.tmpl", html.Response(res, ctl.apiHeader))
 }
 
 // BaseLogoutPutAction is for logout by Ajax [PUT]
-func (ctl *controller) BaseLogoutPutAction(c *gin.Context) {
+func (ctl *controller) BaseLogoutPutAction(ctx *gin.Context) {
 	ctl.logger.Debug("LogoutPutAction")
 
 	// Session
-	sess.Logout(c)
+	sess.Logout(ctx)
 
 	// View
-	c.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"message": "logout",
 	})
 }
