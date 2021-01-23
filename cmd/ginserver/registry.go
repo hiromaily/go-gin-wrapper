@@ -18,8 +18,8 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
-	"github.com/hiromaily/go-gin-wrapper/pkg/server/cors"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader/cors"
 	"github.com/hiromaily/go-gin-wrapper/pkg/storage/mysql"
 )
 

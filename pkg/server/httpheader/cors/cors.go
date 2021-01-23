@@ -45,58 +45,49 @@ func NewCORS(
 	}
 }
 
-// CheckHeader is for CORS before handling request
-//  check preflight of XMLHttpRequest Level2 XMLHttpRequest
+// ValidateHeader validates CORS before handling request
+//  check preflight (OPTIONS) of XMLHttpRequest Level2 XMLHttpRequest
 func (c *cors) ValidateHeader(ctx *gin.Context) error {
-	c.logger.Info("cors CheckHeader")
-
-	// TODO: should it be checked when `Options` method??
-	// 1.check origin
 	origin := ctx.Request.Header.Get("Origin")
-	c.logger.Debug("CheckHeader", zap.String("origin header", origin))
-	// Origin header: http://127.0.0.1:8000
+	aclHeader := ctx.Request.Header.Get("Access-Control-Request-Headers")
+	method := ctx.Request.Header.Get("Access-Control-Request-Method")
+
+	c.logger.Info("cors CheckHeader",
+		zap.String("origin header", origin),
+		zap.String("Access-Control-Request-Headers header", aclHeader),
+		zap.String("Access-Control-Request-Method header", method),
+	)
+
+	// Origin header would be `http://127.0.0.1:8000` on local
 	if str.SearchIndex(origin, c.corsConf.Origins) == -1 {
 		return errors.New("origin header is invalid")
 	}
 
-	// 2.check header
-	// added header intentionally set on Access-Control-Request-Headers
-	// this value may change into lower case when extracting
-	header := ctx.Request.Header.Get("Access-Control-Request-Headers")
-	c.logger.Debug("CheckHeader", zap.String("Access-Control-Request-Headers header", header))
-	// Access-Control-Request-Headers header: x-custom-header-cors, x-custom-header-gin
-
-	// TODO: is it OK to check
-	for _, h := range strings.Split(header, ",") {
-		if str.SearchIndexLower(strings.TrimSpace(h), c.corsConf.Headers) == -1 {
-			return errors.New("Access-Control-Request-Headers header is invalid")
+	// Access-Control-Request-Headers
+	for _, header := range strings.Split(aclHeader, ",") {
+		if str.SearchIndexLower(strings.TrimSpace(header), c.corsConf.Headers) == -1 {
+			return errors.Errorf("Access-Control-Request-Headers: %s is invalid", header)
 		}
 	}
 
-	// 3.check method
-	// this value is suppoused request to send after option method request
-	method := ctx.Request.Header.Get("Access-Control-Request-Method")
-	c.logger.Debug("CheckHeader", zap.String("Access-Control-Request-Method header", method))
 	// Access-Control-Request-Method header: GET
 	if str.SearchIndex(method, c.corsConf.Methods) == -1 {
 		return errors.New("Access-Control-Request-Method header is invalid")
 	}
-	// if strings.Contains(s, "authorization") == true || strings.Contains(s, "Authorization") == true {
-
 	return nil
 }
 
 // SetResponseHeader sets CORS header
 // which has same type to gin.HandlerFunc `type HandlerFunc func(*Context)`
 func (c *cors) SetResponseHeader(ctx *gin.Context) {
-	c.logger.Info("cors SetHeader")
+	c.logger.Info("cors SetHeader",
+		zap.String("c.Request.RemoteAddr", ctx.Request.RemoteAddr),
+	)
 	if !c.corsConf.Enabled || ctx.Request.Method != "GET" {
 		return
 	}
 
-	// Access-Control-Allow-Origin
-	// allow from remote addr
-	c.logger.Debug("", zap.String("c.Request.RemoteAddr", ctx.Request.RemoteAddr))
+	// Access-Control-Allow-Origin: allow from remote addr
 	// ctx.Writer.Header().Set(HeaderOrigin, ctx.Request.RemoteAddr)
 	ctx.Writer.Header().Set(HeaderOrigin, strings.Join(c.corsConf.Origins, ", "))
 
