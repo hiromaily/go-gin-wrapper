@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 )
 
@@ -39,11 +38,6 @@ func (ctl *controller) APIJWTIndexPostAction(ctx *gin.Context) {
 	}
 	ctl.logger.Debug("APIJWTIndexPostAction", zap.String("token", token))
 
-	hh.SetResponseHeader(ctx, ctl.logger)
-	// FIXME
-	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
-	//	cors.SetHeader(ctx)
-	//}
 	// json response
 	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateJWTJson(token))
 }

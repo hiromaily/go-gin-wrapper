@@ -30,5 +30,5 @@ func (ctl *controller) AccountIndexAction(ctx *gin.Context) {
 		"title":    "Accounts Page",
 		"navi_key": "/accounts/",
 	}
-	ctx.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", html.Response(resp, ctl.apiHeader))
+	ctx.HTML(http.StatusOK, "pages/accounts/accounts.tmpl", html.Response(resp, ctl.apiHeaderConf))
 }

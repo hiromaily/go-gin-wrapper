@@ -76,7 +76,7 @@ func (ctl *controller) BaseIndexAction(ctx *gin.Context) {
 		"title":    "Top Page",
 		"navi_key": "/",
 	}
-	ctx.HTML(http.StatusOK, "pages/bases/index.tmpl", html.Response(res, ctl.apiHeader))
+	ctx.HTML(http.StatusOK, "pages/bases/index.tmpl", html.Response(res, ctl.apiHeaderConf))
 }
 
 // BaseLoginGetAction is for login page [GET]
@@ -139,7 +139,7 @@ func (ctl *controller) BaseLogoutPostAction(ctx *gin.Context) {
 		"title":    "Logout Page",
 		"navi_key": "/logout",
 	}
-	ctx.HTML(http.StatusOK, "pages/bases/logout.tmpl", html.Response(res, ctl.apiHeader))
+	ctx.HTML(http.StatusOK, "pages/bases/logout.tmpl", html.Response(res, ctl.apiHeaderConf))
 }
 
 // BaseLogoutPutAction is for logout by Ajax [PUT]

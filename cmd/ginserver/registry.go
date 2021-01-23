@@ -108,7 +108,6 @@ func (r *registry) newMiddleware() server.Middlewarer {
 		r.conf.Server,
 		r.conf.Proxy,
 		r.conf.API,
-		r.conf.API.CORS,
 		r.conf.Develop,
 	)
 }
@@ -128,7 +127,6 @@ func (r *registry) newController() controller.Controller {
 		r.newUserRepository(),
 		r.newJWT(),
 		r.conf.API.Header,
-		r.conf.API.CORS,
 		r.conf.Auth,
 	)
 }

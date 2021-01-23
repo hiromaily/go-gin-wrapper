@@ -2,13 +2,10 @@ package httpheader
 
 import (
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 // SetResponseHeader sets HTTP response header
-func SetResponseHeader(ctx *gin.Context, logger *zap.Logger) {
-	logger.Info("httpheader SetResponseHeader")
-
+func SetResponseHeader(ctx *gin.Context) {
 	ctx.Writer.Header().Set("X-Content-Type-Options", "nosniff")
 	ctx.Writer.Header().Set("X-XSS-Protection", "1, mode=block")
 	ctx.Writer.Header().Set("X-Frame-Options", "deny")

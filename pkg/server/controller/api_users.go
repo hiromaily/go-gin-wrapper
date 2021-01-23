@@ -9,7 +9,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
-	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	jsonresp "github.com/hiromaily/go-gin-wrapper/pkg/server/response/json"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/validator"
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
@@ -144,11 +143,6 @@ func (ctl *controller) APIUserListGetAction(ctx *gin.Context) {
 		return
 	}
 
-	hh.SetResponseHeader(ctx, ctl.logger)
-	// FIXME
-	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
-	//	cors.SetHeader(ctx)
-	//}
 	// json response
 	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserListJSON(users))
 }
@@ -179,11 +173,6 @@ func (ctl *controller) APIUserInsertPostAction(ctx *gin.Context) {
 		return
 	}
 
-	hh.SetResponseHeader(ctx, ctl.logger)
-	// FIXME
-	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
-	//	cors.SetHeader(ctx)
-	//}
 	// json response
 	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserJSON(id))
 }
@@ -207,11 +196,6 @@ func (ctl *controller) APIUserGetAction(ctx *gin.Context) {
 		return
 	}
 
-	hh.SetResponseHeader(ctx, ctl.logger)
-	// FIXME
-	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
-	//	cors.SetHeader(ctx)
-	//}
 	// json response
 	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserListJSON(users))
 }
@@ -238,11 +222,6 @@ func (ctl *controller) APIUserPutAction(ctx *gin.Context) {
 		ctl.logger.Debug("there was no updated data.")
 	}
 
-	hh.SetResponseHeader(ctx, ctl.logger)
-	// FIXME
-	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
-	//	cors.SetHeader(ctx)
-	//}
 	// json response
 	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserJSON(str.Atoi(ctx.Param("id"))))
 }
@@ -273,11 +252,6 @@ func (ctl *controller) APIUserDeleteAction(ctx *gin.Context) {
 		ctl.logger.Debug("there was no updated data.")
 	}
 
-	hh.SetResponseHeader(ctx, ctl.logger)
-	// FIXME
-	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
-	//	cors.SetHeader(ctx)
-	//}
 	// json response
 	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserJSON(str.Atoi(ctx.Param("id"))))
 }
@@ -292,11 +266,6 @@ func (ctl *controller) APIUserIDsGetAction(ctx *gin.Context) {
 		return
 	}
 
-	hh.SetResponseHeader(ctx, ctl.logger)
-	// FIXME
-	//if ctl.corsConf.Enabled && ctx.Request.Method == "GET" {
-	//	cors.SetHeader(ctx)
-	//}
 	// json response
 	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateUserIDsJSON(ids))
 }

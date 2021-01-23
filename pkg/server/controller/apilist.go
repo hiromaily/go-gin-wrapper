@@ -29,7 +29,7 @@ func (ctl *controller) APIListIndexAction(ctx *gin.Context) {
 		"navi_key": "/apilist/",
 		"ids":      ids,
 	}
-	ctx.HTML(http.StatusOK, "pages/apilist/index.tmpl", html.Response(res, ctl.apiHeader))
+	ctx.HTML(http.StatusOK, "pages/apilist/index.tmpl", html.Response(res, ctl.apiHeaderConf))
 }
 
 // APIListIndex2Action is top page for API List (this is old version)
@@ -46,5 +46,5 @@ func (ctl *controller) APIListIndex2Action(ctx *gin.Context) {
 		"navi_key": "/apilist/",
 		"ids":      ids,
 	}
-	ctx.HTML(http.StatusOK, "pages/apilist/index2.tmpl", html.Response(res, ctl.apiHeader))
+	ctx.HTML(http.StatusOK, "pages/apilist/index2.tmpl", html.Response(res, ctl.apiHeaderConf))
 }

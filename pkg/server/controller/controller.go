@@ -23,12 +23,11 @@ type Controller interface {
 }
 
 type controller struct {
-	logger    *zap.Logger
-	userRepo  repository.UserRepository
-	jwter     jwts.JWTer
-	apiHeader *config.Header
-	corsConf  *config.CORS
-	authConf  *config.Auth
+	logger        *zap.Logger
+	userRepo      repository.UserRepository
+	jwter         jwts.JWTer
+	apiHeaderConf *config.Header
+	authConf      *config.Auth
 }
 
 // NewController returns Controller
@@ -36,15 +35,13 @@ func NewController(
 	logger *zap.Logger,
 	userRepo repository.UserRepository,
 	jwter jwts.JWTer,
-	apiHeader *config.Header,
-	cors *config.CORS,
+	apiHeaderConf *config.Header,
 	auth *config.Auth) Controller {
 	return &controller{
-		logger:    logger,
-		userRepo:  userRepo,
-		jwter:     jwter,
-		apiHeader: apiHeader,
-		authConf:  auth,
-		corsConf:  cors,
+		logger:        logger,
+		userRepo:      userRepo,
+		jwter:         jwter,
+		apiHeaderConf: apiHeaderConf,
+		authConf:      auth,
 	}
 }

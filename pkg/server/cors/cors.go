@@ -87,9 +87,10 @@ func (c *cors) ValidateHeader(ctx *gin.Context) error {
 }
 
 // SetResponseHeader sets CORS header
+// which has same type to gin.HandlerFunc `type HandlerFunc func(*Context)`
 func (c *cors) SetResponseHeader(ctx *gin.Context) {
 	c.logger.Info("cors SetHeader")
-	if !c.corsConf.Enabled {
+	if !c.corsConf.Enabled || ctx.Request.Method != "GET" {
 		return
 	}
 

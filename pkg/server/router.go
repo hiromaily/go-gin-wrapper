@@ -99,7 +99,10 @@ func (s *server) setErrorRouter(r *gin.Engine) {
 
 // JWT API router
 func (s *server) setJWTRouter(r *gin.Engine) {
-	jwt := r.Group("/api/jwts", s.middleware.CheckHTTPHeader())
+	jwt := r.Group("/api/jwts",
+		s.middleware.CheckHTTPHeader(),
+		s.middleware.SetResponseHeader(),
+	)
 
 	jwt.POST("", s.controller.APIJWTIndexPostAction) // jwt end point
 }
@@ -107,15 +110,17 @@ func (s *server) setJWTRouter(r *gin.Engine) {
 // user API router
 func (s *server) setUserRouter(r *gin.Engine) {
 	// additional middleware handler
-	handlers := []gin.HandlerFunc{s.middleware.CheckHTTPHeader()}
+	preHandlers := []gin.HandlerFunc{s.middleware.CheckHTTPHeader()}
 	if s.apiConf.JWT.Mode != 0 {
-		handlers = append(handlers, s.middleware.CheckJWT())
+		preHandlers = append(preHandlers, s.middleware.CheckJWT())
 	}
 	if s.apiConf.CORS.Enabled {
-		handlers = append(handlers, s.middleware.CheckCORS())
+		preHandlers = append(preHandlers, s.middleware.CheckCORS())
 	}
+	preHandlers = append(preHandlers, s.middleware.SetResponseHeader())
+	preHandlers = append(preHandlers, s.middleware.SetCORSHeader())
 
-	users := r.Group("/api/users", handlers...)
+	users := r.Group("/api/users", preHandlers...)
 
 	users.GET("", s.controller.APIUserListGetAction)
 	users.POST("", s.controller.APIUserInsertPostAction)
@@ -126,5 +131,6 @@ func (s *server) setUserRouter(r *gin.Engine) {
 	users.GET("/ids", s.controller.APIUserIDsGetAction) // get user list
 
 	// accept CORS
-	users.OPTIONS("", s.middleware.SetCORSHeader())
+	// FIXME: how to handle that only header is enough to run
+	// users.OPTIONS("", s.middleware.SetCORSHeader())
 }

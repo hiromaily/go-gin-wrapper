@@ -5,6 +5,10 @@ import (
 	"net/http"
 	"strings"
 
+	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
+
+	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -28,10 +32,11 @@ type Middlewarer interface {
 	CheckHTTPReferer() gin.HandlerFunc
 	CheckCSRF() gin.HandlerFunc
 	RejectNonHTTPS() gin.HandlerFunc
-	SetCORSHeader() gin.HandlerFunc
 	CheckHTTPHeader() gin.HandlerFunc
 	CheckJWT() gin.HandlerFunc
 	CheckCORS() gin.HandlerFunc
+	SetResponseHeader() gin.HandlerFunc
+	SetCORSHeader() gin.HandlerFunc
 }
 
 // server object
@@ -44,7 +49,6 @@ type middleware struct {
 	serverConf  *config.Server
 	proxyConf   *config.Proxy
 	apiConf     *config.API
-	corsConf    *config.CORS
 	developConf *config.Develop
 }
 
@@ -57,7 +61,6 @@ func NewMiddleware(
 	serverConf *config.Server,
 	proxyConf *config.Proxy,
 	apiConf *config.API,
-	corsConf *config.CORS,
 	developConf *config.Develop,
 ) Middlewarer {
 	return &middleware{
@@ -68,7 +71,6 @@ func NewMiddleware(
 		serverConf:  serverConf,
 		proxyConf:   proxyConf,
 		apiConf:     apiConf,
-		corsConf:    corsConf,
 		developConf: developConf,
 	}
 }
@@ -324,11 +326,6 @@ func (m *middleware) RejectNonHTTPS() gin.HandlerFunc {
 	}
 }
 
-// SetCORSHeader sets CORS header
-func (m *middleware) SetCORSHeader() gin.HandlerFunc {
-	return m.corser.SetResponseHeader
-}
-
 //-----------------------------------------------------------------------------
 // web API use
 //-----------------------------------------------------------------------------
@@ -414,6 +411,16 @@ func (m *middleware) CheckCORS() gin.HandlerFunc {
 			return
 		}
 	}
+}
+
+// SetResponseHeader sets response header
+func (m *middleware) SetResponseHeader() gin.HandlerFunc {
+	return hh.SetResponseHeader
+}
+
+// SetCORSHeader sets CORS header
+func (m *middleware) SetCORSHeader() gin.HandlerFunc {
+	return m.corser.SetResponseHeader
 }
 
 //-----------------------------------------------------------------------------
