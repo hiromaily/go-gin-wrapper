@@ -47,7 +47,7 @@ func validateUserRequest(ctx *gin.Context, data *UserRequest) error {
 		return err
 	}
 
-	result := validator.CheckValidation(data, false)
+	result := validator.Validate(data, false)
 	if len(result) != 0 {
 		return errors.New("validation error")
 	}
@@ -69,7 +69,7 @@ func validateUserRequestUpdate(ctx *gin.Context, data *UserRequest) (int, error)
 	if data.FirstName == "" && data.LastName == "" && data.Email == "" && data.Password == "" {
 		return 0, errors.New("validation error")
 	}
-	result := validator.CheckValidation(data, true)
+	result := validator.Validate(data, true)
 	if len(result) != 0 {
 		return 0, errors.New("validation error")
 	}

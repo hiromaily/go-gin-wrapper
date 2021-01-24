@@ -37,7 +37,7 @@ func (ctl *controller) login(ctx *gin.Context) (int, *LoginRequest, []string) {
 		Pass:  ctx.PostForm("inputPassword"),
 	}
 
-	result := validator.CheckValidation(loginRequest, false)
+	result := validator.Validate(loginRequest, false)
 	if len(result) != 0 {
 		errs := validator.ConvertErrorMsgs(result, errFormat)
 		return 0, loginRequest, errs
@@ -59,7 +59,7 @@ func (ctl *controller) apiLogin(ctx *gin.Context) (int, string, error) {
 		Pass:  ctx.PostForm("inputPassword"),
 	}
 
-	result := validator.CheckValidation(loginRequest, false)
+	result := validator.Validate(loginRequest, false)
 	if len(result) != 0 {
 		return 0, "", errors.New("validation error")
 	}
