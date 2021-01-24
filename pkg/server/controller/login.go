@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
@@ -67,4 +69,31 @@ func (ctl *controller) apiLogin(ctx *gin.Context) (int, string, error) {
 		return 0, "", errors.New("login error")
 	}
 	return userID, email, nil
+}
+
+// response for login page
+func (ctl *controller) loginResponse(ctx *gin.Context, input *LoginRequest, msg string, errs []string) {
+	token := ctl.session.GenerateToken()
+	ctl.session.SetToken(ctx, token)
+
+	// Google/Facebook Open ID
+	gURL := "/oauth2/google/signin"
+	fURL := "/oauth2/facebook/signin"
+
+	if msg == "" {
+		msg = "enter"
+	}
+	if input == nil {
+		input = &LoginRequest{}
+	}
+
+	// view
+	ctx.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
+		"message":               msg,
+		"input":                 input,
+		"github.com/pkg/errors": errs,
+		"gintoken":              token,
+		"gURL":                  gURL,
+		"fURL":                  fURL,
+	})
 }

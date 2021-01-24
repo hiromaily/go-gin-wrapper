@@ -19,9 +19,10 @@ type Baser interface {
 	BaseLogoutPutAction(ctx *gin.Context)
 }
 
+// debug use
 // nolint: unused, deadcode
-func debugContext(ctx *gin.Context, logger *zap.Logger) {
-	logger.Debug("request",
+func (ctl *controller) debugContext(ctx *gin.Context) {
+	ctl.logger.Debug("request",
 		zap.Any("gin_ctx", ctx),
 		zap.Any("gin_ctx_keys", ctx.Keys),
 		zap.String("request_method", ctx.Request.Method),
@@ -34,42 +35,14 @@ func debugContext(ctx *gin.Context, logger *zap.Logger) {
 	)
 }
 
-// response for Login Page
-func (ctl *controller) resLogin(ctx *gin.Context, input *LoginRequest, msg string, errors []string) {
-	// token
-	token := ctl.session.GenerateToken()
-	ctl.session.SetToken(ctx, token)
-
-	// Google Open ID
-	gURL := "/oauth2/google/signin"
-	fURL := "/oauth2/facebook/signin"
-
-	if msg == "" {
-		msg = "Enter Details to Login!!"
-	}
-
-	// it's better to not return nil
-	if input == nil {
-		input = &LoginRequest{}
-	}
-
-	// View
-	ctx.HTML(http.StatusOK, "pages/bases/login.tmpl", gin.H{
-		"message":               msg,
-		"input":                 input,
-		"github.com/pkg/errors": errors,
-		"gintoken":              token,
-		"gURL":                  gURL,
-		"fURL":                  fURL,
-	})
-}
-
-// BaseIndexAction is top page
+// BaseIndexAction returns top page
 func (ctl *controller) BaseIndexAction(ctx *gin.Context) {
-	// debug log
-	// debugContext(ctx)
+	ctl.logger.Debug("BaseIndexAction")
 
-	// View
+	// debug log
+	ctl.debugContext(ctx)
+
+	// view
 	res := gin.H{
 		"title":    "Top Page",
 		"navi_key": "/",
@@ -77,55 +50,48 @@ func (ctl *controller) BaseIndexAction(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "pages/bases/index.tmpl", html.Response(res, ctl.apiHeaderConf))
 }
 
-// BaseLoginGetAction is for login page [GET]
+// BaseLoginGetAction returns login page [GET]
 func (ctl *controller) BaseLoginGetAction(ctx *gin.Context) {
-	// debug log
-	// debugContext(ctx)
+	ctl.logger.Debug("BaseLoginGetAction")
 
-	// If already loged in, go another page using redirect
-	// Judge loged in or not.
-	if bRet, _ := ctl.session.IsLogin(ctx); bRet {
+	// debug log
+	// ctl.debugContext(ctx)
+
+	if logined, _ := ctl.session.IsLogin(ctx); logined {
 		// Redirect[GET]
-		// FIXME: Browser request cache data when redirecting at status code 301
-		// https://infra.xyz/archives/75
+		// Note: Browser uses cache data when redirecting with status code 301
 		// 301 Moved Permanently   (Do cache,   it's possible to change from POST to GET)
 		// 302 Found               (Not cache,  it's possible to change from POST to GET)
 		// 307 Temporary Redirect  (Not cache,  it's not possible to change from POST to GET)
 		// 308 Moved Permanently   (Do cache,   it's not possible to change from POST to GET)
-
-		// ctx.Redirect(http.StatusMovedPermanently, "/accounts/") //301
 		ctx.Redirect(http.StatusTemporaryRedirect, "/accounts/") // 307
-
 		return
 	}
 
-	// return
-	ctl.resLogin(ctx, nil, "", nil)
+	ctl.loginResponse(ctx, nil, "", nil)
 }
 
-// BaseLoginPostAction is to receive user request from login page [POST]
+// BaseLoginPostAction handles login request [POST]
 func (ctl *controller) BaseLoginPostAction(ctx *gin.Context) {
-	// check login
-	userID, posted, errs := ctl.login(ctx)
-	if errs != nil {
-		ctl.resLogin(ctx, posted, "", errs)
+	ctl.logger.Debug("BaseLoginPostAction")
+
+	userID, loginRequest, errs := ctl.login(ctx)
+	if len(errs) != 0 {
+		ctl.loginResponse(ctx, loginRequest, "", errs)
 		return
 	}
 
-	// When login is successful
-	// Session
+	// start session
 	ctl.session.SetUserID(ctx, userID)
-
-	// token delete
 	ctl.session.DeleteToken(ctx)
 
-	// Change method POST to GET
+	// change method POST to GET
 	// Redirect[GET]
 	// Status code 307 can't change post to get, 302 is suitable
 	ctx.Redirect(http.StatusFound, "/accounts/")
 }
 
-// BaseLogoutPostAction is for logout [POST]
+// BaseLogoutPostAction handles logout [POST]
 func (ctl *controller) BaseLogoutPostAction(ctx *gin.Context) {
 	ctl.logger.Debug("LogoutPostAction")
 
@@ -140,14 +106,13 @@ func (ctl *controller) BaseLogoutPostAction(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "pages/bases/logout.tmpl", html.Response(res, ctl.apiHeaderConf))
 }
 
-// BaseLogoutPutAction is for logout by Ajax [PUT]
+// BaseLogoutPutAction handles logout API [PUT]
 func (ctl *controller) BaseLogoutPutAction(ctx *gin.Context) {
 	ctl.logger.Debug("LogoutPutAction")
 
-	// Session
 	ctl.session.Logout(ctx)
 
-	// View
+	// view
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "logout",
 	})
