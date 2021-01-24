@@ -7,7 +7,6 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/DeanThompson/ginpprof v0.0.0-20201112072838-007b1e56b2e1
-	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.10.0
@@ -19,7 +18,6 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
-	github.com/hiromaily/golibs v0.0.0-20201019070620-8c38788571a9
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -37,8 +35,7 @@ require (
 	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 	golang.org/x/oauth2 v0.0.0-20210113205817-d3ed898aa8a3
-	golang.org/x/sys v0.0.0-20210113181707-4bcb84eeeb78 // indirect
-	golang.org/x/tools v0.0.0-20210114065538-d78b04bdf963 // indirect
+	golang.org/x/tools v0.1.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200601152816-913338de1bd2 // indirect
