@@ -424,6 +424,7 @@ func TestInsertUser(t *testing.T) {
 	}
 
 	oldTimeUnix := time.Now().UTC().UnixNano()
+	time.Sleep(1 * time.Second)
 
 	type args struct {
 		user *user.User
