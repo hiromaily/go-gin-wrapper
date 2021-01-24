@@ -11,7 +11,8 @@ type Chater interface {
 	ChatIndexAction(ctx *gin.Context)
 }
 
-// ChatIndexAction is top page of chat [GET]
+// ChatIndexAction returns chat page [GET]
+// - WIP
 func (ctl *controller) ChatIndexAction(ctx *gin.Context) {
 	ctl.logger.Info("ChatIndexAction")
 

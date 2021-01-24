@@ -14,29 +14,29 @@ type APILister interface {
 	APIListIndex2Action(ctx *gin.Context)
 }
 
-// APIListIndexAction is top page for API List (react version)
+// APIListIndexAction returns API List page
 func (ctl *controller) APIListIndexAction(ctx *gin.Context) {
-	// return header and key
 	ids, err := ctl.userRepo.GetUserIDs()
 	if err != nil {
-		ctx.AbortWithError(500, err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	// View
+	// view
 	res := gin.H{
 		"title":    "API List Page",
 		"navi_key": "/apilist/",
 		"ids":      ids,
 	}
+	// return header and key as well
 	ctx.HTML(http.StatusOK, "pages/apilist/index.tmpl", html.Response(res, ctl.apiHeaderConf))
 }
 
-// APIListIndex2Action is top page for API List (this is old version)
+// APIListIndex2Action returns API List page (old version)
 func (ctl *controller) APIListIndex2Action(ctx *gin.Context) {
 	ids, err := ctl.userRepo.GetUserIDs()
 	if err != nil {
-		ctx.AbortWithError(500, err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 

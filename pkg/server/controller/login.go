@@ -9,19 +9,18 @@ import (
 
 // Loginer interface
 type Loginer interface {
-	CheckLoginOnHTML(ctx *gin.Context) (int, *LoginRequest, []string)
-	checkAPILogin(ctx *gin.Context) (int, string, error)
+	login(ctx *gin.Context) (int, *LoginRequest, []string)
+	apiLogin(ctx *gin.Context) (int, string, error)
 }
 
-// LoginRequest is request structure for login
+// LoginRequest is login payload
 type LoginRequest struct {
 	Email string `valid:"nonempty,email,min=5,max=40" field:"email" dispName:"E-Mail"`
 	Pass  string `valid:"nonempty,min=8,max=20" field:"pass" dispName:"Password"`
 }
 
-// ErrFmt is error message for validation package
-// TODO: Should this be defined as something common library?
-var ErrFmt = map[string]string{
+// errFormat is required by validation package
+var errFormat = map[string]string{
 	"nonempty": "Empty is not allowed on %s",
 	"email":    "Format of %s is invalid",
 	"alphanum": "Only alphabet is allowd on %s",
@@ -29,47 +28,43 @@ var ErrFmt = map[string]string{
 	"max":      "At a maximum %s of characters is allowed on %s",
 }
 
-// CheckLoginOnHTML is check login on html page.
-func (ctl *controller) CheckLoginOnHTML(ctx *gin.Context) (int, *LoginRequest, []string) {
-	// Get Post Parameters
-	posted := &LoginRequest{
+// login validates for login
+func (ctl *controller) login(ctx *gin.Context) (int, *LoginRequest, []string) {
+	loginRequest := &LoginRequest{
 		Email: ctx.PostForm("inputEmail"),
 		Pass:  ctx.PostForm("inputPassword"),
 	}
 
-	// Validation
-	mRet := validator.CheckValidation(posted, false)
-	if len(mRet) != 0 {
-		errs := validator.ConvertErrorMsgs(mRet, ErrFmt)
-		return 0, posted, errs
+	result := validator.CheckValidation(loginRequest, false)
+	if len(result) != 0 {
+		errs := validator.ConvertErrorMsgs(result, errFormat)
+		return 0, loginRequest, errs
 	}
 
-	// Check inputed mail and password
-	userID, err := ctl.userRepo.Login(posted.Email, posted.Pass)
+	userID, err := ctl.userRepo.Login(loginRequest.Email, loginRequest.Pass)
 	if err != nil {
-		errs := []string{"E-mail or Password is made a mistake."}
-		return 0, posted, errs
+		errs := []string{"E-mail or Password is invalid"}
+		return 0, loginRequest, errs
 	}
 	return userID, nil, nil
 }
 
-// checkAPILogin checks login by API
-func (ctl *controller) checkAPILogin(ctx *gin.Context) (int, string, error) {
-	posted := &LoginRequest{
-		Email: ctx.PostForm("inputEmail"),
+// apiLogin validates for API login
+func (ctl *controller) apiLogin(ctx *gin.Context) (int, string, error) {
+	email := ctx.PostForm("inputEmail")
+	loginRequest := &LoginRequest{
+		Email: email,
 		Pass:  ctx.PostForm("inputPassword"),
 	}
 
-	// Validation
-	mRet := validator.CheckValidation(posted, false)
-	if len(mRet) != 0 {
+	result := validator.CheckValidation(loginRequest, false)
+	if len(result) != 0 {
 		return 0, "", errors.New("validation error")
 	}
 
-	// Check inputed mail and password
-	userID, err := ctl.userRepo.Login(posted.Email, posted.Pass)
+	userID, err := ctl.userRepo.Login(loginRequest.Email, loginRequest.Pass)
 	if err != nil {
 		return 0, "", errors.New("login error")
 	}
-	return userID, ctx.PostForm("inputEmail"), nil
+	return userID, email, nil
 }

@@ -21,7 +21,7 @@ func (ctl *controller) APIJWTIndexPostAction(ctx *gin.Context) {
 	ctl.logger.Debug("controler APIJWTIndexPostAction")
 
 	// check login
-	userID, mail, err := ctl.checkAPILogin(ctx)
+	userID, mail, err := ctl.apiLogin(ctx)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return

@@ -106,7 +106,7 @@ func (ctl *controller) BaseLoginGetAction(ctx *gin.Context) {
 // BaseLoginPostAction is to receive user request from login page [POST]
 func (ctl *controller) BaseLoginPostAction(ctx *gin.Context) {
 	// check login
-	userID, posted, errs := ctl.CheckLoginOnHTML(ctx)
+	userID, posted, errs := ctl.login(ctx)
 	if errs != nil {
 		ctl.resLogin(ctx, posted, "", errs)
 		return
