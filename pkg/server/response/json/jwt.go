@@ -2,15 +2,12 @@ package json
 
 // JWTResponse is response of JWT request
 type JWTResponse struct {
-	Code  int    `json:"code"`
 	Token string `json:"token"`
 }
 
-// CreateJWTJson is for response format of JWT
+// CreateJWTJson is response of JWT token
 func CreateJWTJson(token string) *JWTResponse {
-	jwtJSON := JWTResponse{
-		Code:  0,
+	return &JWTResponse{
 		Token: token,
 	}
-	return &jwtJSON
 }

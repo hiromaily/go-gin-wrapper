@@ -6,10 +6,9 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 )
 
-// Response is to add common parameter for html response
+// Response adds common parameter for html response
 func Response(obj gin.H, api *config.Header) gin.H {
 	// type H map[string]interface{}
-
 	obj["header"] = api.Header
 	obj["key"] = api.Key
 

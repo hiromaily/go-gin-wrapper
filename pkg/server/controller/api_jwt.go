@@ -28,7 +28,7 @@ func (ctl *controller) APIJWTIndexPostAction(ctx *gin.Context) {
 	}
 
 	token, err := ctl.jwter.CreateBasicToken(
-		time.Now().Add(time.Minute*60).Unix(),
+		time.Now().Add(time.Minute*60).Unix(), // TODO: time should be configurable
 		strconv.Itoa(userID),
 		mail,
 	)
@@ -39,5 +39,5 @@ func (ctl *controller) APIJWTIndexPostAction(ctx *gin.Context) {
 	ctl.logger.Debug("APIJWTIndexPostAction", zap.String("token", token))
 
 	// json response
-	jsonresp.ResponseUserJSON(ctx, http.StatusOK, jsonresp.CreateJWTJson(token))
+	ctx.JSON(http.StatusOK, jsonresp.CreateJWTJson(token))
 }

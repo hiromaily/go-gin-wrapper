@@ -11,6 +11,8 @@ import (
 	"unicode/utf8"
 )
 
+// TODO: refactoring
+
 // BasicValidator is validator function
 type BasicValidator func(str string) bool
 
