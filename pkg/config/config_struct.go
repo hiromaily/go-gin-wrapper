@@ -38,6 +38,7 @@ type Server struct {
 	Host      string     `toml:"host" validate:"required"`
 	Port      int        `toml:"port" validate:"required"`
 	Docs      *Docs      `toml:"docs" validate:"required"`
+	Token     *Token     `toml:"token" validate:"required"`
 	Session   *Session   `toml:"session" validate:"required"`
 	BasicAuth *BasicAuth `toml:"basic_auth" validate:"required"`
 }
@@ -45,6 +46,11 @@ type Server struct {
 // Docs is document root path of go-gin-wrapper project
 type Docs struct {
 	Path string `toml:"path" validate:"required"`
+}
+
+// Token is used for CSRF (cross-site request forgeries)
+type Token struct {
+	Salt string `toml:"salt" validate:"required"`
 }
 
 // Session is session property

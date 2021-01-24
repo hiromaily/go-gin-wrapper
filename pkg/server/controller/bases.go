@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginurl"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
@@ -39,7 +38,7 @@ func debugContext(ctx *gin.Context, logger *zap.Logger) {
 // response for Login Page
 func (ctl *controller) resLogin(ctx *gin.Context, input *LoginRequest, msg string, errors []string) {
 	// token
-	token := csrf.CreateToken(ctl.logger)
+	token := ctl.token.Generate()
 	sess.SetTokenSession(ctx, token)
 
 	// Google Open ID

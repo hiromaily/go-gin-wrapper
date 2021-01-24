@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
-
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -17,6 +15,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/reverseproxy/types"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginurl"
+	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader/cors"
 	str "github.com/hiromaily/go-gin-wrapper/pkg/strings"
 )

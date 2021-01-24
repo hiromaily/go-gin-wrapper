@@ -23,6 +23,9 @@ port = 8080
 # this path must be chnaged first for specific environment
 path = "${GOPATH}/src/github.com/hiromaily/go-gin-wrapper"
 
+[server.token]
+salt = "goginwebservertoken"
+
 [server.session]
 name = "go-web-ginserver"
 key = "secretskey123456"

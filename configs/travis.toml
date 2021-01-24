@@ -21,6 +21,9 @@ port = 8080
 [server.docs]
 path = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper"
 
+[server.token]
+salt = "goginwebservertoken"
+
 [server.session]
 name = "go-web-ginserver"
 key = "secretskey123456"

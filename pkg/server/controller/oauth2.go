@@ -14,7 +14,6 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
-	"github.com/hiromaily/go-gin-wrapper/pkg/server/csrf"
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 )
 
@@ -102,7 +101,7 @@ func (ctl *controller) OAuth2SignInGoogleAction(ctx *gin.Context) {
 	googleOauthConfig.ClientSecret = auth.ClientSecret
 
 	// token
-	token := csrf.CreateToken(ctl.logger)
+	token := ctl.token.Generate()
 	sess.SetTokenSession(ctx, token)
 
 	url := googleOauthConfig.AuthCodeURL(token)
@@ -120,7 +119,7 @@ func (ctl *controller) OAuth2SignInFacebookAction(ctx *gin.Context) {
 	facebookOauthConfig.ClientSecret = auth.ClientSecret
 
 	// token
-	token := csrf.CreateToken(ctl.logger)
+	token := ctl.token.Generate()
 	sess.SetTokenSession(ctx, token)
 
 	url := facebookOauthConfig.AuthCodeURL(token)

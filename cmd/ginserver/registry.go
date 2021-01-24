@@ -21,6 +21,7 @@ import (
 	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader/cors"
 	"github.com/hiromaily/go-gin-wrapper/pkg/storage/mysql"
+	"github.com/hiromaily/go-gin-wrapper/pkg/token"
 )
 
 // Registry interface
@@ -33,6 +34,7 @@ type registry struct {
 	logger      *zap.Logger
 	gin         *gin.Engine
 	jwter       jwts.JWTer
+	token       token.Generator
 	isTestMode  bool
 	mysqlClient *sql.DB
 	hash        encryption.MD5
@@ -126,6 +128,7 @@ func (r *registry) newController() controller.Controller {
 		r.newLogger(),
 		r.newUserRepository(),
 		r.newJWT(),
+		r.newTokenGenerator(),
 		r.conf.API.Header,
 		r.conf.Auth,
 	)
@@ -149,6 +152,13 @@ func (r *registry) newJWT() jwts.JWTer {
 		r.jwter = jwts.NewJWT(auth.Audience, signAlgo)
 	}
 	return r.jwter
+}
+
+func (r *registry) newTokenGenerator() token.Generator {
+	if r.token == nil {
+		r.token = token.NewGenerator(r.conf.Server.Token.Salt)
+	}
+	return r.token
 }
 
 func (r *registry) newLogger() *zap.Logger {
