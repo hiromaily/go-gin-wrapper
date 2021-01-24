@@ -17,7 +17,7 @@ func GetConf(fileName string) (*Root, error) {
 	return newConf(fmt.Sprintf("%s/%s", basePath, fileName))
 }
 
-// GetEnvConf returns *Root from environment variable `$GOING_CONF` for unittest
+// GetEnvConf returns *Root from environment variable `$GO-GIN_CONF` for unittest
 func GetEnvConf() (*Root, error) {
 	return newConf(os.Getenv("GO_GIN_CONF"))
 }
