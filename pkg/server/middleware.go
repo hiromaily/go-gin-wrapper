@@ -179,7 +179,7 @@ func (m *middleware) FilterIP() gin.HandlerFunc {
 		}
 		for _, rejectIP := range m.rejectIPs {
 			if ip == rejectIP {
-				ctx.AbortWithStatus(403)
+				ctx.AbortWithStatus(http.StatusForbidden)
 				return
 			}
 		}
@@ -308,7 +308,10 @@ func (m *middleware) validateReferer(ctx *gin.Context, pageFrom string) error {
 func (m *middleware) CheckCSRF() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		m.logger.Info("middleware CheckCSRF")
-		m.session.IsTokenValid(ctx, ctx.PostForm("gintoken"))
+		if err := m.session.ValidateToken(ctx, ctx.PostForm("gintoken")); err != nil {
+			ctx.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
 		ctx.Next()
 	}
 }
@@ -319,7 +322,7 @@ func (m *middleware) RejectNonHTTPS() gin.HandlerFunc {
 		m.logger.Info("middleware RejectNonHTTPS")
 
 		if !strings.Contains(ctx.Request.URL.Scheme, "https://") {
-			ctx.AbortWithStatus(403)
+			ctx.AbortWithStatus(http.StatusForbidden)
 			return
 		}
 		ctx.Next()

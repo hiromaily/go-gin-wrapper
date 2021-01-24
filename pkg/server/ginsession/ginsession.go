@@ -18,7 +18,7 @@ type Sessioner interface {
 	SetToken(ctx *gin.Context, token string)
 	GetToken(ctx *gin.Context) string
 	DeleteToken(ctx *gin.Context)
-	IsTokenValid(ctx *gin.Context, token string) bool
+	ValidateToken(ctx *gin.Context, token string) error
 }
 
 type sessioner struct {
@@ -52,6 +52,7 @@ func (s *sessioner) Logout(ctx *gin.Context) {
 }
 
 // SetUserID sets userID as session
+// - skip if session has uid
 func (s *sessioner) SetUserID(ctx *gin.Context, userID int) {
 	session := sessions.Default(ctx)
 	v := session.Get("uid")
@@ -59,6 +60,7 @@ func (s *sessioner) SetUserID(ctx *gin.Context, userID int) {
 		session.Set("uid", userID)
 		session.Save()
 	}
+	s.logger.Debug("SetUserID has already been set")
 }
 
 // GenerateToken generates token
@@ -90,28 +92,26 @@ func (s *sessioner) DeleteToken(ctx *gin.Context) {
 	session.Save()
 }
 
-// IsTokenValid validates token
-func (s *sessioner) IsTokenValid(ctx *gin.Context, token string) bool {
+// ValidateToken validates token
+func (s *sessioner) ValidateToken(ctx *gin.Context, token string) error {
 	sesToken := s.GetToken(ctx)
-	s.logger.Info("IsTokenSessionValid",
-		zap.String("GetTokenSession()", sesToken),
-		zap.String("token", token),
+	s.logger.Info("IsTokenValid",
+		zap.String("GetToken()", sesToken),
+		zap.String("given_token", token),
 	)
 
-	var err error
-	if sesToken == "" && token == "" {
-		err = errors.New("token is not allowed as blank")
-	} else if sesToken == "" {
-		err = errors.New("token is missing. Session might have expired")
-	} else if sesToken != token {
-		err = errors.New("token is invalid")
-	} else {
-		return true
+	if sesToken != "" && token != "" {
+		return nil
 	}
 
-	// token delete
+	var err error
+	if token == "" {
+		err = errors.New("given token is empty")
+	} else if sesToken == "" {
+		err = errors.New("session token is missing, might have been expired")
+	} else if sesToken != token {
+		err = errors.New("token is invalid")
+	}
 	s.DeleteToken(ctx)
-	s.logger.Error("session error", zap.Error(err))
-	ctx.AbortWithError(400, err)
-	return false
+	return err
 }
