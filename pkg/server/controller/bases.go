@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginurl"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
@@ -38,8 +37,8 @@ func debugContext(ctx *gin.Context, logger *zap.Logger) {
 // response for Login Page
 func (ctl *controller) resLogin(ctx *gin.Context, input *LoginRequest, msg string, errors []string) {
 	// token
-	token := ctl.token.Generate()
-	sess.SetTokenSession(ctx, token)
+	token := ctl.session.GenerateToken()
+	ctl.session.SetToken(ctx, token)
 
 	// Google Open ID
 	gURL := "/oauth2/google/signin"
@@ -85,7 +84,7 @@ func (ctl *controller) BaseLoginGetAction(ctx *gin.Context) {
 
 	// If already loged in, go another page using redirect
 	// Judge loged in or not.
-	if bRet, _ := sess.IsLogin(ctx); bRet {
+	if bRet, _ := ctl.session.IsLogin(ctx); bRet {
 		// Redirect[GET]
 		// FIXME: Browser request cache data when redirecting at status code 301
 		// https://infra.xyz/archives/75
@@ -115,10 +114,10 @@ func (ctl *controller) BaseLoginPostAction(ctx *gin.Context) {
 
 	// When login is successful
 	// Session
-	sess.SetUserSession(ctx, userID)
+	ctl.session.SetUserID(ctx, userID)
 
 	// token delete
-	sess.DelTokenSession(ctx)
+	ctl.session.DeleteToken(ctx)
 
 	// Change method POST to GET
 	// Redirect[GET]
@@ -131,7 +130,7 @@ func (ctl *controller) BaseLogoutPostAction(ctx *gin.Context) {
 	ctl.logger.Debug("LogoutPostAction")
 
 	// Session
-	sess.Logout(ctx)
+	ctl.session.Logout(ctx)
 
 	// View
 	res := gin.H{
@@ -146,7 +145,7 @@ func (ctl *controller) BaseLogoutPutAction(ctx *gin.Context) {
 	ctl.logger.Debug("LogoutPutAction")
 
 	// Session
-	sess.Logout(ctx)
+	ctl.session.Logout(ctx)
 
 	// View
 	ctx.JSON(http.StatusOK, gin.H{

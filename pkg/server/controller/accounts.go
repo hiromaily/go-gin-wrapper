@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
 
@@ -19,7 +18,7 @@ func (ctl *controller) AccountIndexAction(ctx *gin.Context) {
 	ctl.logger.Info("controller AccountIndexAction")
 
 	// validate access
-	if logined, _ := sess.IsLogin(ctx); !logined {
+	if logined, _ := ctl.session.IsLogin(ctx); !logined {
 		// redirect [GET]
 		ctx.Redirect(http.StatusTemporaryRedirect, "/login")
 		return

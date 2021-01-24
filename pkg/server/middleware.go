@@ -13,7 +13,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/files"
 	"github.com/hiromaily/go-gin-wrapper/pkg/reverseproxy/types"
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginurl"
 	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader/cors"
@@ -40,6 +40,7 @@ type Middlewarer interface {
 type middleware struct {
 	// session xxxx
 	logger      *zap.Logger
+	session     ginsession.Sessioner
 	jwter       jwts.JWTer
 	corser      cors.CORSer
 	rejectIPs   []string
@@ -52,6 +53,7 @@ type middleware struct {
 // NewMiddleware returns Server interface
 func NewMiddleware(
 	logger *zap.Logger,
+	session ginsession.Sessioner,
 	jwter jwts.JWTer,
 	corser cors.CORSer,
 	rejectIPs []string,
@@ -62,6 +64,7 @@ func NewMiddleware(
 ) Middlewarer {
 	return &middleware{
 		logger:      logger,
+		session:     session,
 		jwter:       jwter,
 		corser:      corser,
 		rejectIPs:   rejectIPs,
@@ -248,8 +251,8 @@ func (m *middleware) UpdateUserSession() gin.HandlerFunc {
 		}
 
 		m.logger.Info("middleware UpdateUserSession")
-		if logined, uid := sess.IsLogin(ctx); logined {
-			sess.SetUserSession(ctx, uid)
+		if logined, uid := m.session.IsLogin(ctx); logined {
+			m.session.SetUserID(ctx, uid)
 		}
 		ctx.Next()
 	}
@@ -276,7 +279,7 @@ func (m *middleware) CheckHTTPReferer() gin.HandlerFunc {
 			m.logger.Error("fail to call validateReferer()", zap.Error(err))
 
 			// delete token
-			sess.DelTokenSession(ctx)
+			m.session.DeleteToken(ctx)
 
 			ctx.AbortWithError(http.StatusBadRequest, err)
 			return
@@ -305,7 +308,7 @@ func (m *middleware) validateReferer(ctx *gin.Context, pageFrom string) error {
 func (m *middleware) CheckCSRF() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		m.logger.Info("middleware CheckCSRF")
-		sess.IsTokenSessionValid(ctx, m.logger, ctx.PostForm("gintoken"))
+		m.session.IsTokenValid(ctx, ctx.PostForm("gintoken"))
 		ctx.Next()
 	}
 }

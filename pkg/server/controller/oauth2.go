@@ -14,7 +14,6 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/model/user"
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 )
 
 // OAuther interface
@@ -101,8 +100,8 @@ func (ctl *controller) OAuth2SignInGoogleAction(ctx *gin.Context) {
 	googleOauthConfig.ClientSecret = auth.ClientSecret
 
 	// token
-	token := ctl.token.Generate()
-	sess.SetTokenSession(ctx, token)
+	token := ctl.session.GenerateToken()
+	ctl.session.SetToken(ctx, token)
 
 	url := googleOauthConfig.AuthCodeURL(token)
 	ctx.Redirect(http.StatusTemporaryRedirect, url) // 307
@@ -119,8 +118,8 @@ func (ctl *controller) OAuth2SignInFacebookAction(ctx *gin.Context) {
 	facebookOauthConfig.ClientSecret = auth.ClientSecret
 
 	// token
-	token := ctl.token.Generate()
-	sess.SetTokenSession(ctx, token)
+	token := ctl.session.GenerateToken()
+	ctl.session.SetToken(ctx, token)
 
 	url := facebookOauthConfig.AuthCodeURL(token)
 
@@ -158,13 +157,13 @@ func checkError(ctx *gin.Context, logger *zap.Logger) bool {
 	return true
 }
 
-func checkState(ctx *gin.Context, logger *zap.Logger) bool {
+func (ctl *controller) checkState(ctx *gin.Context, logger *zap.Logger) bool {
 	logger.Info("checkState")
 
 	state, _ := ctx.GetQuery("state")
 	// ctl.logger.Debugf("state is %s", state)
 	// ctl.logger.Debugf("saved state is %s", sess.GetTokenSession(ctx))
-	if state == "" || sess.GetTokenSession(ctx) != state {
+	if state == "" || ctl.session.GetToken(ctx) != state {
 		// error
 		logger.Error("checkState", zap.Error(errors.New("state is invalid")))
 		ctx.Redirect(http.StatusTemporaryRedirect, "/") // 307
@@ -247,7 +246,7 @@ func (ctl *controller) registerOrLogin(ctx *gin.Context, mode uint8, user *user.
 			return
 		}
 		// Session
-		sess.SetUserSession(ctx, int(id))
+		ctl.session.SetUserID(ctx, int(id))
 
 	} else {
 		ctl.logger.Debug("registerOrLogin", zap.Any("user", userAuth))
@@ -255,7 +254,7 @@ func (ctl *controller) registerOrLogin(ctx *gin.Context, mode uint8, user *user.
 		if userAuth.ID != 0 && userAuth.Auth == mode {
 			// 1:existing user (google) -> login procedure
 			// Session
-			sess.SetUserSession(ctx, userAuth.ID)
+			ctl.session.SetUserID(ctx, userAuth.ID)
 		} else {
 			ctl.logger.Debug("registerOrLogin: redirect login page. user is already existing")
 			// 2:existing user (no auth or another auth) -> err
@@ -266,7 +265,7 @@ func (ctl *controller) registerOrLogin(ctx *gin.Context, mode uint8, user *user.
 
 	// Login
 	// token delete
-	sess.DelTokenSession(ctx)
+	ctl.session.DeleteToken(ctx)
 
 	// Redirect[GET]
 	ctx.Redirect(http.StatusTemporaryRedirect, "/accounts") // 307
@@ -284,7 +283,7 @@ func (ctl *controller) OAuth2CallbackGoogleAction(ctx *gin.Context) {
 	}
 
 	// 1.Confirm State(token)
-	bRet = checkState(ctx, ctl.logger)
+	bRet = ctl.checkState(ctx, ctl.logger)
 	if !bRet {
 		return
 	}
@@ -335,7 +334,7 @@ func (ctl *controller) OAuth2CallbackFacebookAction(ctx *gin.Context) {
 	}
 
 	// 1.Confirm State(token)
-	bRet = checkState(ctx, ctl.logger)
+	bRet = ctl.checkState(ctx, ctl.logger)
 	if !bRet {
 		return
 	}

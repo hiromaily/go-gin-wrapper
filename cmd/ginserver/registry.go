@@ -18,7 +18,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/controller"
-	sess "github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader/cors"
 	"github.com/hiromaily/go-gin-wrapper/pkg/storage/mysql"
 	"github.com/hiromaily/go-gin-wrapper/pkg/token"
@@ -33,6 +33,7 @@ type registry struct {
 	conf        *config.Root
 	logger      *zap.Logger
 	gin         *gin.Engine
+	session     ginsession.Sessioner
 	jwter       jwts.JWTer
 	token       token.Generator
 	isTestMode  bool
@@ -80,13 +81,13 @@ func (r *registry) newSessionStore() sessions.Store {
 
 	if red.IsSession && red.Host != "" && red.Port != 0 {
 		r.newLogger().Debug("newSessionStore(): redis session start")
-		return sess.NewRedisStore(
+		return ginsession.NewRedisStore(
 			r.newLogger(),
 			fmt.Sprintf("%s:%d", red.Host, red.Port),
 			red.Pass,
 			r.conf.Server.Session)
 	}
-	return sess.NewCookieStore(r.conf.Server.Session)
+	return ginsession.NewCookieStore(r.conf.Server.Session)
 }
 
 func herokuRedisSetting(redisConf *config.Redis) {
@@ -104,6 +105,7 @@ func herokuRedisSetting(redisConf *config.Redis) {
 func (r *registry) newMiddleware() server.Middlewarer {
 	return server.NewMiddleware(
 		r.newLogger(),
+		r.newSession(),
 		r.newJWT(),
 		r.newCORS(),
 		r.rejectIPs(),
@@ -127,11 +129,18 @@ func (r *registry) newController() controller.Controller {
 	return controller.NewController(
 		r.newLogger(),
 		r.newUserRepository(),
+		r.newSession(),
 		r.newJWT(),
-		r.newTokenGenerator(),
 		r.conf.API.Header,
 		r.conf.Auth,
 	)
+}
+
+func (r *registry) newSession() ginsession.Sessioner {
+	if r.session == nil {
+		r.session = ginsession.NewSessioner(r.newLogger(), r.newTokenGenerator())
+	}
+	return r.session
 }
 
 func (r *registry) newJWT() jwts.JWTer {

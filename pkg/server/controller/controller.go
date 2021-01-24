@@ -6,7 +6,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwts"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/repository"
-	"github.com/hiromaily/go-gin-wrapper/pkg/token"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 )
 
 // Controller  interface
@@ -26,8 +26,8 @@ type Controller interface {
 type controller struct {
 	logger        *zap.Logger
 	userRepo      repository.UserRepository
+	session       ginsession.Sessioner
 	jwter         jwts.JWTer
-	token         token.Generator
 	apiHeaderConf *config.Header
 	authConf      *config.Auth
 }
@@ -36,13 +36,14 @@ type controller struct {
 func NewController(
 	logger *zap.Logger,
 	userRepo repository.UserRepository,
+	session ginsession.Sessioner,
 	jwter jwts.JWTer,
-	token token.Generator,
 	apiHeaderConf *config.Header,
 	auth *config.Auth) Controller {
 	return &controller{
 		logger:        logger,
 		userRepo:      userRepo,
+		session:       session,
 		jwter:         jwter,
 		apiHeaderConf: apiHeaderConf,
 		authConf:      auth,
