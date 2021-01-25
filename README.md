@@ -38,6 +38,7 @@ Now it's under `refactoring`.
 - Docker compose
   - MySQL 5.7
   - Redis
+- [direnv](https://github.com/direnv/direnv) for MacOS user  
 
 ## Example
 Example is [here](https://ginserver.herokuapp.com/) on Heroku.
