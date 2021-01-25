@@ -7,9 +7,9 @@
   "website": "https://github.com/hiromaily/go-gin-wrapper",
   "success_url": "/",
   "env" : {
-    "HEROKU_FLG": {
-      "description": "set environment as Heroku",
-      "value": 1
+    "GO_GIN_CONF": {
+      "description": "config path",
+      "value": "${GOPATH}/src/github.com/hiromaily/go-gin-wrapper/configs/settings.toml"
     },
     "ENC_KEY": {
       "description": "encode key",

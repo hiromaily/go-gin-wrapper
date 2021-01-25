@@ -117,7 +117,6 @@ $ heroku addons:create heroku-redis:hobby-dev -a ginserver
 $ heroku config | grep REDIS
 
 ## Environment variable
-$ heroku config:add HEROKU_FLG=1
 $ heroku config:add ENC_KEY=xxxxx
 $ heroku config:add ENC_IV=xxxxx
 
@@ -148,7 +147,6 @@ $ ginserver -f /app/configs/heroku.toml -crypto
 #### Only Heroku environment
 | NAME              | Value            |
 |:------------------|:-----------------|
-| HEROKU_FLG        | 1                |
 | PORT              | 8080             |
 
 - Heroku server use `PORT` automatically as environment variable.
