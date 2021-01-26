@@ -230,13 +230,13 @@ check-all-http:
 
 	# get token `<input type="hidden" name="gintoken" value="969c72910db079ece758f4acfecd05e7">`
 	# http localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$/\1/'
-	$(eval TOKEN := $(shell http localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$$/\1/'))
+	$(eval TOKEN := $(shell http --session=go-web-ginserver localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$$/\1/'))
 	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=password gintoken=$(TOKEN)
 
 .PHONY: check-login
 check-login:
-	$(eval TOKEN := $(shell http --session= localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$$/\1/'))
-	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=password gintoken=$(TOKEN)
+	$(eval TOKEN := $(shell http --session=go-web-ginserver localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$$/\1/'))
+	http --body --form --session=go-web-ginserver POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=password gintoken=$(TOKEN)
 
 .PHONY: check-token
 check-token:
