@@ -9,6 +9,7 @@ import (
 
 // NewRedisStore returns redis session store
 func NewRedisStore(logger *zap.Logger, host, pass string, conf *config.Session) sessions.Store {
+	logger.Info("redis session store")
 	store, err := sessions.NewRedisStore(80, "tcp", host, pass, []byte(conf.Key))
 	if err != nil {
 		logger.Error("fail to call sessions.NewRedisStore()", zap.Error(err))
@@ -19,7 +20,8 @@ func NewRedisStore(logger *zap.Logger, host, pass string, conf *config.Session) 
 }
 
 // NewCookieStore returns cookie store
-func NewCookieStore(conf *config.Session) sessions.Store {
+func NewCookieStore(logger *zap.Logger, conf *config.Session) sessions.Store {
+	logger.Info("cookie store")
 	return sessions.NewCookieStore([]byte(conf.Key))
 }
 

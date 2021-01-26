@@ -93,7 +93,9 @@ func (s *server) Start() (*gin.Engine, error) {
 		return nil, err
 	}
 
-	s.loadStaticFiles()
+	if err := s.loadStaticFiles(); err != nil {
+		return nil, err
+	}
 
 	s.setRouter(s.gin)
 
@@ -223,14 +225,19 @@ func getTempFunc() template.FuncMap {
 	return funcMap
 }
 
-func (s *server) loadStaticFiles() {
-	s.logger.Info("server loadStaticFiles()")
-	rootPath := s.serverConf.Docs.Path
+func (s *server) loadStaticFiles() error {
+	projectPath, err := s.projectRoot()
+	if err != nil {
+		return err
+	}
+	s.logger.Info("server loadStaticFiles()", zap.String("project_path", projectPath))
 
-	s.gin.Static("/statics", rootPath+"/web/statics")
-	s.gin.Static("/assets", rootPath+"/web/statics/assets")
-	s.gin.Static("/favicon.ico", rootPath+"/web/statics/favicon.ico")
-	s.gin.Static("/swagger", rootPath+"/web/swagger/swagger-ui")
+	s.gin.Static("/statics", projectPath+"/web/statics")
+	s.gin.Static("/assets", projectPath+"/web/statics/assets")
+	s.gin.Static("/favicon.ico", projectPath+"/web/statics/favicon.ico")
+	s.gin.Static("/swagger", projectPath+"/web/swagger/swagger-ui")
+
+	return nil
 }
 
 func (s *server) run() error {

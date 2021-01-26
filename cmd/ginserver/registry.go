@@ -87,7 +87,7 @@ func (r *registry) newSessionStore() sessions.Store {
 			red.Pass,
 			r.conf.Server.Session)
 	}
-	return ginsession.NewCookieStore(r.conf.Server.Session)
+	return ginsession.NewCookieStore(r.newLogger(), r.conf.Server.Session)
 }
 
 func herokuRedisSetting(redisConf *config.Redis) {
