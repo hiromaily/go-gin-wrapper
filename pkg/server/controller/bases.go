@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"go.uber.org/zap"
 	"net/http"
-
 
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginctx"
 
@@ -62,6 +62,7 @@ func (ctl *controller) BaseLoginPostAction(ctx *gin.Context) {
 
 	userID, loginRequest, errs := ctl.login(ctx)
 	if len(errs) != 0 {
+		ctl.logger.Debug("login_error", zap.Any("errors", errs))
 		ctl.loginResponse(ctx, loginRequest, "", errs)
 		return
 	}

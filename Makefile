@@ -208,7 +208,8 @@ test-quick:
 #[GIN-debug] DELETE /api/users/id/:id         --> github.com/hiromaily/go-gin-wrapper/pkg/server/controller.Controller.APIUserDeleteAction-fm (12 handlers)
 #[GIN-debug] GET    /api/users/ids            --> github.com/hiromaily/go-gin-wrapper/pkg/server/controller.Controller.APIUserIDsGetAction-fm (12 handlers)
 ###############################################################################
-http:
+.PHONY: check-all-http
+check-all-http:
 	# httpie #brew install httpie
 	# jq     #brew install jq
 
@@ -222,21 +223,23 @@ http:
 
 	# login
 	http localhost:8080/login
-	http --body --form POST http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=foo-bar-password
+	http --body --form POST http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=password
 	# => "Referer is invalid"
-	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=foo-bar-password
+	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=password
 	# => "given token is empty"
 
 	# get token `<input type="hidden" name="gintoken" value="969c72910db079ece758f4acfecd05e7">`
 	# http localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$/\1/'
 	$(eval TOKEN := $(shell http localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$$/\1/'))
-	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=foo-bar-password gintoken=$(TOKEN)
+	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=password gintoken=$(TOKEN)
 
-login:
+.PHONY: check-login
+check-login:
 	$(eval TOKEN := $(shell http --session= localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$$/\1/'))
-	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=foo-bar-password gintoken=$(TOKEN)
+	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=password gintoken=$(TOKEN)
 
-token:
+.PHONY: check-token
+check-token:
 	$(eval TOKEN := $(shell http localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$$/\1/'))
 	echo $(TOKEN)
 

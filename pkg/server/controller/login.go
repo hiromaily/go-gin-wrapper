@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginctx"
 	"net/http"
-
 
 	"go.uber.org/zap"
 
@@ -48,6 +48,7 @@ func (ctl *controller) login(ctx *gin.Context) (int, *LoginRequest, []string) {
 
 	userID, err := ctl.userRepo.Login(loginRequest.Email, loginRequest.Pass)
 	if err != nil {
+		ctl.logger.Debug("login_error", zap.Error(err))
 		errs := []string{"E-mail or Password is invalid"}
 		return 0, loginRequest, errs
 	}
@@ -82,6 +83,7 @@ func (ctl *controller) loginResponse(ctx *gin.Context, input *LoginRequest, msg 
 		zap.String("session.GenerateToken()", token),
 		zap.String("SetToken()", ""),
 	)
+	ginctx.DebugContext(ctx, ctl.logger)
 
 	// Google/Facebook Open ID
 	gURL := "/oauth2/google/signin"
