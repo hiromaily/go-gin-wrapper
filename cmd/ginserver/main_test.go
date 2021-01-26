@@ -1,4 +1,4 @@
-// +build integration-main
+// +build maintest
 
 package main
 
