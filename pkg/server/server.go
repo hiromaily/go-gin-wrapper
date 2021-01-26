@@ -133,6 +133,8 @@ func (s *server) setMiddleware() {
 
 	s.gin.Use(s.middleware.FilterIP())
 
+	s.gin.Use(s.middleware.CheckGinError())
+
 	s.gin.Use(s.middleware.SetMetaData())
 
 	s.gin.Use(s.middleware.UpdateUserSession())

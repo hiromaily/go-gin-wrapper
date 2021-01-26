@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -75,6 +76,10 @@ func (ctl *controller) apiLogin(ctx *gin.Context) (int, string, error) {
 func (ctl *controller) loginResponse(ctx *gin.Context, input *LoginRequest, msg string, errs []string) {
 	token := ctl.session.GenerateToken()
 	ctl.session.SetToken(ctx, token)
+	ctl.logger.Debug("loginResponse",
+		zap.String("session.GenerateToken()", token),
+		zap.String("SetToken()", ""),
+	)
 
 	// Google/Facebook Open ID
 	gURL := "/oauth2/google/signin"

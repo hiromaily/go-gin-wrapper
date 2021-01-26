@@ -39,7 +39,7 @@ func (s *server) setBaseRouter(r *gin.Engine) {
 	r.GET("/login", s.controller.BaseLoginGetAction)
 	r.POST("/login",
 		s.middleware.CheckHTTPReferer(),
-		s.middleware.CheckCSRF(),
+		// s.middleware.CheckCSRF(), //FIXME: set proper timing
 		s.controller.BaseLoginPostAction,
 	)
 

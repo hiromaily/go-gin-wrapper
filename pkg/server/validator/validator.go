@@ -17,6 +17,7 @@ import (
 // BasicValidator is validator function
 //-----------------------------------------------------------------------------
 
+// BasicValidator is basic validator
 type BasicValidator func(str string) bool
 
 // TagMap is to map tag name of struct to function
@@ -75,6 +76,7 @@ func isAlphabet(str string) bool {
 // CalcValidator is validator function
 //-----------------------------------------------------------------------------
 
+// CalcValidator is validator with parameter
 type CalcValidator func(str string, num int) bool
 
 // TagMapCal is to map tag name of struct to function

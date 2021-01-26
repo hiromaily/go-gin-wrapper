@@ -13,6 +13,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/files"
 	"github.com/hiromaily/go-gin-wrapper/pkg/reverseproxy/types"
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginctx"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginsession"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginurl"
 	hh "github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
@@ -24,6 +25,7 @@ import (
 type Middlewarer interface {
 	GlobalRecover() gin.HandlerFunc
 	FilterIP() gin.HandlerFunc
+	CheckGinError() gin.HandlerFunc
 	SetMetaData() gin.HandlerFunc
 	UpdateUserSession() gin.HandlerFunc
 	CheckHTTPReferer() gin.HandlerFunc
@@ -187,6 +189,16 @@ func (m *middleware) FilterIP() gin.HandlerFunc {
 	}
 }
 
+func (m *middleware) CheckGinError() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		m.logger.Info("middleware CheckGinError",
+			zap.Any("errors", ctx.Errors),
+			zap.Error(ctx.Err()),
+		)
+		ctx.Next()
+	}
+}
+
 // SetMetaData is to set meta data
 func (m *middleware) SetMetaData() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -307,7 +319,9 @@ func (m *middleware) validateReferer(ctx *gin.Context, pageFrom string) error {
 // CheckCSRF checks CSRF token
 func (m *middleware) CheckCSRF() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		m.logger.Info("middleware CheckCSRF")
+		m.logger.Info("middleware CheckCSRF", zap.String("gintoken", ctx.PostForm("gintoken")))
+		ginctx.DebugContext(ctx, m.logger)
+
 		if err := m.session.ValidateToken(ctx, ctx.PostForm("gintoken")); err != nil {
 			ctx.AbortWithError(http.StatusBadRequest, err)
 			return
