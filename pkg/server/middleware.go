@@ -191,6 +191,10 @@ func (m *middleware) FilterIP() gin.HandlerFunc {
 
 func (m *middleware) CheckGinError() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if !preCheck(ctx) {
+			return
+		}
+
 		m.logger.Info("middleware CheckGinError",
 			zap.Any("errors", ctx.Errors),
 			zap.Error(ctx.Err()),
@@ -277,6 +281,10 @@ func (m *middleware) UpdateUserSession() gin.HandlerFunc {
 // CheckHTTPReferer checks referer
 func (m *middleware) CheckHTTPReferer() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if !preCheck(ctx) {
+			return
+		}
+
 		m.logger.Info("middleware CheckHTTPReferer")
 
 		// FIXME: looks strange, key requires only path
@@ -319,6 +327,10 @@ func (m *middleware) validateReferer(ctx *gin.Context, pageFrom string) error {
 // CheckCSRF checks CSRF token
 func (m *middleware) CheckCSRF() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if !preCheck(ctx) {
+			return
+		}
+
 		m.logger.Info("middleware CheckCSRF", zap.String("gintoken", ctx.PostForm("gintoken")))
 		ginctx.DebugContext(ctx, m.logger)
 
@@ -333,6 +345,10 @@ func (m *middleware) CheckCSRF() gin.HandlerFunc {
 // RejectNonHTTPS rejects if request is NOT HTTPS
 func (m *middleware) RejectNonHTTPS() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if !preCheck(ctx) {
+			return
+		}
+
 		m.logger.Info("middleware RejectNonHTTPS")
 
 		if !strings.Contains(ctx.Request.URL.Scheme, "https://") {
@@ -350,6 +366,10 @@ func (m *middleware) RejectNonHTTPS() gin.HandlerFunc {
 // CheckHTTPHeader checks HTTP Header
 func (m *middleware) CheckHTTPHeader() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if !preCheck(ctx) {
+			return
+		}
+
 		m.logger.Info("middleware CheckHttpHeader",
 			zap.Any("request_header", ctx.Request.Header),
 			zap.Any("request_form", ctx.Request.Form),
@@ -386,6 +406,10 @@ func (m *middleware) CheckHTTPHeader() gin.HandlerFunc {
 // CheckJWT checks JWT token code
 func (m *middleware) CheckJWT() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if !preCheck(ctx) {
+			return
+		}
+
 		m.logger.Info("middleware CheckJWT")
 
 		auth := ctx.Request.Header.Get("Authorization")
@@ -416,6 +440,10 @@ func (m *middleware) CheckJWT() gin.HandlerFunc {
 // CheckCORS checks CORS
 func (m *middleware) CheckCORS() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if !preCheck(ctx) {
+			return
+		}
+
 		m.logger.Info("middleware CheckCORS")
 
 		if ctx.Request.Method != "OPTIONS" || ctx.Request.Header.Get("Origin") == "" {

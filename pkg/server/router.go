@@ -33,7 +33,8 @@ func (s *server) setBaseRouter(r *gin.Engine) {
 	r.GET("/index", func(ctx *gin.Context) { // redirect
 		ctx.Redirect(http.StatusMovedPermanently, "/")
 	})
-	r.HEAD("/", func(ctx *gin.Context) {}) // health check
+	// r.HEAD("/", func(ctx *gin.Context) {}) // health check
+	// FIXME: helath check must have specific endpoint for that.
 
 	// login
 	r.GET("/login", s.controller.BaseLoginGetAction)

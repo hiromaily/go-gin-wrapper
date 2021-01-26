@@ -11,6 +11,8 @@ import (
 func DebugContext(ctx *gin.Context, logger *zap.Logger) {
 	logger.Debug("request",
 		zap.Any("gin_ctx", ctx),
+		zap.Any("gin_ctx_errors", ctx.Errors),
+		zap.Any("gin_ctx_err", ctx.Err()),
 		zap.Any("gin_ctx_keys", ctx.Keys),
 		zap.String("request_method", ctx.Request.Method),
 		zap.Any("request_header", ctx.Request.Header),

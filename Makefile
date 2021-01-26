@@ -233,7 +233,7 @@ http:
 	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=foo-bar-password gintoken=$(TOKEN)
 
 login:
-	$(eval TOKEN := $(shell http localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$$/\1/'))
+	$(eval TOKEN := $(shell http --session= localhost:8080/login | grep gintoken | awk '{print $4}' | sed 's/^.*"\(.*\)".*$$/\1/'))
 	http --body --form POST http://localhost:8080/login Referer:http://localhost:8080/login inputEmail=foobar@gogin.com inputPassword=foo-bar-password gintoken=$(TOKEN)
 
 token:
