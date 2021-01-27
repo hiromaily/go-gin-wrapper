@@ -30,85 +30,7 @@ var (
 	r           *gin.Engine
 	errRedirect = errors.New("redirect")
 	referer     string
-
-	// header
-	// keyHeaderWrong   = map[string]string{"X-Custom-Header-Gin": "mistake"}
-	// basicAuthHeaders = map[string]string{"Authorization": "Basic d2ViOnRlc3Q="}
-	// jwtAuth          = map[string]string{"Authorization": "Bearer %s"}
-	// rightHeaders = []map[string]string{ajaxHeader, keyHeader}
-	// wrongKeyHeaders = []map[string]string{ajaxHeader, keyHeaderWrong}
-	// onlyAjaxHeaders = []map[string]string{ajaxHeader}
-	// onlyKeyHeaders  = []map[string]string{keyHeader}
-	// rightHeadersWithJWT = []map[string]string{ajaxHeader, keyHeader, jwtAuth}
 )
-
-// Test Data for ajax API (When JWT is off)
-//var userID = 12
-//
-//var getUserAPITests = []struct {
-//	url     string
-//	code    int
-//	method  string
-//	headers []map[string]string
-//	err     error
-//}{
-//	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", wrongKeyHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", onlyKeyHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", nil, nil},
-//	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, // TODO:value is necessary
-//	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
-//	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, // TODO:value is necessary
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, // TODO:no resource is right
-//	// TODO:with post data, put data
-//}
-//
-//// Test Data for ajax API (When JWT is on)
-//var getUserAPITests2 = []struct {
-//	url     string
-//	code    int
-//	method  string
-//	headers []map[string]string
-//	err     error
-//}{
-//	// no jwts token
-//	{"/api/users", http.StatusBadRequest, "GET", rightHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", wrongKeyHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", onlyKeyHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", nil, nil},
-//	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, // TODO:value is necessary
-//	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
-//	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, // TODO:value is necessary
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "DELETE", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil}, // TODO:no resource is right
-//	// TODO:with post data, put data
-//	// TODO:with jwts token
-//}
-//
-//// Test Data for ajax API (When JWT is on, plus jwts)
-//var getUserAPITests3 = []struct {
-//	url     string
-//	code    int
-//	method  string
-//	headers []map[string]string
-//	err     error
-//}{
-//	// with jwts token
-//	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, // TODO:no resource is right
-//	// TODO:with post data, put data
-//}
 
 func setup() {
 	// this code is related to main() in main.go
@@ -711,7 +633,85 @@ func TestJWTAPIRequest(t *testing.T) {
 	}
 }
 
-//func TestGetUserAPIRequestOnTable(t *testing.T) {
+// header
+// keyHeaderWrong   = map[string]string{"X-Custom-Header-Gin": "mistake"}
+// basicAuthHeaders = map[string]string{"Authorization": "Basic d2ViOnRlc3Q="}
+// jwtAuth          = map[string]string{"Authorization": "Bearer %s"}
+// rightHeaders = []map[string]string{ajaxHeader, keyHeader}
+// wrongKeyHeaders = []map[string]string{ajaxHeader, keyHeaderWrong}
+// onlyAjaxHeaders = []map[string]string{ajaxHeader}
+// onlyKeyHeaders  = []map[string]string{keyHeader}
+// rightHeadersWithJWT = []map[string]string{ajaxHeader, keyHeader, jwtAuth}
+
+// Test Data for ajax API (When JWT is off)
+//var userID = 12
+//
+//var getUserAPITests = []struct {
+//	url     string
+//	code    int
+//	method  string
+//	headers []map[string]string
+//	err     error
+//}{
+//	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
+//	{"/api/users", http.StatusBadRequest, "GET", wrongKeyHeaders, nil},
+//	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
+//	{"/api/users", http.StatusBadRequest, "GET", onlyKeyHeaders, nil},
+//	{"/api/users", http.StatusBadRequest, "GET", nil, nil},
+//	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, // TODO:value is necessary
+//	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
+//	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, // TODO:value is necessary
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, // TODO:no resource is right
+//	// TODO:with post data, put data
+//}
+//
+//// Test Data for ajax API (When JWT is on)
+//var getUserAPITests2 = []struct {
+//	url     string
+//	code    int
+//	method  string
+//	headers []map[string]string
+//	err     error
+//}{
+//	// no jwts token
+//	{"/api/users", http.StatusBadRequest, "GET", rightHeaders, nil},
+//	{"/api/users", http.StatusBadRequest, "GET", wrongKeyHeaders, nil},
+//	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
+//	{"/api/users", http.StatusBadRequest, "GET", onlyKeyHeaders, nil},
+//	{"/api/users", http.StatusBadRequest, "GET", nil, nil},
+//	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, // TODO:value is necessary
+//	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
+//	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, // TODO:value is necessary
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "DELETE", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "GET", rightHeaders, nil}, // TODO:no resource is right
+//	// TODO:with post data, put data
+//	// TODO:with jwts token
+//}
+//
+//// Test Data for ajax API (When JWT is on, plus jwts)
+//var getUserAPITests3 = []struct {
+//	url     string
+//	code    int
+//	method  string
+//	headers []map[string]string
+//	err     error
+//}{
+//	// with jwts token
+//	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
+//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, // TODO:no resource is right
+//	// TODO:with post data, put data
+//}
+
+//func TestGetUserAPIRequest(t *testing.T) {
 //	t.SkipNow()
 //
 //	// request
