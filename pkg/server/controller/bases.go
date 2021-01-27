@@ -1,13 +1,12 @@
 package controller
 
 import (
-	"go.uber.org/zap"
 	"net/http"
 
-	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginctx"
-
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
+	"github.com/hiromaily/go-gin-wrapper/pkg/server/ginctx"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/response/html"
 )
 

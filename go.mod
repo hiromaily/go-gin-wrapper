@@ -7,6 +7,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/DeanThompson/ginpprof v0.0.0-20201112072838-007b1e56b2e1
+	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.10.0
