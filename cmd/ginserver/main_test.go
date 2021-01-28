@@ -26,10 +26,7 @@ import (
 	"github.com/hiromaily/go-gin-wrapper/pkg/token"
 )
 
-var (
-	loginReferer string
-	errRedirect  = errors.New("redirect")
-)
+var errRedirect = errors.New("redirect")
 
 func setup() {
 	flag.Parse()
@@ -49,6 +46,20 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+func getloginReferer() (string, error) {
+	// config
+	conf, err := config.GetEnvConf()
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf(
+		"http://%s:%d/login",
+		conf.Server.Host,
+		conf.Server.Port,
+	), nil
+}
+
 func getServer() (*gin.Engine, error) {
 	// this code is related to main() in main.go
 
@@ -62,12 +73,6 @@ func getServer() (*gin.Engine, error) {
 	if *portNum != 0 {
 		conf.Server.Port = *portNum
 	}
-
-	// Referer for test
-	loginReferer = fmt.Sprintf(
-		"http://%s:%d/login",
-		conf.Server.Host,
-		conf.Server.Port)
 
 	// server
 	regi := NewRegistry(conf, true) // run as test mode
@@ -249,9 +254,15 @@ func TestGetRequest(t *testing.T) {
 }
 
 func TestLoginRequest(t *testing.T) {
+	loginReferer, err := getloginReferer()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	contentType := map[string]string{"Content-Type": "application/x-www-form-urlencoded"}
 	referer := map[string]string{"Referer": loginReferer}
 	loginHeaders := []map[string]string{contentType, referer}
+
 	type args struct {
 		url     string
 		method  string
@@ -270,22 +281,6 @@ func TestLoginRequest(t *testing.T) {
 		args args
 		want want
 	}{
-		//{
-		//	name: "access login page",
-		//	args: args{
-		//		url: "/login",
-		//		method: "GET",
-		//		headers: nil,
-		//		email: "",
-		//		pass: "",
-		//		isToken: false,
-		//	},
-		//	want: want{
-		//		statusCode: http.StatusOK,
-		//		nextPage: "",
-		//		err: nil,
-		//	},
-		//},
 		{
 			name: "access login page without email, password",
 			args: args{
@@ -436,11 +431,13 @@ func TestLoginRequest(t *testing.T) {
 			}
 			if tt.args.method == "POST" {
 				postData = createPostData(tt.args.email, tt.args.pass, ginToken)
+				t.Logf("postData: %v", postData)
 			}
 
 			req, _ := http.NewRequest(tt.args.method, fmt.Sprintf("%s%s", ts.URL, tt.args.url), bytes.NewBuffer([]byte(postData.Encode())))
 			if tt.args.headers != nil {
 				httpheader.SetHTTPHeaders(req, tt.args.headers)
+				httpheader.Debug(req)
 			}
 			// request
 			res, err := client.Do(req)

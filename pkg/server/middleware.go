@@ -319,7 +319,7 @@ func (m *middleware) validateReferer(ctx *gin.Context, pageFrom string) error {
 	)
 
 	if referer != ctx.Request.Referer() {
-		return errors.New("Referer is invalid")
+		return errors.Errorf("Referer is invalid: actual: %s, want: %s", ctx.Request.Referer(), referer)
 	}
 	return nil
 }

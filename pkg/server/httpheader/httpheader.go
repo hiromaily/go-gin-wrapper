@@ -36,8 +36,8 @@ func SetHTTPHeaders(req *http.Request, headers []map[string]string) {
 	}
 }
 
-// DebugHTTPHeader debugs http request headers
-func DebugHTTPHeader(req *http.Request) error {
+// Debug debugs http request headers
+func Debug(req *http.Request) error {
 	dumped, err := httputil.DumpRequestOut(req, true)
 	if err != nil {
 		return err

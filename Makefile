@@ -148,6 +148,10 @@ user-db-test: setup-testdb
 get-req-test: setup-testdb
 	go test -race -tags=integration -run TestGetRequest -v ./cmd/ginserver/...
 
+.PHONY: login-req-test
+login-req-test: setup-testdb
+	go test -race -tags=integration -run TestLoginRequest -v ./cmd/ginserver/...
+
 
 #.PHONY: setup-testdb
 #setup-testdb:
