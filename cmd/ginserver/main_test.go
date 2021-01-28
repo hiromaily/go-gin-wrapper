@@ -1,4 +1,4 @@
-// +build notfixintegration
+// +build integration
 
 package main
 
@@ -27,38 +27,12 @@ import (
 )
 
 var (
-	r           *gin.Engine
-	errRedirect = errors.New("redirect")
-	referer     string
+	loginReferer string
+	errRedirect  = errors.New("redirect")
 )
 
 func setup() {
-	// this code is related to main() in main.go
 	flag.Parse()
-
-	// config
-	conf, err := config.NewConfig(*tomlPath, *isEncrypted)
-	if err != nil {
-		panic(err)
-	}
-
-	// overwrite config by args
-	if *portNum != 0 {
-		conf.Server.Port = *portNum
-	}
-
-	// Referer for test
-	referer = fmt.Sprintf(
-		"http://%s:%d/login",
-		conf.Server.Host,
-		conf.Server.Port)
-
-	// server
-	regi := NewRegistry(conf, true) // run as test mode
-	server := regi.NewServer()
-	if r, err = server.Start(); err != nil {
-		panic(err)
-	}
 }
 
 func teardown() {
@@ -75,6 +49,31 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+func getServer() (*gin.Engine, error) {
+	// this code is related to main() in main.go
+
+	// config
+	conf, err := config.GetEnvConf()
+	if err != nil {
+		return nil, err
+	}
+
+	// overwrite config by args
+	if *portNum != 0 {
+		conf.Server.Port = *portNum
+	}
+
+	// Referer for test
+	loginReferer = fmt.Sprintf(
+		"http://%s:%d/login",
+		conf.Server.Host,
+		conf.Server.Port)
+
+	// server
+	regi := NewRegistry(conf, true) // run as test mode
+	return regi.NewServer().Start()
+}
+
 func createPostData(email, pass, ginToken string) url.Values {
 	data := make(url.Values)
 
@@ -87,8 +86,6 @@ func createPostData(email, pass, ginToken string) url.Values {
 }
 
 func TestGetRequest(t *testing.T) {
-	t.SkipNow()
-
 	basicAuthHeaders := map[string]string{"Authorization": "Basic d2ViOnRlc3Q="}
 
 	type args struct {
@@ -199,14 +196,18 @@ func TestGetRequest(t *testing.T) {
 		},
 	}
 
-	// request
-	ts := httptest.NewServer(r)
+	ginEngine, err := getServer()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ts := httptest.NewServer(ginEngine)
 	defer ts.Close()
 
 	client := &http.Client{
 		Timeout: time.Duration(3) * time.Second,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return errors.New("redirect")
+			return errRedirect
 		},
 	}
 
@@ -248,11 +249,9 @@ func TestGetRequest(t *testing.T) {
 }
 
 func TestLoginRequest(t *testing.T) {
-	t.SkipNow()
-
 	contentType := map[string]string{"Content-Type": "application/x-www-form-urlencoded"}
-	refererLogin := map[string]string{"Referer": referer}
-	loginHeaders := []map[string]string{contentType, refererLogin}
+	referer := map[string]string{"Referer": loginReferer}
+	loginHeaders := []map[string]string{contentType, referer}
 	type args struct {
 		url     string
 		method  string
@@ -401,15 +400,19 @@ func TestLoginRequest(t *testing.T) {
 		},
 	}
 
-	// request
-	ts := httptest.NewServer(r)
+	ginEngine, err := getServer()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ts := httptest.NewServer(ginEngine)
 	defer ts.Close()
 
 	jar, _ := cookiejar.New(nil) // cookie
 	client := &http.Client{
 		Timeout: time.Duration(3) * time.Second,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return errors.New("redirect")
+			return errRedirect
 		},
 		Jar: jar,
 	}
@@ -579,15 +582,19 @@ func TestJWTAPIRequest(t *testing.T) {
 		},
 	}
 
-	// request
-	ts := httptest.NewServer(r)
+	ginEngine, err := getServer()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ts := httptest.NewServer(ginEngine)
 	defer ts.Close()
 
 	jar, _ := cookiejar.New(nil) // cookie
 	client := &http.Client{
 		Timeout: time.Duration(3) * time.Second,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return errors.New("redirect")
+			return errRedirect
 		},
 		Jar: jar,
 	}
@@ -721,7 +728,7 @@ func TestJWTAPIRequest(t *testing.T) {
 //	client := &http.Client{
 //		Timeout: time.Duration(3) * time.Second,
 //		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-//			return errors.New("redirect")
+//			return errRedirect
 //		},
 //	}
 //

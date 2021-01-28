@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/boil"
 	"go.uber.org/zap"
 
@@ -147,16 +146,17 @@ func (r *registry) newJWT() jwts.JWTer {
 	if r.jwter == nil {
 		auth := r.conf.API.JWT
 		var signAlgo jwts.SigAlgoer
-		if auth.Mode == jwts.HMAC && auth.Secret != "" {
+		if auth.Mode == jwts.AlgoHMAC && auth.Secret != "" {
 			signAlgo = jwts.NewHMAC(auth.Secret)
-		} else if auth.Mode == jwts.RSA && auth.PrivateKey != "" && auth.PublicKey != "" {
+		} else if auth.Mode == jwts.AlgoRSA && auth.PrivateKey != "" && auth.PublicKey != "" {
 			var err error
 			signAlgo, err = jwts.NewRSA(auth.PrivateKey, auth.PublicKey)
 			if err != nil {
 				panic(err)
 			}
 		} else {
-			panic(errors.New("invalid jwt config"))
+			// panic(errors.New("invalid jwt config"))
+			return nil
 		}
 		r.jwter = jwts.NewJWT(auth.Audience, signAlgo)
 	}

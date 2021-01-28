@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwts"
 	"github.com/hiromaily/go-gin-wrapper/pkg/reverseproxy/types"
 )
 
@@ -108,11 +109,11 @@ type Header struct {
 
 // JWT is JWT Auth property
 type JWT struct {
-	Mode       uint8  `toml:"mode" validate:"lte=3"` // 0:off, 1:HMAC, 2:RSA
-	Audience   string `toml:"audience" validate:"required"`
-	Secret     string `toml:"secret_code"`
-	PrivateKey string `toml:"private_key"`
-	PublicKey  string `toml:"public_key"`
+	Mode       jwts.JWTAlgo `toml:"mode" validate:"oneof=no hmac rsa"`
+	Audience   string       `toml:"audience" validate:"required"`
+	Secret     string       `toml:"secret_code"`
+	PrivateKey string       `toml:"private_key"`
+	PublicKey  string       `toml:"public_key"`
 }
 
 // Auth is authentication property for OAuth2

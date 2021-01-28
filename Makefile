@@ -144,6 +144,10 @@ integration-test: setup-testdb
 user-db-test: setup-testdb
 	go test -race -tags=integration -v ./pkg/repository/...
 
+.PHONY: get-req-test
+get-req-test: setup-testdb
+	go test -race -tags=integration -run TestGetRequest -v ./cmd/ginserver/...
+
 
 #.PHONY: setup-testdb
 #setup-testdb:

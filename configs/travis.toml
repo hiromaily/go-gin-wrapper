@@ -66,8 +66,8 @@ header = "X-Custom-Header-Gin"
 key = "key12345"
 
 [api.jwt]
-mode = 0   #0:off, 1:HMAC, 2:RSA
-audience = "hiromaily.com"
+mode = "no" # no, hmac, rsa
+audience = "go-gin.com"
 secret_code = "secret1234567890"
 private_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/test/rsakey/jwttest_rsa"
 public_key = "/home/travis/gopath/src/github.com/hiromaily/go-gin-wrapper/test/rsakey/jwttest_rsa.pub"

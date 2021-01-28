@@ -9,11 +9,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+// JWTAlgo is JWT encryption algorism
+type JWTAlgo string
+
 const (
-	// HMAC signing algorithm
-	HMAC uint8 = 1
-	// RSA signing algorithm
-	RSA uint8 = 2
+	// AlgoNO doesn't use jwt itself
+	AlgoNO JWTAlgo = "no"
+	// AlgoHMAC is HMAC signing algorithm
+	AlgoHMAC JWTAlgo = "hmac"
+	// AlgoRSA is RSA signing algorithm
+	AlgoRSA JWTAlgo = "rsa"
 )
 
 // CustomClaims is jwt claim
@@ -175,7 +180,7 @@ type SigAlgoer interface {
 // HMAC
 // ----------------------------------------------------------------------------
 type algoHMAC struct {
-	encrypted uint8
+	encrypted JWTAlgo
 	method    jwt.SigningMethod
 	secret    string
 }
@@ -183,7 +188,7 @@ type algoHMAC struct {
 // NewHMAC returns SigAlgoer
 func NewHMAC(secret string) SigAlgoer {
 	return &algoHMAC{
-		encrypted: HMAC,
+		encrypted: AlgoHMAC,
 		method:    jwt.SigningMethodHS256,
 		secret:    secret,
 	}
@@ -214,7 +219,7 @@ func (a *algoHMAC) GetKey() interface{} {
 // RSA
 // ----------------------------------------------------------------------------
 type algoRSA struct {
-	encrypted  uint8
+	encrypted  JWTAlgo
 	method     jwt.SigningMethod
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey
@@ -232,7 +237,7 @@ func NewRSA(privKey, pubKey string) (SigAlgoer, error) {
 	}
 
 	return &algoRSA{
-		encrypted:  RSA,
+		encrypted:  AlgoRSA,
 		method:     jwt.SigningMethodRS256,
 		privateKey: privKeyParsed,
 		publicKey:  pubKeyParsed,
