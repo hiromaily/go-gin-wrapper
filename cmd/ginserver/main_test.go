@@ -372,7 +372,7 @@ func TestLoginRequest(t *testing.T) {
 				isToken: false,
 			},
 			want: want{
-				statusCode: http.StatusOK,
+				statusCode: http.StatusBadRequest,
 				nextPage:   "",
 				err:        nil,
 			},
