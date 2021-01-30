@@ -71,8 +71,8 @@ key = "key12345"
 mode = "hmac" # hmac, rsa
 audience = "go-gin.com"
 secret_code = "secret1234567890"
-private_key = "./test/rsakey/jwttest_rsa"
-public_key = "./test/rsakey/jwttest_rsa.pub"
+private_key = "/set-absolute-path/test/rsakey/jwttest_rsa"
+public_key = "/set-absolute-path/test/rsakey/jwttest_rsa.pub"
 
 #------------------------------------------------------------------------------
 # Auth

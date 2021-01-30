@@ -584,21 +584,21 @@ func TestJWTAPIRequest(t *testing.T) {
 				err:        nil,
 			},
 		},
-		//{
-		//	name: "happy path: auth mode `rsa`",
-		//	args: args{
-		//		url:     "/api/jwts",
-		//		method:  "POST",
-		//		headers: jwtHeaders,
-		//		email:   "foobar@gogin.com",
-		//		pass:    "password",
-		//		authMode: jwts.AlgoRSA,
-		//	},
-		//	want: want{
-		//		statusCode: http.StatusOK,
-		//		err:        nil,
-		//	},
-		//},
+		{
+			name: "happy path with rsa",
+			args: args{
+				url:      "/api/jwts",
+				method:   "POST",
+				headers:  jwtHeaders,
+				email:    "foobar@gogin.com",
+				pass:     "password",
+				authMode: jwts.AlgoRSA,
+			},
+			want: want{
+				statusCode: http.StatusOK,
+				err:        nil,
+			},
+		},
 	}
 
 	for _, tt := range tests {
