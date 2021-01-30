@@ -806,19 +806,19 @@ func TestGetUserAPIRequest(t *testing.T) {
 				err:        nil,
 			},
 		},
-		{
-			name: "happy path for DELETE request",
-			args: args{
-				url:     "/api/users/id/1",
-				method:  "DELETE",
-				headers: []map[string]string{ajaxHeader, keyHeader},
-				isJWT:   true,
-			},
-			want: want{
-				statusCode: http.StatusOK,
-				err:        nil,
-			},
-		},
+		//{
+		//	name: "happy path for DELETE request",
+		//	args: args{
+		//		url:     "/api/users/id/1",
+		//		method:  "DELETE",
+		//		headers: []map[string]string{ajaxHeader, keyHeader},
+		//		isJWT:   true,
+		//	},
+		//	want: want{
+		//		statusCode: http.StatusOK,
+		//		err:        nil,
+		//	},
+		//},
 	}
 
 	client, ts, err := getClientServer(jwts.AlgoHMAC, false)
