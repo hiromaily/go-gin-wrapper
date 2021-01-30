@@ -156,6 +156,10 @@ login-req-test: setup-testdb
 jwt-req-test: setup-testdb
 	go test -race -tags=integration -run TestJWTAPIRequest -v ./cmd/ginserver/...
 
+.PHONY: jwt-req-test
+user-req-test: setup-testdb
+	go test -race -tags=integration -run TestGetUserAPIRequest -v ./cmd/ginserver/...
+
 
 #.PHONY: setup-testdb
 #setup-testdb:

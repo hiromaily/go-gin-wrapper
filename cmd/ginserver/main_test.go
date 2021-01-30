@@ -6,10 +6,8 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -472,39 +470,10 @@ func TestLoginRequest(t *testing.T) {
 	}
 }
 
-func getJWTToken(res *http.Response) (string, error) {
-	type ResponseJWT struct {
-		Code  uint8  `json:"code"`
-		Token string `json:"token"`
-	}
-
-	body, _, err := parseBody(res)
-	if err != nil {
-		return "", errors.Wrap(err, "fail to call parseResponse()")
-	}
-
-	var jwt ResponseJWT
-	if err := json.Unmarshal(body, &jwt); err != nil {
-		return "", err
-	}
-	return jwt.Token, nil
-}
-
-// parse response body
-func parseBody(res *http.Response) ([]byte, int, error) {
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, res.StatusCode, err
-	}
-	return body, res.StatusCode, nil
-}
-
 func TestJWTAPIRequest(t *testing.T) {
 	ajaxHeader := map[string]string{"X-Requested-With": "XMLHttpRequest"}
 	keyHeader := map[string]string{"X-Custom-Header-Gin": "key12345"}
 	contentType := map[string]string{"Content-Type": "application/x-www-form-urlencoded"}
-	apiHeaders := []map[string]string{ajaxHeader, keyHeader}
 	jwtHeaders := []map[string]string{ajaxHeader, keyHeader, contentType}
 
 	type args struct {
@@ -544,7 +513,7 @@ func TestJWTAPIRequest(t *testing.T) {
 			args: args{
 				url:      "/api/jwts",
 				method:   "POST",
-				headers:  apiHeaders,
+				headers:  []map[string]string{ajaxHeader, keyHeader},
 				email:    "foobar@gogin.com",
 				pass:     "password",
 				authMode: jwts.AlgoHMAC,
@@ -641,7 +610,7 @@ func TestJWTAPIRequest(t *testing.T) {
 			if res.StatusCode != http.StatusOK {
 				return
 			}
-			if _, err := getJWTToken(res); err != nil {
+			if _, err := jwts.GetJWTResponseToken(res); err != nil {
 				t.Errorf("fail to parse response: %v", err)
 			}
 		})
@@ -661,28 +630,6 @@ func TestJWTAPIRequest(t *testing.T) {
 // Test Data for ajax API (When JWT is off)
 //var userID = 12
 //
-//var getUserAPITests = []struct {
-//	url     string
-//	code    int
-//	method  string
-//	headers []map[string]string
-//	err     error
-//}{
-//	{"/api/users", http.StatusOK, "GET", rightHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", wrongKeyHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", onlyAjaxHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", onlyKeyHeaders, nil},
-//	{"/api/users", http.StatusBadRequest, "GET", nil, nil},
-//	{"/api/users", http.StatusBadRequest, "POST", rightHeaders, nil}, // TODO:value is necessary
-//	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
-//	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, // TODO:value is necessary
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
-//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, // TODO:no resource is right
-//	// TODO:with post data, put data
-//}
 //
 //// Test Data for ajax API (When JWT is on)
 //var getUserAPITests2 = []struct {
@@ -725,6 +672,175 @@ func TestJWTAPIRequest(t *testing.T) {
 //	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, // TODO:no resource is right
 //	// TODO:with post data, put data
 //}
+
+func TestGetUserAPIRequest(t *testing.T) {
+	ajaxHeader := map[string]string{"X-Requested-With": "XMLHttpRequest"}
+	keyHeader := map[string]string{"X-Custom-Header-Gin": "key12345"}
+	wrongKeyHeader := map[string]string{"X-Custom-Header-Gin": "wrong-key"}
+	jwtAuthHeader := map[string]string{"Authorization": "Bearer %s"}
+	// contentType := map[string]string{"Content-Type": "application/x-www-form-urlencoded"}
+	// apiHeaders := []map[string]string{ajaxHeader, keyHeader}
+	// jwtHeaders := []map[string]string{ajaxHeader, keyHeader, contentType}
+
+	// keyHeaderWrong   = map[string]string{"X-Custom-Header-Gin": "mistake"}
+	// basicAuthHeaders = map[string]string{"Authorization": "Basic d2ViOnRlc3Q="}
+	// jwtAuth          = map[string]string{"Authorization": "Bearer %s"}
+	// rightHeaders = []map[string]string{ajaxHeader, keyHeader}
+	// wrongKeyHeaders = []map[string]string{ajaxHeader, keyHeaderWrong}
+
+	//	{"/api/users", http.StatusNotFound, "PUT", rightHeaders, nil},
+	//	{"/api/users", http.StatusNotFound, "DELETE", rightHeaders, nil},
+	//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil},
+	//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusNotFound, "POST", rightHeaders, nil},
+	//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusBadRequest, "PUT", rightHeaders, nil}, // TODO:value is necessary
+	//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "DELETE", rightHeaders, nil},
+	//	{fmt.Sprintf("/api/users/id/%d", userID), http.StatusOK, "GET", rightHeaders, nil}, // TODO:no resource is right
+	//	// TODO:with post data, put data
+	//}
+
+	type args struct {
+		url     string
+		method  string
+		headers []map[string]string
+		isJWT   bool
+	}
+	type want struct {
+		statusCode int
+		err        error
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			name: "happy path with user list",
+			args: args{
+				url:     "/api/users",
+				method:  "GET",
+				headers: []map[string]string{ajaxHeader, keyHeader},
+				isJWT:   true,
+			},
+			want: want{
+				statusCode: http.StatusOK,
+				err:        nil,
+			},
+		},
+		{
+			name: "wrong key http header",
+			args: args{
+				url:     "/api/users",
+				method:  "GET",
+				headers: []map[string]string{ajaxHeader, wrongKeyHeader},
+				isJWT:   true,
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				err:        nil,
+			},
+		},
+		{
+			name: "no key http header",
+			args: args{
+				url:     "/api/users",
+				method:  "GET",
+				headers: []map[string]string{ajaxHeader},
+				isJWT:   true,
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				err:        nil,
+			},
+		},
+		{
+			name: "no ajax http header",
+			args: args{
+				url:     "/api/users",
+				method:  "GET",
+				headers: []map[string]string{keyHeader},
+				isJWT:   true,
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				err:        nil,
+			},
+		},
+		{
+			name: "no http header",
+			args: args{
+				url:     "/api/users",
+				method:  "GET",
+				headers: nil,
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				err:        nil,
+			},
+		},
+		{
+			name: "wrong method", // TODO:value is required
+			args: args{
+				url:     "/api/users",
+				method:  "POST",
+				headers: []map[string]string{ajaxHeader, keyHeader},
+				isJWT:   true,
+			},
+			want: want{
+				statusCode: http.StatusBadRequest,
+				err:        nil,
+			},
+		},
+	}
+
+	client, ts, err := getClientServer(jwts.AlgoHMAC, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ts.Close()
+
+	// get jwt token first
+	postData := createPostData("foobar@gogin.com", "password", "")
+	token, err := jwts.GetJWTToken(client, fmt.Sprintf("%s%s", ts.URL, "/api/jwts"), postData)
+	if err != nil {
+		t.Fatal(err)
+	}
+	jwtAuthHeader["Authorization"] = fmt.Sprintf(jwtAuthHeader["Authorization"], token)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Logf("[%s] %s %s", tt.name, tt.args.method, tt.args.url)
+
+			req, _ := http.NewRequest(tt.args.method, fmt.Sprintf("%s%s", ts.URL, tt.args.url), nil)
+			if tt.args.headers != nil {
+				httpheader.SetHTTPHeaders(req, tt.args.headers)
+			}
+			if tt.args.isJWT {
+				httpheader.SetHTTPHeaders(req, []map[string]string{jwtAuthHeader})
+			}
+
+			// request
+			res, err := client.Do(req)
+			defer func() {
+				if res.Body != nil {
+					res.Body.Close()
+				}
+			}()
+
+			// handle response
+			urlError, isURLErr := err.(*url.Error)
+			if isURLErr && urlError.Err.Error() != tt.want.err.Error() {
+				t.Errorf("%s request: actual error: %v, want error: %v", tt.args.url, err, tt.want.err)
+				return
+			}
+			if err != nil {
+				return
+			}
+			if res.StatusCode != tt.want.statusCode {
+				t.Errorf("%s request: actual status code: %v, want: %v", tt.args.url, res.StatusCode, tt.want.statusCode)
+			}
+		})
+	}
+}
 
 //func TestGetUserAPIRequest(t *testing.T) {
 //	t.SkipNow()

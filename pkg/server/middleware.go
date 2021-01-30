@@ -390,10 +390,14 @@ func (m *middleware) CheckHTTPHeader() gin.HandlerFunc {
 
 		// TODO: when preflight request, `X-Requested-With` may be not sent
 		// TODO: all cors requests should not include `X-Requested-With`
-		if ctx.Request.Method != "OPTIONS" {
+		if ctx.Request.Method == "OPTIONS" {
 			ctx.Next()
 			return
 		}
+		m.logger.Debug("debug",
+			zap.Bool("m.apiConf.Ajax", m.apiConf.Ajax),
+			zap.Bool("!m.isXHR(ctx)", m.isXHR(ctx)),
+		)
 		if m.apiConf.Ajax && !m.isXHR(ctx) {
 			m.logger.Error("Ajax request is required")
 			ctx.AbortWithStatus(http.StatusBadRequest)
