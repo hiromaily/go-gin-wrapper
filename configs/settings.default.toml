@@ -68,9 +68,9 @@ header = "X-Custom-Header-Gin"
 key = "key12345"
 
 [api.jwt]
-mode = "no" # no, hmac, rsa
+mode = "hmac" # hmac, rsa
 audience = "go-gin.com"
-secret_code = ""
+secret_code = "secret1234567890"
 private_key = "./test/rsakey/jwttest_rsa"
 public_key = "./test/rsakey/jwttest_rsa.pub"
 

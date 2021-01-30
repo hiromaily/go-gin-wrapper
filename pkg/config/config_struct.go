@@ -109,7 +109,7 @@ type Header struct {
 
 // JWT is JWT Auth property
 type JWT struct {
-	Mode       jwts.JWTAlgo `toml:"mode" validate:"oneof=no hmac rsa"`
+	Mode       jwts.JWTAlgo `toml:"mode" validate:"oneof=hmac rsa"`
 	Audience   string       `toml:"audience" validate:"required"`
 	Secret     string       `toml:"secret_code"`
 	PrivateKey string       `toml:"private_key"`

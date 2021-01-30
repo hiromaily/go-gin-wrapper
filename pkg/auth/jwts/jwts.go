@@ -13,8 +13,6 @@ import (
 type JWTAlgo string
 
 const (
-	// AlgoNO doesn't use jwt itself
-	AlgoNO JWTAlgo = "no"
 	// AlgoHMAC is HMAC signing algorithm
 	AlgoHMAC JWTAlgo = "hmac"
 	// AlgoRSA is RSA signing algorithm

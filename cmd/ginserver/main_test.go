@@ -21,6 +21,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
+	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwts"
 	"github.com/hiromaily/go-gin-wrapper/pkg/config"
 	"github.com/hiromaily/go-gin-wrapper/pkg/server/httpheader"
 	"github.com/hiromaily/go-gin-wrapper/pkg/token"
@@ -60,7 +61,7 @@ func getloginReferer() (string, error) {
 	), nil
 }
 
-func getServer() (*gin.Engine, error) {
+func getServer(authMode jwts.JWTAlgo) (*gin.Engine, error) {
 	// this code is related to main() in main.go
 
 	// config
@@ -73,10 +74,34 @@ func getServer() (*gin.Engine, error) {
 	if *portNum != 0 {
 		conf.Server.Port = *portNum
 	}
+	// overwrite jwt mode
+	conf.API.JWT.Mode = authMode
 
 	// server
 	regi := NewRegistry(conf, true) // run as test mode
 	return regi.NewServer().Start()
+}
+
+func getClientServer(authMode jwts.JWTAlgo, isCookie bool) (*http.Client, *httptest.Server, error) {
+	ginEngine, err := getServer(authMode)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ts := httptest.NewServer(ginEngine)
+	// defer ts.Close()
+
+	client := &http.Client{
+		Timeout: time.Duration(3) * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return errRedirect
+		},
+	}
+	if isCookie {
+		jar, _ := cookiejar.New(nil) // cookie
+		client.Jar = jar
+	}
+	return client, ts, nil
 }
 
 func createPostData(email, pass, ginToken string) url.Values {
@@ -201,20 +226,11 @@ func TestGetRequest(t *testing.T) {
 		},
 	}
 
-	ginEngine, err := getServer()
+	client, ts, err := getClientServer(jwts.AlgoHMAC, false)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	ts := httptest.NewServer(ginEngine)
 	defer ts.Close()
-
-	client := &http.Client{
-		Timeout: time.Duration(3) * time.Second,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return errRedirect
-		},
-	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -395,22 +411,11 @@ func TestLoginRequest(t *testing.T) {
 		},
 	}
 
-	ginEngine, err := getServer()
+	client, ts, err := getClientServer(jwts.AlgoHMAC, true)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	ts := httptest.NewServer(ginEngine)
 	defer ts.Close()
-
-	jar, _ := cookiejar.New(nil) // cookie
-	client := &http.Client{
-		Timeout: time.Duration(3) * time.Second,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return errRedirect
-		},
-		Jar: jar,
-	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -496,8 +501,6 @@ func parseBody(res *http.Response) ([]byte, int, error) {
 }
 
 func TestJWTAPIRequest(t *testing.T) {
-	t.SkipNow()
-
 	ajaxHeader := map[string]string{"X-Requested-With": "XMLHttpRequest"}
 	keyHeader := map[string]string{"X-Custom-Header-Gin": "key12345"}
 	contentType := map[string]string{"Content-Type": "application/x-www-form-urlencoded"}
@@ -505,12 +508,12 @@ func TestJWTAPIRequest(t *testing.T) {
 	jwtHeaders := []map[string]string{ajaxHeader, keyHeader, contentType}
 
 	type args struct {
-		url     string
-		method  string
-		headers []map[string]string
-		email   string
-		pass    string
-		// authMode int  //TODO: how to handle // 0:off, 1:HMAC, 2:RSA
+		url      string
+		method   string
+		headers  []map[string]string
+		email    string
+		pass     string
+		authMode jwts.JWTAlgo // TODO: how to handle // no, hmac, rsa
 	}
 	type want struct {
 		statusCode int
@@ -524,11 +527,12 @@ func TestJWTAPIRequest(t *testing.T) {
 		{
 			name: "wrong method",
 			args: args{
-				url:     "/api/jwts",
-				method:  "GET",
-				headers: jwtHeaders,
-				email:   "foobar@gogin.com",
-				pass:    "password",
+				url:      "/api/jwts",
+				method:   "GET",
+				headers:  jwtHeaders,
+				email:    "foobar@gogin.com",
+				pass:     "password",
+				authMode: jwts.AlgoHMAC,
 			},
 			want: want{
 				statusCode: http.StatusNotFound,
@@ -538,11 +542,12 @@ func TestJWTAPIRequest(t *testing.T) {
 		{
 			name: "http header without Authorization",
 			args: args{
-				url:     "/api/jwts",
-				method:  "POST",
-				headers: apiHeaders,
-				email:   "foobar@gogin.com",
-				pass:    "password",
+				url:      "/api/jwts",
+				method:   "POST",
+				headers:  apiHeaders,
+				email:    "foobar@gogin.com",
+				pass:     "password",
+				authMode: jwts.AlgoHMAC,
 			},
 			want: want{
 				statusCode: http.StatusBadRequest,
@@ -552,11 +557,12 @@ func TestJWTAPIRequest(t *testing.T) {
 		{
 			name: "password is wrong",
 			args: args{
-				url:     "/api/jwts",
-				method:  "POST",
-				headers: jwtHeaders,
-				email:   "foobar@gogin.com",
-				pass:    "wrong-password",
+				url:      "/api/jwts",
+				method:   "POST",
+				headers:  jwtHeaders,
+				email:    "foobar@gogin.com",
+				pass:     "wrong-password",
+				authMode: jwts.AlgoHMAC,
 			},
 			want: want{
 				statusCode: http.StatusBadRequest,
@@ -564,41 +570,46 @@ func TestJWTAPIRequest(t *testing.T) {
 			},
 		},
 		{
-			name: "happy path",
+			name: "happy path with hmac",
 			args: args{
-				url:     "/api/jwts",
-				method:  "POST",
-				headers: jwtHeaders,
-				email:   "foobar@gogin.com",
-				pass:    "password",
+				url:      "/api/jwts",
+				method:   "POST",
+				headers:  jwtHeaders,
+				email:    "foobar@gogin.com",
+				pass:     "password",
+				authMode: jwts.AlgoHMAC,
 			},
 			want: want{
-				statusCode: http.StatusBadRequest,
+				statusCode: http.StatusOK,
 				err:        nil,
 			},
 		},
-	}
-
-	ginEngine, err := getServer()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ts := httptest.NewServer(ginEngine)
-	defer ts.Close()
-
-	jar, _ := cookiejar.New(nil) // cookie
-	client := &http.Client{
-		Timeout: time.Duration(3) * time.Second,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return errRedirect
-		},
-		Jar: jar,
+		//{
+		//	name: "happy path: auth mode `rsa`",
+		//	args: args{
+		//		url:     "/api/jwts",
+		//		method:  "POST",
+		//		headers: jwtHeaders,
+		//		email:   "foobar@gogin.com",
+		//		pass:    "password",
+		//		authMode: jwts.AlgoRSA,
+		//	},
+		//	want: want{
+		//		statusCode: http.StatusOK,
+		//		err:        nil,
+		//	},
+		//},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Logf("[%s] %s %s", tt.name, tt.args.method, tt.args.url)
+
+			client, ts, err := getClientServer(tt.args.authMode, true)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer ts.Close()
 
 			postData := createPostData(tt.args.email, tt.args.pass, "")
 

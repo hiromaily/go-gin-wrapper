@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/hiromaily/go-gin-wrapper/pkg/auth/jwts"
 )
 
 // setRouter is mapper for request path and handler
@@ -114,9 +112,7 @@ func (s *server) setJWTRouter(r *gin.Engine) {
 func (s *server) setUserRouter(r *gin.Engine) {
 	// additional middleware handler
 	preHandlers := []gin.HandlerFunc{s.middleware.CheckHTTPHeader()}
-	if s.apiConf.JWT.Mode != jwts.AlgoNO {
-		preHandlers = append(preHandlers, s.middleware.CheckJWT())
-	}
+	preHandlers = append(preHandlers, s.middleware.CheckJWT())
 	if s.apiConf.CORS.Enabled {
 		preHandlers = append(preHandlers, s.middleware.CheckCORS())
 	}

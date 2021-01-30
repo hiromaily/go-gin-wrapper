@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/boil"
 	"go.uber.org/zap"
 
@@ -155,8 +156,7 @@ func (r *registry) newJWT() jwts.JWTer {
 				panic(err)
 			}
 		} else {
-			// panic(errors.New("invalid jwt config"))
-			return nil
+			panic(errors.New("invalid jwt config"))
 		}
 		r.jwter = jwts.NewJWT(auth.Audience, signAlgo)
 	}
