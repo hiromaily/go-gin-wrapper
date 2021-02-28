@@ -19,6 +19,7 @@ Now it's under `refactoring`.
 - [ ] refactoring code by [The Second Edition of "Refactoring"](https://martinfowler.com/articles/refactoring-2nd-ed.html)
 - [ ] refactoring code by [codebeat.co](https://codebeat.co/projects/github-com-hiromaily-go-gin-wrapper-master/ratings)
 - [ ] change architecture like Clean Architecture
+  - [ ] make UI adaptable like WEB to CUI
 - [ ] fix session functionality
 - [x] remove any dependencies from [hiromaily/golibs](https://github.com/hiromaily/golibs)
   - [x] use [sqlboiler](https://github.com/volatiletech/sqlboiler) as ORM
@@ -27,7 +28,7 @@ Now it's under `refactoring`.
 - [x] add zap logger
 - [x] add graceful shutdown
 - [x] refactoring jwt package  
-- [ ] fix main_test
+- [x] fix main_test
 - [x] unittest by table driven test
 - [x] clean up variable, func name
 - [x] clean up comments

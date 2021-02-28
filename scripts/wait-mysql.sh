@@ -1,7 +1,7 @@
 #!/bin/sh
 # wait_mysql.sh
 
-#command: ["./wait_mysql.sh", "mysql", "/go/bin/api", "--host", "0.0.0.0", "--port", "8081", "--config", "config/example.yml"]
+#command: ["./wait_mysql.sh", "127.0.0.1", "3306", "/go/bin/api", "--host", "0.0.0.0", "--port", "8081", "--config", "config/example.yml"]
 set -e
 
 host="$1"

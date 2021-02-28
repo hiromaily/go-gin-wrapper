@@ -170,33 +170,6 @@ user-req-test: setup-testdb
 #	export DB_PASS=root &&\
 #	sh ./scripts/create-test-db.sh
 
-#.PHONY: maintest
-#maintest:
-#	# Execute
-#	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
-#	-f ../../configs/settings.toml -crypto -om 0
-#
-#	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
-#	-run "TestGetUserAPIRequestOnTable" \
-#	-f ../../configs/settings.toml -crypto -om 1
-#
-#	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
-#	-run "TestGetUserAPIRequestOnTable" \
-#	-f ../../configs/settings.toml -crypto -om 2
-#
-#	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
-#	-run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
-#	-f ../../configs/settings.toml -crypto -om 1
-#
-#	go test -v -covermode=count -coverprofile=profile.cov cmd/ginserver/*.go \
-#	-run "TestGetJwtAPIRequestOnTable|TestGetUserAPIRequestOnTable" \
-#	-f ../../configs/settings.toml -crypto -om 2
-#
-#.PHONY: test-quick
-#test-quick:
-#	go test -run TestLogin -v cmd/ginserver/*.go -f ../../configs/settings.toml -crypto
-
-
 ###############################################################################
 # httpie
 #

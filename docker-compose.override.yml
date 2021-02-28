@@ -29,4 +29,4 @@ services:
     stdin_open: true
     tty: true
     #command: realize start
-    command: ./scripts/wait-mysql.sh mysql realize start
+    command: ./scripts/wait-mysql.sh 127.0.0.1 13306 realize start

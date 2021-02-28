@@ -38,7 +38,7 @@ CREATE TABLE `t_user` (
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'mail address',
   `password` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT 'password',
   `oauth2_type` tinyint(2) UNSIGNED NOT NULL DEFAULT 0 COMMENT'oauth2 type, google, facebook',
-  `delete_flg` char(1) COLLATE utf8_unicode_ci DEFAULT '0' COMMENT 'delete flg',
+  `delete_flg` char(1) COLLATE utf8_unicode_ci DEFAULT '0' COMMENT 'delete flag',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'created date',
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'updated date',
   PRIMARY KEY (`id`),
