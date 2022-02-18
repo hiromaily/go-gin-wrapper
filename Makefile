@@ -62,15 +62,15 @@ lint:
 ###############################################################################
 .PHONY: build
 build:
-	go build -i -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
+	go build -v -o ${GOPATH}/bin/ginserver ./cmd/ginserver/
 
 .PHONY: build-proxy
 build-proxy:
-	go build -i -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
+	go build -v -o ${GOPATH}/bin/reverseproxy ./cmd/reverseproxy/
 
 .PHONY: build-swg
 build-swg:
-	go build -i -v -o ${GOPATH}/bin/swgserver ./swagger/go-swagger/cmd/swagger-server/
+	go build -v -o ${GOPATH}/bin/swgserver ./swagger/go-swagger/cmd/swagger-server/
 
 
 ###############################################################################
