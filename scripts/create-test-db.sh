@@ -42,3 +42,12 @@ expect -c "
     send \"${DB_PASS}\n\"
     interact
     "
+
+# could be replaced like for `https://serverfault.com/questions/177135/expect-script-wait-command-hangs`
+#expect -c "
+#    set timeout 30
+#    spawn sh -c \"mysql -u${DB_USER} -p -h${DB_HOST} ${DB_NAME} -P${DB_PORT:-3306} < ${SQL_DIR}/data_${DB_NAME}.sql\"
+#    expect \"Enter password:\"
+#    send \"${DB_PASS}\r\"
+#    expect EOF
+#    "
